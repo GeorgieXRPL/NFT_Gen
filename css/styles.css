@@ -1,0 +1,4987 @@
+:root {
+  --bg-primary: #000000; /* Changed from #0f0f13 to full black */
+  --bg-secondary: #111111; /* Changed from #1a1a23 to full black */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0b0;
+  --accent-primary: #6c5ce7;
+  --accent-secondary: #a29bfe;
+  --button-hover: #5649c0;
+  --border-color: #2d2d3a;
+  --success-color: #00b894;
+  --warning-color: #fdcb6e;
+  --danger-color: #ff7675;
+  --icon-size: 20px;
+  --trait-header-odd: #493da1; /* Purple tone for odd trait headers */
+  --trait-header-even: #2a235d; /* Darker purple tone for even trait headers */
+  --trait-header-odd-hover: #544ab2; /* Hover color for odd trait headers */
+  --trait-header-even-hover: #352c74; /* Hover color for even trait headers */
+  --rule-header-odd: #3a2e8c; /* Darker purple for odd rule headers */
+  --rule-header-even: #231d4d; /* Even darker purple for even rule headers */
+  --rule-header-odd-hover: #463799; /* Hover color for odd rule headers */
+  --rule-header-even-hover: #2d2661; /* Hover color for even rule headers */
+
+  /* Rarity color scheme */
+  --rarity-common: #00b894; /* Green - Common (high percentage) */
+  --rarity-uncommon: #00cec9; /* Teal - Uncommon */
+  --rarity-rare: #6c5ce7; /* Purple - Rare */
+  --rarity-very-rare: #e84393; /* Pink - Very rare */
+  --rarity-extremely-rare: #ff7675; /* Red - Extremely rare (low percentage) */
+
+  /* Font family variables */
+  --font-family: "Archivo", sans-serif;
+  --font-weight-thin: 100;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Slider track colors */
+  --slider-track-bg: #333; /* Background color for slider tracks */
+  --slider-track-border: #444; /* Border color for slider tracks */
+
+  /* Scrollbar colors */
+  --scrollbar-track: #333;
+  --scrollbar-thumb: #555;
+  --scrollbar-thumb-hover: #777;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight-regular);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  padding-right: 20px;
+}
+
+/* Landing Page Styles - Update to match landing-page-consolidated.css */
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Update the title-container style for the landing page */
+.title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+  text-align: right;
+  max-width: 1200px;
+  width: 100%;
+}
+
+/* Update the landing-title style with semibold font */
+.landing-title {
+  font-size: 3.5rem;
+  font-weight: var(--font-weight-semibold);
+  background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Update the landing-byline style with thin font */
+.landing-byline {
+  font-size: 1.2rem;
+  font-weight: var(--font-weight-thin);
+  color: var(--text-secondary);
+  margin-top: -0.5rem;
+}
+
+.landing-description {
+  max-width: 1000px;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Add these styles for the landing page layout */
+.feature-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.feature-item {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feature-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--accent-primary);
+}
+
+.feature-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* Feature title with semibold font */
+.feature-title {
+  font-size: 1.1rem;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+/* Feature description with regular font */
+.feature-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+/* Adjust button height and padding with medium font weight */
+.btn {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 38px;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.9rem;
+  height: 32px;
+}
+
+/* Adjust icon size in buttons */
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-sm svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--button-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--accent-primary);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(108, 92, 231, 0.1);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #e74c3c;
+}
+
+/* Add these styles for the new buttons */
+
+/* Find the existing button styles for btn-new, btn-load, and btn-save and replace them with these enhanced versions */
+
+.btn-new {
+  border: 2px solid var(--danger-color);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.btn-new:hover {
+  background-color: rgba(255, 118, 117, 0.25); /* Increased opacity from 0.1 to 0.25 */
+  color: #ffffff; /* Brighter text on hover */
+  box-shadow: 0 0 10px rgba(255, 118, 117, 0.5); /* Added glow effect */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+.btn-new svg {
+  color: var(--danger-color);
+  transition: all 0.3s ease;
+}
+
+.btn-new:hover svg {
+  color: #ff9a98; /* Brighter icon on hover */
+}
+
+.btn-load {
+  border: 2px solid #3498db;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.btn-load:hover {
+  background-color: rgba(52, 152, 219, 0.25); /* Increased opacity from 0.1 to 0.25 */
+  color: #ffffff; /* Brighter text on hover */
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5); /* Added glow effect */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+.btn-load svg {
+  color: #3498db;
+  transition: all 0.3s ease;
+}
+
+.btn-load:hover svg {
+  color: #5dade2; /* Brighter icon on hover */
+}
+
+.btn-save {
+  border: 2px solid var(--success-color);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+  background-color: rgba(0, 184, 148, 0.25); /* Increased opacity from 0.1 to 0.25 */
+  color: #ffffff; /* Brighter text on hover */
+  box-shadow: 0 0 10px rgba(0, 184, 148, 0.5); /* Added glow effect */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+.btn-save svg {
+  color: var(--success-color);
+  transition: all 0.3s ease;
+}
+
+.btn-save:hover svg {
+  color: #1dd1a1; /* Brighter icon on hover */
+}
+
+/* Add these styles for fixed navigation */
+.nav-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1000 !important;
+  background: #000 !important;
+  display: block !important;
+  border-bottom: none !important;
+}
+
+.nav-header, .nav-tabs-container, .nav-actions {
+  background: #000 !important;
+  z-index: 999999 !important;
+}
+
+.content-area {
+  position: relative !important;
+  overflow-y: visible !important;
+  height: auto !important;
+  /* padding-top moved to main.css for consistency */
+  margin-top: 110px !important;
+  display: block !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+/* Use browser's native scrollbar - no custom styling to avoid duplicates */
+
+.tab-content, #traits-rules, #generate-nfts, #general-info, #generate-metadata, #export-nfts {
+  /* padding-top moved to main.css for consistency */
+  margin-top: 0 !important;
+  z-index: auto !important;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.tab-content:not(.active) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Only floating UI should have z-index: 9999 */
+.modal, .modal-overlay, .tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip, .feedback-message, .feedback-fixed-position, .fixed-notification-container {
+  z-index: 9999 !important;
+}
+
+/* Notifications z-index moved to final-overrides.css for highest priority */
+
+/* Remove z-index from main content containers */
+.tab-content, .traits-section, .rules-section, .trait-layer-bar, .trait-layer-header, .trait-item, .trait-layer-content, .combination-rule-modal {
+  z-index: auto !important;
+}
+
+/* Remove display: none from nav-container/content-area */
+.nav-container, .content-area {
+  display: block !important;
+}
+
+/* Update the nav-header style to ensure full black background coverage */
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  background-color: #000000; /* Ensure black background */
+  width: 100%; /* Make sure it spans the full width */
+  border: none;
+  border-bottom: none; /* Explicitly remove bottom border */
+}
+
+.nav-logo {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent-primary);
+}
+
+/* Update the nav-header-content style */
+.nav-header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  background-color: #000000; /* Ensure black background */
+  z-index: 10; /* Ensure it's above other elements */
+}
+
+.nav-title {
+  font-size: 62.4px !important;
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent-primary);
+  letter-spacing: -3px; /* Added to reduce text spacing by 3 pixels */
+}
+
+.nav-byline {
+  font-size: 1.2rem; /* Increased from 0.9rem */
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  margin-top: -0.25rem;
+}
+
+/* Update the nav-tabs and buttons layout */
+.nav-tabs {
+  display: flex !important;
+  overflow: hidden; /* Change from overflow-x: auto to overflow: hidden */
+  border-bottom: none;
+  border-top: none; /* Explicitly remove top border */
+  flex: 1;
+  background-color: #000000; /* Added full black background */
+  border: 3px solid #000 !important;
+  width: 720px;
+  max-width: 720px;
+  height: 50px !important; /* Ensure consistent height */
+  align-items: center !important; /* Ensure vertical centering */
+}
+
+/* Add this new style to hide scrollbars specifically for the navigation container */
+.nav-tabs-container {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  border-bottom: none;
+  border-top: none; /* Explicitly remove top border */
+  overflow: hidden; /* Ensure no scrolling is possible */
+  background-color: #000000; /* Added full black background */
+  height: 50px !important; /* Fixed height for consistent alignment */
+  width: 100% !important;
+}
+
+/* Update the nav-actions class to ensure no overflow */
+.nav-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-right: 1rem;
+  flex-wrap: nowrap;
+  overflow: visible;
+  background-color: #000000; /* Ensure black background */
+  z-index: 10; /* Ensure it's above other elements */
+  align-items: center; /* Ensure vertical centering */
+}
+
+/* Make the buttons more compact */
+.nav-actions .btn {
+  padding: 0.4rem 0.8rem;
+  white-space: nowrap;
+}
+
+/* Add this to ensure the tabs don't wrap and stay in a single line */
+.nav-tab {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: none !important;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0; /* Prevent tabs from shrinking */
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.nav-tab.active {
+  color: var(--accent-primary);
+  border-bottom: 3px solid var(--accent-primary);
+}
+
+.nav-tab:hover, .nav-tab:hover:not(.active) {
+  background: none !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  filter: none !important;
+  transform: none !important;
+  cursor: pointer !important;
+  transition: none !important; /* Remove transition to prevent hover animations */
+}
+
+/* Remove all hover animations for Generate NFTs tab specifically */
+.nav-tab[data-tab="generate-nfts"]:hover,
+.nav-tab[data-tab="generate-nfts"]:hover:not(.active) {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important;
+  cursor: pointer !important;
+}
+
+/* Disable tooltips for navigation tabs */
+.nav-tab .tooltiptext {
+  display: none;
+}
+
+/* Disabled navigation tabs */
+.nav-tab.disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  color: #666 !important;
+  pointer-events: none;
+}
+
+.nav-tab.disabled:hover {
+  background: none !important;
+  color: #666 !important;
+  box-shadow: none !important;
+}
+
+/* Enable tooltips for disabled tabs */
+.nav-tab.disabled .tooltiptext {
+  display: block !important;
+  background: #333 !important;
+  color: #fff !important;
+  border: 1px solid #555 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+}
+
+/* Content Area */
+/* Add some padding to the content area to account for fixed nav */
+.content-area {
+  padding-top: 1rem;
+  padding: 2rem 2rem 2rem 0 !important;
+}
+
+/* ========================================
+   TAB SCROLLING CONTROL - STYLES.CSS OVERRIDE
+   ======================================== */
+
+/* Collection Info tab rules moved to collection-info-override.css */
+
+/* Traits & Rules Tab - SCROLL ENABLED but scrollbar hidden */
+#traits-rules.tab-content {
+  overflow-y: scroll !important; /* Use scroll instead of auto to always reserve space */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: calc(100vh - 110px) !important;
+  max-height: calc(100vh - 110px) !important;
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+/* Hide scrollbar for webkit browsers (Chrome, Safari, Edge) */
+#traits-rules.tab-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* All tabs scrollable by default - Collection Info and Generate NFTs are frozen */
+
+/* Remove excessive spacing from Generate NFTs tab */
+#generate-nfts .generate-nfts-main-row {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#generate-nfts .nft-preview-section {
+  margin-bottom: 0 !important;
+}
+
+#generate-nfts .traits-section {
+  margin-bottom: 0 !important;
+}
+
+/* Generate Metadata Tab - SCROLL DISABLED */
+#generate-metadata.tab-content {
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  max-height: calc(100vh - 110px) !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Export NFTs Tab - SCROLL DISABLED */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+#export-nfts.tab-content {
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Changed from calc(100vh - 110px) to none to prevent clipping */
+  min-height: auto !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+/* Use browser's native scrollbar - no custom styling to avoid duplicates */
+
+.content-area {
+  flex: 1;
+  padding: 2rem;
+  display: none; /* Hidden by default, shown when project starts */
+}
+
+/* File input styling */
+.file-input {
+  display: none;
+}
+
+/* Section Styles */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+
+.section-title svg {
+  margin-right: 0.75rem;
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+.section-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* Form Styles */
+.form-container {
+  max-width: 800px;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.form-control::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.form-help {
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-thin);
+  color: #f39c12 !important; /* Orange color for visual consistency with tooltips */
+  margin-top: 0.5rem;
+}
+
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.required {
+  color: #ff6b6b;
+}
+
+.optional {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-thin);
+}
+
+/* Traits & Rules Tab Styles - handled by traits-panel-override.css */
+
+/* Divider styles moved to final-overrides.css for consistency */
+
+.empty-state {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-thin);
+}
+
+/* Dropzone Styles */
+.dropzone-container {
+  margin-bottom: 2rem;
+}
+
+/* Update the dropzone styles to use dark grey background */
+.dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background-color: #222230; /* Changed from var(--bg-secondary) to dark grey */
+}
+
+.dropzone.highlight {
+  border-color: var(--accent-primary);
+  background-color: rgba(108, 92, 231, 0.1);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Add styles for the button in the dropzone */
+.dropzone-content .btn {
+  margin-top: 1rem;
+}
+
+/* add-folders-btn styles moved to final-overrides.css */
+
+/* Ensure the dropzone content has proper spacing */
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.dropzone-content svg {
+  width: 36px; /* Reduced from 48px */
+  height: 36px; /* Reduced from 48px */
+  color: var(--text-secondary);
+}
+
+.dropzone-content p {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.dropzone-help {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-thin);
+  color: var(--text-secondary);
+  max-width: 500px;
+}
+
+/* Trait Layer Styles */
+.trait-layers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 24px !important;
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+/* Add styles for draggable trait layers */
+.trait-layer-bar {
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: none !important;
+}
+
+.trait-layer-bar.dragging {
+  cursor: grabbing;
+  opacity: 0.5;
+  transform: scale(1.02);
+  box-shadow: none !important;
+}
+
+.trait-layer-placeholder {
+  background-color: var(--bg-secondary);
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  margin: 8px 0;
+  transition: all 0.2s ease;
+}
+
+.trait-layer-bar.expanded {
+  cursor: default;
+}
+
+.trait-layer-bar.expanded .trait-layer-header {
+  cursor: pointer;
+}
+
+/* Ensure drag handle is visible */
+.trait-layer-drag-handle {
+  cursor: grab;
+  padding: 8px;
+  margin-right: 8px;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.trait-layer-drag-handle:hover {
+  color: var(--text-primary);
+}
+
+.trait-layer-bar.expanded .trait-layer-drag-handle {
+  cursor: default;
+  color: var(--text-secondary);
+}
+
+/* Update the trait layer header styles with purple tones */
+.trait-layer-header {
+  min-width: 1557px !important;
+  width: 1557px !important;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  height: 90px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  /* Remove any box-shadow or drop shadow */
+  box-shadow: none !important;
+}
+
+/* Apply alternating colors to trait layer headers - using purple tones */
+.trait-layer-bar:nth-child(odd) .trait-layer-header {
+  background-color: var(--trait-header-odd); /* Purple tone for odd rows */
+}
+
+.trait-layer-bar:nth-child(even) .trait-layer-header {
+  background-color: var(--trait-header-even); /* Darker purple tone for even rows */
+}
+
+/* Apply hover effects with slightly lighter colors */
+.trait-layer-bar:nth-child(odd) .trait-layer-header:hover {
+  background-color: var(--trait-header-odd-hover); /* Lighter purple for odd rows hover */
+}
+
+.trait-layer-bar:nth-child(even) .trait-layer-header:hover {
+  background-color: var(--trait-header-even-hover); /* Lighter dark purple for even rows hover */
+}
+
+.trait-layer-toggle {
+  margin-right: 1rem;
+}
+
+.trait-layer-toggle svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  color: var(--text-secondary);
+}
+
+.trait-layer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px; /* Add margin to ensure spacing between info and rarity slider */
+}
+
+.trait-layer-name {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.25rem;
+}
+
+.trait-layer-stats {
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-thin);
+  color: var(--text-secondary);
+}
+
+/* Updated trait layer rarity styles for header */
+/* Find the trait-layer-header-rarity class and update it to ensure proper layout */
+.trait-layer-header-rarity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  min-width: 120px; /* Reduced from 150px for better alignment */
+}
+
+/* Update the trait-layer-header-rarity-slider to make it much smaller */
+.trait-layer-header-rarity-slider {
+  width: 50px; /* Reduced from 60px to make the slider smaller */
+  -webkit-appearance: none;
+  height: 8px !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+  background-color: #000 !important;
+  border: 1px solid var(--slider-track-border);
+  outline: none;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 1; /* Allow slider to shrink if needed */
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+/* Update the trait-layer-header-rarity-value to ensure it's properly aligned */
+.trait-layer-header-rarity-value {
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-medium);
+  width: 60px; /* Fixed width at 60px */
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.25rem;
+  text-align: center;
+  transition: color 0.3s ease;
+  margin: 0;
+  flex-shrink: 0; /* Prevent value from shrinking */
+}
+
+.trait-layer-position {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.position-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
+}
+
+.position-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.position-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.position-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.position-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.position-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.trait-layer-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.rename-layer:hover {
+  color: var(--warning-color);
+}
+
+.delete-layer:hover {
+  color: var(--danger-color);
+}
+
+.trait-layer-content {
+  display: none;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+}
+
+.trait-layer-content.expanded {
+  display: block;
+}
+
+/* Update the trait-layer-dropzone to use dark grey background */
+.trait-layer-dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  background-color: #222230; /* Added dark grey background */
+}
+
+.trait-layer-dropzone.highlight {
+  border-color: var(--accent-primary);
+  background-color: rgba(108, 92, 231, 0.1);
+}
+
+/* Add this CSS to fix the Add Traits button formatting */
+.trait-layer-dropzone .add-traits-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 150px;
+  height: 38px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.trait-layer-dropzone .add-traits-btn svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* Improve the dropzone content styling */
+.trait-layer-dropzone .dropzone-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.trait-layer-dropzone .dropzone-content p {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.traits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Update the trait-item background to use dark grey */
+.trait-item {
+  background-color: #222230; /* Changed from var(--bg-secondary) to dark grey */
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.trait-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Update the trait-image background to use darker grey */
+.trait-image {
+  height: 150px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a28; /* Changed to darker grey */
+}
+
+.trait-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.trait-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trait-image-placeholder svg {
+  width: 48px;
+  height: 48px;
+  color: var(--text-secondary);
+}
+
+.trait-details {
+  width: 178px !important;
+  height: 50px !important;
+  min-width: 178px !important;
+  min-height: 50px !important;
+  max-width: 178px !important;
+  max-height: 50px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.trait-name {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trait-rarity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+}
+
+.trait-rarity-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.trait-rarity-header label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-regular);
+}
+
+.trait-rarity-value {
+  font-weight: var(--font-weight-medium);
+  transition: color 0.3s ease;
+}
+
+.trait-rarity-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--slider-track-bg);
+  border: 1px solid var(--slider-track-border);
+  outline: none;
+}
+
+.trait-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.trait-rarity-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.trait-rarity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.trait-rarity-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Add styles for trait rarity action buttons */
+/* Find the trait-rarity-actions class and update it to display buttons side by side */
+.trait-rarity-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Update the button styling to ensure they're the same width */
+.trait-rarity-actions .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto; /* Changed from fixed width to auto */
+  min-width: 200px; /* Added min-width to ensure buttons aren't too small */
+  height: 38px;
+  font-size: 1rem;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.trait-rarity-actions .tooltiptext {
+  width: 250px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.3;
+}
+
+/* Special styling for the randomize rarities tooltip */
+/* Make sure the randomize tooltip is visible and properly styled */
+.randomize-tooltip {
+  all: unset !important;
+  display: none !important;
+}
+
+/* Make the randomize rarities button wider */
+.randomize-rarities-btn {
+  min-width: 280px !important;
+}
+
+.trait-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  align-items: center; /* Add this to align items vertically */
+  margin-top: 0;
+}
+
+/* Add these styles for the rarity box and text */
+.trait-rarity-box {
+  width: 80px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.trait-rarity-text {
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-medium);
+  color: #000; /* Black text for better contrast */
+  text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.5); /* Text shadow for better readability */
+}
+
+/* Update the trait actions to accommodate the rarity box */
+.trait-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  align-items: center;
+}
+
+/* Remove the old trait-rarity-indicator since we're replacing it */
+.trait-rarity-indicator {
+  display: none;
+}
+
+/* Update rarity color classes */
+.rarity-common {
+  color: #ffffff; /* White for Common */
+}
+
+.rarity-uncommon {
+  color: #00cec9; /* Teal - Uncommon */
+}
+
+.rarity-rare {
+  color: #6c5ce7; /* Purple - Rare */
+}
+
+.rarity-very-rare {
+  color: #e84393; /* Pink - Very rare */
+}
+
+.rarity-extremely-rare {
+  color: #ff7675; /* Red - Extremely rare (low percentage) */
+}
+
+/* Background color classes for the indicator */
+.bg-rarity-common {
+  background-color: #ffffff; /* White for Common */
+}
+
+.bg-rarity-uncommon {
+  background-color: #00cec9; /* Teal - Uncommon */
+}
+
+.bg-rarity-rare {
+  background-color: #6c5ce7; /* Purple - Rare */
+}
+
+.bg-rarity-very-rare {
+  background-color: #e84393; /* Pink - Very rare */
+}
+
+.bg-rarity-extremely-rare {
+  background-color: #ff7675; /* Red - Extremely rare */
+}
+
+.rename-trait:hover {
+  color: var(--warning-color);
+}
+
+.delete-trait:hover {
+  color: var(--danger-color);
+}
+
+.stacking-order-info {
+  display: flex;
+  flex-direction: row !important; /* Ensure horizontal layout */
+  align-items: center;
+  background-color: rgba(108, 92, 231, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-top: 0 !important;
+  margin-left: 0 !important; /* Removed - indentation is on text instead */
+  height: 100px !important; /* Set height to 100px */
+  min-height: 100px !important;
+  max-height: 100px !important;
+}
+
+.stacking-order-info svg {
+  color: #f39c12 !important; /* Orange color to match tooltips */
+  margin-right: 0.75rem;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.stacking-order-info {
+  justify-content: center !important; /* Center icon and text together */
+}
+
+.stacking-order-info p {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-thin);
+  color: #f39c12 !important; /* Orange color to match tooltips */
+  margin: 0 !important; /* Remove default paragraph margins */
+  margin-left: 0 !important; /* Removed - text and icon centered together */
+  display: flex !important; /* Use flex for proper alignment */
+  align-items: center !important; /* Vertically center text */
+  height: 100% !important; /* Take full height of container */
+  white-space: normal; /* Allow text wrapping if needed */
+}
+
+/* Tab Content Styles */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title-container {
+    align-items: center;
+    text-align: center;
+  }
+
+  .nav-header-content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .landing-title {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .landing-title {
+    font-size: 2.5rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+  }
+
+  .feature-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .feature-item {
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .nav-tabs {
+    padding-bottom: 0.5rem;
+  }
+
+  .form-container {
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .trait-layer-header {
+    flex-wrap: wrap;
+  }
+
+  .trait-layer-position {
+    margin-top: 0.5rem;
+    margin-left: 2.2rem;
+  }
+
+  .traits-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+/* SVG Icon styles */
+.icon {
+  display: inline-block;
+  line-height: 1;
+}
+
+.icon svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  vertical-align: middle;
+}
+
+.icon-sm svg {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-lg svg {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-xl svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Add these styles for notifications */
+/* Update the notification styles to ensure full text visibility and proper color coding */
+
+/* Replace the notification container styles */
+.notification-container {
+  position: fixed;
+  /* z-index moved to final-overrides.css for highest priority */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px; /* Increased from 350px to allow more text */
+  width: 400px; /* Increased from 350px */
+  top: 20px;
+  right: 20px;
+  pointer-events: none;
+}
+
+/* Update the notification styles */
+.notification {
+  background-color: var(--bg-secondary);
+  border-left: 4px solid var(--accent-primary);
+  border-radius: 4px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start; /* Changed from center to allow multi-line text */
+  animation: fadeIn 0.3s ease;
+  max-width: 100%;
+  margin-bottom: 8px;
+  pointer-events: auto;
+  position: relative;
+}
+
+.notification.success {
+  border-left-color: var(--success-color);
+  color: var(--success-color); /* Use green color for success notifications */
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.notification.success .notification-message {
+  color: var(--success-color) !important; /* Ensure success message text is green */
+}
+
+.notification.error {
+  border-left-color: var(--danger-color);
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.notification.warning {
+  border-left-color: var(--warning-color);
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+/* Update the notification message styles */
+.notification-message {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-medium);
+  white-space: normal; /* Changed from nowrap to allow text wrapping */
+  overflow: visible; /* Changed from hidden */
+  line-height: 1.4; /* Added for better readability of multi-line text */
+  word-break: break-word; /* Added to prevent overflow */
+}
+
+/* Add specific styles for error messages */
+.notification-message.error-message {
+  font-size: 0.85rem; /* Smaller font for error messages */
+  color: #ff7675; /* Ensure error text is red */
+}
+
+/* Update the notification icon styles */
+.notification-icon {
+  margin-right: 12px;
+  flex-shrink: 0;
+  margin-top: 2px; /* Align with first line of text */
+}
+
+.notification.success .notification-icon {
+  color: var(--success-color); /* Ensure success icon is green */
+}
+
+.notification.error .notification-icon {
+  color: var(--danger-color); /* Ensure error icon is red */
+}
+
+.notification.warning .notification-icon {
+  color: var(--warning-color); /* Ensure warning icon is yellow */
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7; /* Slightly transparent by default */
+  transition: opacity 0.2s ease;
+}
+
+.notification-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  opacity: 1; /* Fully opaque on hover */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add these styles to the end of the file */
+
+/* Trait Layers Section */
+.trait-layers-section {
+  margin-bottom: 30px;
+}
+
+.trait-layers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.trait-layers-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.trait-layers-info {
+  display: flex;
+  align-items: center;
+  cursor: help;
+}
+
+.trait-layers-info svg {
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+}
+
+#trait-layers-dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  padding-top: 0 !important; /* Remove top indentation */
+  margin-top: 0 !important; /* Remove top margin */
+  margin-bottom: 24px !important;
+  transition: all 0.3s ease;
+  background-color: #222230; /* Added dark grey background */
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+#trait-layers-dropzone.highlight {
+  border-color: var(--primary-color);
+  background-color: var(--bg-hover);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.dropzone-content svg {
+  width: 36px; /* Reduced from 48px */
+  height: 36px; /* Reduced from 48px */
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.trait-layers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px !important;
+}
+
+/* Combination Rules Section - handled by traits-panel-override.css */
+
+.combination-rules-container .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.combination-rules-container .empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 15px;
+  color: var(--text-secondary);
+}
+
+/* Add this to ensure the project actions have a black background */
+.project-actions {
+  display: flex;
+  gap: 0.75rem;
+  background-color: #000000; /* Ensure black background */
+  z-index: 10; /* Ensure it's above other elements */
+}
+
+/* Add these improved modal styles to fix the broken modals */
+/* Find the existing modal styles and replace them with these */
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.modal {
+  background-color: #1a1a23; /* Dark grey background for all modals */
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: #1a1a23; /* Dark grey background */
+}
+
+.modal-header h3 {
+  font-weight: var(--font-weight-semibold);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #1a1a23; /* Dark grey background */
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: #1a1a23; /* Dark grey background */
+}
+
+/* Specific styles for the combination rule modal */
+.combination-rule-modal {
+  max-width: 800px;
+  width: 95%;
+}
+
+.larger-rule-modal {
+  max-width: 1000px;
+}
+
+/* Fix for modal input container */
+.modal-input-container {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.modal-input-container input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+
+.modal-input-container input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+/* Fix for confirmation modal */
+.confirmation-modal .modal-body {
+  padding: 2rem 1.5rem;
+}
+
+/* Ensure modals are on top of everything */
+#confirmation-modal {
+  z-index: 2000000;
+}
+
+/* Confirmation modal background - use #2c3e50 like other app popups */
+#confirmation-modal .modal,
+#confirmation-modal .modal-header,
+#confirmation-modal .modal-body,
+#confirmation-modal .modal-footer {
+  background: #2c3e50 !important;
+  color: #ffffff !important;
+}
+
+#confirmation-modal .modal-header h3,
+#confirmation-modal .modal-message,
+#confirmation-modal .modal-description {
+  color: #ffffff !important;
+}
+
+#combination-rule-modal {
+  z-index: 11000;
+}
+
+/* Add these styles to remove scrollbar and increment/decrement controls from the Total Supply field */
+#total-supply {
+  /* Remove default appearance */
+  -moz-appearance: textfield;
+  appearance: textfield;
+  /* Remove scrollbar in WebKit browsers */
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  /* Remove scrollbar in Firefox */
+  scrollbar-width: none;
+  /* Remove scrollbar in IE/Edge */
+  -ms-overflow-style: none;
+  /* Remove scrollbar in WebKit browsers */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Add these styles to ensure the Rules headers match the trait layer headers - handled by traits-panel-override.css */
+
+/* Add a dark grey background to the Rules headers */
+.rule-header {
+  background-color: #1a1a23; /* Dark grey background to match modals */
+  color: var(--text-primary);
+}
+
+/* Ensure the rule items have the same width as trait layers */
+.rule-item {
+  width: 100%;
+  margin-bottom: 0.75rem; /* Match the spacing of trait layers */
+  border-radius: 12px; /* Match the border radius of trait layers */
+  overflow: hidden;
+}
+
+/* Update the rules list to match trait layers container */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0; /* Remove gap to match trait layers */
+}
+
+/* Make sure action buttons in rule headers have proper contrast */
+.rule-header .action-btn {
+  color: var(--text-secondary);
+}
+
+.rule-header .action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* Update subsection titles with semibold font */
+.subsection-title {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Update subsection descriptions with thin font */
+.subsection-description {
+  font-weight: var(--font-weight-thin);
+}
+
+/* Update modal message and description text */
+.modal-message {
+  font-weight: var(--font-weight-medium);
+}
+
+.modal-description {
+  font-weight: var(--font-weight-thin);
+}
+
+/* Update rule detail labels and values */
+.rule-detail-label {
+  font-weight: var(--font-weight-medium);
+}
+
+.rule-detail-value {
+  font-weight: var(--font-weight-regular);
+}
+
+.rule-detail-sublabel {
+  font-weight: var(--font-weight-thin);
+}
+
+/* Ensure no borders are visible in the navigation area */
+.nav-container *,
+.nav-header *,
+.nav-tabs-container *,
+.nav-tabs * {
+  border-color: #000000;
+}
+
+/* Find the tooltip styles and replace or add these styles */
+
+/* Tooltip Styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltiptext {
+  position: fixed; /* Change from absolute to fixed for better positioning */
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+  background-color: #333;
+  color: #f39c12;
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4;
+  white-space: normal; /* Allow text wrapping */
+  max-width: 300px; /* Set maximum width */
+  width: max-content; /* Use the content's width */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none; /* Prevent tooltip from blocking mouse events */
+  opacity: 0;
+  transition: opacity 0.3s;
+  word-wrap: break-word; /* Ensure long words don't overflow */
+  overflow: visible; /* Ensure content is not cut off */
+}
+
+/* Specific tooltip styles for app-action-btn and normalize-rarities-btn */
+.app-action-btn .tooltiptext,
+.normalize-rarities-btn .tooltiptext {
+  width: 170px !important;
+  border-radius: 8px !important;
+}
+
+/* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
+/* Tooltips are now controlled by JavaScript in tooltip-handler-consolidated.js */
+/* This prevents immediate display via CSS :hover */
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+}
+
+/* CRITICAL: Explicitly hide tooltips for disabled elements to override any general rules */
+.tooltip[disabled]:hover .tooltiptext,
+.tooltip:disabled:hover .tooltiptext,
+.tooltip[disabled] .tooltiptext,
+.tooltip:disabled .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Arrow styles */
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  border-width: 5px;
+  border-style: solid;
+}
+
+/* Top tooltip (default) */
+.tooltiptext {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+}
+
+.tooltiptext::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Bottom tooltip */
+.tooltip-bottom {
+  top: 125%;
+  bottom: auto;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+.tooltip-bottom::after {
+  bottom: 100%;
+  top: auto;
+  border-color: transparent transparent #333 transparent;
+}
+
+/* Left-aligned tooltip */
+.tooltip-left {
+  transform: translateX(0);
+  left: 0;
+}
+
+.tooltip-left::after {
+  left: 10px;
+  transform: translateX(0);
+}
+
+/* Right-aligned tooltip */
+.tooltip-right {
+  transform: translateX(0);
+  right: 0;
+  left: auto;
+}
+
+.tooltip-right::after {
+  right: 10px;
+  left: auto;
+  transform: translateX(0);
+}
+
+/* Add these new styles for rarity indicators */
+.trait-rarity-indicator {
+  width: 8px;
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  background-color: var(--accent-primary);
+  transition: all 0.3s ease;
+}
+
+/* Update trait rarity value to support colored text */
+.trait-rarity-value {
+  font-weight: var(--font-weight-medium);
+  transition: color 0.3s ease;
+}
+
+/* Rarity color classes */
+.rarity-common {
+  color: var(--rarity-common);
+}
+
+.rarity-uncommon {
+  color: var(--rarity-uncommon);
+}
+
+.rarity-rare {
+  color: var(--rarity-rare);
+}
+
+.rarity-very-rare {
+  color: var(--rarity-very-rare);
+}
+
+.rarity-extremely-rare {
+  color: var(--rarity-extremely-rare);
+}
+
+/* Background color classes for the indicator */
+.bg-rarity-common {
+  background-color: var(--rarity-common);
+}
+
+.bg-rarity-uncommon {
+  background-color: var(--rarity-uncommon);
+}
+
+.bg-rarity-rare {
+  background-color: var(--rarity-rare);
+}
+
+.bg-rarity-very-rare {
+  background-color: var(--rarity-very-rare);
+}
+
+.bg-rarity-extremely-rare {
+  background-color: var(--rarity-extremely-rare);
+}
+
+/* Update the fixed notification container styles */
+.fixed-notification-container {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+  width: auto;
+  top: 20px;
+  right: 20px;
+  pointer-events: none;
+}
+
+/* Ensure notifications have pointer events */
+.notification {
+  pointer-events: auto;
+}
+
+/* Remove the feedback-message styles since we're using the notification service */
+.feedback-message {
+  display: none;
+}
+
+/* Update rarity color classes with the new color scheme */
+.rarity-zero {
+  color: #666666; /* Dark grey for 0% */
+}
+
+.rarity-very-low {
+  color: #ff5555; /* Red for >0% to 3% */
+}
+
+.rarity-low {
+  color: #ff9933; /* Orange for >3% to 8% */
+}
+
+.rarity-medium {
+  color: #9966cc; /* Purple for >8% to 28% */
+}
+
+.rarity-high {
+  color: #3399ff; /* Blue for >28% to 53% */
+}
+
+.rarity-very-high {
+  color: #33cc66; /* Changed to green for >53% to 78% */
+}
+
+.rarity-max {
+  color: #ffffff; /* White for >78% to 100% */
+}
+
+/* Background color classes for the indicator */
+.bg-rarity-zero {
+  background-color: #666666; /* Dark grey for 0% */
+}
+
+.bg-rarity-very-low {
+  background-color: #ff5555; /* Red for >0% to 3% */
+}
+
+.bg-rarity-low {
+  background-color: #ff9933; /* Orange for >3% to 8% */
+}
+
+.bg-rarity-medium {
+  background-color: #9966cc; /* Purple for >8% to 28% */
+}
+
+.bg-rarity-high {
+  background-color: #3399ff; /* Blue for >28% to 53% */
+}
+
+.bg-rarity-very-high {
+  background-color: #33cc66; /* Changed to green for >53% to 78% */
+}
+
+.bg-rarity-max {
+  background-color: #ffffff; /* White for >78% to 100% */
+}
+
+/* Save Project Dialog */
+.save-project-modal {
+  max-width: 500px;
+  width: 90%;
+}
+
+.save-project-modal .modal-body {
+  padding: 20px;
+}
+
+.save-project-modal .form-group {
+  margin-bottom: 20px;
+}
+
+.save-project-modal .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.save-project-modal .form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--text-color);
+  background-color: var(--input-bg);
+  transition: border-color 0.2s ease;
+}
+
+.save-project-modal .form-control:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.save-project-modal .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Loading Animation */
+.loading-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999 !important;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spinner-wrapper {
+  width: 50px;
+  height: 50px;
+}
+
+.spinner {
+  animation: spinner-rotate 2s linear infinite;
+  transform-origin: center;
+}
+
+.spinner .path {
+  stroke: var(--accent-primary);
+  stroke-linecap: round;
+  animation: spinner-dash 1.5s ease-in-out infinite;
+}
+
+.loading-text {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  text-align: center;
+  /* Ensure text doesn't rotate or animate */
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+@keyframes spinner-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinner-dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
+  }
+}
+
+/* Generate NFTs Section */
+.generate-nfts-content {
+  padding: 20px;
+}
+
+.generate-nfts-header {
+  margin-bottom: 30px;
+}
+
+.generate-nfts-body {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.generate-nfts-info {
+  display: flex;
+  gap: 20px;
+}
+
+.info-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 20px;
+  flex: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.info-card-header svg {
+  width: 24px;
+  height: 24px;
+  color: var(--primary-color);
+}
+
+.info-card-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: var(--text-color);
+}
+
+.info-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: var(--input-bg);
+  border-radius: 4px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.info-value {
+  color: var(--text-color);
+  font-family: var(--monospace-font);
+}
+
+.generate-nfts-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.generate-nfts-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.generate-nfts-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.generate-nfts-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+}
+
+.generate-nfts-buttons .btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.generate-nfts-preview {
+  margin-top: 20px;
+}
+
+.preview-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 40px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.preview-placeholder svg {
+  width: 48px;
+  height: 48px;
+  color: var(--text-muted);
+}
+
+.preview-placeholder p {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+/* NFT Preview Card */
+.nft-preview-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.nft-preview-card:hover {
+  transform: translateY(-2px);
+}
+
+.nft-preview-image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--input-bg);
+}
+
+.nft-preview-info {
+  padding: 15px;
+}
+
+.nft-preview-title {
+  font-weight: 500;
+  margin: 0 0 5px 0;
+  color: var(--text-color);
+}
+
+.nft-preview-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.nft-preview-trait {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  background: var(--input-bg);
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+
+/* Loading Animation for Generation */
+.generating-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.generating-content {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.generating-spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 20px;
+  border: 4px solid var(--input-bg);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.generating-text {
+  color: var(--text-color);
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.generating-progress {
+  margin-top: 15px;
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Override left padding/margin for left column alignment */
+.left-column-section,
+.left-column-section > * {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Force left alignment for NFT preview group and children */
+.nft-preview-section,
+.nft-preview-group,
+.nft-preview-container,
+.nft-single-preview-panel {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+.left-column-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  width: 100%;
+}
+
+/* Remove extra padding from Randomize (Override Rules) button */
+#randomize-override-btn {
+  padding: 0 !important;
+}
+
+/* Remove extra padding from the seed toggle */
+.seed-controls .toggle-label {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Remove extra padding from 'Generate tiered NFT:' controls */
+.tier-controls span,
+.tier-controls select,
+.tier-controls button {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 32px;
+  min-height: 0;
+}
+
+/* Reduce width of tier select drop-down and Generate Tier NFT button */
+.tier-controls select {
+  width: 100px !important;
+  min-width: 0 !important;
+  max-width: 120px !important;
+}
+.tier-controls button {
+  width: 120px !important;
+  min-width: 0 !important;
+  max-width: 140px !important;
+}
+
+/* Custom arrow for tier select drop-down */
+.tier-controls select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg fill="%23333" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 8px center/16px 16px;
+  padding-right: 28px !important;
+}
+
+.left-column-section {
+  max-width: 440px;
+  width: 100%;
+  min-width: 0;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.tier-controls {
+  justify-content: flex-start !important;
+}
+
+.tier-controls button {
+  margin-left: 8px !important;
+}
+
+.generate-nfts-locked-group-row {
+  gap: 0 !important;
+  column-gap: 0 !important;
+}
+
+.left-column-section,
+.traits-list-column {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.tier-group span {
+  margin-right: 10px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Override parent container padding */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.content-area,
+.tab-content {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Ensure the left column and traits list are direct siblings with no gap */
+.generate-nfts-locked-group-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0 !important;
+  column-gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Remove any extra spacing from the content area */
+#generate-nfts.tab-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure the left column takes up exactly the space it needs */
+.left-column-section {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 440px !important;
+  min-width: 0 !important;
+}
+
+/* Ensure the traits list column takes up remaining space */
+.traits-list-column {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+/* Remove any extra padding from the traits list card */
+.traits-list-card {
+  padding: 24px !important;
+  margin: 0 !important;
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  flex: none !important; /* Prevent flex sizing */
+  box-sizing: border-box !important;
+}
+
+/* Override all parent container padding and margins */
+#app,
+.container,
+.content-area,
+.tab-content,
+#generate-nfts,
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.left-column-section,
+.traits-list-column,
+.traits-list-card,
+.nft-preview-section,
+.nft-preview-group,
+.nft-preview-container,
+.nft-single-preview-panel {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure flex containers have no gaps */
+.generate-nfts-locked-group-row,
+.generate-nfts-container,
+.content-area,
+.tab-content {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0 !important;
+  column-gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Force left alignment for all content */
+#generate-nfts.tab-content,
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row {
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+/* Remove any extra spacing from the content area */
+#generate-nfts.tab-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* Ensure the left column takes up exactly the space it needs */
+.left-column-section {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 440px !important;
+  min-width: 0 !important;
+}
+
+/* Ensure the traits list column takes up remaining space */
+.traits-list-column {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+/* Remove any extra padding from the traits list card */
+.traits-list-card {
+  padding: 24px !important;
+  margin: 0 !important;
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  flex: none !important; /* Prevent flex sizing */
+  box-sizing: border-box !important;
+}
+
+/* Override any potential grid layouts */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row {
+  display: flex !important;
+  grid-template-columns: none !important;
+  grid-gap: 0 !important;
+}
+
+/* Ensure no borders or outlines are causing extra space */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.left-column-section,
+.traits-list-column,
+.traits-list-card {
+  border-left: none !important;
+  outline: none !important;
+}
+
+/* Override any potential transform or translate properties */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.left-column-section,
+.traits-list-column {
+  transform: none !important;
+  translate: none !important;
+}
+
+/* Ensure no negative margins are being used */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.left-column-section,
+.traits-list-column {
+  margin: 0 !important;
+}
+
+/* Override any potential position properties */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.left-column-section,
+.traits-list-column {
+  position: relative !important;
+  left: 0 !important;
+  right: auto !important;
+}
+
+/* Ensure no calc() functions are adding extra space */
+.generate-nfts-container,
+.generate-nfts-locked-group,
+.generate-nfts-locked-group-row,
+.left-column-section,
+.traits-list-column {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+/* Override any potential flex-basis properties */
+.left-column-section {
+  flex-basis: auto !important;
+}
+
+.traits-list-column {
+  flex-basis: 0 !important;
+}
+
+/* Ensure no pseudo-elements are adding space */
+.generate-nfts-container::before,
+.generate-nfts-container::after,
+.generate-nfts-locked-group::before,
+.generate-nfts-locked-group::after,
+.generate-nfts-locked-group-row::before,
+.generate-nfts-locked-group-row::after,
+.left-column-section::before,
+.left-column-section::after,
+.traits-list-column::before,
+.traits-list-column::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* --- BEGIN: NFT Generator Section Scoped Overrides --- */
+#generate-nfts,
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-locked-group,
+#generate-nfts .generate-nfts-locked-group-row,
+#generate-nfts .left-column-section,
+#generate-nfts .traits-list-column,
+#generate-nfts .traits-list-card,
+#generate-nfts .nft-preview-section,
+#generate-nfts .nft-preview-group,
+#generate-nfts .nft-preview-container,
+#generate-nfts .nft-single-preview-panel {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#generate-nfts .generate-nfts-locked-group-row,
+#generate-nfts .generate-nfts-container {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0 !important;
+  column-gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#generate-nfts,
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-locked-group,
+#generate-nfts .generate-nfts-locked-group-row {
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+#generate-nfts.tab-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+#generate-nfts .left-column-section {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 440px !important;
+  min-width: 0 !important;
+}
+
+#generate-nfts .traits-list-column {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+#generate-nfts .traits-list-card {
+  padding: 24px !important;
+  margin: 0 !important;
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  flex: none !important; /* Prevent flex sizing */
+  box-sizing: border-box !important;
+}
+
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-locked-group,
+#generate-nfts .generate-nfts-locked-group-row {
+  display: flex !important;
+  grid-template-columns: none !important;
+  grid-gap: 0 !important;
+}
+
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-locked-group,
+#generate-nfts .generate-nfts-locked-group-row,
+#generate-nfts .left-column-section,
+#generate-nfts .traits-list-column,
+#generate-nfts .traits-list-card {
+  border-left: none !important;
+  outline: none !important;
+}
+
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-locked-group,
+#generate-nfts .generate-nfts-locked-group-row,
+#generate-nfts .left-column-section,
+#generate-nfts .traits-list-column {
+  transform: none !important;
+  translate: none !important;
+  margin: 0 !important;
+  position: relative !important;
+  left: 0 !important;
+  right: auto !important;
+}
+
+#generate-nfts .left-column-section {
+  flex-basis: auto !important;
+}
+
+#generate-nfts .traits-list-column {
+  flex-basis: 0 !important;
+}
+
+#generate-nfts .generate-nfts-container::before,
+#generate-nfts .generate-nfts-container::after,
+#generate-nfts .generate-nfts-locked-group::before,
+#generate-nfts .generate-nfts-locked-group::after,
+#generate-nfts .generate-nfts-locked-group-row::before,
+#generate-nfts .generate-nfts-locked-group-row::after,
+#generate-nfts .left-column-section::before,
+#generate-nfts .left-column-section::after,
+#generate-nfts .traits-list-column::before,
+#generate-nfts .traits-list-column::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+/* --- END: NFT Generator Section Scoped Overrides --- */
+
+/* Restore default tab content display logic */
+.tab-content {
+  display: none !important;
+}
+.tab-content.active {
+  display: block !important;
+}
+
+/* Only NFT generator tab content uses flex when active */
+#generate-nfts.tab-content {
+  display: none !important;
+}
+#generate-nfts.tab-content.active {
+  display: flex !important;
+  flex-direction: column !important; /* Match main.css - use column to align with content-area */
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: relative !important; /* Ensure it stays inside content-area */
+}
+
+/* --- FINAL TAB VISIBILITY FIX --- */
+#generate-nfts.tab-content.active .generate-nfts-locked-group-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 24px !important;
+}
+
+/* Add more specific left alignment for the generate-nfts tab */
+#generate-nfts.tab-content.active {
+  display: flex !important;
+  flex-direction: column !important; /* Match main.css - use column to align with content-area */
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: relative !important; /* Ensure it stays inside content-area */
+  left: 0 !important;
+}
+
+/* Ensure the generate-nfts container starts from the far left */
+#generate-nfts .generate-nfts-container {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+/* Ensure the content-area doesn't add any padding to the left side */
+.content-area {
+  padding-left: 0 !important;
+}
+
+/* Override any padding on the tab-content */
+.tab-content {
+  padding-left: 0 !important;
+}
+
+/* Ensure the generate-nfts-locked-group-row extends properly */
+#generate-nfts .generate-nfts-locked-group-row {
+  width: 100% !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 24px !important;
+}
+
+/* Align the section title to the far left as well - REMOVED CONFLICTING RULES */
+
+/* Align the section description to the far left - REMOVED CONFLICTING RULES */
+
+/* Update the generate-nfts structure */
+#generate-nfts.tab-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+/* REMOVED CONFLICTING RULES */
+
+#generate-nfts .generate-nfts-container {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* Ensure content area has no left padding for all tabs */
+.content-area {
+  padding: 2rem 2rem 2rem 0 !important;
+}
+
+/* Correct alignment with the navigation bar */
+.nav-container {
+  padding-left: 0 !important;
+}
+
+.content-area {
+  padding: 2rem 2rem 2rem 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Fix any container issues */
+#generate-nfts.tab-content.active {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Adjust the section title and description to align with layout - REMOVED CONFLICTING RULES */
+
+/* Restore default tab visibility rules */
+.tab-content {
+  display: none !important;
+}
+
+.tab-content.active {
+  display: block !important;
+}
+
+/* Special case for generate-nfts tab only when active */
+#generate-nfts.tab-content {
+  display: none !important;
+}
+
+#generate-nfts.tab-content.active {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Remove any display properties that might be causing conflicts */
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-locked-group,
+#generate-nfts .generate-nfts-locked-group-row {
+  display: flex !important;
+}
+
+/* Make this important enough to override everything else */
+.tab-content:not(.active) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* IMPORTANT: CLEAN UP ALL TAB DISPLAY RULES */
+/* Remove all previous .tab-content display declarations */
+
+/* FINAL TAB VISIBILITY RULES - These should take precedence over all else */
+.tab-content {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+.tab-content.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+  height: auto !important;
+  width: auto !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Special case for generate-nfts tab only when active */
+#generate-nfts.tab-content.active {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+
+/* Ensure proper display for specific containers within the active generate-nfts tab */
+#generate-nfts.tab-content.active .generate-nfts-container,
+#generate-nfts.tab-content.active .generate-nfts-locked-group,
+#generate-nfts.tab-content.active .generate-nfts-locked-group-row {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+}
+
+/* With the above rules being added at the end of the file, they should override all previous rules */
+
+/* Update left alignment for generate-nfts only when active */
+#generate-nfts.tab-content.active {
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* These rules should only apply to active generate-nfts tab - REMOVED CONFLICTING RULES */
+
+/* FINAL FIX - Hide specific generate-nfts elements when tab is not active */
+#generate-nfts:not(.active) .generate-nfts-container,
+#generate-nfts:not(.active) .generate-nfts-locked-group,
+#generate-nfts:not(.active) .generate-nfts-locked-group-row,
+#generate-nfts:not(.active) .left-column-section,
+#generate-nfts:not(.active) .traits-list-column {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Override any display property for inactive tabs */
+#generate-nfts.tab-content:not(.active) * {
+  display: none !important;
+}
+
+/* Ensure section titles and descriptions are always visible in active tabs */
+.tab-content.active .section-title,
+.tab-content.active .section-description {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Special case for generate-nfts tab - REMOVED CONFLICTING RULES */
+
+/* Override the display none for inactive tabs (only for direct children of #generate-nfts) */
+#generate-nfts.tab-content:not(.active) * {
+  display: none !important;
+}
+
+/* Improve alignment of elements in the NFT controls section */
+.nft-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 0 8px;
+  margin-top: 16px;
+}
+
+/* Better align the randomize buttons */
+.control-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.control-buttons .btn {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* Improve seed controls layout */
+.seed-controls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.seed-controls .toggle-label {
+  min-width: 55px;
+  flex-shrink: 0;
+}
+
+.seed-controls input.form-control {
+  flex: 1;
+  min-width: 0;
+}
+
+.seed-controls button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Improve tier controls layout */
+.tier-controls {
+  display: flex;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.tier-group {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.tier-group span {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tier-group div {
+  flex: 0.8;
+  min-width: 90px;
+}
+
+#generate-tier-nft-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* NFT rarity and seed info alignment */
+.nft-rarity-seed-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  padding: 0 5px;
+}
+
+/* Make the preview panel better aligned */
+.nft-preview-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.subsection-title {
+  align-self: flex-start;
+  margin-bottom: 10px;
+}
+
+/* Ensure consistent width for all controls */
+.nft-controls > div {
+  width: 100%;
+}
+
+/* Random seed container alignment */
+.random-seed-container {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.random-seed-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.random-seed-header .toggle-label {
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.random-seed-header input {
+  flex: 1;
+}
+
+/* Additional button alignment for generator controls */
+#randomize-override-btn {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#generate-seed-nft-btn,
+#generate-tier-nft-btn {
+  width: auto;
+  min-width: 90px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+/* Ensure consistent tier control styling */
+.tier-group span {
+  color: var(--text-color);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.tier-group div {
+  position: relative;
+  min-width: 100px;
+}
+
+/* Ensure consistency in spacing */
+.nft-controls {
+  margin-top: 16px;
+  padding: 0 4px;
+}
+
+/* Better align icons inside buttons */
+.nft-controls .btn svg {
+  margin-right: 4px;
+}
+
+/* Ensure tier selector has consistent appearance */
+#tier-select {
+  width: 100%;
+  padding-right: 28px;
+}
+
+/* Improve form controls margin and padding */
+.left-panel-section {
+  margin-bottom: 24px;
+}
+
+/* Improve NFT preview layout */
+.nft-preview-section {
+  padding: 0;
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Refinements for the NFT preview panel */
+.nft-single-preview-panel {
+  aspect-ratio: 1 / 1;
+  max-width: 400px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.nft-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Better rarity and seed info display */
+.nft-rarity-seed-row {
+  margin: 12px 0;
+  padding: 0 4px;
+}
+
+.nft-overall-rarity {
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.nft-seed-info {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Improve trait info panel layout */
+.nft-trait-info-panel {
+  padding: 12px;
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  height: 702px !important; /* Fixed height to prevent layout shifts */
+  min-height: 702px !important;
+  max-height: 702px !important;
+  flex: none !important; /* Prevent flex sizing */
+}
+
+/* Removed - consolidated in final-overrides.css */
+
+.nft-trait-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  height: 165px !important;
+}
+
+.nft-trait-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: #222;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.nft-trait-info-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nft-trait-layer-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-color);
+}
+
+/* Additional tweaks for layout consistency */
+.left-column-section {
+  padding: 20px !important;
+  padding-right: 16px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.left-column-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Refinements for toggle controls */
+.toggle-container {
+  margin-bottom: 12px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.toggle-slider {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  background-color: #444;
+  border-radius: 34px;
+  transition: .4s;
+  flex-shrink: 0;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--accent-primary);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(16px);
+}
+
+.toggle-text {
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+/* Ensure all controls have proper spacing */
+.nft-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* Remove any conflicting styles from previous definitions */
+.nft-controls > div {
+  margin: 0 !important;
+}
+
+/* Consistent button sizes */
+.nft-controls .btn {
+  min-height: 38px;
+}
+
+/* Adjust tier group text size and alignment */
+.tier-group span {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 500;
+  flex-basis: 120px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+/* Improve tier control alignment to match elements above */
+.tier-controls {
+  display: flex;
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 2px;
+}
+
+/* Ensure perfect alignment with seed controls above */
+.tier-group {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding-left: 1px;
+}
+
+/* Make tier select width match seed input above */
+.tier-group div {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+#tier-select {
+  width: 100%;
+  padding-right: 28px;
+  padding-left: 10px;
+  height: 38px;
+}
+
+/* Ensure Generate button width matches above */
+#generate-tier-nft-btn {
+  width: 90px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Ensure seed controls match perfectly with tier controls */
+.seed-controls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding-left: 2px;
+}
+
+.seed-controls .toggle-label {
+  min-width: 55px;
+  flex-basis: 55px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.seed-controls input.form-control {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding-left: 10px;
+}
+
+#generate-seed-nft-btn {
+  width: 90px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Additional adjustments to ensure perfect alignment */
+.control-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+  padding-left: 2px;
+}
+
+.control-buttons .btn {
+  flex: 1;
+  height: 38px;
+  min-width: 0;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-size: 14px;
+  padding: 0 12px;
+}
+
+/* Override any previous settings for the buttons */
+#randomize-override-btn,
+#generate-seed-nft-btn,
+#generate-tier-nft-btn {
+  height: 32px;
+  font-size: 14px;
+}
+
+/* Ensure consistent text size across all control areas */
+.toggle-text,
+.tier-group span,
+.seed-controls .toggle-label .toggle-text {
+  font-size: 14px;
+}
+
+/* Standardize padding for all elements in the left panel */
+.left-column-section {
+  padding: 24px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.left-column-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px;
+}
+
+/* Set consistent padding for control sections */
+.left-panel-section,
+.nft-preview-section,
+.toggle-container,
+.random-seed-container,
+.nft-preview-container,
+.nft-preview-group,
+.nft-controls,
+.control-buttons,
+.seed-controls,
+.tier-controls {
+  padding: 0;
+  width: 100%;
+}
+
+/* Standardize padding for control groups */
+.control-buttons,
+.seed-controls,
+.tier-controls {
+  padding: 0 4px;
+  gap: 10px;
+}
+
+/* Consistent internal padding */
+.nft-single-preview-panel {
+  margin: 0 auto 8px;
+}
+
+.nft-rarity-seed-row {
+  padding: 4px 4px;
+  margin: 8px 0 12px;
+}
+
+/* Standard form controls padding */
+.form-control,
+.toggle-label,
+#tier-select {
+  padding: 8px 10px;
+}
+
+/* Consistent subsection title spacing */
+.subsection-title {
+  margin: 0 0 12px 0;
+  padding: 0 4px;
+}
+
+/* Consistent spacing for form help text */
+.form-help {
+  padding: 0 4px;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+/* Improve toggle container spacing */
+.toggle-container {
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+/* Apply consistent internal padding to random seed container */
+.random-seed-container {
+  padding: 0 4px;
+}
+
+.random-seed-header {
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+/* Additional padding standardization */
+
+/* Ensure control buttons have consistent padding */
+.control-buttons {
+  padding: 0 4px;
+}
+
+/* Reset and standardize padding for seed and tier controls */
+.seed-controls {
+  padding: 0 4px;
+}
+
+.tier-controls {
+  padding: 0 4px;
+}
+
+/* Ensure toggle components are aligned */
+.toggle-label {
+  padding: 4px;
+}
+
+/* Standardize inputs */
+#random-seed,
+#single-seed-input {
+  padding: 8px 10px;
+  height: 32px;
+}
+
+/* Reset any previously set padding for these elements */
+#randomize-override-btn, 
+#generate-seed-nft-btn, 
+#generate-tier-nft-btn {
+  padding: 8px 12px;
+}
+
+/* Consistent spacing between control rows */
+.nft-controls {
+  gap: 14px;
+  margin-top: 14px;
+}
+
+/* NFT Preview title consistent padding */
+.nft-preview-container .subsection-title {
+  padding: 0 4px;
+  margin-bottom: 12px;
+}
+
+/* Ensure consistent width and margin for form inputs */
+.form-control, 
+#tier-select {
+  margin: 0;
+  padding: 8px 10px;
+  height: 38px;
+}
+
+/* Common padding for all interactive elements */
+.left-column-section .btn,
+.left-column-section input,
+.left-column-section select,
+.left-column-section .toggle-label {
+  box-sizing: border-box;
+}
+
+/* Apply consistent padding to the subsections */
+.left-panel-section,
+.nft-preview-section {
+  padding: 0 0 8px 0;
+}
+
+/* Final refinements for perfect alignment and consistent padding */
+
+/* Update tier group span to align with toggle */
+.tier-group span {
+  padding: 4px;
+  flex-basis: 120px;
+  margin-right: 0;
+}
+
+/* Ensure equal vertical spacing between all components */
+.left-column-group > * {
+  margin-bottom: 0;
+}
+
+/* Reset any conflicting padding from previous rules */
+.control-buttons,
+.seed-controls,
+.tier-controls {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Ensure seed and tier groups align perfectly */
+.seed-controls .toggle-label,
+.tier-group span {
+  flex-basis: 120px;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure perfect alignment of form help text */
+.random-seed-container .form-help {
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: 0;
+}
+
+/* Consistent padding for the toggle container */
+.toggle-container .toggle-label {
+  display: flex;
+  padding: 4px;
+}
+
+/* Make sure the preview panel has consistent vertical margins */
+.nft-single-preview-panel {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+/* Make all headings consistent */
+.subsection-title,
+.trait-info-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+
+/* Ensure toggle sliders and text have the same alignment */
+.toggle-slider {
+  margin: 0 8px 0 0;
+}
+
+/* Final spacing fixes for controls */
+.random-seed-header label.toggle-label {
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-text {
+  padding-top: 1px;
+}
+
+/* Fix NFT Preview section padding */
+.nft-preview-section {
+  padding: 0 4px !important;
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Ensure NFT preview container has consistent padding */
+.nft-preview-container {
+  padding: 0 !important;
+  width: 100%;
+}
+
+/* Fix NFT preview group padding */
+.nft-preview-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 !important;
+}
+
+/* Ensure NFT single preview panel has consistent padding */
+.nft-single-preview-panel {
+  width: 100%;
+  margin: 0 auto 12px;
+  padding: 0 !important;
+}
+
+/* Fix NFT rarity seed row padding */
+.nft-rarity-seed-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 8px 0 12px;
+  padding: 0 4px !important;
+}
+
+/* Ensure consistent padding in NFT preview placeholder */
+.nft-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 20px 0 !important;
+  text-align: center;
+}
+
+/* Fix inconsistent padding in subsection title */
+.nft-preview-container .subsection-title {
+  padding: 0 4px !important;
+  margin-bottom: 12px;
+  width: 100%;
+  align-self: flex-start;
+}
+
+/* Standardize traits list padding to match the NFT preview panel */
+.traits-list-column {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+}
+
+.traits-list-card {
+  padding: 24px !important;
+  margin: 0 !important;
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  flex: none !important; /* Prevent flex sizing */
+  box-sizing: border-box !important;
+}
+
+.trait-info-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 14px 0;
+  padding: 0 4px !important;
+}
+
+.nft-trait-info-panel {
+  padding: 0 4px !important;
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  height: 702px !important; /* Fixed height to prevent layout shifts */
+  min-height: 702px !important;
+  max-height: 702px !important;
+  flex: none !important; /* Prevent flex sizing */
+}
+
+/* Ensure NFT trait info list has proper bottom padding for non-scrollable margin */
+.nft-trait-info-list {
+  padding-bottom: 8px !important; /* Standard padding, visual frame added via ::after pseudo-element */
+}
+
+/* Removed - consolidated in final-overrides.css */
+
+.nft-trait-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px !important;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  height: 165px !important;
+}
+
+/* Ensure toggle container aligns with other elements */
+.toggle-container {
+  margin-bottom: 8px;
+  padding: 0 4px !important;
+}
+
+/* Final check for padding consistency in left column */
+.random-seed-container {
+  padding: 0 4px !important;
+}
+
+.random-seed-header {
+  padding: 0 !important;
+}
+
+/* One last check to ensure NFT controls spacing is consistent */
+.nft-controls {
+  padding: 0 4px !important;
+  margin-top: 14px;
+}
+
+/* Ensure ALL tab content is left-aligned with navigation bar */
+.tab-content {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tab-content .section-title,
+.tab-content .section-description,
+.tab-content .form-container {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+}
+
+/* tab-content traits-section and rules-section rules - handled by traits-panel-override.css */
+
+/* Make content area flush with navigation */
+.content-area {
+  padding: 2rem 2rem 2rem 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Remove existing left padding from all main tab containers */
+#traits-rules,
+#generate-nfts,
+#generate-metadata,
+#export-nfts {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Fix any nested containers to maintain alignment */
+.generate-nfts-container {
+  margin-left: 0 !important;
+}
+
+/* Fix two-column layout in tab content - handled by collection-info-override.css for general-info */
+
+/* Ensure traits and rules section maintains proper alignment - handled by traits-panel-override.css */
+
+/* Fix dropzone alignment */
+#trait-layers-dropzone {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+/* Fix any specific container issues */
+.trait-layers-actions,
+.stacking-order-info {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.trait-layers-actions-left {
+  margin-left: 6px !important; /* Changed to 6px */
+}
+
+.trait-layers-actions-right {
+  margin-right: 6px !important; /* Changed to 6px */
+}
+
+/* Ensure content doesn't get too wide and maintains left alignment */
+.content-area > * {
+  max-width: 1400px !important;
+}
+
+/* Consistent alignment for metadata and export tabs */
+#generate-metadata,
+#export-nfts {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+#generate-metadata .section-title,
+#generate-metadata .section-description,
+#export-nfts .section-title,
+#export-nfts .section-description {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+}
+
+/* Consistent form container alignment for all tabs */
+.form-container {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+  width: calc(100% - 48px) !important;
+  max-width: 1200px !important;
+}
+
+/* Override specific case for any tables in metadata or export tabs */
+#generate-metadata table,
+#export-nfts table {
+  margin-left: 24px !important;
+  width: calc(100% - 48px) !important;
+}
+
+/* Final fix for any remaining alignment issues */
+.tab-content > * {
+  margin-left: 0 !important;
+}
+
+/* Ensure navigation container aligns with content */
+.nav-container {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+.nav-tabs-container {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.nav-tabs {
+  padding-left: 24px !important; /* Match content padding */
+  margin-left: 0 !important;
+}
+
+/* Make sure nav header also aligns properly */
+.nav-header {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+/* STANDARDIZE LEFT PADDING ACROSS ALL TABS */
+
+/* General Info tab padding fixes - handled by collection-info-override.css */
+
+/* Generate Metadata and Export NFTs tab padding fixes */
+#generate-metadata .section-title,
+#generate-metadata .section-description,
+#export-nfts .section-title,
+#export-nfts .section-description {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+}
+
+#generate-metadata .form-container,
+#export-nfts .form-container {
+  margin-left: 24px !important;
+  width: calc(100% - 48px) !important;
+}
+
+/* Consistent padding for the two-column form - handled by collection-info-override.css for general-info */
+
+/* Ensure all form groups inside general info have consistent spacing - handled by collection-info-override.css */
+
+/* Standardize dropzone areas across all tabs */
+.dropzone {
+  margin-left: 24px !important;
+  width: calc(100% - 48px) !important;
+}
+
+/* Standardize all subsection titles */
+.subsection-title {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+}
+
+/* Final fix for any custom sections in any tab */
+.tab-content > div:not(.section-title):not(.section-description) {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.tab-content > .form-container,
+.tab-content > .metadata-section,
+.tab-content > .export-section {
+  margin-left: 24px !important;
+}
+
+.tab-content > .traits-section,
+.tab-content > .rules-section {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* MASTER LEFT PADDING FIX - MAKE ALL TABS MATCH COLLECTION INFO TAB */
+.tab-content > *:not(.traits-section):not(.rules-section) {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Direct children that need specific width control */
+.tab-content > .form-container,
+.tab-content > .traits-section,
+.tab-content > .rules-section,
+.tab-content > .combination-rules-container,
+.tab-content > .trait-layers-container,
+.tab-content > .dropzone,
+.tab-content > #trait-layers-dropzone,
+.tab-content > .two-column-form {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+}
+
+.tab-content > .trait-layers-container {
+  margin-bottom: 24px !important;
+}
+
+/* Fix for the Generate NFTs tab which has a unique structure */
+#generate-nfts.tab-content > *,
+#generate-nfts .section-title,
+#generate-nfts .section-description,
+#generate-nfts .generate-nfts-locked-group-row,
+#generate-nfts .generate-nfts-container,
+#generate-nfts .generate-nfts-actions,
+#generate-nfts .nft-preview-section {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+}
+
+/* Ensure any nested elements don't get double padding */
+.tab-content > * > * {
+  padding-left: 0 !important;
+}
+
+/* Specific exceptions for multi-level nested elements that should have no left padding */
+.form-container .form-group,
+.form-container .form-column,
+.traits-section .trait-layers-container,
+.traits-section .stacking-order-info,
+.form-container .form-actions {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Override for specific elements in forms */
+.form-container input,
+.form-container textarea,
+.form-container select,
+.form-container button {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Final alignment fix for nested inner content */
+.generate-nfts-locked-group-row .left-column-section,
+.generate-nfts-locked-group-row .traits-list-column,
+.left-column-section .nft-controls,
+.left-column-section .nft-preview-section,
+.traits-list-column .traits-list-card {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Traits & Rules tab styles are handled by traits-panel-override.css */
+
+/* Fix padding for toggle-container and random-seed-container to match NFT preview panel */
+#generate-nfts .left-panel-section,
+#generate-nfts .toggle-container,
+#generate-nfts .random-seed-container {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+  width: calc(100% - 24px) !important;
+}
+
+#generate-nfts .toggle-container .toggle-label,
+#generate-nfts .random-seed-container .form-help,
+#generate-nfts .random-seed-header {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Ensure nested elements don't get double padding */
+#generate-nfts .random-seed-container .random-seed-header label,
+#generate-nfts .random-seed-container .random-seed-header input {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Fix toggle text alignment for consistency */
+#generate-nfts .toggle-text,
+#generate-nfts .form-help {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Ensure the left-column-section has consistent padding */
+#generate-nfts .left-column-section {
+  padding: 24px !important;
+  padding-right: 8px !important;
+}
+
+/* Ensure the NFT preview section aligns with the elements above it */
+#generate-nfts .nft-preview-section {
+  padding-left: 24px !important;
+  margin-left: 0 !important;
+  width: calc(100% - 24px) !important;
+}
+
+/* COLLECTION INFO TAB LEFT PADDING FIX - handled by collection-info-override.css */
+
+/* Collection Info tab styles are handled by collection-info-override.css */
+
+/* Form group fixes to prevent double padding - handled by collection-info-override.css */
+
+
+/* Form action buttons - handled by collection-info-override.css */
+
+
+#randomize-override-btn {
+  width: 90px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Ensure .trait-layer-dropzone extends to the right edge */
+.trait-layer-dropzone {
+  width: 100% !important;
+  max-width: none !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.trait-item > .trait-image {
+  margin-top: 15px !important;
+}
+
+.traits-list-card {
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  /* ... keep other properties ... */
+}
+
+/* traits-section width - handled by traits-panel-override.css */
+
+/* Divider styles moved to final-overrides.css for consistency */
+
+.randomize-tooltip, .randomize-rarities-btn .tooltiptext.randomize-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.nft-trait-name-below {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 4px;
+  margin-bottom: 0;
+  width: 115px !important;
+  height: 42px !important;
+}
+.nft-trait-name-below .nft-trait-name {
+  font-weight: 600;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  width: 100%;
+}
+.nft-trait-name-below .nft-trait-sublayer {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  width: 100%;
+}
+
+.seed-label {
+  font-size: 15px !important;
+  font-weight: bold !important;
+  color: var(--text-color, #fff) !important;
+}
+
+.trait-name.custom-tooltip-anchor, .custom-tooltip-anchor, .trait-selection-name.custom-tooltip-anchor {
+  width: 175px !important;
+  height: 25px !important;
+  min-width: 175px !important;
+  min-height: 25px !important;
+  max-width: 175px !important;
+  max-height: 25px !important;
+  display: block !important;
+  position: relative !important;
+}
+
+/* Override custom-tooltip-anchor height when trait layers are expanded */
+.trait-layer-bar.expanded .trait-item .custom-tooltip-anchor {
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+}
+
+.trait-item {
+  min-width: 175px !important;
+  min-height: 270px !important;
+  height: 270px !important;
+  max-height: 270px !important;
+  width: 175px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+.trait-details {
+  min-width: 175px !important;
+  min-height: 25px !important;
+  height: 25px !important;
+  width: 175px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
+
+.rules-section {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+}
+
+.tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip {
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+}
+
+.trait-layer-bar.expanded .traits-grid,
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(8, 175px) !important;
+  gap: 10px !important;
+  column-gap: 10px !important;
+  row-gap: 10px !important;
+  width: 100% !important;
+  justify-content: start !important;
+  align-items: flex-start !important;
+  justify-items: center !important;
+  min-height: 330px !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  grid-auto-flow: row !important;
+  place-items: start center !important;
+}
+
+#app-title, .app-title, .main-nav, .main-navigation, .project-buttons, .project-btn, #project-buttons, #main-nav, #main-navigation, #project-btns, #project-btn-new, #project-btn-load, #project-btn-save, #project-btn-saveas {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+}
+
+.nav-header {
+  background-color: #000 !important;
+}
+
+.nav-title {
+  font-size: 62.4px !important;
+}
+
+/* Add top padding to the main content area to prevent it from being hidden under the fixed header */
+.content-area, .tab-content, #generate-nfts, #traits-rules, #generate-metadata, #export-nfts {
+  /* padding-top moved to main.css for consistency */
+}
+
+/* Ensure all floating and content elements in Traits & Rules are always below the navigation, app title, and project buttons */
+.tab-content,
+.traits-section,
+.rules-section,
+.trait-layer-bar,
+.trait-layer-header,
+.trait-item,
+.modal,
+.modal-overlay,
+.tooltip,
+.tooltiptext,
+.custom-tooltip,
+.randomize-tooltip,
+.notification,
+.notification-container,
+.feedback-message,
+.feedback-fixed-position,
+.feedback-left-aligned,
+.fixed-notification-container,
+.specific-tooltip,
+.injected-tooltip,
+.override-randomize-tooltip,
+.randomize-tooltip-content,
+.trait-layer-content,
+.combination-rule-modal {
+  z-index: 9999 !important;
+}
+
+/* Only floating UI elements should have z-index: 9999, not main content containers */
+.modal,
+.modal-overlay,
+.tooltip,
+.tooltiptext,
+.custom-tooltip,
+.randomize-tooltip,
+.notification,
+.notification-container,
+.feedback-message,
+.feedback-fixed-position,
+.feedback-left-aligned,
+.fixed-notification-container,
+.specific-tooltip,
+.injected-tooltip,
+.override-randomize-tooltip,
+.randomize-tooltip-content,
+.combination-rule-modal {
+  z-index: 9999 !important;
+}
+
+/* Remove z-index from main content containers if previously set */
+.tab-content,
+.traits-section,
+.rules-section,
+.trait-layer-bar,
+.trait-layer-header,
+.trait-item,
+.trait-layer-content {
+  z-index: unset !important;
+}
+
+/* Final override: No floating UI except the fixed header can have z-index above 9999 */
+.tooltip,
+.tooltiptext,
+.custom-tooltip,
+.randomize-tooltip,
+.modal,
+.modal-overlay,
+.notification,
+.notification-container,
+.feedback-message,
+.feedback-fixed-position,
+.feedback-left-aligned,
+.fixed-notification-container,
+.specific-tooltip,
+.injected-tooltip,
+.override-randomize-tooltip,
+.randomize-tooltip-content,
+.combination-rule-modal,
+#trait-image-preview-modal {
+  z-index: 9999 !important;
+}
+
+/* Remove z-index from all content elements */
+.trait-item,
+.trait-layer-bar,
+.trait-layer-header,
+.trait-details,
+.trait-layer-content,
+.nft-trait-info-item,
+.nft-trait-info-item .nft-trait-name-layer-container,
+.nft-trait-info-item .nft-trait-name,
+.nft-trait-info-item .nft-trait-layer-name,
+.trait-forbidden-overlay {
+  z-index: unset !important;
+}
+
+/* Ensure stacking-order-info tooltip and all rule-related buttons never overlap the fixed top section */
+.stacking-order-info.tooltip,
+.add-layer-btn,
+#add-layer-btn,
+#delete-all-layers,
+.add-folders-btn,
+#add-combination-rule,
+.edit-rule-btn,
+.delete-rule-btn {
+  z-index: unset !important;
+  position: relative !important;
+}
+
+.add-folders-btn,
+.action-btn,
+.rule-actions .action-btn {
+  z-index: unset !important;
+  position: relative !important;
+}
+
+.add-folders-btn,
+#add-folders-btn,
+.add-layer-btn,
+#add-layer-btn,
+.action-btn,
+.rule-actions .action-btn {
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+.tab-content,
+.section-title,
+.subsection-title,
+h3.subsection-title {
+  margin-top: 0.5rem !important;
+  /* padding-top moved to main.css for consistency */
+}
+
+.content-area {
+  margin-top: 0 !important;
+  /* padding-top moved to main.css for consistency */
+  height: auto !important;
+  min-height: unset !important;
+}
+
+.content-area,
+#general-info .content-area,
+#traits-rules .content-area,
+#generate-metadata .content-area,
+#export-nfts .content-area {
+  margin-top: 0 !important;
+  /* padding-top moved to main.css for consistency */
+  height: auto !important;
+  min-height: unset !important;
+}
+
+.trait-forbidden-overlay {
+  z-index: 20 !important;
+  pointer-events: none !important;
+}
+
+.nft-trait-thumb .trait-forbidden-overlay {
+  z-index: 20 !important;
+}
+
+/* FINAL OVERRIDE: Always show forbidden overlay on top in NFT Traits panel */
+.nft-trait-thumb .trait-forbidden-overlay, .trait-forbidden-overlay {
+  z-index: 99999 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 60px !important;
+  height: 60px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  background: none !important;
+  opacity: 1 !important;
+}
+
+/* --- ENFORCE TRAIT LAYERS ACTIONS AND DROPZONE SIZING --- */
+.trait-layers-actions {
+  width: 1557px !important;
+  height: 55px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  box-sizing: border-box !important;
+}
+.trait-layer-dropzone,
+.trait-layers-dropzone {
+  width: 1557px !important;
+  height: 228px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  max-height: 228px !important;
+  min-height: 228px !important;
+  box-sizing: border-box !important;
+  margin-bottom: 24px !important;
+}
+
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  margin-top: -5px !important;
+}
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  margin-top: -5px !important;
+}
+
+.trait-layer-header-rarity-slider {
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+.trait-layer-header-rarity-slider::-moz-range-track {
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+/* Unified app action button style */
+.app-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  min-width: 150px;
+  height: 38px;
+  white-space: nowrap;
+}
+.app-action-btn svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+.app-action-btn:hover {
+  background-color: var(--button-hover);
+}
+.app-action-btn--danger {
+  background-color: #ff0000 !important;
+  color: #fff !important;
+}
+.app-action-btn--danger:hover {
+  background-color: #cc0000 !important;
+}
+/* Remove/override old conflicting rules for these buttons */
+.add-traits-btn, .randomize-rarities-btn, .normalize-rarities-btn, #add-layer-btn, #delete-all-layers, #add-combination-rule {
+  all: unset;
+  display: revert;
+  box-sizing: border-box;
+}
+.add-traits-btn, .randomize-rarities-btn, .normalize-rarities-btn, #add-layer-btn, #add-combination-rule {
+  composes: app-action-btn btn btn-primary;
+}
+#delete-all-layers {
+  composes: app-action-btn btn app-action-btn--danger;
+}
+
+.randomize-rarities-tiered-btn {
+  /* ... same styles as before ... */
+}
+.add-traits-btn, .randomize-rarities-tiered-btn, .normalize-rarities-btn, #add-layer-btn, #delete-all-layers, #add-combination-rule {
+  /* ... same styles as before ... */
+}
+
+/* Remove or override conflicting display/block/position rules for trait-selection-img, trait-none-placeholder, and trait-forbidden-overlay in the Select Trait modal */
+#trait-selection-modal .trait-selection-img,
+#trait-selection-modal .trait-none-placeholder,
+#trait-selection-modal .trait-forbidden-overlay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  position: relative !important;
+  background: none !important;
+}
+
+#single-seed-input {
+  width: 166px !important;
+  min-width: 166px !important;
+  max-width: 166px !important;
+  text-align: right !important;
+}
+
+/* Toggle Switch Styles for Metadata Tab */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+}
+.toggle-label input[type="checkbox"] {
+  display: none;
+}
+.toggle-slider {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  background-color: #4a4a4a;
+  border-radius: 11px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+.toggle-slider:before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+.toggle-label input[type="checkbox"]:checked + .toggle-slider {
+  background-color: var(--accent-primary);
+}
+.toggle-label input[type="checkbox"]:checked + .toggle-slider:before {
+  transform: translateX(22px);
+  background-color: white;
+}
+.toggle-text {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 500;
+}
+/* Tooltip for toggle */
+.toggle-label .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background-color: rgba(0, 0, 0, 0.9) !important; /* Standard black tooltip background */
+  background: rgba(0, 0, 0, 0.9) !important; /* Standard black tooltip background */
+  color: #ffffff !important; /* Standard white text */
+  border-radius: 6px;
+  padding: 8px 10px !important; /* Standard padding */
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 260px;
+  max-width: 340px;
+  z-index: 10;
+  font-size: 11px !important; /* Standard font size */
+  font-family: 'Archivo', sans-serif !important; /* Standard font */
+  pointer-events: none;
+  white-space: normal;
+}
+.toggle-label:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  display: block;
+}
+
+/* Batch management section width and padding */
+#batch-management-section {
+  width: 921px !important;
+  height: 364px !important;
+  min-width: 921px !important;
+  max-width: 921px !important;
+  min-height: 364px !important;
+  max-height: 364px !important;
+  margin: 0 !important;
+  margin-top: 20px !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  padding: 20px !important;
+  background-color: #111111 !important;
+  background: #111111 !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  display: grid !important;
+  box-sizing: border-box !important;
+}
+#batch-management-section input[type=number]::-webkit-inner-spin-button,
+#batch-management-section input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#batch-management-section input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

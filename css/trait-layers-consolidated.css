@@ -1,0 +1,1602 @@
+/* =========================================
+   CONSOLIDATED TRAIT LAYERS STYLING
+   This file contains all styles for the trait layers functionality,
+   including headers, content, sliders, and drag-and-drop.
+   ========================================= */
+
+/*
+  CRITICAL: All trait layer content (trait-layer-bar, trait-layer-header, etc.) must always scroll UNDERNEATH the fixed header, navigation, logo, and project action buttons. Only floating UI (modals, tooltips, notifications) can have z-index above 9999. Do NOT set z-index or position: fixed/sticky on any trait layer content. This is enforced below and in styles.css. */
+.trait-layer-bar,
+.trait-layer-header {
+  z-index: unset !important;
+  position: static !important;
+}
+
+/* ===== TRAIT LAYERS SECTION ===== */
+.trait-layers-section {
+  margin-bottom: 30px;
+}
+
+.trait-layers-header {
+  min-width: 1557px !important;
+  width: 1557px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 15px !important;
+  max-width: 1557px !important;
+}
+
+.trait-layers-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ===== TRAIT LAYERS ACTIONS ===== */
+.trait-layers-actions {
+  width: 1557px !important;
+  height: 55px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  margin-left: 0 !important; /* Changed from auto to 0 as requested */
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.trait-layers-actions-left {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: flex-start; /* Changed from center to flex-start to allow margin-top to work */
+  vertical-align: middle;
+  gap: 10px;
+  margin-top: 6px; /* Moved 4px up from 10px */
+  margin-left: 6px; /* Changed to 6px */
+}
+
+.trait-layers-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: flex-start; /* Changed from center to flex-start to allow margin-top to work */
+  vertical-align: middle;
+  gap: 10px;
+  margin-top: 6px; /* Moved 4px up from 10px */
+  margin-right: 6px; /* Changed to 6px */
+}
+
+/* Add Layer Container */
+.add-layer-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-layer-input {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-width: 200px;
+}
+
+#add-layer-btn,
+#delete-all-layers {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#add-layer-btn svg,
+#delete-all-layers svg {
+  margin-right: 0;
+}
+
+/* ===== TRAIT LAYERS DROPZONE ===== */
+#trait-layers-dropzone, .trait-layers-dropzone {
+  width: 1557px !important;
+  height: 228px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  max-height: 228px !important;
+  min-height: 228px !important;
+  box-sizing: border-box !important;
+  margin-top: 0 !important; /* Remove top margin */
+  margin-bottom: 24px !important;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  padding-top: 0 !important; /* Remove top indentation */
+  background-color: #222230;
+  transition: all 0.3s ease;
+}
+
+#trait-layers-dropzone.highlight,
+#trait-layers-dropzone.active {
+  border-color: var(--accent-primary);
+  background-color: rgba(108, 92, 231, 0.1);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.dropzone-content svg {
+  width: 36px;
+  height: 36px;
+  color: var(--text-secondary);
+}
+
+.dropzone-content p {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.dropzone-help {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-thin);
+  color: var(--text-secondary);
+  max-width: 500px;
+}
+
+/* add-folders-btn styles moved to final-overrides.css */
+
+/* ===== TRAIT LAYERS CONTAINER ===== */
+.trait-layers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 24px !important;
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: 24px !important;
+  margin-right: auto !important;
+}
+
+/* ===== TRAIT LAYER BAR ===== */
+.trait-layer-bar {
+  margin-bottom: 0.75rem;
+  cursor: default;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: visible; /* Changed from hidden to visible to prevent corner clipping */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: none !important;
+}
+
+.trait-layer-bar.dragging {
+  opacity: 0.7;
+  background-color: #3a3852;
+  box-shadow: none !important;
+  position: relative;
+  z-index: 100;
+  cursor: grabbing;
+}
+
+/* Placeholder styling for drag and drop visualization */
+.trait-layer-placeholder {
+  height: 4rem;
+  border: 2px dashed var(--accent-primary);
+  border-radius: 12px;
+  background-color: rgba(108, 92, 231, 0.1);
+  margin-bottom: 0.75rem;
+  transition: all 0.2s ease;
+  animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* ===== DIVIDER ===== */
+.traits-section .divider {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 3rem !important;
+  margin-bottom: 0 !important;
+  height: 1px !important;
+  background-color: var(--border-color) !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  position: relative !important;
+  float: none !important;
+  clear: both !important;
+}
+
+/* ===== TRAIT LAYER HEADER ===== */
+/*
+  Ensure .trait-layer-header has 2rem left and right padding for visual consistency.
+*/
+.trait-layer-header {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 2rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  border-radius: 12px !important;
+  flex-wrap: nowrap !important; /* Prevent wrapping */
+  box-shadow: none !important;
+}
+
+/* Fix trait layer header background for purple look */
+.trait-layer-bar .trait-layer-header {
+  background-color: var(--trait-header-odd) !important;
+}
+.trait-layer-bar:nth-child(even) .trait-layer-header {
+  background-color: var(--trait-header-even) !important;
+}
+
+/* Hover effects */
+.trait-layer-bar:nth-child(odd) .trait-layer-header:hover {
+  background-color: var(--trait-header-odd-hover) !important;
+}
+
+.trait-layer-bar:nth-child(even) .trait-layer-header:hover {
+  background-color: var(--trait-header-even-hover) !important;
+}
+
+/* Ensure drag handle is visible and properly sized */
+.trait-layer-drag-handle {
+  margin-left: 24px !important;
+  margin-right: 1rem !important;
+  cursor: grab;
+  flex: 0 0 auto !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Layer Arrow */
+.trait-layer-arrow {
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.trait-layer-arrow svg {
+  width: 32px !important;
+  height: 32px !important;
+  stroke-width: 3px !important;
+  font-weight: 900 !important;
+  transition: transform 0.2s;
+}
+
+.trait-layer-arrow.expanded svg {
+  transform: rotate(90deg) !important;
+}
+
+.trait-layer-arrow svg {
+  transform: rotate(0deg) !important;
+}
+
+/* Ensure the info section doesn't take too much space */
+.trait-layer-info {
+  flex: 0 1 auto !important; /* Allow it to shrink but not grow */
+  min-width: 150px !important;
+  margin-right: 10px !important;
+}
+
+.trait-layer-name {
+  font-weight: var(--font-weight-semibold) !important;
+  margin-bottom: 0.25rem !important;
+  color: var(--text-primary) !important;
+}
+
+.trait-layer-stats {
+  font-size: 0.85rem !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ===== TRAIT LAYER RARITY SLIDER ===== */
+/* Update the trait layer header rarity section to use more space */
+.trait-layer-header-rarity {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin-top: 0.25rem !important;
+  min-width: 200px !important;
+  flex: 1 !important;
+  margin-right: 1rem !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Make the slider take up all available space */
+.trait-layer-header-rarity-slider {
+  width: 100% !important;
+  flex: 1 !important;
+  -webkit-appearance: none !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+  background-color: #000 !important;
+  border: 1px solid var(--slider-track-border) !important;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 10;
+  position: relative;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+/* Slider thumb styling */
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  margin-top: -5px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  margin-top: -5px !important;
+}
+
+/* Hover effect for slider thumb */
+.trait-layer-header-rarity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 5px var(--accent-primary) !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-thumb:hover {
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 5px var(--accent-primary) !important;
+}
+
+/* Rarity value input */
+.trait-layer-header-rarity-value {
+  font-size: 0.85rem !important;
+  font-weight: var(--font-weight-medium) !important;
+  width: 60px !important;
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  padding: 0.25rem !important;
+  text-align: center !important;
+  transition: color 0.3s ease !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* ===== TRAIT LAYER POSITION CONTROLS ===== */
+/* Make sure the position controls and actions don't shrink */
+.trait-layer-position {
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 1rem !important;
+  flex: 0 0 auto !important;
+}
+
+.position-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
+}
+
+.position-controls {
+  display: flex !important;
+  gap: 0.25rem !important;
+}
+
+.position-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.position-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.position-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+}
+
+.position-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* ===== TRAIT LAYER ACTIONS ===== */
+.trait-layer-actions {
+  display: flex !important;
+  gap: 0.5rem !important;
+  flex: 0 0 auto !important;
+}
+
+.action-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  padding: 0.5rem !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.action-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+}
+
+.rename-layer,
+.delete-layer {
+  color: inherit !important;
+  background: none !important;
+  border: none !important;
+}
+
+/* ===== TRAIT LAYER CONTENT ===== */
+.trait-layer-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out !important;
+  padding: 0 1rem !important;
+  border-top: 1px solid var(--border-color) !important;
+  background-color: var(--bg-primary) !important;
+  user-drag: none;
+  -webkit-user-drag: none;
+  visibility: hidden;
+}
+
+.trait-layer-content.expanded {
+  width: 1557px !important;
+  max-height: 1000px !important; /* Large enough to contain any content */
+  transition: max-height 0.5s ease-in !important;
+  padding: 1rem 0 1rem 0 !important; /* Remove left and right padding to align with header */
+  visibility: visible;
+}
+
+/* ===== TRAIT LAYER DROPZONE ===== */
+.trait-layer-dropzone {
+  width: 1557px !important;
+  height: 228px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  max-height: 228px !important;
+  min-height: 228px !important;
+  box-sizing: border-box !important;
+  margin-left: 24px !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  border: 2px dashed var(--border-color) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  text-align: center !important;
+  margin-bottom: 1.5rem !important;
+  transition: all 0.3s ease !important;
+  background-color: #222230 !important;
+}
+
+.trait-layer-dropzone.highlight {
+  border-color: var(--accent-primary) !important;
+  background-color: rgba(108, 92, 231, 0.1) !important;
+}
+
+.trait-layer-dropzone .dropzone-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.trait-layer-dropzone .dropzone-content p {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+/* Add Traits Button */
+.trait-layer-dropzone .add-traits-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 150px;
+  height: 38px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.trait-layer-dropzone .add-traits-btn svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* ===== TRAIT RARITY ACTIONS ===== */
+.trait-rarity-actions {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 1rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.trait-rarity-actions .btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  min-width: 200px !important;
+  height: 38px !important;
+  font-size: 1rem !important;
+  white-space: nowrap !important;
+}
+
+.randomize-rarities-btn {
+  min-width: 280px !important;
+}
+
+/* ===== TRAITS GRID ===== */
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+/* ===== TRAIT ITEM ===== */
+.trait-item,
+.traits-grid .trait-layer-trait-item,
+.traits-grid .trait-item {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 270px !important;
+  min-height: 270px !important;
+  max-height: 270px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background-color: #222230 !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  box-sizing: border-box !important;
+  padding: 12px 8px 12px 8px !important;
+}
+
+.trait-item:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.trait-item > .trait-image {
+  margin-top: 15px !important;
+}
+
+.trait-image {
+  height: 150px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #1a1a28 !important;
+}
+
+.trait-image img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+.trait-image-placeholder {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.trait-image-placeholder svg {
+  width: 48px !important;
+  height: 48px !important;
+  color: var(--text-secondary) !important;
+}
+
+.trait-details {
+  min-width: 175px !important;
+  min-height: 50px !important;
+  height: 50px !important;
+  width: 175px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+}
+
+/* Override trait-details height when trait layers are expanded */
+.trait-layer-bar.expanded .trait-layer-trait-item .trait-details,
+.trait-layer-bar.expanded .trait-item .trait-details {
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+}
+
+/* Ensure trait-details content is vertically aligned */
+.trait-details {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+}
+
+.trait-name {
+  font-weight: var(--font-weight-semibold) !important;
+  margin-bottom: 0.5rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ===== TRAIT RARITY ===== */
+.trait-rarity {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.9rem !important;
+  gap: 0.5rem !important;
+}
+
+/* Override trait-layer-trait-rarity height when trait layers are expanded */
+.trait-layer-bar.expanded .trait-layer-trait-item .trait-layer-trait-rarity,
+.trait-layer-bar.expanded .trait-item .trait-layer-trait-rarity {
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  gap: 0 !important;
+}
+
+.trait-rarity-header {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.trait-rarity-header label {
+  color: var(--text-secondary) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+.trait-rarity-value {
+  font-weight: var(--font-weight-medium) !important;
+  transition: color 0.3s ease !important;
+}
+
+.trait-rarity-input {
+  font-size: 0.9rem !important;
+  color: var(--accent-primary) !important;
+  font-weight: 600 !important;
+  width: 60px !important;
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  padding: 0.35rem !important;
+  text-align: center !important;
+}
+
+.trait-layer-trait-rarity-slider {
+  width: 175px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  max-height: 15px !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  accent-color: #a084ff !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border-radius: 3px !important;
+  background: var(--slider-track-bg) !important;
+  border: 1px solid var(--slider-track-border) !important;
+  outline: none !important;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 10;
+  position: relative;
+}
+
+.trait-layer-trait-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.trait-layer-trait-rarity-slider::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+}
+
+.trait-layer-trait-rarity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2) !important;
+}
+
+.trait-layer-trait-rarity-slider::-moz-range-thumb:hover {
+  transform: scale(1.2) !important;
+}
+
+.trait-rarity-slider {
+  width: 100% !important;
+  -webkit-appearance: none !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  background: var(--slider-track-bg) !important;
+  border: 1px solid var(--slider-track-border) !important;
+  outline: none !important;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 10;
+  position: relative;
+  margin-top: 30px !important;
+}
+
+.trait-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.trait-rarity-slider::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+}
+
+.trait-rarity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2) !important;
+}
+
+.trait-rarity-slider::-moz-range-thumb:hover {
+  transform: scale(1.2) !important;
+}
+
+/* ===== TRAIT ACTIONS ===== */
+.trait-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  padding: 0.5rem !important;
+  border-top: 1px solid var(--border-color) !important;
+  align-items: center !important;
+  margin-top: 0 !important;
+}
+
+.trait-rarity-box {
+  width: 80px !important;
+  height: 24px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-right: 8px !important;
+  flex-shrink: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.trait-rarity-text {
+  font-size: 0.75rem !important;
+  font-weight: var(--font-weight-medium) !important;
+  color: #000 !important;
+  text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+.trait-rarity-indicator {
+  display: none !important;
+}
+
+.rename-trait:hover {
+  color: var(--warning-color) !important;
+}
+
+.delete-trait:hover {
+  color: var(--danger-color) !important;
+}
+
+/* ===== RARITY COLOR CLASSES ===== */
+/* Text colors */
+.rarity-zero {
+  color: #666666 !important; /* Dark grey for 0% */
+}
+
+.rarity-very-low {
+  color: #ff5555 !important; /* Red for >0% to 3% */
+}
+
+.rarity-low {
+  color: #ff9933 !important; /* Orange for >3% to 8% */
+}
+
+.rarity-medium {
+  color: #9966cc !important; /* Purple for >8% to 28% */
+}
+
+.rarity-high {
+  color: #3399ff !important; /* Blue for >28% to 53% */
+}
+
+.rarity-very-high {
+  color: #33cc66 !important; /* Green for >53% to 78% */
+}
+
+.rarity-max {
+  color: #ffffff !important; /* White for >78% to 100% */
+}
+
+/* Background colors */
+.bg-rarity-zero {
+  background-color: #666666 !important; /* Dark grey for 0% */
+}
+
+.bg-rarity-very-low {
+  background-color: #ff5555 !important; /* Red for >0% to 3% */
+}
+
+.bg-rarity-low {
+  background-color: #ff9933 !important; /* Orange for >3% to 8% */
+}
+
+.bg-rarity-medium {
+  background-color: #9966cc !important; /* Purple for >8% to 28% */
+}
+
+.bg-rarity-high {
+  background-color: #3399ff !important; /* Blue for >28% to 53% */
+}
+
+.bg-rarity-very-high {
+  background-color: #33cc66 !important; /* Green for >53% to 78% */
+}
+
+.bg-rarity-max {
+  background-color: #ffffff !important; /* White for >78% to 100% */
+}
+
+/* ===== STACKING ORDER INFO ===== */
+.stacking-order-info,
+.stacking-order-info.tooltip {
+  width: 1557px !important;
+  margin-left: 0 !important; /* Removed - indentation is on text instead */
+  margin-top: 0 !important;
+  height: 100px !important; /* Set height to 100px */
+  min-height: 100px !important;
+  max-height: 100px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important; /* Vertically align content to container */
+}
+
+.stacking-order-info {
+  flex-direction: row !important; /* Ensure horizontal layout */
+}
+
+.stacking-order-info svg {
+  color: #f39c12 !important; /* Orange color to match tooltips */
+  margin-right: 0.75rem;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.stacking-order-info {
+  justify-content: center !important; /* Center icon and text together */
+}
+
+.stacking-order-info p {
+  font-size: 0.9rem;
+  font-weight: var(--font-weight-thin);
+  color: #f39c12 !important; /* Orange color to match tooltips */
+  margin: 0 !important; /* Remove default paragraph margins */
+  margin-left: 0 !important; /* Removed - text and icon centered together */
+  display: flex !important; /* Use flex for proper alignment */
+  align-items: center !important; /* Vertically center text */
+  height: 100% !important; /* Take full height of container */
+  white-space: normal; /* Allow text wrapping if needed */
+}
+
+/* ===== TRAIT PREVIEW NO DRAG ===== */
+.traits-selection-list,
+.trait-selection-item,
+.trait-selection-label,
+.trait-selection-thumbnail,
+.trait-selection-thumbnail img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* Make sure the trait selection label is still clickable */
+.trait-selection-label {
+  cursor: pointer;
+}
+
+/* Ensure trait checkboxes work properly */
+.trait-checkbox {
+  pointer-events: none;
+}
+
+/* ===== RESPONSIVE STYLING ===== */
+@media (max-width: 768px) {
+  .trait-layer-header {
+    flex-wrap: wrap !important;
+  }
+
+  .trait-layer-info {
+    flex-basis: 100% !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .trait-layer-header-rarity {
+    max-width: 250px !important;
+    min-width: 150px !important;
+  }
+
+  .trait-layer-position {
+    margin-left: auto !important;
+    margin-right: 0.5rem !important;
+  }
+
+  .traits-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trait-layer-header-rarity {
+    max-width: 200px !important;
+    min-width: 120px !important;
+  }
+
+  .traits-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
+
+  .trait-image {
+    height: 120px !important;
+  }
+}
+
+/* ===== TRAIT LAYER EXPANDED ===== */
+.trait-layer-bar.expanded {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 1px var(--accent-primary) !important;
+  cursor: default !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-header {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* ===== TRAIT LAYER PLACEHOLDER ===== */
+.trait-layer-placeholder {
+  height: 60px !important;
+  border: 2px dashed var(--border-color) !important;
+  border-radius: 8px !important;
+  margin: 8px 0 !important;
+  background-color: rgba(108, 92, 231, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* ===== DRAG AND DROP STYLES ===== */
+.trait-layer-bar.dragging {
+  opacity: 0.4 !important;
+  cursor: grabbing !important;
+}
+
+.trait-layer-bar {
+  cursor: grab !important;
+  transition: all 0.2s ease !important;
+}
+
+.trait-layer-bar.expanded {
+  cursor: default !important;
+}
+
+/* ===== TRAIT LAYER DRAG HANDLE ===== */
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-drag-handle:active {
+  cursor: grabbing !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-drag-handle {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+/* Remove all custom randomize-tooltip styles */
+.randomize-tooltip, .randomize-rarities-btn .tooltiptext.randomize-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* FINAL OVERRIDE: Remove all gaps and spacing between trait cards in expanded trait layers */
+.trait-layer-bar.expanded .traits-grid,
+#traits-rules .trait-layer-bar.expanded .traits-grid,
+#traits-rules .traits-grid {
+  gap: 0 !important;
+  row-gap: 10px !important;
+  column-gap: 0px !important;
+  justify-content: start !important;
+}
+
+.traits-grid {
+  gap: 0 !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-trait-item,
+.trait-layer-bar.expanded .trait-item,
+#traits-rules .trait-layer-bar.expanded .trait-layer-trait-item,
+#traits-rules .trait-layer-bar.expanded .trait-item,
+.traits-grid .trait-item,
+.trait-item {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  background: #222230 !important;
+  box-sizing: border-box !important;
+}
+
+/* Remove all mouse hover effects from the Randomize Rarities (tiered) button */
+.randomize-rarities-btn:hover, .randomize-rarities-btn:focus, .randomize-rarities-btn:active {
+  background: #5b4dc7 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+  outline: none !important;
+  border: none !important;
+  filter: none !important;
+  transform: translateY(-2px) !important;
+  cursor: pointer !important;
+}
+
+.randomize-rarities-btn:hover .tooltiptext,
+.randomize-rarities-btn .tooltiptext.randomize-tooltip,
+.randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Force .trait-layer-dropzone and its parent containers to stretch to the far right */
+.trait-layer-dropzone {
+  width: 100vw !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.traits-section {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 0 !important;
+}
+
+/* Removed custom-tooltip-anchor styles to prevent tooltip display */
+.trait-name, .trait-selection-name {
+  width: 150px !important;
+  height: 53px !important;
+  min-width: 150px !important;
+  min-height: 53px !important;
+  max-width: 150px !important;
+  max-height: 53px !important;
+  display: block !important;
+  position: relative !important;
+}
+
+.randomize-rarities-btn .tooltiptext {
+  display: none !important;
+}
+.randomize-rarities-btn:hover .tooltiptext {
+  display: block !important;
+}
+
+.trait-layer-bar.expanded .traits-grid {
+  row-gap: 10px !important;
+  column-gap: 2.5px !important;
+}
+
+.rules-section {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+}
+
+.tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip {
+  z-index: 99999 !important;
+}
+
+.trait-layer-bar.expanded .traits-grid,
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(8, 175px) !important;
+  gap: 10px !important;
+  column-gap: 5px !important;
+  row-gap: 10px !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+  justify-content: start !important;
+  min-height: 228px !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  grid-auto-flow: row !important;
+  place-items: start !important;
+}
+
+/* Remove z-index from all content elements */
+.trait-item,
+.trait-layer-bar,
+.trait-layer-header,
+.trait-details,
+.trait-layer-content {
+  z-index: unset !important;
+}
+/* Floating UI only */
+.tooltip,
+.tooltiptext,
+.custom-tooltip,
+.randomize-tooltip,
+.modal,
+.modal-overlay:not(#trait-selection-modal),
+.notification,
+.notification-container {
+  z-index: 9999 !important;
+}
+
+/* Trait selection modal must always be on top */
+#trait-selection-modal.modal-overlay {
+  z-index: 1000000 !important;
+  position: fixed !important;
+}
+
+.add-folders-btn,
+.action-btn,
+.rule-actions .action-btn {
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+.tab-content,
+.section-title,
+.subsection-title,
+h3.subsection-title {
+  margin-top: 1.5rem !important;
+  padding-top: 0 !important;
+}
+
+.content-area {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  height: auto !important;
+  min-height: unset !important;
+}
+
+.custom-tooltip-anchor {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  height: 25px !important;
+  min-height: 25px !important;
+  max-height: 25px !important;
+  text-align: center !important;
+}
+.trait-layer-trait-name-ellipsis-list {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+  font-size: 11px !important;
+}
+.trait-name-ellipsis-list {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+  font-size: 11px !important;
+}
+
+#trait-selection-modal .trait-selection-name.custom-tooltip-anchor {
+  position: relative !important;
+  z-index: 10010 !important;
+}
+
+/*
+  Ensure all .modal-close-btn and .modal-close classes for all modals are exactly 20x20px, with no conflicting width/height/font-size rules.
+*/
+.modal-close-btn, .modal-close {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  font-size: 20px !important;
+  line-height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/*
+  Set .trait-layers-actions to exactly 1557px width and center them horizontally. 
+  Note: .subsection-title and .subsection-description are now content-width only.
+*/
+.trait-layers-actions {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/*
+  Apply Collection Info tab general styles (width, padding, margin, backgrounds, etc) to all main tabs for visual consistency.
+*/
+.tab-content .section-title,
+.tab-content .section-description {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: calc(100% - 48px) !important;
+  box-sizing: border-box !important;
+}
+.tab-content .content-area {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+.tab-content .form-container,
+.tab-content .form-container.two-column-form {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+  margin-bottom: 2rem !important;
+  padding: 2rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border: 2px dashed var(--border-color) !important;
+  border-radius: 12px !important;
+  background: #222230 !important;
+  box-sizing: border-box !important;
+}
+.tab-content .form-column {
+  flex: 1 !important;
+  min-width: 400px !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+.tab-content .form-control {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 1.2rem 1rem !important;
+  font-size: 1.1rem !important;
+  line-height: 1.5 !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+.tab-content textarea.form-control {
+  min-height: 150px !important;
+  resize: vertical !important;
+  padding: 1.2rem 1rem !important;
+}
+.tab-content .form-group {
+  margin-bottom: 1.5rem !important;
+}
+.tab-content .form-group label {
+  display: block !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: var(--text-primary) !important;
+}
+.tab-content .form-help {
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: var(--text-secondary) !important;
+}
+.tab-content .form-control:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1) !important;
+}
+@media (max-width: 768px) {
+  .tab-content .form-column {
+    min-width: 300px !important;
+  }
+}
+@media (max-width: 480px) {
+  .tab-content .form-container {
+    padding: 1.5rem !important;
+  }
+  .tab-content .form-control {
+    padding: 1rem 0.75rem !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* Traits & Rules section title styles are handled by traits-panel-override.css */
+
+.combination-rule-modal .trait-name-ellipsis-combo {
+  width: 137.7px !important;
+  min-width: 137.7px !important;
+  max-width: 137.7px !important;
+  height: 15.58px !important;
+  min-height: 15.58px !important;
+  max-height: 15.58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+
+.combination-rule-modal .trait-selection-name.custom-tooltip-anchor {
+  width: 82px !important;
+  min-width: 82px !important;
+  max-width: 82px !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  max-height: 14px !important;
+  margin-top: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 9px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.combination-rule-modal .trait-checkbox-thumb {
+  margin: 0 auto !important;
+  padding: 0 !important;
+  align-self: center !important;
+}
+
+/* --- FIXED HEADER/NAVIGATION LAYOUT CONFLICT RESOLUTION --- */
+.nav-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1000 !important;
+  background: #000 !important;
+  display: block !important;
+  border-bottom: none !important;
+}
+
+.content-area {
+  position: relative !important;
+  overflow-y: visible !important;
+  height: auto !important;
+  padding-top: 0 !important;
+  margin-top: 110px !important;
+  display: block !important;
+}
+
+/* Only floating UI should have z-index: 9999 */
+.modal, .modal-overlay:not(#trait-selection-modal), .tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip, .notification, .notification-container, .feedback-message, .feedback-fixed-position, .fixed-notification-container {
+  z-index: 9999 !important;
+}
+
+/* Remove z-index from main content containers */
+.tab-content, .traits-section, .rules-section, .trait-layer-bar, .trait-layer-header, .trait-item, .trait-layer-content, .combination-rule-modal {
+  z-index: auto !important;
+}
+
+/* All button color, background, and border-radius rules for Traits & Rules tab are now enforced in traits-panel-override.css for maximum specificity. Remove any duplicate/conflicting rules below. */
+.trait-layer-dropzone .add-traits-btn,
+.trait-rarity-actions .btn,
+#add-combination-rule,
+.action-btn,
+.rule-actions .action-btn,
+.randomize-rarities-btn,
+.add-traits-btn {
+  height: 35px !important;
+  min-height: 35px !important;
+  max-height: 35px !important;
+  /* border-radius: 35px !important; */ /* Removed pill shape to allow override */
+  /* background, color, and icon color are now set in traits-panel-override.css */
+}
+.trait-layer-dropzone .add-traits-btn:hover,
+.trait-rarity-actions .btn:hover,
+#add-combination-rule:hover,
+.action-btn:hover,
+.rule-actions .action-btn:hover,
+.randomize-rarities-btn:hover,
+.add-traits-btn:hover {
+  /* background, color, and icon color are now set in traits-panel-override.css */
+}
+
+#delete-all-layers:hover {
+  background: #8b0000 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+  outline: none !important;
+  border: none !important;
+  filter: none !important;
+  transform: translateY(-2px) !important;
+  cursor: pointer !important;
+}

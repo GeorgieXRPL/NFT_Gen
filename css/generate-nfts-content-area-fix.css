@@ -1,0 +1,66 @@
+/* ========================================
+   GENERATE NFTS CONTENT-AREA FIX - COMPREHENSIVE OVERRIDE
+   ======================================== */
+/* This file MUST load AFTER ALL other CSS files to override calc(100vh - 110px) */
+/* CRITICAL: Override ALL conflicting rules from:
+   1. traits-panel-override.css line 1964: body .content-area, .content-area { height: calc(100vh - 110px) !important; margin-top: 110px !important; }
+   2. traits-panel-override.css line 2696: body .content-area, .content-area { height: calc(100vh - 110px) !important; margin-top: 110px !important; }
+   3. main.css line 465: .content-area { margin-top: 110px !important; }
+   4. styles.css line 333: .content-area { margin-top: 110px !important; }
+*/
+
+/* PRIMARY: Match EXACT selector pattern from traits-panel-override.css but with class added for higher specificity */
+/* The original uses: body .content-area, .content-area */
+/* We use: body .content-area.generate-nfts-content-active, .content-area.generate-nfts-content-active */
+body .content-area.generate-nfts-content-active,
+.content-area.generate-nfts-content-active,
+body body .content-area.generate-nfts-content-active,
+html body .content-area.generate-nfts-content-active,
+html body body .content-area.generate-nfts-content-active,
+body #app .content-area.generate-nfts-content-active,
+body #app .project-interface .content-area.generate-nfts-content-active,
+html body #app .project-interface .content-area.generate-nfts-content-active,
+html html body body #app .project-interface .content-area.generate-nfts-content-active,
+body body #app .project-interface .content-area.generate-nfts-content-active,
+body body #app body .project-interface .content-area.generate-nfts-content-active,
+body body body #app .project-interface .content-area.generate-nfts-content-active {
+  margin-top: 0 !important; /* CRITICAL: Override ALL margin-top: 110px rules */
+  padding-top: 0 !important;
+  height: auto !important; /* CRITICAL: Override ALL calc(100vh - 110px) rules which creates 675px empty space - use auto to fit content */
+  min-height: 0 !important; /* CRITICAL: Override calc() - allow content to determine height */
+  max-height: none !important; /* CRITICAL: Override calc() - remove max height constraint */
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  overflow: visible !important;
+}
+
+/* FALLBACK: Use :has() selector as backup for when class isn't applied yet */
+html body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+body .content-area:has(#generate-nfts.tab-content.active),
+html body body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+body body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+body #app .project-interface .content-area:has(#generate-nfts.tab-content.active) {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  height: auto !important; /* Use auto to fit content and eliminate empty space */
+  min-height: 0 !important; /* Allow content to determine height */
+  max-height: none !important; /* Remove max height constraint */
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  overflow: visible !important;
+}
+

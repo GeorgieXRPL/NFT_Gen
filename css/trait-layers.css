@@ -1,0 +1,27 @@
+/* Drag handle: white icon on purple background */
+.trait-layer-drag-handle {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-radius: 50%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.trait-layer-drag-handle svg {
+  color: #fff !important;
+  fill: #fff !important;
+}
+
+/* Trait layer header and rarity slider background */
+.trait-layer-header {
+  background: #6c5ce7 !important;
+  color: #fff !important;
+}
+.trait-layer-header-rarity,
+.trait-layer-header-rarity-slider {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #fff !important;
+  border-radius: 6px;
+} 

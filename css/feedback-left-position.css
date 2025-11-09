@@ -1,0 +1,26 @@
+/* Feedback Left Position - Ensures notifications are positioned to the left of the "New Project" button */
+
+/* Override any other positioning */
+.feedback-left-aligned {
+  position: fixed !important;
+  transform: none !important;
+  z-index: 9999999 !important;
+}
+
+/* Make notifications more compact */
+.feedback-left-aligned .notification,
+.feedback-left-aligned .feedback-single-line {
+  max-width: 250px !important; /* Reduced from 300px */
+  width: auto !important;
+  padding: 4px 8px !important;
+}
+
+/* Ensure text is small and compact */
+.feedback-left-aligned .notification-message,
+.feedback-left-aligned .feedback-message-text {
+  font-size: 8px !important; /* Reduced from 10px to 8px */
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}

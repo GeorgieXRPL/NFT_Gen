@@ -1,0 +1,537 @@
+/* 
+ * Select Trait Modal - Independent CSS
+ * Similar aesthetics to Dark Traits Modal but with different class names
+ */
+
+/* Select Trait Modal Container */
+#trait-selection-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#trait-selection-modal .select-trait-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#trait-selection-modal .select-trait-container {
+  background: #222;
+  border-radius: 12px;
+  width: 962px !important;
+  min-width: 962px !important;
+  max-width: 962px !important;
+  flex: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  height: 750px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Hide all overflow */
+  overflow-x: hidden !important; /* Explicitly hide horizontal scrollbar */
+  overflow-y: hidden !important; /* Container doesn't scroll, only inner content */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+#trait-selection-modal .select-trait-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #333;
+  background: #1a1a1a;
+  position: relative;
+  gap: 20px;
+}
+
+#trait-selection-modal .select-trait-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important; /* allow zoomed thumbs to overflow */
+  overflow-x: hidden !important; /* Explicitly hide horizontal scrollbar */
+  padding: 20px;
+}
+
+#trait-selection-modal .select-trait-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #333;
+  background: #1a1a1a;
+}
+
+/* Select Trait List Container */
+#trait-selection-modal .select-trait-list {
+  display: grid;
+  grid-template-columns: repeat(6, 141px);
+  gap: 10px;
+  padding: 8px;
+  justify-content: start;
+  overflow-y: visible !important;
+  overflow-x: visible !important; /* allow overflow to show on hover zoom */
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  /* Hide horizontal scrollbar but keep scrolling functionality */
+  scrollbar-width: thin; /* Firefox - keep vertical scrollbar visible */
+  scrollbar-color: #444 #1a1a1a;
+}
+
+/* Select Trait Search Section */
+#trait-selection-modal .select-trait-search-section {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+#trait-selection-modal .trait-search-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: #181818;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Archivo', sans-serif;
+}
+
+#trait-selection-modal .trait-search-input::placeholder {
+  color: #888;
+}
+
+#trait-selection-modal .trait-search-input:focus {
+  outline: none;
+  border-color: #6c5ce7;
+}
+
+#trait-selection-modal .trait-search-clear {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Archivo', sans-serif;
+  transition: background 0.2s ease;
+}
+
+#trait-selection-modal .trait-search-clear:hover {
+  background: #5a6268;
+}
+
+#trait-selection-modal .trait-count-indicator {
+  font-size: 13px;
+  color: #aaa;
+  font-family: 'Archivo', sans-serif;
+  margin-bottom: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Select Trait Cards - 141x165px similar to Dark Traits */
+#trait-selection-modal .trait-selection-thumb {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 141px !important;
+  height: 165px !important;
+  min-width: 141px !important;
+  min-height: 165px !important;
+  max-width: 141px !important;
+  max-height: 165px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  border: 1px solid #a259e6 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Ensure all children align properly */
+#trait-selection-modal .trait-selection-thumb > *:not(.select-trait-rarity):not(.select-trait-view-btn) {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#trait-selection-modal .trait-selection-thumb:hover {
+  border-color: #a259e6;
+  transform: scale(1.06) !important;
+  z-index: 2000000 !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+}
+
+/* Select Trait Image Container */
+#trait-selection-modal .trait-selection-thumb .trait-selection-img {
+  width: 135px !important;
+  height: 106px !important;
+  max-width: 135px !important;
+  max-height: 106px !important;
+  min-width: 135px !important;
+  min-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  margin: 0 auto 8px auto !important;
+  cursor: default !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  pointer-events: none !important;
+  border: none !important;
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Force image inside to be vertically centered */
+#trait-selection-modal .trait-selection-thumb .trait-selection-img img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  margin: auto !important;
+  display: block !important;
+}
+
+/* Select Trait Name */
+#trait-selection-modal .trait-selection-name {
+  width: 132.44px !important;
+  min-width: 132.44px !important;
+  max-width: 132.44px !important;
+  height: 29.14px !important;
+  min-height: 29.14px !important;
+  max-height: 29.14px !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  padding: 4px 8px !important;
+  border-radius: 0 0 6px 6px !important;
+  font-weight: 600 !important;
+  font-family: 'Archivo', sans-serif !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 3 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+}
+
+/* Select Trait Name - with custom-tooltip-anchor class */
+#trait-selection-modal .trait-selection-name.custom-tooltip-anchor {
+  margin-left: 4px !important;
+}
+
+/* Select Trait Name Text/ellipsis */
+#trait-selection-modal .trait-name-ellipsis-select {
+  width: 140.44px !important;
+  min-width: 140.44px !important;
+  max-width: 140.44px !important;
+  height: 15.89px !important;
+  min-height: 15.89px !important;
+  max-height: 15.89px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  font-family: 'Archivo', sans-serif !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #fff !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin-left: 5px !important;
+}
+
+/* Select Trait Selection States */
+#trait-selection-modal .trait-selection-thumb.selected {
+  border-color: #e17055 !important;
+  border-width: 3px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  box-shadow: 0 0 15px rgba(225, 112, 85, 0.5) !important;
+  transform: scale(1.02) !important;
+  transition: all 0.2s ease !important;
+  z-index: 2000 !important;
+}
+
+#trait-selection-modal .trait-selection-thumb.selected:hover {
+  transform: scale(1.06) !important;
+  z-index: 2000000 !important;
+}
+
+/* Select Trait VIEW Button */
+#trait-selection-modal .select-trait-view-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 34px;
+  min-width: 34px;
+  max-width: 34px;
+  height: 20px;
+  min-height: 20px;
+  max-height: 20px;
+  background: #f39c12;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Archivo', sans-serif;
+}
+
+#trait-selection-modal .select-trait-view-btn:hover {
+  background: #e67e22;
+}
+
+/* Select Trait Forbidden Overlay */
+#trait-selection-modal .trait-forbidden-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* Select Trait Rarity Badge */
+#trait-selection-modal .trait-selection-thumb .trait-selection-rarity {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  color: #8b5cf6;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'Archivo', sans-serif;
+  z-index: 4;
+  pointer-events: none;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Select Trait Scrollbar */
+#trait-selection-modal .select-trait-list::-webkit-scrollbar {
+  width: 12px;
+  height: 0 !important; /* Hide horizontal scrollbar */
+}
+
+#trait-selection-modal .select-trait-list::-webkit-scrollbar:horizontal {
+  height: 0 !important;
+  display: none !important;
+}
+
+#trait-selection-modal .select-trait-list::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 6px;
+}
+
+#trait-selection-modal .select-trait-list::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 6px;
+  border: 2px solid #1a1a1a;
+}
+
+#trait-selection-modal .select-trait-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+#trait-selection-modal .select-trait-list {
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1a1a1a;
+  /* Hide horizontal scrollbar for Firefox */
+  overflow-x: hidden !important;
+}
+
+/* Select Trait Buttons */
+#trait-selection-modal .select-trait-close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  align-self: start;
+  line-height: 1;
+}
+
+#trait-selection-modal .select-trait-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Preserve select trait close button styles when tooltip is added */
+#trait-selection-modal .select-trait-close-btn.tooltip,
+#trait-selection-modal .tooltip.select-trait-close-btn {
+  background: none !important;
+  border: none !important;
+  color: #aaa !important;
+  font-size: 28px !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+#trait-selection-modal .select-trait-close-btn.tooltip:hover,
+#trait-selection-modal .tooltip.select-trait-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+#trait-selection-modal .select-trait-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  font-family: 'Archivo', sans-serif;
+}
+
+#trait-selection-modal .select-trait-tip {
+  font-size: 12px;
+  color: #aaa;
+  font-family: 'Archivo', sans-serif;
+}
+
+#trait-selection-modal .select-trait-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#trait-selection-modal .select-trait-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  font-family: 'Archivo', sans-serif;
+}
+
+#trait-selection-modal .select-trait-loading > div:first-child {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 18px;
+  font-family: 'Archivo', sans-serif;
+}
+
+#trait-selection-modal .btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Archivo', sans-serif;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+#trait-selection-modal .btn-primary {
+  background: #28a745;
+  color: #fff;
+}
+
+#trait-selection-modal .btn-primary:hover {
+  background: #218838;
+}
+
+#trait-selection-modal .btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+#trait-selection-modal .btn-secondary:hover {
+  background: #5a6268;
+}
+
+/* Override modal overlay for consistent dark theme */
+#trait-selection-modal.modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+/* Search input styling */
+#trait-selection-modal input[type="text"].trait-search-input {
+  font-family: 'Archivo', sans-serif;
+}
+
+/* Loading state */
+#trait-selection-modal .trait-list-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+}
+
+#trait-selection-modal .trait-spinner {
+  width: 38px;
+  height: 38px;
+  border: 4px solid #6c5ce7;
+  border-top: 4px solid #222;
+  border-radius: 50%;
+  animation: trait-spin 1s linear infinite;
+}
+
+@keyframes trait-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

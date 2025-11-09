@@ -1,0 +1,449 @@
+/**
+ * Enhanced drag-and-drop styling for trait layers
+ * Improves visual feedback for drag operations
+ */
+
+/*
+  CRITICAL: All trait layer content (trait-layer-bar, trait-layer-header, etc.) must always scroll UNDERNEATH the fixed header, navigation, logo, and project action buttons. Only floating UI (modals, tooltips, notifications) can have z-index above 9999. Do NOT set z-index or position: fixed/sticky on any trait layer content. This is enforced below and in styles.css. */
+.trait-layer-bar,
+.trait-layer-header {
+  z-index: unset !important;
+  position: static !important;
+}
+
+/* Hover state to indicate elements are draggable */
+.trait-layer-bar:not(.expanded):hover {
+  border-color: var(--accent-primary) !important;
+  background-color: rgba(108, 92, 231, 0.05) !important;
+}
+
+/* Dragging state with better visual feedback */
+.trait-layer-bar.dragging {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+  outline: 2px solid var(--accent-primary) !important;
+  z-index: 100 !important;
+  position: relative !important;
+  background-color: rgba(108, 92, 231, 0.08) !important;
+}
+
+/* Enhanced placeholder styling */
+.trait-layer-placeholder {
+  animation: pulse-border 1.5s infinite ease-in-out !important;
+  background-color: rgba(108, 92, 231, 0.08) !important;
+}
+
+@keyframes pulse-border {
+  0% {
+    border-color: var(--accent-primary-light, rgba(108, 92, 231, 0.3)) !important;
+  }
+  50% {
+    border-color: var(--accent-primary, rgb(108, 92, 231)) !important;
+  }
+  100% {
+    border-color: var(--accent-primary-light, rgba(108, 92, 231, 0.3)) !important;
+  }
+}
+
+/* Visual indicator for drag handle */
+.trait-layer-drag-handle {
+  transition: all 0.2s ease !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-bar:not(.expanded):hover .trait-layer-drag-handle {
+  color: var(--accent-primary) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Cursor styles */
+.trait-layer-bar:not(.expanded) {
+  cursor: grab !important;
+}
+
+.trait-layer-bar.dragging {
+  cursor: grabbing !important;
+}
+
+/* IMPROVED: Enhanced visual indication that expanded layers can't be dragged */
+.trait-layer-bar.expanded {
+  cursor: default !important;
+  pointer-events: auto !important; /* Ensure clicks are captured */
+}
+
+.trait-layer-bar.expanded .trait-layer-drag-handle {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  position: relative !important;
+}
+
+/* Add a visual indicator to show expanded layers can't be dragged */
+.trait-layer-bar.expanded .trait-layer-drag-handle::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(255, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  opacity: 0 !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-drag-handle:hover::after {
+  opacity: 0.3 !important;
+}
+
+/* Ensure content area of expanded layers can't be dragged */
+.trait-layer-content.expanded {
+  user-select: text !important;
+  -webkit-user-drag: none !important;
+}
+
+/* Prevent trait items inside expanded layers from triggering drag */
+.trait-layer-bar.expanded * {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+}
+
+/* Add a slight visual differentiation for expanded layer headers */
+.trait-layer-bar.expanded .trait-layer-header {
+  min-width: 1557px !important;
+  width: 1557px !important;
+  max-width: 1557px !important;
+  background-color: rgba(108, 92, 231, 0.08) !important;
+}
+
+/* Enhanced prevention of dragging within expanded layers */
+.trait-layer-content.expanded,
+.trait-layer-content.expanded *,
+.trait-layer-bar.expanded .trait-item,
+.trait-layer-bar.expanded .trait-layer-trait-item,
+.trait-layer-bar.expanded .trait-actions,
+.trait-layer-bar.expanded .trait-layer-trait-actions,
+.trait-layer-bar.expanded .trait-details,
+.trait-layer-bar.expanded button,
+.trait-layer-bar.expanded input {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: auto !important; /* Ensure clicks work properly */
+}
+
+/* Make sure sub-elements in expanded layers can't initialize drag */
+.trait-layer-content.expanded .trait-thumbnail,
+.trait-layer-content.expanded .trait-details,
+.trait-layer-content.expanded .trait-info,
+.trait-layer-content.expanded .trait-actions,
+.trait-layer-content.expanded .trait-layer-trait-actions,
+.trait-layer-content.expanded .action-btn,
+.trait-layer-content.expanded .trait-name,
+.trait-layer-content.expanded .trait-layer-trait-rarity,
+.trait-layer-content.expanded .rarity-slider {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: auto !important; /* Keep interactive elements working */
+}
+
+/* Prevent drag from starting on any UI control inside expanded layers */
+.trait-layer-bar.expanded .trait-item [draggable],
+.trait-layer-bar.expanded input[type="range"],
+.trait-layer-bar.expanded button,
+.trait-layer-bar.expanded .action-btn,
+.trait-layer-bar.expanded .slider,
+.trait-layer-bar.expanded .slider-container {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: auto !important; /* Make sure clicks work */
+}
+
+/* Visual indicators for drag state changes */
+.trait-layer-bar.drag-enabled {
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.5) !important;
+  transition: box-shadow 0.3s ease-in-out !important;
+}
+
+.trait-layer-bar.drag-disabled {
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.5) !important;
+  transition: box-shadow 0.3s ease-in-out !important;
+}
+
+/* Change cursor for drag handles in expanded trait layers */
+.trait-layer-bar.expanded .trait-layer-drag-handle {
+  cursor: not-allowed !important;
+}
+
+/* Visual indicator that dragging is disabled for expanded layers */
+.trait-layer-bar.expanded {
+  position: relative;
+}
+
+.trait-layer-bar.expanded::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: rgba(231, 76, 60, 0.5);
+  z-index: 5;
+}
+
+/* Make sure drag handle shows proper cursor state */
+.trait-layer-bar:not(.expanded) .trait-layer-drag-handle {
+  cursor: grab !important;
+}
+
+.trait-layer-bar:not(.expanded) .trait-layer-drag-handle:active {
+  cursor: grabbing !important;
+}
+
+/* FIX: Ensure trait action buttons are always clickable in expanded traits */
+.trait-layer-bar.expanded .action-btn,
+.trait-layer-bar.expanded .delete-trait,
+.trait-layer-bar.expanded .rename-trait {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+/* Make sure trait action buttons have proper hover effects in expanded layers */
+.trait-layer-bar.expanded .delete-trait:hover {
+  color: var(--danger-color, #ff5252) !important;
+  background-color: rgba(255, 82, 82, 0.1) !important;
+}
+
+.trait-layer-bar.expanded .rename-trait:hover {
+  color: var(--warning-color, #ffcc00) !important;
+  background-color: rgba(255, 204, 0, 0.1) !important;
+}
+
+/* Override any pointer-events: none that might be inherited */
+.trait-item,
+.trait-actions,
+.action-btn,
+.delete-trait,
+.rename-trait {
+  pointer-events: auto !important;
+}
+
+.trait-details {
+  width: 175px !important;
+  height: 50px !important;
+  min-width: 175px !important;
+  min-height: 50px !important;
+  max-width: 175px !important;
+  max-height: 50px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.custom-tooltip-anchor {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  text-align: center !important;
+}
+
+.trait-name-ellipsis-list {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  font-size: 11px !important;
+  margin-top: 20px !important;
+  max-height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+  font-size: 15px !important;
+}
+
+#trait-selection-modal .trait-selection-name.custom-tooltip-anchor {
+  position: relative !important;
+  z-index: 10010 !important;
+}
+
+/*
+  Ensure all .modal-close-btn and .modal-close classes for all modals are exactly 20x20px, with no conflicting width/height/font-size rules.
+*/
+.modal-close-btn, .modal-close {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  font-size: 20px !important;
+  line-height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/*
+  Set .trait-layers-actions to exactly 1557px width and center them horizontally. 
+  Note: .subsection-title and .subsection-description are now content-width only.
+*/
+.trait-layers-actions {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/*
+  Apply Collection Info tab general styles (width, padding, margin, backgrounds, etc) to all main tabs for visual consistency.
+*/
+.tab-content .section-title,
+.tab-content .section-description {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: calc(100% - 48px) !important;
+  box-sizing: border-box !important;
+}
+.tab-content .content-area {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+.tab-content .form-container,
+.tab-content .form-container.two-column-form {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+  margin-bottom: 2rem !important;
+  padding: 2rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border: 2px dashed var(--border-color) !important;
+  border-radius: 12px !important;
+  background: #222230 !important;
+  box-sizing: border-box !important;
+}
+.tab-content .form-column {
+  flex: 1 !important;
+  min-width: 400px !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+.tab-content .form-control {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 1.2rem 1rem !important;
+  font-size: 1.1rem !important;
+  line-height: 1.5 !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+.tab-content textarea.form-control {
+  min-height: 150px !important;
+  resize: vertical !important;
+  padding: 1.2rem 1rem !important;
+}
+.tab-content .form-group {
+  margin-bottom: 1.5rem !important;
+}
+.tab-content .form-group label {
+  display: block !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: var(--text-primary) !important;
+}
+.tab-content .form-help {
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: var(--text-secondary) !important;
+}
+.tab-content .form-control:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1) !important;
+}
+@media (max-width: 768px) {
+  .tab-content .form-column {
+    min-width: 300px !important;
+  }
+}
+@media (max-width: 480px) {
+  .tab-content .form-container {
+    padding: 1.5rem !important;
+  }
+  .tab-content .form-control {
+    padding: 1rem 0.75rem !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* Traits & Rules section title styles are handled by traits-panel-override.css */
+
+/*
+  Ensure .trait-layer-header has 2rem left and right padding for visual consistency.
+*/
+.trait-layer-header {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  box-shadow: none !important;
+}
+
+.trait-layer-header-rarity-slider {
+  background: #000 !important;
+  background-color: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+.trait-layer-header-rarity-slider::-moz-range-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  margin-top: -5px !important;
+}
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  margin-top: -5px !important;
+}
+
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+} 

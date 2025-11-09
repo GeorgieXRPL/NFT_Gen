@@ -1,0 +1,33 @@
+/* Rarity Status Indicator Styles */
+.rarity-status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+}
+
+.rarity-status-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  width: 43px;
+}
+
+.rarity-status-text {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+.rarity-status-text.updated {
+  color: #00ff30;
+}
+
+.rarity-status-text.outdated {
+  color: #ef4444;
+}
+
+.rarity-status-text:not(.updated):not(.outdated) {
+  color: #6b7280;
+}

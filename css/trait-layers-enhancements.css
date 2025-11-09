@@ -1,0 +1,198 @@
+/**
+ * Trait Layers Enhancements CSS
+ * Additional styles for enhanced trait layers functionality:
+ * - Only one trait layer expanded at a time
+ * - Block drag and drop for expanded layers
+ * - Better placeholders during drag and drop
+ * - Smooth expansion/collapse animations
+ */
+
+/* ===== TRAIT LAYER EXPANDED STATE ===== */
+.trait-layer-bar.expanded {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 1px var(--accent-primary) !important;
+  cursor: default !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-header {
+  background-color: rgba(108, 92, 231, 0.08) !important;
+}
+
+/* Add transition for smoother expand/collapse animation */
+.trait-layer-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out !important;
+}
+
+.trait-layer-content.expanded {
+  max-height: 1000px !important; /* Large enough to contain any content */
+  transition: max-height 0.5s ease-in !important;
+}
+
+/* Add subtle animation for the arrow rotation */
+.trait-layer-arrow {
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.trait-layer-arrow svg {
+  width: 32px !important;
+  height: 32px !important;
+  stroke-width: 3px !important;
+  font-weight: 900 !important;
+  transition: transform 0.2s;
+}
+
+.trait-layer-arrow.expanded svg {
+  transform: rotate(90deg) !important;
+}
+
+.trait-layer-arrow svg {
+  transform: rotate(0deg) !important;
+}
+
+/* ===== DRAG AND DROP STATES ===== */
+.trait-layer-bar {
+  cursor: grab !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.trait-layer-bar.dragging {
+  opacity: 0.4 !important;
+  cursor: grabbing !important;
+}
+
+.trait-layer-bar.expanded {
+  cursor: default !important;
+}
+
+/* Placeholder during drag operation */
+.trait-layer-placeholder {
+  height: 70px !important;
+  border: 2px dashed var(--accent-primary) !important;
+  border-radius: 8px !important;
+  margin: 8px 0 !important;
+  background-color: rgba(108, 92, 231, 0.15) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Drag handle styling */
+.trait-layer-drag-handle {
+  cursor: grab !important;
+  color: var(--text-secondary) !important;
+  margin-right: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-drag-handle:active {
+  cursor: grabbing !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-drag-handle {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+/* Ensure the content cannot be dragged when expanded */
+.trait-layer-content {
+  user-select: text !important;
+  -webkit-user-drag: none !important;
+}
+
+/* ===== RULE BUTTON TOOLTIPS ===== */
+.rule-actions .action-btn {
+  position: relative !important;
+}
+
+.rule-actions .action-btn .tooltip-text {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  z-index: 9999 !important;
+  bottom: auto !important;
+  top: 130% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  white-space: nowrap !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: #fff !important;
+  text-align: center !important;
+  font-size: 0.8rem !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  transition: opacity 0.3s !important;
+  pointer-events: none !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.rule-actions .action-btn .tooltip-text::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+.rule-actions .action-btn:hover .tooltip-text {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.trait-layer-header {
+  box-shadow: none !important;
+}
+
+.trait-layer-header-rarity-slider {
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-track {
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  margin-top: -5px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  margin-top: -5px !important;
+}
+
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+} 

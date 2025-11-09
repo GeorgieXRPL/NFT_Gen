@@ -1,0 +1,462 @@
+/* Consolidated Tooltip Styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Base tooltip text styling */
+.tooltiptext {
+  visibility: hidden;
+  position: absolute;
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #f39c12;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4;
+  white-space: normal;
+  max-width: 300px;
+  width: max-content;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  word-wrap: break-word;
+}
+
+/* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
+/* Tooltips are now controlled by JavaScript in tooltip-handler-consolidated.js */
+/* This prevents immediate display via CSS :hover */
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+}
+
+/* CRITICAL: Explicitly hide tooltips for disabled elements */
+.tooltip[disabled]:hover .tooltiptext,
+.tooltip:disabled:hover .tooltiptext,
+.tooltip[disabled] .tooltiptext,
+.tooltip:disabled .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Tooltip positioning */
+.tooltip .tooltiptext {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Export tab tooltips use fixed positioning controlled by JavaScript - override default positioning */
+#export-nfts .tooltip .tooltiptext {
+  /* JavaScript sets position via inline styles - don't use default CSS positioning */
+  position: fixed !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+/* Bottom tooltip */
+.tooltip.tooltip-bottom .tooltiptext {
+  bottom: auto;
+  top: 125%;
+}
+
+.tooltip.tooltip-bottom .tooltiptext::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+}
+
+/* Left tooltip */
+.tooltip.tooltip-left .tooltiptext {
+  right: 125%;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.tooltip.tooltip-left .tooltiptext::after {
+  top: 50%;
+  left: 100%;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent rgba(0, 0, 0, 0.9);
+}
+
+/* Right tooltip */
+.tooltip.tooltip-right .tooltiptext {
+  left: 125%;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.tooltip.tooltip-right .tooltiptext::after {
+  top: 50%;
+  right: 100%;
+  left: auto;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-color: transparent rgba(0, 0, 0, 0.9) transparent transparent;
+}
+
+/* Add specific styling for rule action button tooltips */
+.rule-actions .tooltip .tooltiptext {
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+/* Ensure rule action tooltips are positioned correctly */
+.rule-actions .tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+/* Remove all custom randomize-tooltip styles */
+.tooltip .tooltiptext.randomize-tooltip,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.tooltip .tooltiptext.randomize-tooltip br,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip br {
+  display: none !important;
+}
+
+/* Ensure tooltips are visible within containers with overflow hidden */
+.trait-layer-header,
+.trait-layer-content,
+.trait-layer-bar,
+.trait-layers-container,
+.nav-tabs-container,
+.nav-actions,
+.trait-layer-actions,
+.trait-layer-position,
+.modal,
+.modal-body,
+.modal-content,
+.dropdown-menu,
+.trait-item,
+.trait-details,
+.trait-actions {
+  overflow: visible !important;
+}
+
+/* Ensure tooltips don't get cut off by parent containers */
+body {
+  overflow-x: hidden;
+}
+
+/* Rule Button Tooltips */
+.rule-actions .action-btn {
+  position: relative;
+}
+
+.rule-actions .action-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+  bottom: auto;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  white-space: nowrap;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #f39c12;
+  text-align: center;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.rule-actions .action-btn .tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+}
+
+.rule-actions .action-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Ensure tooltips are always on top */
+.tooltip-text {
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+}
+
+/* Ensure trait layer tooltips use viewport positioning to match JS calculations */
+/* Exception: Header buttons should use absolute positioning relative to each button */
+.trait-layer-header .position-btn.tooltip,
+.trait-layer-header .action-btn.tooltip,
+.trait-layer-header .rename-layer.tooltip,
+.trait-layer-header .delete-layer.tooltip {
+  position: relative !important;
+}
+
+.trait-layer-header .position-btn.tooltip .tooltiptext,
+.trait-layer-header .action-btn.tooltip .tooltiptext,
+.trait-layer-header .rename-layer.tooltip .tooltiptext,
+.trait-layer-header .delete-layer.tooltip .tooltiptext {
+  position: absolute !important;
+  bottom: 125% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin-bottom: 5px !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+}
+
+.trait-layer-header .position-btn.tooltip:hover .tooltiptext,
+.trait-layer-header .action-btn.tooltip:hover .tooltiptext,
+.trait-layer-header .rename-layer.tooltip:hover .tooltiptext,
+.trait-layer-header .delete-layer.tooltip:hover .tooltiptext {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Add arrow to header button tooltips */
+.trait-layer-header .position-btn.tooltip .tooltiptext::after,
+.trait-layer-header .action-btn.tooltip .tooltiptext::after,
+.trait-layer-header .rename-layer.tooltip .tooltiptext::after,
+.trait-layer-header .delete-layer.tooltip .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
+}
+
+/* For other tooltips in trait-layer-bar (like drag handle), keep fixed positioning */
+.trait-layer-bar .tooltip:not(.position-btn):not(.action-btn):not(.rename-layer):not(.delete-layer) .tooltiptext,
+.trait-layer-content .tooltip .tooltiptext {
+  position: fixed !important;
+  transform: none !important;
+  bottom: auto !important; /* avoid conflicting bottom from default */
+}
+
+/* Global app-wide tooltip visual style normalization */
+html body .tooltip .tooltiptext,
+html body .tooltiptext,
+html body .custom-tooltip,
+html body .rule-actions .action-btn .tooltip-text {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  text-align: center !important;
+}
+
+/* Absolute top priority z-index for all tooltips */
+html body .tooltip .tooltiptext,
+html body .tooltiptext,
+html body .custom-tooltip,
+html body .randomize-tooltip-content,
+html body .randomize-direct-tooltip,
+html body .override-randomize-tooltip,
+html body .rule-actions .action-btn .tooltip-text {
+  z-index: 2147483647 !important;
+}
+
+/* Saved Seeds modal: button tooltips should anchor to their buttons and show above them */
+#saved-seeds-modal .rarity-search-container .tooltip .tooltiptext,
+#saved-seeds-modal .trait-search-container .tooltip .tooltiptext,
+#saved-seeds-modal .seeds-container .tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-buttons .tooltip .tooltiptext {
+  position: absolute !important;
+  top: 125% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* NFTs Collection modal - unify ALL tooltips to the app default style and sizing */
+#saved-seeds-modal .tooltip .tooltiptext,
+#saved-seeds-modal .tooltiptext,
+#saved-seeds-modal .custom-tooltip {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  padding: 8px 10px !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  white-space: normal !important;
+  max-width: 260px !important;
+  width: max-content !important;
+  z-index: 2147483647 !important;
+}
+
+/* Default placement for saved-seeds tooltips: below and centered */
+#saved-seeds-modal .tooltip .tooltiptext {
+  position: absolute !important;
+  top: 125% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Ensure Auto-fix Violations tooltip stacks above its controls */
+#saved-seeds-modal .auto-fix-toggle {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 1 !important;
+}
+/* Auto-fix tooltip: Use fixed positioning to escape modal container boundaries */
+/* Note: Position will be calculated dynamically by JavaScript to align with the button */
+#saved-seeds-modal .auto-fix-toggle .tooltiptext {
+  position: fixed !important; /* Use fixed to escape modal container boundaries */
+  z-index: 10001 !important; /* Higher than modal (10000) but lower than close button (10002) */
+}
+
+/* Arrows consistent with default theme */
+#saved-seeds-modal .tooltip .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+/* Prevent clipping by any nested containers in the modal */
+#saved-seeds-modal, 
+#saved-seeds-modal * {
+  overflow: visible !important;
+}
+
+/* Rarity status tooltip should anchor to the status text and sit just below it */
+#saved-seeds-modal .rarity-status-text.tooltip {
+  position: relative !important;
+}
+#saved-seeds-modal .rarity-status-text.tooltip .tooltiptext {
+  position: absolute !important;
+  top: 125% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Arrow color normalization for all tooltip variants */
+html body .tooltip .tooltiptext::after,
+html body .tooltiptext::after,
+html body .rule-actions .action-btn .tooltip-text::after {
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
+}
+
+/* Bottom-positioned arrow normalization */
+html body .tooltip.tooltip-bottom .tooltiptext::after,
+html body .tooltip-bottom .tooltiptext::after,
+html body .rule-actions .action-btn .tooltip-text.tooltip-bottom::after {
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+.randomize-rarities-tiered-btn .tooltiptext,
+.normalize-rarities-btn .tooltiptext {
+  display: none !important;
+}
+.randomize-rarities-tiered-btn:hover .tooltiptext,
+.normalize-rarities-btn:hover .tooltiptext {
+  display: block !important;
+}
+
+.trait-details {
+  width: 175px !important;
+  height: 50px !important;
+  min-width: 175px !important;
+  min-height: 50px !important;
+  max-width: 175px !important;
+  max-height: 50px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Override trait-details height when trait layers are expanded */
+.trait-layer-bar.expanded .trait-item .trait-details {
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+}
+
+.trait-item,
+.traits-grid .trait-layer-trait-item,
+.traits-grid .trait-item {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 300px !important;
+  min-height: 300px !important;
+  max-height: 300px !important;
+}
+
+.trait-layer-bar.expanded .traits-grid,
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(8, 1fr) !important;
+  gap: 10px !important;
+  column-gap: 10px !important;
+  row-gap: 10px !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+  justify-items: stretch !important;
+  min-height: 330px !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  grid-auto-flow: row !important;
+  place-items: start !important;
+}

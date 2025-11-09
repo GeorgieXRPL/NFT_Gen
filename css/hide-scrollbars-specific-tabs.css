@@ -1,0 +1,260 @@
+/* 
+ * HIDE SCROLLBARS FOR SPECIFIC TABS
+ * 
+ * This CSS file hides scrollbars specifically for:
+ * - Collection Info tab (#general-info)
+ * - Generate NFTs tab (#generate-nfts)
+ * 
+ * While keeping scrollbars visible for other tabs like Traits & Rules
+ */
+
+/* ========================================
+   COLLECTION INFO TAB - HIDE SCROLLBAR
+   ======================================== */
+
+/* Collection Info tab rules moved to collection-info-override.css */
+
+/* ========================================
+   GENERATE NFTS TAB - HIDE SCROLLBAR
+   ======================================== */
+
+/* Hide scrollbar for Generate NFTs tab - All browsers */
+#generate-nfts.tab-content,
+html body #app .project-interface .content-area #generate-nfts,
+#generate-nfts.tab-content.active,
+#generate-nfts.tab-content.tab-content,
+html body #app .project-interface .content-area #generate-nfts.tab-content,
+html body #app .project-interface .content-area #generate-nfts.tab-content.active {
+  /* Firefox */
+  scrollbar-width: none !important;
+  /* IE and Edge */
+  -ms-overflow-style: none !important;
+  /* Webkit browsers (Chrome, Safari, Edge) - HIDE SCROLLBAR COMPLETELY */
+  overflow-y: hidden !important; /* Changed from auto to hidden to prevent scrollbar */
+  overflow-x: hidden !important;
+  overflow: hidden !important;
+  /* Override any conflicting height settings */
+  height: calc(100vh - 110px) !important;
+  max-height: calc(100vh - 110px) !important;
+  /* Prevent scrolling behavior */
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+/* Hide scrollbar for Generate NFTs tab - Webkit browsers - MAXIMUM SPECIFICITY */
+#generate-nfts.tab-content::-webkit-scrollbar,
+#generate-nfts.tab-content.active::-webkit-scrollbar,
+#generate-nfts.tab-content.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #generate-nfts::-webkit-scrollbar,
+html body #app .project-interface .content-area #generate-nfts.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #generate-nfts.tab-content.active::-webkit-scrollbar,
+html body #app .project-interface .content-area:has(#generate-nfts.tab-content.active) #generate-nfts::-webkit-scrollbar,
+html body #app .project-interface:has(#generate-nfts.tab-content.active) .content-area #generate-nfts::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  background: transparent !important;
+}
+
+/* Hide scrollbar track and thumb for Generate NFTs tab */
+#generate-nfts.tab-content::-webkit-scrollbar-track,
+#generate-nfts.tab-content::-webkit-scrollbar-thumb,
+#generate-nfts.tab-content.active::-webkit-scrollbar-track,
+#generate-nfts.tab-content.active::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #generate-nfts::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #generate-nfts::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* ========================================
+   OTHER TABS - ENSURE SCROLLBARS ARE VISIBLE
+   ======================================== */
+
+/* Ensure scrollbars are visible for Traits & Rules tab */
+#traits-rules.tab-content,
+html body #app .project-interface .content-area #traits-rules,
+#traits-rules.tab-content.active {
+  /* Keep scroll functionality but hide scrollbar */
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  /* Firefox - Hide scrollbar */
+  scrollbar-width: none !important;
+  /* IE and Edge - Hide scrollbar */
+  -ms-overflow-style: none !important;
+}
+
+/* HIDE SCROLLBAR FOR TRAITS-RULES TAB - Keep scroll functionality */
+#traits-rules.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #traits-rules::-webkit-scrollbar,
+#traits-rules.tab-content.active::-webkit-scrollbar {
+  /* Hide scrollbar completely */
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+#traits-rules.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #traits-rules::-webkit-scrollbar-track,
+#traits-rules.tab-content.active::-webkit-scrollbar-track {
+  background: auto !important;
+  border-radius: auto !important;
+}
+
+#traits-rules.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #traits-rules::-webkit-scrollbar-thumb,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb {
+  background: auto !important;
+  border-radius: auto !important;
+  border: auto !important;
+}
+
+#traits-rules.tab-content::-webkit-scrollbar-thumb:hover,
+html body #app .project-interface .content-area #traits-rules::-webkit-scrollbar-thumb:hover,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb:hover {
+  background: auto !important;
+}
+
+/* Ensure scrollbars are visible for Generate Metadata tab */
+#generate-metadata.tab-content,
+html body #app .project-interface .content-area #generate-metadata,
+#generate-metadata.tab-content.active {
+  /* Firefox */
+  scrollbar-width: thin !important;
+  /* IE and Edge */
+  -ms-overflow-style: scrollbar !important;
+  /* Webkit browsers */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Ensure scrollbars are visible for Generate Metadata tab - Webkit browsers */
+#generate-metadata.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #generate-metadata::-webkit-scrollbar,
+#generate-metadata.tab-content.active::-webkit-scrollbar {
+  display: block !important;
+  width: 8px !important;
+  background: transparent !important;
+}
+
+#generate-metadata.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #generate-metadata::-webkit-scrollbar-track,
+#generate-metadata.tab-content.active::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+#generate-metadata.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #generate-metadata::-webkit-scrollbar-thumb,
+#generate-metadata.tab-content.active::-webkit-scrollbar-thumb {
+  background: #444 !important;
+  border-radius: 4px !important;
+}
+
+#generate-metadata.tab-content::-webkit-scrollbar-thumb:hover,
+html body #app .project-interface .content-area #generate-metadata::-webkit-scrollbar-thumb:hover,
+#generate-metadata.tab-content.active::-webkit-scrollbar-thumb:hover {
+  background: #555 !important;
+}
+
+/* Ensure scrollbars are visible for Export NFTs tab */
+#export-nfts.tab-content,
+html body #app .project-interface .content-area #export-nfts,
+#export-nfts.tab-content.active {
+  /* Firefox */
+  scrollbar-width: none !important;
+  /* IE and Edge */
+  -ms-overflow-style: none !important;
+  /* Webkit browsers */
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  overflow: hidden !important;
+}
+
+/* Ensure scrollbars are visible for Export NFTs tab - Webkit browsers */
+#export-nfts.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar,
+#export-nfts.tab-content.active::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+#export-nfts.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar-track,
+#export-nfts.tab-content.active::-webkit-scrollbar-track {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+#export-nfts.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar-thumb,
+#export-nfts.tab-content.active::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+#export-nfts.tab-content::-webkit-scrollbar-thumb:hover,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar-thumb:hover,
+#export-nfts.tab-content.active::-webkit-scrollbar-thumb:hover {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+/* ========================================
+   ADDITIONAL SPECIFICITY FOR EDGE CASES
+   ======================================== */
+
+/* Additional specificity for Collection Info tab to override any conflicting styles */
+.tab-content#general-info,
+.tab-content#general-info.active,
+.tab-content#general-info.tab-content {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overflow-y: hidden !important; /* Force no scrolling */
+  overflow-x: hidden !important;
+  height: auto !important;
+  max-height: calc(100vh - 110px) !important;
+}
+
+.tab-content#general-info::-webkit-scrollbar,
+.tab-content#general-info.active::-webkit-scrollbar,
+.tab-content#general-info.tab-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Generate NFTs tab scrollbar rules moved to main.css for consistency */
+
+.tab-content#generate-nfts::-webkit-scrollbar,
+.tab-content#generate-nfts.active::-webkit-scrollbar,
+.tab-content#generate-nfts.tab-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ========================================
+   MAXIMUM SPECIFICITY OVERRIDES
+   ======================================== */
+
+/* Collection Info tab maximum specificity rules moved to collection-info-override.css */
+
+/* All tabs scrollable by default - Collection Info and Generate NFTs are frozen */

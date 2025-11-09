@@ -1,0 +1,223 @@
+/* Fix for traits list panel to match left side panels' padding and dimensions */
+
+/* Base container layout with consistent left padding */
+.generate-nfts-container {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 12px !important;
+  margin-left: 24px !important;
+  width: calc(100% - 48px) !important;
+  align-items: flex-start !important;
+  padding-left: 0 !important;
+}
+
+/* Ensure the traits list wrapper has the correct width and position */
+.generate-nfts-container .traits-list-wrapper {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  flex: 0 0 320px !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Ensure the traits list card has consistent styling */
+.generate-nfts-container .traits-list-card {
+  background: #23232b;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
+  border: 1.5px solid #232323;
+  padding: 20px 16px;
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  flex: none !important; /* Prevent flex sizing */
+  display: flex !important;
+  flex-direction: column;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: hidden !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+}
+
+/* Ensure the traits list content is always visible with scrolling */
+.generate-nfts-container .nft-trait-info-panel {
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  flex: none !important; /* Prevent flex sizing */
+  display: flex !important;
+  flex-direction: column;
+  overflow: hidden;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Removed - consolidated in final-overrides.css */
+
+/* Removed - consolidated in final-overrides.css */
+
+/* Left side column with fixed width */
+.generate-nfts-container .left-side-column {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 500px !important;
+  min-width: 500px !important;
+  max-width: 500px !important;
+  flex: 0 0 500px !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Ensure panels in left column have consistent width */
+.generate-nfts-container .settings-panel,
+.generate-nfts-container .preview-panel {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* NFT trait info list placeholder - fixed height and non-scrollable */
+.nft-trait-info-list-placeholder,
+.generate-nfts-container .nft-trait-info-panel .nft-trait-info-list .nft-trait-info-list-placeholder,
+.traits-list-card .nft-trait-info-panel .nft-trait-info-list .nft-trait-info-list-placeholder {
+  height: 732px !important; /* Fixed height to prevent layout shifts */
+  min-height: 732px !important;
+  max-height: 732px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  text-align: center !important;
+  color: var(--text-secondary) !important;
+  box-sizing: border-box !important;
+  position: relative !important; /* Ensure it's positioned relative to parent */
+  overflow: hidden !important; /* Prevent scrolling of placeholder content */
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+/* Ensure placeholder content (text and icon) is fixed and non-scrollable */
+.nft-trait-info-list-placeholder > *,
+.nft-trait-info-list-placeholder svg,
+.nft-trait-info-list-placeholder div {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  flex-shrink: 0 !important;
+  max-height: none !important;
+}
+
+/* Prevent parent list from scrolling when placeholder is shown - multiple selectors */
+.nft-trait-info-list:has(.nft-trait-info-list-placeholder),
+.generate-nfts-container .nft-trait-info-panel .nft-trait-info-list:has(.nft-trait-info-list-placeholder),
+.traits-list-card .nft-trait-info-panel .nft-trait-info-list:has(.nft-trait-info-list-placeholder) {
+  overflow: hidden !important; /* Disable scrolling when placeholder is present */
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  height: 732px !important;
+  max-height: 732px !important;
+  min-height: 732px !important;
+}
+
+/* Disable scrolling on parent panel when placeholder is present */
+.generate-nfts-container .nft-trait-info-panel:has(.nft-trait-info-list-placeholder),
+.traits-list-card .nft-trait-info-panel:has(.nft-trait-info-list-placeholder),
+.nft-trait-info-panel:has(.nft-trait-info-list-placeholder) {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+}
+
+/* Alternative selector for browsers that don't support :has() */
+.nft-trait-info-list .nft-trait-info-list-placeholder ~ * {
+  display: none !important; /* Hide other content when placeholder exists */
+}
+
+/* Removed - consolidated in final-overrides.css */
+
+.nft-trait-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.nft-trait-info-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-right: 46px; /* Make space for edit button */
+}
+
+/* Make trait items more compact for better scrolling */
+.nft-trait-info-item {
+  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(30, 30, 30, 0.3);
+  border-radius: 12px;
+  box-sizing: border-box;
+  position: relative;
+  transition: background 0.2s ease;
+  height: 110px !important;
+}
+
+.nft-trait-info-item:hover {
+  background: rgba(40, 40, 40, 0.5);
+}
+
+/* Ensure titles and section headers look good */
+.settings-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--accent-primary, #6c5ce7);
+}
+
+/* Fix vertical spacing for long trait lists */
+.nft-trait-info-list .nft-trait-info-item:last-child {
+  margin-bottom: 0; /* Remove bottom margin since we have padding-bottom on the container */
+}
+
+/* Removed - consolidated in final-overrides.css */
+
+/* Make sure the traits panels maintain fixed height without growth */
+.generate-nfts-container .traits-list-wrapper {
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 920px) {
+  .generate-nfts-container {
+    flex-direction: column !important;
+    width: calc(100% - 24px) !important;
+    margin-left: 12px !important;
+  }
+  
+  .generate-nfts-container .left-side-column,
+  .generate-nfts-container .settings-panel,
+  .generate-nfts-container .preview-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  
+  .generate-nfts-container .traits-list-wrapper {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 12px !important;
+  }
+}
+
+/* Removed - consolidated in final-overrides.css */

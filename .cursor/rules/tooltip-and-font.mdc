@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When a new tooltip of object that contains any text is created or added to the app, ensure it always respect the overal tooltip style and font being used.

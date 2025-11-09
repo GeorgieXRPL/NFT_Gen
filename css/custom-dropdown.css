@@ -1,0 +1,368 @@
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  font-family: var(--font-family);
+  margin-bottom: 15px;
+}
+
+.custom-dropdown-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  cursor: pointer;
+  position: relative;
+  padding-right: 35px;
+}
+
+.custom-dropdown-selected::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.custom-dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  z-index: 1000;
+  margin-top: 4px;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-dropdown-options.show {
+  display: block;
+}
+
+.custom-dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.custom-dropdown-option:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.custom-dropdown-option.selected {
+  background-color: rgba(108, 92, 231, 0.2);
+}
+
+.custom-dropdown-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.custom-dropdown-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Rule type specific colors */
+.rule-type-never-color .custom-dropdown-icon svg,
+.rule-type-never-option .custom-dropdown-icon svg,
+.never-combine-option .custom-dropdown-icon svg {
+  stroke: var(--danger-color);
+}
+
+.rule-type-always-color .custom-dropdown-icon svg,
+.rule-type-always-option .custom-dropdown-icon svg,
+.always-combine-option .custom-dropdown-icon svg {
+  stroke: var(--success-color);
+}
+
+.rule-type-conditional-color .custom-dropdown-icon svg,
+.rule-type-conditional-option .custom-dropdown-icon svg,
+.conditional-restriction-option .custom-dropdown-icon svg {
+  stroke: var(--warning-color);
+}
+
+.rule-type-top-color .custom-dropdown-icon svg,
+.rule-type-top-option .custom-dropdown-icon svg,
+.always-above-option .custom-dropdown-icon svg {
+  stroke: #006cff;
+}
+
+.rule-type-bottom-color .custom-dropdown-icon svg,
+.rule-type-bottom-option .custom-dropdown-icon svg,
+.always-below-option .custom-dropdown-icon svg {
+  stroke: #ff6600;
+}
+
+.rule-type-above-color .custom-dropdown-icon svg {
+  stroke: #006cff;
+}
+
+.rule-type-below-color .custom-dropdown-icon svg {
+  stroke: #ff6600;
+}
+
+.rule-type-immediately-above-color .custom-dropdown-icon svg {
+  stroke: #9000ff;
+}
+
+.rule-type-immediately-below-color .custom-dropdown-icon svg {
+  stroke: #ffe400;
+}
+
+/* Rule applies to specific colors */
+.between-layers-option .custom-dropdown-icon svg {
+  stroke: #5c6bc0;
+}
+
+.between-traits-option .custom-dropdown-icon svg {
+  stroke: #a29bfe;
+}
+
+.layer-to-traits-option .custom-dropdown-icon svg {
+  stroke: #74b9ff;
+}
+
+.traits-to-layer-option .custom-dropdown-icon svg {
+  stroke: #81ecec;
+}
+
+/* Text colors for Rule Applies to options */
+.between-layers-option .custom-dropdown-text {
+  color: #5c6bc0;
+}
+
+.between-traits-option .custom-dropdown-text {
+  color: #a29bfe;
+}
+
+.layer-to-traits-option .custom-dropdown-text {
+  color: #74b9ff;
+}
+
+.traits-to-layer-option .custom-dropdown-text {
+  color: #81ecec;
+}
+
+/* Text colors for options */
+.rule-type-never-option .custom-dropdown-text,
+.never-combine-option .custom-dropdown-text {
+  color: var(--danger-color);
+}
+
+.rule-type-always-option .custom-dropdown-text,
+.always-combine-option .custom-dropdown-text {
+  color: var(--success-color);
+}
+
+.rule-type-conditional-option .custom-dropdown-text,
+.conditional-restriction-option .custom-dropdown-text {
+  color: var(--warning-color);
+}
+
+.rule-type-top-option .custom-dropdown-text,
+.always-above-option .custom-dropdown-text {
+  color: #006cff;
+}
+
+.rule-type-bottom-option .custom-dropdown-text,
+.always-below-option .custom-dropdown-text {
+  color: #ff6600;
+}
+
+.rule-type-above-color .custom-dropdown-text {
+  color: #006cff;
+}
+
+.rule-type-below-color .custom-dropdown-text {
+  color: #ff6600;
+}
+
+.rule-type-immediately-above-color .custom-dropdown-text {
+  color: #9000ff;
+}
+
+.rule-type-immediately-below-color .custom-dropdown-text {
+  color: #ffe400;
+}
+
+/* Hide the original select element */
+.custom-dropdown select {
+  display: none;
+}
+
+/* Scrollbar styling for dropdown options */
+.custom-dropdown-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-dropdown-options::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.custom-dropdown-options::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.custom-dropdown-options::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* Ensure the dropdown doesn't get cut off at the bottom of the screen */
+.custom-dropdown-options.dropdown-up {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+
+/* Ensure the dropdown is visible on mobile */
+@media (max-width: 768px) {
+  .custom-dropdown-options {
+    max-height: 250px;
+  }
+}
+
+/* Fix for the rule type dropdown */
+#rule-type-dropdown .custom-dropdown-selected,
+#rule-applies-to-dropdown .custom-dropdown-selected {
+  margin-bottom: 0;
+}
+
+/* Fix for the form group spacing */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Tier select dropdown styling */
+#tier-select, 
+#tier-select option {
+  font-family: 'Archivo', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  border-radius: 6px !important;
+  padding: 8px 10px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  cursor: pointer !important;
+}
+
+#tier-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 16px !important;
+  padding-right: 35px !important;
+}
+
+/* Override default select dropdown to make it render properly across browsers */
+#tier-select option {
+  background-color: #121212 !important;
+  color: white !important;
+  padding: 12px !important;
+  border-bottom: 1px solid #333 !important;
+  font-weight: 700 !important;
+}
+
+/* Specific tier option styling */
+#tier-select option[value="Mythic"] {
+  color: #ff0000 !important;
+  background-color: #121212 !important;
+  text-shadow: 0 0 1px rgba(255, 0, 0, 0.5) !important;
+  font-weight: 800 !important;
+}
+
+#tier-select option[value="Legendary"] {
+  color: #e2b84a !important;
+  background-color: #121212 !important;
+  text-shadow: 0 0 1px rgba(226, 184, 74, 0.5) !important;
+  font-weight: 800 !important;
+}
+
+#tier-select option[value="Epic"] {
+  color: #9b4a9b !important;
+  background-color: #121212 !important;
+  text-shadow: 0 0 1px rgba(155, 74, 155, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+#tier-select option[value="Rare"] {
+  color: #4a90e2 !important;
+  background-color: #121212 !important;
+  text-shadow: 0 0 1px rgba(74, 144, 226, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+#tier-select option[value="Uncommon"] {
+  color: #7ed957 !important;
+  background-color: #121212 !important;
+  text-shadow: 0 0 1px rgba(126, 217, 87, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+#tier-select option[value="Common"] {
+  color: #ffffff !important;
+  background-color: #121212 !important;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5) !important;
+  font-weight: 700 !important;
+}
+
+/* High specificity to ensure our styles take precedence */
+.tier-controls .tier-group #tier-select {
+  min-width: 140px !important;
+  font-family: 'Archivo', sans-serif !important;
+}
+
+/* For Firefox which doesn't support styling option elements well */
+@-moz-document url-prefix() {
+  #tier-select {
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: #272727 !important;
+  }
+  
+  /* Add a custom styling for Firefox */
+  #tier-select.active-dropdown {
+    outline: 2px solid var(--accent-primary) !important;
+  }
+}
+
+.immediately-above-option .custom-dropdown-icon svg {
+  stroke: #9000ff;
+}
+
+.immediately-below-option .custom-dropdown-icon svg {
+  stroke: #ffe400;
+}
+
+.immediately-above-option .custom-dropdown-text {
+  color: #9000ff;
+}
+
+.immediately-below-option .custom-dropdown-text {
+  color: #ffe400;
+}

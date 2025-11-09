@@ -1,0 +1,50 @@
+/* Trait Layer Expanded Alignment CSS
+ * Styles for aligning trait-layer-trait-name-ellipsis-list with trait-layer-trait-image
+ * when trait layers are expanded
+ */
+
+/* Ensure trait-layer-trait-image has proper width and flex layout when expanded */
+.trait-layer-bar.expanded #trait-layer-trait-image {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Horizontal alignment: trait-layer-trait-name-ellipsis-list is now inside trait-image */
+.trait-layer-bar.expanded #trait-layer-trait-image .trait-layer-trait-name-ellipsis-list {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure the trait item container properly centers its children */
+.trait-layer-bar.expanded .trait-layer-trait-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* Make sure trait-image maintains its height and flex layout */
+.trait-layer-bar.expanded #trait-layer-trait-image {
+  height: 150px !important;
+  min-height: 150px !important;
+  max-height: 150px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+

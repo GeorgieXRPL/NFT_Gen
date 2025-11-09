@@ -1,0 +1,874 @@
+/* Fix for Traits & Rules tab layout */
+.traits-section h3.subsection-title,
+.rules-section h3.subsection-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.subsection-description {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* Trait layers styles are handled by traits-panel-override.css */
+
+/* Fix for trait layers actions */
+.trait-layers-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.trait-layers-actions-left {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: flex-start; /* Changed from center to flex-start to allow margin-top to work */
+  vertical-align: middle;
+  margin-top: 6px; /* Moved 4px up from 10px */
+  margin-left: 6px; /* Changed to 6px */
+}
+
+.trait-layers-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: flex-start; /* Changed from center to flex-start to allow margin-top to work */
+  vertical-align: middle;
+  margin-top: 6px; /* Moved 4px up from 10px */
+  margin-right: 6px; /* Changed to 6px */
+}
+
+/* Fix for Add Combination Rule button */
+.rules-section {
+  margin-top: 2rem;
+}
+
+#add-combination-rule {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+/* Fix for slider interaction */
+.trait-rarity-slider,
+.trait-layer-header-rarity-slider {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 10;
+  position: relative;
+}
+
+/* Prevent drag and drop when interacting with sliders */
+.trait-rarity-slider:active,
+.trait-layer-header-rarity-slider:active {
+  cursor: grabbing;
+}
+
+/* Fix for trait layer header rarity controls */
+.trait-layer-header-rarity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  z-index: 10;
+  position: relative;
+  flex: 1; /* Make it take available space */
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.trait-layer-header-rarity-slider {
+  width: 100%; /* Take full width of container */
+  -webkit-appearance: none;
+  height: 8px; /* Increased height */
+  border-radius: 4px;
+  background: transparent !important;
+  background-color: transparent !important;
+  outline: none;
+  /* Add visible track styling */
+  background: #333; /* Darker background for the track */
+  border: 1px solid #444; /* Border for better visibility */
+}
+
+.trait-layer-header-rarity-value {
+  font-size: 0.9rem;
+  color: var(--accent-primary);
+  font-weight: 600;
+  width: 60px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.35rem;
+  text-align: center;
+}
+
+/* Fix for trait rarity slider */
+.trait-rarity {
+  position: relative;
+  z-index: 5;
+}
+
+.trait-rarity-slider {
+  z-index: 10;
+  /* Add visible track styling */
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px; /* Increased height */
+  border-radius: 4px;
+  background: #333; /* Darker background for the track */
+  border: 1px solid #444; /* Border for better visibility */
+  outline: none;
+}
+
+/* Disable drag and drop when interacting with sliders */
+.trait-layer-bar.slider-active {
+  draggable: false !important;
+}
+
+/* Make sliders more prominent */
+.trait-rarity-slider::-webkit-slider-thumb,
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+}
+
+.trait-rarity-slider::-moz-range-thumb,
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid white;
+}
+
+.trait-rarity-slider::-webkit-slider-thumb:hover,
+.trait-layer-header-rarity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.trait-rarity-slider::-moz-range-thumb:hover,
+.trait-layer-header-rarity-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Alternating colors for trait layer headers */
+.trait-layer-bar:nth-child(odd) .trait-layer-header {
+  background-color: var(--trait-header-odd); /* Purple tone for odd rows */
+}
+
+.trait-layer-bar:nth-child(even) .trait-layer-header {
+  background-color: var(--trait-header-even); /* Darker purple tone for even rows */
+}
+
+/* Apply hover effects with slightly lighter colors */
+.trait-layer-bar:nth-child(odd) .trait-layer-header:hover {
+  background-color: var(--trait-header-odd-hover); /* Lighter purple for odd rows hover */
+}
+
+.trait-layer-bar:nth-child(even) .trait-layer-header:hover {
+  background-color: var(--trait-header-even-hover); /* Lighter dark purple for even rows hover */
+}
+
+/* Make trait layer header buttons larger */
+.trait-layer-actions .action-btn,
+.trait-layer-position .position-btn {
+  padding: 0.6rem;
+  margin: 0 0.2rem;
+}
+
+.trait-layer-actions .action-btn svg,
+.trait-layer-position .position-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Enhanced tooltip styles to always show on top */
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: auto;
+  min-width: 100px;
+  max-width: 200px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #f39c12;
+  text-align: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+
+  /* Position the tooltip */
+  position: absolute; /* Keep absolute positioning */
+  z-index: 9999; /* Very high z-index to ensure it's on top of everything */
+  bottom: 125%; /* Position above the element */
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Styling */
+  font-size: 0.75rem; /* Smaller font size */
+  line-height: 1.2;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: normal;
+  pointer-events: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Show the tooltip when hovering over the parent element (but NOT for disabled elements) */
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* CRITICAL: Explicitly hide tooltips for disabled elements */
+.tooltip[disabled]:hover .tooltiptext,
+.tooltip:disabled:hover .tooltiptext,
+.tooltip[disabled] .tooltiptext,
+.tooltip:disabled .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Add arrow to tooltip */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+/* Adjust tooltip position for elements near the top of the screen */
+.tooltip.tooltip-bottom .tooltiptext {
+  bottom: auto;
+  top: 125%;
+}
+
+.tooltip.tooltip-bottom .tooltiptext::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
+}
+
+/* Ensure tooltips don't get cut off by parent containers */
+body {
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Make sure tooltips can escape their containers */
+.trait-layer-header,
+.trait-layer-content,
+.trait-layer-bar,
+.trait-layers-container,
+.nav-tabs-container,
+.nav-actions,
+.trait-layer-actions,
+.trait-layer-position {
+  overflow: visible !important;
+}
+
+/* Adjust tooltip position for elements near the left edge of the screen */
+.tooltip.tooltip-left .tooltiptext {
+  left: 0;
+  transform: none;
+}
+
+.tooltip.tooltip-left .tooltiptext::after {
+  left: 10px;
+  margin-left: 0;
+}
+
+/* Adjust tooltip position for elements near the right edge of the screen */
+.tooltip.tooltip-right .tooltiptext {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.tooltip.tooltip-right .tooltiptext::after {
+  left: auto;
+  right: 10px;
+  margin-left: 0;
+}
+
+/* Redesigned trait layer header based on the sketch */
+.trait-layer-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 1.2rem !important;
+  position: relative !important;
+  height: 90px !important;
+  flex-direction: row !important;
+}
+
+.trait-layer-drag-handle {
+  margin-right: 0.5rem;
+  cursor: grab;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-info {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  min-width: 180px !important;
+  margin: 0 10px 0 0 !important;
+  flex: 0 1 auto !important;
+  height: 100% !important;
+  gap: 0 !important;
+}
+
+.trait-layer-name {
+  z-index: 10 !important;
+  position: relative !important;
+  background: none !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  line-height: 1 !important;
+  color: var(--text-primary) !important;
+  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  height: auto !important;
+}
+
+.trait-layer-stats {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 0.85rem !important;
+  line-height: 1 !important;
+  color: #b0b0b0 !important;
+  text-align: left !important;
+  width: 100%;
+}
+
+.trait-layer-header-rarity {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  flex: 1;
+}
+
+.trait-layer-position {
+  display: flex;
+  align-items: center;
+  margin-right: 0;
+}
+
+.trait-layer-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Trait rarity input field */
+.trait-rarity-input {
+  font-size: 0.9rem;
+  color: var(--accent-primary);
+  font-weight: 600;
+  width: 70px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.35rem;
+  text-align: center;
+}
+
+/* Fix for trait item layout */
+.trait-item {
+  min-width: 175px !important;
+  min-height: 270px !important;
+  height: 270px !important;
+  max-height: 270px !important;
+  width: 175px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  background-color: #222230 !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  box-sizing: border-box !important;
+  padding: 12px 8px 12px 8px !important;
+}
+
+.trait-rarity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Add styles for the arrow icon */
+.trait-layer-arrow {
+  z-index: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  margin-right: 0.5rem !important;
+  margin-left: 0 !important;
+  cursor: pointer !important;
+}
+
+.trait-layer-arrow svg {
+  width: 32px !important;
+  height: 32px !important;
+  stroke-width: 3px !important;
+  font-weight: 900 !important;
+  transition: transform 0.2s;
+  display: block !important;
+}
+
+.trait-layer-arrow.expanded svg {
+  transform: rotate(90deg) !important;
+}
+
+.trait-layer-arrow svg {
+  transform: rotate(0deg) !important;
+}
+
+/* Make the Add Traits button icon consistent with other buttons */
+.add-traits-btn svg {
+  width: 14px !important;
+  height: 14px !important;
+  margin-right: 4px;
+}
+
+/* Add these styles to fix the Add Traits button formatting */
+.add-traits-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.add-traits-btn:hover {
+  background-color: var(--button-hover);
+}
+
+.add-traits-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Ensure consistent button icon sizing throughout the app */
+.btn-sm svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Add styles for the modal input container */
+.modal-input-container {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.modal-input-container input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.modal-input-container input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+/* Update the confirmation modal styles */
+.confirmation-modal .modal-body {
+  padding: 1.5rem 1rem;
+}
+
+.confirmation-modal .modal-icon {
+  margin-bottom: 1.5rem;
+}
+
+.confirmation-modal .modal-message {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Style the confirm button to match the theme */
+#confirm-action {
+  background-color: var(--accent-primary);
+}
+
+#confirm-action:hover {
+  background-color: var(--button-hover);
+}
+
+/* Add styles to make sure the file input is properly hidden but still accessible */
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Make sure the button is properly styled and visible */
+#select-folders-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+/* Add a hover effect to make it clear it's clickable */
+#select-folders-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Fix navigation container to make it sticky */
+.nav-container {
+  position: sticky;
+  top: 0;
+  z-index: 999999;
+  background-color: var(--bg-secondary);
+  border-bottom: 0px solid var(--border-color);
+  overflow-y: visible !important;
+}
+
+/* Make the nav header fixed */
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 0px solid var(--border-color);
+}
+
+/* Fix the nav-tabs-container */
+.nav-tabs-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  overflow: visible !important;
+  position: relative;
+  z-index: 50;
+  background-color: var(--bg-secondary);
+  padding: 0;
+  height: 50px; /* Fixed height to prevent layout shifts */
+}
+
+/* Fix the nav-tabs */
+.nav-tabs {
+  display: flex;
+  overflow-x: hidden; /* Changed from auto to hidden to remove scrollbar */
+  border-bottom: none;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding-left: 1rem;
+  max-width: calc(100% - 350px); /* Reserve space for buttons */
+  white-space: nowrap;
+  justify-content: flex-start;
+  align-items: center; /* Ensure vertical centering */
+}
+
+/* Restore nav-actions to horizontal row and ensure visibility */
+.nav-actions {
+  position: relative !important; /* Changed from fixed to relative for proper alignment */
+  right: auto !important;
+  top: auto !important;
+  height: 50px;
+  display: flex !important;
+  flex-direction: row;
+  align-items: center !important;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  z-index: 10;
+  background-color: transparent;
+  margin-left: auto; /* Push to the right side */
+}
+
+.nav-actions .btn {
+  margin-bottom: 0;
+  width: auto;
+  justify-content: flex-start;
+  align-items: center;
+  height: 40px;
+  display: flex;
+  vertical-align: middle; /* Ensure vertical alignment */
+}
+
+/* Grid layout for nav tabs and buttons */
+.nav-tabs-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0;
+  width: 100%;
+  background: #000;
+}
+
+.nav-tabs-row {
+  display: contents;
+}
+
+.nav-tab {
+  grid-column: 1;
+  /* existing nav-tab styles remain */
+}
+
+.nav-tab-btn {
+  grid-column: 2;
+  margin-left: 24px;
+  min-width: 140px;
+  justify-content: flex-start;
+  align-items: center;
+  height: 40px;
+  display: flex;
+}
+
+.nav-tab-btn-spacer {
+  grid-column: 2;
+  height: 40px;
+}
+
+/* Project action buttons visual style */
+#new-project {
+  border: 2px solid var(--danger-color) !important; /* Red border */
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+#new-project svg {
+  color: var(--danger-color);
+}
+#new-project:hover {
+  background-color: rgba(255, 118, 117, 0.1);
+}
+
+#load-project-btn {
+  border: 2px solid #3498db !important; /* Blue border */
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+#load-project-btn svg {
+  color: #3498db;
+}
+#load-project-btn:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+#save-project {
+  border: 2px solid var(--success-color) !important; /* Green border */
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+#save-project svg {
+  color: var(--success-color);
+}
+#save-project:hover {
+  background-color: rgba(0, 184, 148, 0.1);
+}
+
+#save-project-as {
+  border: 2px solid var(--accent-secondary) !important; /* Secondary accent color border */
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  margin-left: 5px;
+}
+#save-project-as svg {
+  color: var(--accent-secondary);
+}
+#save-project-as:hover {
+  background-color: rgba(108, 92, 231, 0.1);
+}
+
+.nav-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: background 0.2s, border 0.2s, color 0.2s;
+  cursor: pointer;
+  background: var(--bg-secondary);
+}
+
+.nav-actions .btn svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.traits-section,
+.trait-layers-container,
+.trait-layer-header,
+.trait-layers-container {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-header {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+.combination-rules-container, .combination-rules-container > * {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+/* Highest specificity for combination-rules-container width */
+body .combination-rules-container {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+.stacking-order-info-tooltip {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+body .stacking-order-info-tooltip {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+body #trait-layers-dropzone,
+body .trait-layers-dropzone,
+body .stacking-order-info,
+body .stacking-order-info-tooltip,
+body .traits-section {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0 !important;
+}
+
+body #trait-layers-dropzone,
+body .trait-layers-dropzone {
+  margin-bottom: 24px !important;
+}
+
+body .stacking-order-info,
+body .stacking-order-info-tooltip,
+body .traits-section {
+  margin-bottom: 0 !important;
+}
+
+body .tab-content > * {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: 24px !important;
+}
+
+.trait-details {
+  min-width: 178px !important;
+  min-height: 25px !important;
+  height: 25px !important;
+  width: 178px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
+
+.traits-section {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  margin-bottom: 0 !important;
+}
+
+.rules-section {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+}
+
+.tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip {
+  z-index: 99999 !important;
+}
+
+/* Remove z-index from all content elements */
+.trait-item,
+.trait-layer-bar,
+.trait-layer-header,
+.trait-details,
+.trait-layer-content {
+  z-index: unset !important;
+}
+/* Floating UI only */
+.tooltip,
+.tooltiptext,
+.custom-tooltip,
+.randomize-tooltip,
+.modal,
+.modal-overlay:not(#trait-selection-modal),
+.notification,
+.notification-container {
+  z-index: 9999 !important;
+}
+
+/* Trait selection modal must always be on top */
+#trait-selection-modal.modal-overlay {
+  z-index: 1000000 !important;
+  position: fixed !important;
+}
+
+/* --- CRITICAL: UNIFY TOOLTIP STYLE (NO BLUE BORDER) --- */
+.tooltip, .tooltiptext, .custom-tooltip {
+  background: #181818 !important;
+  color: #fff !important;
+  font-family: 'Archivo', sans-serif !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+  outline: none !important;
+}

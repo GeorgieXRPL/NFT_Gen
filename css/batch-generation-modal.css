@@ -1,0 +1,1171 @@
+/* Batch Generation Modal Styles */
+.batch-generation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  font-family: 'Archivo', sans-serif;
+}
+
+/* Hide description button in batch generation modal NFT cards */
+#batch-generation-modal .seed-card-thumbnail .seed-desc-btn,
+.batch-generation-modal .seed-card-thumbnail .seed-desc-btn {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.batch-generation-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.batch-generation-container {
+  background: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  width: 1400px;
+  max-width: 95vw;
+  height: 750px;
+  max-height: 95vh;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden !important; /* Prevent content from extending outside */
+  padding-bottom: 18px; /* Add 18px footer space */
+  transition: none !important; /* Prevent stretch effect */
+}
+
+.batch-generation-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #333;
+  background: #222;
+  border-radius: 12px 12px 0 0;
+  gap: 0px;
+}
+
+.batch-generation-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.batch-generation-title {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Archivo', sans-serif;
+  width: 291px;
+  height: 22px;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.batch-generation-tip {
+  font-size: 11px;
+  color: #bdc3c7;
+  font-style: italic;
+  width: 330px;
+  height: 28px;
+  line-height: 14px;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.batch-generation-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  margin-left: auto;
+  margin-right: 40px;
+}
+
+.batch-count-input {
+  width: 80px;
+  height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  font-family: 'Archivo', sans-serif;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.batch-count-input:focus {
+  outline: none;
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.batch-count-input::placeholder {
+  color: #888;
+}
+
+/* Dark scrollbar for batch count input */
+.batch-count-input::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.batch-count-input::-webkit-scrollbar-track {
+  background: #222;
+  border-radius: 4px;
+}
+
+.batch-count-input::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.batch-count-input::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.batch-count-input::-webkit-scrollbar-corner {
+  background: #222;
+}
+
+/* Hide spinner buttons (up/down arrows) for batch-count-input */
+.batch-count-input::-webkit-inner-spin-button,
+.batch-count-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  display: none;
+}
+
+.stop-btn {
+  visibility: hidden !important;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.stop-btn.visible {
+  visibility: visible !important;
+  opacity: 1;
+}
+
+
+.total-counter {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  background: transparent;
+  color: #e17055;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.total-counter .counter-line-1 {
+  font-weight: 700;
+  color: #e17055;
+  white-space: nowrap;
+}
+
+.total-counter #total-count {
+  font-weight: 700;
+  color: #e17055;
+  display: inline;
+}
+
+.total-counter .counter-line-2 {
+  font-weight: 700;
+  color: #e17055;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.selected-count-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 25px;
+  background: transparent;
+  color: #313131;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  margin-right: 0;
+  width: 120px;
+  justify-content: center;
+}
+
+.selected-count-display #selected-count-text {
+  font-weight: 700;
+  color: #313131;
+}
+
+/* Selected NFT card styling */
+.saved-seed-card.selected {
+  border: 3px solid #e17055 !important;
+  box-shadow: 0 0 15px rgba(225, 112, 85, 0.5) !important;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
+.saved-seed-card.selected:hover {
+  transform: scale(1.05);
+}
+
+/* Button styles */
+.batch-generation-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: fit-content;
+  white-space: nowrap;
+}
+
+.generate-btn {
+  background: #6c5ce7;
+  color: #fff;
+}
+
+.generate-btn:hover {
+  background: #5a4fcf;
+}
+
+.generate-btn:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.dark-mode-toggle {
+  background: #4a4a4a;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.dark-mode-toggle .toggle-icon {
+  display: none !important; /* Remove moon icon */
+}
+
+.dark-mode-toggle .toggle-label {
+  font-size: 14px !important; /* Standard button font size */
+  font-weight: 500 !important; /* Standard button font weight */
+}
+
+.dark-mode-toggle:hover {
+  background: #5a5a5a;
+  border-color: #6a6a6a;
+}
+
+.dark-mode-toggle.active {
+  background: #00ff88;
+  color: #000000;
+  border-color: #00ff88;
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(0, 255, 136, 1.0),
+    0 0 12px rgba(0, 255, 136, 0.95),
+    0 0 16px rgba(0, 255, 136, 0.8);
+  transform: none;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: darkToggleActivate 0.3s ease-out;
+}
+
+/* Dark NFTs toggle activation animation - matching Seed NFT toggle structure */
+@keyframes darkToggleActivate {
+  0% {
+    box-shadow: 
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 0px rgba(0, 255, 136, 0);
+  }
+  50% {
+    box-shadow: 
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 10px rgba(0, 255, 136, 1.0),
+      0 0 14px rgba(0, 255, 136, 0.95);
+  }
+  100% {
+    box-shadow: 
+      inset 0 3px 5px rgba(0, 0, 0, 0.5),
+      0 0 8px rgba(0, 255, 136, 1.0),
+      0 0 12px rgba(0, 255, 136, 0.95),
+      0 0 16px rgba(0, 255, 136, 0.8);
+  }
+}
+
+/* Toggle icon is hidden, so no active state styling needed */
+
+.dark-mode-toggle.active:hover {
+  background: #00e677;
+  border-color: #00e677;
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 136, 1.0),
+    0 0 14px rgba(0, 255, 136, 0.95),
+    0 0 18px rgba(0, 255, 136, 0.85);
+  transform: none;
+}
+
+.add-batch-btn {
+  background: #00b894;
+  color: #fff;
+}
+
+.add-batch-btn:hover {
+  background: #00a085;
+}
+
+.add-batch-btn:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.add-selected-btn {
+  background: #fdcb6e;
+  color: #2d3436;
+}
+
+.add-selected-btn:hover {
+  background: #e17055;
+  color: #fff;
+}
+
+.add-selected-btn:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.copy-selected-seeds-btn {
+  background: #6c5ce7;
+  color: #fff;
+}
+
+.copy-selected-seeds-btn:hover {
+  background: #5a4fcf;
+}
+
+.copy-selected-seeds-btn:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* Hidden state - keeps space but invisible and prevents interaction */
+.copy-selected-seeds-btn[style*="visibility: hidden"] {
+  pointer-events: none;
+}
+
+.stop-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.stop-btn:hover {
+  background: #c0392b;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #444;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: #ff4444;
+  transform: scale(1.1);
+}
+
+.close-btn:active {
+  transform: scale(0.95);
+}
+
+/* Grid styles */
+.saved-seeds-grid {
+  flex: 1;
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important; /* Use minmax to prevent resizing */
+  gap: 7px;
+  padding: 20px;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  align-content: start;
+  max-height: calc(100vh - 390px) !important; /* Adjusted for 18px footer padding (was 372px, now 390px) */
+  min-height: 0 !important; /* Allow flex item to shrink */
+  position: relative !important;
+  transition: none !important; /* Prevent stretch effect */
+  will-change: auto !important;
+  grid-auto-rows: auto !important; /* Prevent row height animation */
+  contain: layout style !important; /* Prevent cascading layout changes */
+  grid-auto-flow: row !important; /* Ensure consistent row flow */
+  scrollbar-gutter: stable !important; /* Reserve space for scrollbar to prevent stretching */
+}
+
+/* Custom scrollbar styling for dark theme */
+.saved-seeds-grid::-webkit-scrollbar {
+  width: 12px;
+}
+
+.saved-seeds-grid::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 6px;
+}
+
+.saved-seeds-grid::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 6px;
+  border: 2px solid #1a1a1a;
+}
+
+.saved-seeds-grid::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.saved-seeds-grid::-webkit-scrollbar-thumb:active {
+  background: #666;
+}
+
+/* Firefox scrollbar styling - Note: scrollbar-width is already handled above with transition: none */
+
+.saved-seed-card {
+  background: #2c2c2c;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  width: 100% !important; /* Fixed width to prevent resizing */
+  min-width: 0 !important; /* Prevent grid from expanding cards */
+  flex-shrink: 0 !important; /* Prevent cards from shrinking */
+}
+
+.saved-seed-card:hover {
+  border-color: #6c5ce7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  /* transform removed to prevent card resizing on new rows */
+}
+
+.seed-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.seed-card-number {
+  font-size: 6px;
+  font-weight: 600;
+  color: #fff;
+  font-family: monospace;
+  text-align: center;
+  margin-bottom: 8px;
+  word-break: break-all;
+  line-height: 1.1;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.seed-card-buttons {
+  display: flex;
+  gap: 5px;
+  position: relative;
+  z-index: 10;
+}
+
+.seed-card-btn {
+  background: #444;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px 8px;
+  position: relative !important;
+  z-index: 10000 !important; /* High z-index to ensure buttons are above other elements */
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 7px;
+  font-weight: 500;
+  font-family: 'Archivo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  position: relative;
+  z-index: 10;
+  min-width: 32px;
+  height: 20px;
+}
+
+/* Button width adjustments: -1px for edit/copy, +7px for delete */
+.batch-generation-modal .seed-card-btn.edit-btn,
+.batch-generation-modal .seed-card-btn.copy-btn {
+  min-width: 31px !important;
+  width: 31px !important;
+}
+
+.batch-generation-modal .seed-card-btn.delete-btn {
+  min-width: 39px !important;
+  width: 39px !important;
+}
+
+.seed-card-btn:hover {
+  background: #555;
+  color: #fff;
+}
+
+.edit-btn {
+  background: #4a90e2;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background: #357abd;
+}
+
+.copy-btn {
+  background: #6c5ce7;
+  color: #fff;
+}
+
+.copy-btn:hover {
+  background: #5a4fcf;
+}
+
+.view-btn {
+  background: #00b894;
+  color: #fff;
+}
+
+.view-btn:hover {
+  background: #00a085;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+/* Preserve button colors when wrapped in tooltip containers - Light blue to match saved seeds modal */
+.batch-generation-modal .tooltip .seed-card-btn.edit-btn,
+.batch-generation-modal .seed-card-btn.edit-btn.tooltip {
+  background: #4a90e2 !important;
+  color: #fff !important;
+}
+
+.batch-generation-modal .tooltip .seed-card-btn.edit-btn:hover,
+.batch-generation-modal .seed-card-btn.edit-btn.tooltip:hover {
+  background: #357abd !important;
+}
+
+.batch-generation-modal .tooltip .seed-card-btn.copy-btn,
+.batch-generation-modal .seed-card-btn.copy-btn.tooltip {
+  background: #6c5ce7 !important;
+  color: #fff !important;
+}
+
+.batch-generation-modal .tooltip .seed-card-btn.copy-btn:hover,
+.batch-generation-modal .seed-card-btn.copy-btn.tooltip:hover {
+  background: #5a4fcf !important;
+}
+
+.batch-generation-modal .tooltip .seed-card-btn.delete-btn,
+.batch-generation-modal .seed-card-btn.delete-btn.tooltip {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+
+.batch-generation-modal .tooltip .seed-card-btn.delete-btn:hover,
+.batch-generation-modal .seed-card-btn.delete-btn.tooltip:hover {
+  background: #c0392b !important;
+}
+
+/* Ensure tooltip text uses consistent styling */
+.batch-generation-modal .tooltip .tooltiptext {
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+}
+
+.seed-card-image {
+  width: 100%;
+  height: 120px;
+  background: #333;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-image {
+  color: #888;
+  font-size: 12px;
+}
+
+.seed-card-info {
+  width: 100.41px;
+  font-size: 12px;
+  position: relative;
+  z-index: 10;
+}
+
+.trait-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.trait-name {
+  color: #bdc3c7;
+  font-weight: 500;
+}
+
+.trait-value {
+  color: #fff;
+  font-weight: 400;
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 20px;
+  padding: 0 20px;
+  flex-shrink: 0 !important; /* Prevent pagination from shrinking */
+  min-height: 50px !important; /* Ensure pagination has minimum height */
+}
+
+.page-btn {
+  background: #333;
+  border: 1px solid #555;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-family: 'Archivo', sans-serif;
+}
+
+.page-btn:hover {
+  background: #444;
+  border-color: #6c5ce7;
+}
+
+.page-btn.active {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+  color: #fff;
+}
+
+/* Collection Space Counter - Ensure no margin-right conflicts */
+.batch-generation-modal .collection-space-counter,
+.batch-generation-modal #collection-space-counter {
+  position: absolute !important;
+  bottom: 11px !important;
+  right: 32px !important; /* Moved 12px to the left */
+  width: 120px !important;
+  height: 50px !important;
+  background: #ef4444 !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  z-index: 1000 !important;
+  margin-right: 0 !important; /* Force remove margin-right */
+}
+
+.space-counter-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  color: #fff;
+  font-family: 'Archivo', sans-serif;
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.space-counter-title {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  margin-bottom: 2px !important;
+  opacity: 0.9 !important;
+  text-align: center !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.space-counter-value {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  margin-bottom: 1px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.space-counter-label {
+  font-size: 8px !important;
+  font-weight: 500 !important;
+  opacity: 0.8 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* No seeds message */
+.no-seeds {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #bdc3c7;
+  font-size: 16px;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* Modal header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #333;
+  background: #222;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 600;
+  font-family: 'Archivo', sans-serif;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #444;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: #ff4444;
+  transform: scale(1.1);
+}
+
+.close-btn:active {
+  transform: scale(0.95);
+}
+
+/* Modal body */
+.modal-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 25px;
+  overflow: hidden;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(8, 1fr) !important;
+    max-height: calc(100vh - 352px) !important; /* Increased height by 28px (was 380px, now 352px) */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+    max-height: calc(100vh - 332px) !important; /* Increased height by 28px (was 360px, now 332px) */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    max-height: calc(100vh - 312px) !important; /* Increased height by 28px (was 340px, now 312px) */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    max-height: calc(100vh - 292px) !important; /* Increased height by 28px (was 320px, now 292px) */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* NFT Viewer Modal Styles */
+.nft-viewer-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20000;
+  font-family: 'Archivo', sans-serif;
+}
+
+.nft-viewer-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.nft-viewer-container {
+  background: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  width: 90%;
+  max-width: 800px;
+  height: 90%;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.nft-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #333;
+  background: #222;
+  border-radius: 12px 12px 0 0;
+}
+
+.nft-viewer-title {
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'Archivo', sans-serif;
+}
+
+.nft-viewer-close {
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nft-viewer-close:hover {
+  background: #444;
+}
+
+.nft-viewer-content {
+  flex: 1;
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.nft-viewer-image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2c2c2c;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.nft-viewer-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.nft-viewer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.nft-viewer-seed {
+  color: #fff;
+  font-size: 16px;
+  padding: 15px;
+  background: #2c2c2c;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.nft-viewer-seed strong {
+  color: #e17055;
+}
+
+.nft-viewer-traits {
+  color: #fff;
+  font-size: 16px;
+}
+
+.nft-viewer-traits strong {
+  color: #e17055;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.nft-viewer-traits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nft-viewer-trait {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background: #2c2c2c;
+  border-radius: 6px;
+  border: 1px solid #444;
+}
+
+.nft-viewer-trait .trait-name {
+  color: #bdc3c7;
+  font-weight: 500;
+}
+
+.nft-viewer-trait .trait-value {
+  color: #fff;
+  font-weight: 400;
+}
+
+/* Responsive design for NFT viewer */
+@media (max-width: 768px) {
+  .nft-viewer-content {
+    flex-direction: column;
+  }
+  
+  .nft-viewer-image-container {
+    max-height: 300px;
+  }
+  
+  .nft-viewer-info {
+    max-height: 200px;
+  }
+}
+
+/* Drag and Drop Styles (replicated from Saved Seeds modal) */
+.saved-seed-card.dragging {
+  opacity: 0.7;
+  transform: rotate(8deg) scale(1.05);
+  z-index: 1000;
+  cursor: grabbing !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 2px solid #6c5ce7;
+}
+
+.saved-seed-card[draggable="true"] {
+  cursor: grab !important;
+}
+
+.saved-seed-card[draggable="true"]:active {
+  cursor: grabbing !important;
+}
+
+/* Drop target styles */
+.saved-seed-card.drop-target {
+  border: 2px dashed #6c5ce7;
+  background: rgba(108, 92, 231, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+}
+
+.saved-seed-card.drop-target::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px dashed #6c5ce7;
+  border-radius: 8px;
+  background: rgba(108, 92, 231, 0.05);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.saved-seed-card.drag-over {
+  border: 2px solid #6c5ce7;
+  background: rgba(108, 92, 231, 0.2);
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+}
+
+.saved-seed-card.drag-over::before {
+  opacity: 1;
+  background: rgba(108, 92, 231, 0.15);
+}
+
+/* Grid container */
+#batch-nfts-grid {
+  position: relative;
+}
+
+/* Drag mode styles */
+.drag-mode .saved-seed-card:not(.dragging) {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Enhanced visual feedback for drop targets */
+.drag-mode .saved-seed-card.drop-target:not(.dragging) {
+  animation: pulse-drop-target 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-drop-target {
+  0%, 100% {
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4);
+  }
+  50% {
+    border-color: #a29bfe;
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .batch-generation-modal-content {
+    width: 95vw;
+    height: 90vh;
+  }
+  
+  .batch-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Cross-page drag and drop styles */
+.pagination-btn.drag-over-page {
+  background-color: #4a90e2 !important;
+  color: white !important;
+  transform: scale(1.1) !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+.pagination-btn.drag-over-page:hover {
+  background-color: #357abd !important;
+  transform: scale(1.15) !important;
+}

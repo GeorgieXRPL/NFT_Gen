@@ -1,0 +1,155 @@
+/* 
+ * TAB SCROLLING CONTROL
+ * Control which tabs can scroll vertically and which cannot
+ * 
+ * Usage:
+ * - Add class "scroll-enabled" to tabs that should scroll
+ * - Add class "scroll-disabled" to tabs that should not scroll
+ * - Default behavior: tabs scroll unless explicitly disabled
+ */
+
+/* ========================================
+   DEFAULT SCROLLING BEHAVIOR (SCROLL ENABLED)
+   ======================================== */
+
+/* All tabs scroll by default - EXCEPT export-nfts which should never scroll */
+.tab-content:not(#export-nfts) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: calc(100vh - 110px) !important;
+  max-height: calc(100vh - 110px) !important;
+}
+
+/* Explicitly prevent export-nfts from inheriting scroll behavior */
+#export-nfts.tab-content,
+#export-nfts.tab-content.active {
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: auto !important;
+  max-height: calc(100vh - 110px) !important;
+}
+
+/* ========================================
+   SCROLL ENABLED TABS (EXPLICIT)
+   ======================================== */
+
+/* Tabs that should definitely scroll */
+.tab-content.scroll-enabled {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: calc(100vh - 110px) !important;
+  max-height: calc(100vh - 110px) !important;
+}
+
+/* ========================================
+   SCROLL DISABLED TABS (NO SCROLLING)
+   ======================================== */
+
+/* Tabs that should NOT scroll */
+.tab-content.scroll-disabled {
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  height: calc(100vh - 110px) !important;
+  max-height: calc(100vh - 110px) !important;
+}
+
+/* ========================================
+   INDIVIDUAL TAB CONTROL
+   ======================================== */
+
+/* Collection Info tab rules moved to collection-info-override.css */
+
+/* Traits & Rules Tab - SCROLL ENABLED */
+#traits-rules.tab-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* All tabs scrollable by default - Collection Info and Generate NFTs are frozen */
+
+/* Generate Metadata Tab - SCROLLABLE (like other tabs) */
+
+/* Export NFTs Tab - SCROLL DISABLED (user will decide later) */
+#export-nfts.tab-content {
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+}
+
+/* ========================================
+   CUSTOM SCROLLBAR STYLING FOR SCROLLING TABS
+   ======================================== */
+
+/* Use browser's native scrollbar - no custom styling to avoid duplicates */
+
+/* ========================================
+   RESPONSIVE BEHAVIOR
+   ======================================== */
+
+/* On smaller screens, all tabs scroll for better usability */
+@media (max-width: 768px) {
+  .tab-content {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  .tab-content.scroll-disabled {
+    overflow-y: auto !important; /* Override disabled scrolling on mobile */
+  }
+}
+
+/* ========================================
+   CONTENT ADJUSTMENT FOR NON-SCROLLING TABS
+   ======================================== */
+
+/* Ensure content fits properly in non-scrolling tabs */
+.tab-content.scroll-disabled {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.tab-content.scroll-disabled .section-title,
+.tab-content.scroll-disabled .section-description {
+  flex-shrink: 0 !important;
+}
+
+.tab-content.scroll-disabled .main-content {
+  flex: 1 !important;
+  overflow-y: auto !important; /* Allow scrolling within main content area */
+  overflow-x: hidden !important;
+}
+
+/* ========================================
+   DEBUGGING HELPERS
+   ======================================== */
+
+/* Add visual indicators for debugging (remove in production) */
+.tab-content.scroll-enabled::before {
+  content: "SCROLL ENABLED";
+  position: fixed;
+  top: 120px;
+  right: 10px;
+  background: rgba(0, 255, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: 3px;
+  z-index: 10000;
+  display: none; /* Set to 'block' to enable debugging */
+}
+
+.tab-content.scroll-disabled::before {
+  content: "SCROLL DISABLED";
+  position: fixed;
+  top: 120px;
+  right: 10px;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: 3px;
+  z-index: 10000;
+  display: none; /* Set to 'block' to enable debugging */
+}

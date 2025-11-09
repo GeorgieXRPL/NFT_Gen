@@ -1,0 +1,1527 @@
+/* Export NFTs / Metadata Module Styles */
+
+/* CSS Custom Properties for animated border gradient */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
+}
+
+/* Animated dots for "Saving Batch..." status */
+.saving-dots {
+  display: inline-block;
+  vertical-align: baseline;
+  color: inherit; /* Inherit color from parent text */
+}
+
+.saving-dots span {
+  display: inline-block;
+  vertical-align: baseline;
+  animation: dotPulse 1.4s infinite;
+  animation-fill-mode: both;
+  color: inherit; /* Inherit color from parent text */
+  font-size: inherit; /* Inherit font size from parent text */
+}
+
+.saving-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.saving-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.saving-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* Hide number input arrows for num-batches-input */
+#num-batches-input::-webkit-inner-spin-button,
+#num-batches-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  display: none;
+}
+
+#num-batches-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+#num-batches-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Hide number input arrows for export image dimensions inputs */
+#export-image-width-input::-webkit-inner-spin-button,
+#export-image-width-input::-webkit-outer-spin-button,
+#export-image-height-input::-webkit-inner-spin-button,
+#export-image-height-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  display: none;
+}
+
+#export-image-width-input,
+#export-image-height-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+#export-image-width-input[type="number"],
+#export-image-height-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Override export-option-toggle width for image dimension toggles */
+#image-dimension-original-toggle,
+#image-dimension-custom-toggle {
+  width: 69px !important;
+  min-width: 69px !important;
+  max-width: 69px !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Center num-batches-input text */
+#num-batches-input {
+  text-align: center !important;
+}
+
+/* Export NFTs Content Area - Match content-area styling */
+.export-nfts-content-area {
+  position: relative !important;
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Ensure no height constraint */
+  min-height: auto !important;
+  margin-top: 110px !important;
+  margin-bottom: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: none; /* Hidden by default, shown when export-nfts tab is active - no !important to allow JS override */
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+.export-nfts-content-area::-webkit-scrollbar,
+#export-nfts.tab-content::-webkit-scrollbar,
+#export-nfts.tab-content.active::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Ensure export-nfts tab content is visible when active */
+#export-nfts.tab-content.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  height: auto !important;
+  max-height: none !important; /* Ensure no height constraint */
+  min-height: auto !important;
+  width: auto !important;
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  pointer-events: auto !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Remove all padding-top from export-nfts tab to eliminate empty space */
+#export-nfts.tab-content {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Ensure no height constraint */
+  min-height: auto !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+/* COMPREHENSIVE: Hide scrollbar and disable scrolling for Export NFTs tab - ALL SELECTORS */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+#export-nfts.tab-content,
+#export-nfts.tab-content.active,
+html body #app .project-interface .content-area #export-nfts,
+html body #app .project-interface .content-area #export-nfts.tab-content,
+html body #app .project-interface .content-area #export-nfts.tab-content.active,
+.content-area:has(#export-nfts.tab-content),
+.content-area:has(#export-nfts.tab-content.active),
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active),
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area {
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Ensure no height constraint */
+  min-height: auto !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+  /* Disable scrolling behavior */
+  overscroll-behavior: none !important;
+  /* Prevent scrolling via touch/pointer */
+  touch-action: none !important;
+}
+
+/* Hide scrollbar for ALL browsers - Webkit */
+#export-nfts.tab-content::-webkit-scrollbar,
+#export-nfts.tab-content.active::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts.tab-content.active::-webkit-scrollbar,
+.content-area:has(#export-nfts.tab-content)::-webkit-scrollbar,
+.content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+/* Hide scrollbar track and thumb - Webkit */
+#export-nfts.tab-content::-webkit-scrollbar-track,
+#export-nfts.tab-content::-webkit-scrollbar-thumb,
+#export-nfts.tab-content.active::-webkit-scrollbar-track,
+#export-nfts.tab-content.active::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts.tab-content.active::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts.tab-content.active::-webkit-scrollbar-thumb,
+.content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-track,
+.content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-track,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-thumb,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar-track,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+/* Additional: Hide scrollbar on content-area parent when export tab is active */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active),
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area {
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Remove height constraint */
+  min-height: auto !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-track,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-thumb,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar-track,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+}
+
+/* ========================================
+   FINAL OVERRIDE - HIDE SCROLLBAR ONCE AND FOR ALL
+   ======================================== */
+/* Maximum specificity override to win against ALL other CSS files */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+html body #app .project-interface .content-area #export-nfts.tab-content,
+html body #app .project-interface .content-area #export-nfts.tab-content.active,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active) #export-nfts,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area #export-nfts,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content.active {
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Remove height constraint */
+  min-height: auto !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+html body #app .project-interface .content-area #export-nfts.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts.tab-content.active::-webkit-scrollbar,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active) #export-nfts::-webkit-scrollbar,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area #export-nfts::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content.active::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+html body #app .project-interface .content-area #export-nfts.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts.tab-content.active::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts.tab-content.active::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active) #export-nfts::-webkit-scrollbar-track,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active) #export-nfts::-webkit-scrollbar-thumb,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area #export-nfts::-webkit-scrollbar-track,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area #export-nfts::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content.active::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #export-nfts.tab-content.tab-content.active::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Also hide scrollbar on content-area when export tab is active - MAXIMUM SPECIFICITY */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active),
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active.tab-content),
+html body #app .project-interface:has(#export-nfts.tab-content.active.tab-content) .content-area {
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Remove height constraint */
+  min-height: auto !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active.tab-content)::-webkit-scrollbar,
+html body #app .project-interface:has(#export-nfts.tab-content.active.tab-content) .content-area::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-track,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active)::-webkit-scrollbar-thumb,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar-track,
+html body #app .project-interface:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active.tab-content)::-webkit-scrollbar-track,
+html body #app .project-interface .content-area:has(#export-nfts.tab-content.active.tab-content)::-webkit-scrollbar-thumb,
+html body #app .project-interface:has(#export-nfts.tab-content.active.tab-content) .content-area::-webkit-scrollbar-track,
+html body #app .project-interface:has(#export-nfts.tab-content.active.tab-content) .content-area::-webkit-scrollbar-thumb {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* FINAL OVERRIDE: Force hide scrollbar on ALL possible containers when export-nfts tab is active */
+/* CRITICAL: Do NOT apply overflow: hidden to ALL child elements (*) as it clips content */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+body:has(#export-nfts.tab-content.active),
+html:has(#export-nfts.tab-content.active),
+body:has(#export-nfts.tab-content.active) .content-area,
+html:has(#export-nfts.tab-content.active) .content-area,
+#export-nfts.tab-content.active {
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+  height: auto !important;
+  max-height: none !important; /* Remove height constraint */
+  min-height: auto !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+/* COMPREHENSIVE: Ensure ALL Export NFTs containers and child elements can expand without clipping */
+/* This overrides any conflicting rules from other CSS files */
+#export-nfts.tab-content .section-header,
+#export-nfts.tab-content .form-container,
+#export-nfts.tab-content .two-column-form,
+#export-nfts.tab-content .form-column,
+#export-nfts.tab-content #export-nfts-form-container,
+#export-nfts.tab-content #batch-management-section,
+#export-nfts.tab-content #blockchain-management-section,
+#export-nfts.tab-content #number-of-batches-section,
+#export-nfts.tab-content .batch-card,
+#export-nfts.tab-content .form-group,
+#export-nfts.tab-content .form-control,
+#export-nfts.tab-content .section-title,
+#export-nfts.tab-content .section-description {
+  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+}
+
+body:has(#export-nfts.tab-content.active)::-webkit-scrollbar,
+html:has(#export-nfts.tab-content.active)::-webkit-scrollbar,
+body:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
+html:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
+#export-nfts.tab-content.active::-webkit-scrollbar,
+#export-nfts.tab-content.active *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+#export-nfts .section-header,
+#export-nfts.tab-content .section-header,
+#export-nfts.tab-content.active .section-header {
+  padding-top: 0 !important; /* Match Collection Info positioning - override main.css padding-top: 20px */
+  margin-top: 71px !important; /* Moved down 71px (40px + 31px) */
+  display: flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  margin-bottom: 2rem !important;
+}
+
+#export-nfts .section-title,
+#export-nfts.tab-content .section-title,
+#export-nfts.tab-content.active .section-title {
+  padding-top: 0 !important;
+  margin-top: 0 !important; /* Match Collection Info positioning */
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 1.8rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  margin-right: 1rem !important;
+  margin-bottom: 0 !important;
+}
+
+#export-nfts .section-description {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 1rem !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Prevent ALL toggles from moving when clicked */
+.toggle-button,
+.toggle-button:active,
+.toggle-button.active,
+.toggle-button:hover,
+.toggle-button.active:hover,
+.toggle-button:focus,
+.toggle-button.active:focus {
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  translate: none !important;
+}
+
+/* Exception: Allow pulse animation for "Already Minted" toggle */
+.already-minted-toggle.active {
+  animation: pulse-red 2s infinite !important;
+}
+
+/* Pulse-red animation for Already Minted toggle */
+@keyframes pulse-red {
+  0% {
+    box-shadow: 
+      inset 0 3px 5px rgba(0, 0, 0, 0.5),
+      0 0 10px rgba(231, 76, 60, 0.8),
+      0 0 20px rgba(231, 76, 60, 0.6),
+      0 0 30px rgba(231, 76, 60, 0.4);
+  }
+  50% {
+    box-shadow: 
+      inset 0 3px 5px rgba(0, 0, 0, 0.5),
+      0 0 15px rgba(231, 76, 60, 1.0),
+      0 0 30px rgba(231, 76, 60, 0.8),
+      0 0 45px rgba(231, 76, 60, 0.6);
+  }
+  100% {
+    box-shadow: 
+      inset 0 3px 5px rgba(0, 0, 0, 0.5),
+      0 0 10px rgba(231, 76, 60, 0.8),
+      0 0 20px rgba(231, 76, 60, 0.6),
+      0 0 30px rgba(231, 76, 60, 0.4);
+  }
+}
+
+/* Rarity Rank Toggle - Fixed dimensions */
+#metadata\.rarity\.rank.toggle-button {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease !important;
+  flex: none !important;
+}
+
+/* Rarity Rank Toggle - Halo effect when active */
+#metadata\.rarity\.rank.toggle-button.active {
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important;
+}
+
+/* 1 Metadata/NFT Toggle - Fixed dimensions and transitions */
+#metadata\.per\.nft.toggle-button {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease !important;
+  flex: none !important;
+}
+
+/* Export Metadata NFTs Button - Fixed dimensions and purple color */
+#export-metadata-nfts-btn {
+  width: 172px !important;
+  min-width: 172px !important;
+  max-width: 172px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 12px !important;
+  padding: 0px 8px !important;
+  box-sizing: border-box !important;
+  white-space: normal !important;
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  border: 2px solid #8b5cf6 !important;
+  color: rgb(255, 255, 255) !important;
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease !important;
+}
+
+/* Strong halo effect when active (enabled) */
+#export-metadata-nfts-btn:not(:disabled) {
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(139, 92, 246, 0.8),
+    0 0 12px rgba(139, 92, 246, 0.6) !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  flex: 0 0 auto !important;
+}
+
+/* Greyed out when disabled */
+#export-metadata-nfts-btn:disabled,
+#export-metadata-nfts-btn[disabled],
+#export-metadata-nfts-btn.disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background-color: #2a2a2a !important;
+  border-color: #4a4a4a !important;
+  color: #666666 !important;
+  box-shadow: none !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  flex: 0 0 auto !important;
+  pointer-events: none !important;
+}
+
+/* Apply Button - Fixed dimensions */
+#number-of-batches-section button.btn {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 0px 8px !important;
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important;
+}
+
+/* Background colors for specific containers */
+#metadata-export-options {
+  background-color: #111111 !important;
+  background: #111111 !important;
+}
+
+/* Ensure these containers always have #111111 background and 24px margin-top */
+#image-format-export-form-container-left,
+#export-nfts #image-format-export-form-container-left {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+  margin-left: 0 !important;
+  width: 248px !important;
+  height: 108px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  min-height: 108px !important;
+  max-height: 108px !important;
+  box-sizing: border-box !important;
+}
+
+#batch-management-section,
+#export-nfts #batch-management-section {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transition: box-shadow 0.5s ease !important;
+  position: relative !important;
+}
+
+/* When animation is active, apply gradient border animation */
+#batch-management-section.border-pulsing,
+#export-nfts #batch-management-section.border-pulsing {
+  position: relative !important;
+  transition: none !important;
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  isolation: isolate !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+}
+
+#batch-management-section.border-pulsing::before,
+#export-nfts #batch-management-section.border-pulsing::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -1px !important;
+  left: -1px !important;
+  right: -1px !important;
+  bottom: -1px !important;
+  --angle: 0deg;
+  --c1: #8b5cf6;
+  --c2: rgba(139, 92, 246, 0.1);
+  background: conic-gradient(
+    from var(--angle),
+    var(--c2),
+    var(--c1) 0.1turn,
+    var(--c1) 0.15turn,
+    var(--c2) 0.25turn
+  ) !important;
+  border-radius: 13px !important;
+  z-index: -2 !important;
+  animation: borderRotate 3s linear infinite forwards !important;
+  pointer-events: none !important;
+}
+
+#batch-management-section.border-pulsing::after,
+#export-nfts #batch-management-section.border-pulsing::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 1px !important;
+  left: 1px !important;
+  right: 1px !important;
+  bottom: 1px !important;
+  background: #111111 !important;
+  border-radius: 11px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* Border animation for batch-management-section when number-of-batches-section is hovered/focused */
+#number-of-batches-section:hover ~ #export-nfts-form-column-right #batch-management-section,
+#export-nfts #number-of-batches-section:hover ~ #export-nfts-form-column-right #batch-management-section,
+#number-of-batches-section:focus-within ~ #export-nfts-form-column-right #batch-management-section,
+#export-nfts #number-of-batches-section:focus-within ~ #export-nfts-form-column-right #batch-management-section {
+  /* Gradient animation is handled by .border-pulsing class */
+  transition: none !important;
+}
+
+/* Gradient border animation - rotating gradient using CSS @property for smooth animation */
+@keyframes borderRotate {
+  100% {
+    --angle: 360deg;
+  }
+}
+
+/* Alternative selector for batch-management-section (when it's a sibling or in different structure) */
+#export-nfts-form-column-right:hover #batch-management-section,
+#export-nfts #export-nfts-form-column-right:hover #batch-management-section {
+  /* This will be triggered by JavaScript when number-of-batches-section is hovered */
+}
+
+/* Utilities Section */
+#utilities-section,
+#export-nfts #utilities-section {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Fixed size for utilities-section: 256x556px */
+#utilities-section,
+#export-nfts #utilities-section {
+  width: 256px !important;
+  height: 556px !important;
+  min-width: 256px !important;
+  max-width: 256px !important;
+  min-height: 556px !important;
+  max-height: 556px !important;
+  box-sizing: border-box !important;
+}
+
+/* Utilities card styling (similar to greyed out batch cards) */
+.utilities-card {
+  width: 174px !important;
+  min-width: 174px !important;
+  max-width: 174px !important;
+  border: 2px solid #666666 !important;
+  background: #111111 !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* Remove number input arrows for max-nfts-export-input */
+#max-nfts-export-input::-webkit-outer-spin-button,
+#max-nfts-export-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#max-nfts-export-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Export NFTs Metadata Options card - fixed size */
+#export-nfts-metadata-options,
+#export-nfts #export-nfts-metadata-options {
+  width: 174px !important;
+  height: 128px !important;
+  min-width: 174px !important;
+  max-width: 174px !important;
+  min-height: 128px !important;
+  max-height: 128px !important;
+  box-sizing: border-box !important;
+}
+
+/* Export option toggle styling */
+.export-option-toggle {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}
+
+/* Keep "Export NFTs & Metadata" text on one line */
+#export-option-nfts-metadata,
+#export-nfts #export-option-nfts-metadata {
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.export-option-toggle.active {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* Merge Metadata Files button - ensure it's blue and fixed width */
+#merge-metadata-files-btn,
+#export-nfts #merge-metadata-files-btn {
+  width: 174px !important;
+  min-width: 174px !important;
+  max-width: 174px !important;
+  background: #3b82f6 !important;
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-sizing: border-box !important;
+  transform: translateY(3px) !important;
+}
+
+/* Fixed size for batch-management-section: 921x364px */
+#batch-management-section,
+#export-nfts #batch-management-section {
+  width: 921px !important;
+  height: 364px !important;
+  min-width: 921px !important;
+  max-width: 921px !important;
+  min-height: 364px !important;
+  max-height: 364px !important;
+  box-sizing: border-box !important;
+}
+
+#number-of-batches-section,
+#export-nfts #number-of-batches-section {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+  margin-left: 0 !important;
+  width: 248px !important;
+  height: 108px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  min-height: 108px !important;
+  max-height: 108px !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* When animation is active, apply gradient border animation */
+#number-of-batches-section.border-pulsing,
+#export-nfts #number-of-batches-section.border-pulsing {
+  position: relative !important;
+  transition: none !important;
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  isolation: isolate !important;
+  z-index: 1 !important;
+  overflow: visible !important;
+}
+
+#number-of-batches-section.border-pulsing::before,
+#export-nfts #number-of-batches-section.border-pulsing::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -1px !important;
+  left: -1px !important;
+  right: -1px !important;
+  bottom: -1px !important;
+  --angle: 0deg;
+  --c1: #8b5cf6;
+  --c2: rgba(139, 92, 246, 0.1);
+  background: conic-gradient(
+    from var(--angle),
+    var(--c2),
+    var(--c1) 0.1turn,
+    var(--c1) 0.15turn,
+    var(--c2) 0.25turn
+  ) !important;
+  border-radius: 13px !important;
+  z-index: -2 !important;
+  animation: borderRotate 3s linear infinite forwards !important;
+  pointer-events: none !important;
+}
+
+#number-of-batches-section.border-pulsing::after,
+#export-nfts #number-of-batches-section.border-pulsing::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 1px !important;
+  left: 1px !important;
+  right: 1px !important;
+  bottom: 1px !important;
+  background: #111111 !important;
+  border-radius: 11px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* Border animation for number-of-batches-section on hover/focus */
+#number-of-batches-section:hover,
+#export-nfts #number-of-batches-section:hover,
+#number-of-batches-section:focus-within,
+#export-nfts #number-of-batches-section:focus-within {
+  /* Gradient animation is handled by .border-pulsing class */
+  transition: none !important;
+}
+
+#export-nfts-metadata,
+#export-nfts #export-nfts-metadata {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+  margin-left: 0 !important;
+  width: 248px !important;
+  height: 172px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  min-height: 172px !important;
+  max-height: 172px !important;
+  box-sizing: border-box !important;
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+  will-change: auto !important;
+}
+
+#metadata-format-export-form-container-right,
+#export-nfts #metadata-format-export-form-container-right {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
+  margin-left: 0 !important;
+  width: 248px !important;
+  height: 108px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  min-height: 108px !important;
+  max-height: 108px !important;
+  box-sizing: border-box !important;
+}
+
+/* Match margin-left from metadata-format-export-form-container-right */
+#image-format-export-form-container-left,
+#export-nfts #image-format-export-form-container-left {
+  margin-left: 0 !important;
+}
+
+#blockchain-management-section,
+#export-nfts #blockchain-management-section {
+  background-color: #111111 !important;
+  background: #111111 !important;
+  width: 921px !important;
+  min-width: 921px !important;
+  max-width: 921px !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 172px !important;
+  min-height: 172px !important;
+  max-height: 172px !important;
+}
+
+#nfts-metadata-export,
+#export-nfts #nfts-metadata-export {
+  background-color: transparent !important;
+  background: transparent !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Center content inside image-format-export-form-container-left */
+#image-format-export-form-container-left,
+#export-nfts #image-format-export-form-container-left {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#image-format-export-form-container-left h3,
+#export-nfts #image-format-export-form-container-left h3 {
+  text-align: center !important;
+}
+
+#image-format-export-form-container-left > div,
+#export-nfts #image-format-export-form-container-left > div {
+  justify-content: center !important;
+}
+
+/* Center content inside metadata-format-export-form-container-right */
+#metadata-format-export-form-container-right,
+#export-nfts #metadata-format-export-form-container-right {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#metadata-format-export-form-container-right h3,
+#export-nfts #metadata-format-export-form-container-right h3 {
+  text-align: center !important;
+}
+
+#metadata-format-export-form-container-right > div,
+#export-nfts #metadata-format-export-form-container-right > div {
+  justify-content: center !important;
+}
+
+/* Center content inside number-of-batches-section */
+#number-of-batches-section,
+#export-nfts #number-of-batches-section {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+#number-of-batches-section h3,
+#export-nfts #number-of-batches-section h3 {
+  text-align: center !important;
+}
+
+#number-of-batches-section > div,
+#export-nfts #number-of-batches-section > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* Center content inside batch-management-section (grid layout) - 5 columns, 2 rows */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+#batch-management-section,
+#export-nfts #batch-management-section {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  grid-template-rows: auto repeat(2, auto) !important;
+  justify-items: center !important;
+  align-content: center !important;
+  justify-content: center !important;
+  overflow-x: visible !important; /* Changed from auto to visible to prevent clipping */
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Allow content to expand */
+  width: 921px !important;
+  height: 364px !important;
+  min-width: 921px !important;
+  max-width: 921px !important;
+  min-height: 364px !important;
+  max-height: 364px !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+/* Center content inside blockchain-management-section (grid layout) - 5 columns, 2 rows */
+/* Use overflow: visible to prevent clipping, but prevent scrolling via JS event handlers */
+#blockchain-management-section,
+#export-nfts #blockchain-management-section {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  grid-template-rows: auto repeat(2, auto) !important;
+  justify-items: center !important;
+  align-content: center !important;
+  justify-content: center !important;
+  overflow-x: visible !important; /* Changed from auto to visible to prevent clipping */
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent clipping */
+  overflow: visible !important; /* Allow content to expand */
+  width: 921px !important;
+  height: 172px !important;
+  min-width: 921px !important;
+  max-width: 921px !important;
+  min-height: 172px !important;
+  max-height: 172px !important;
+  scrollbar-width: none !important; /* Still hide scrollbar */
+  -ms-overflow-style: none !important; /* Still hide scrollbar */
+}
+
+#batch-management-section::-webkit-scrollbar,
+#blockchain-management-section::-webkit-scrollbar,
+#export-nfts #batch-management-section::-webkit-scrollbar,
+#export-nfts #blockchain-management-section::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Align blockchain-management-section vertically with batch-management-section */
+#blockchain-management-section,
+#export-nfts #blockchain-management-section {
+  align-self: flex-start !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Ensure the right column main container allows proper layout */
+#nfts-metadata-export,
+#export-nfts #nfts-metadata-export {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+}
+
+#batch-management-section > div:first-child,
+#export-nfts #batch-management-section > div:first-child {
+  text-align: center !important;
+  justify-self: center !important;
+  grid-column: 1 / -1 !important;
+}
+
+/* Center batch cards in grid */
+#batch-management-section .batch-card,
+#export-nfts #batch-management-section .batch-card {
+  justify-self: center !important;
+}
+
+/* Batch card styling - ensure disabled state is greyed out */
+#batch-management-section .batch-card:not([style*="opacity: 1"]),
+#export-nfts #batch-management-section .batch-card:not([style*="opacity: 1"]) {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+
+/* Locked batch card styling (dark red) */
+#batch-management-section .batch-card[style*="background: #5a1a1a"],
+#export-nfts #batch-management-section .batch-card[style*="background: #5a1a1a"] {
+  background: #5a1a1a !important;
+  border: 2px solid #8b0000 !important;
+  position: relative !important;
+}
+
+/* Lock icon styling */
+.batch-card .lock-icon {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  opacity: 0.8 !important;
+}
+
+.batch-card .lock-icon svg {
+  color: #ff4444 !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Disabled toggles and inputs in batch cards */
+#batch-management-section .batch-card input:disabled,
+#batch-management-section .batch-card button:disabled,
+#export-nfts #batch-management-section .batch-card input:disabled,
+#export-nfts #batch-management-section .batch-card button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Select to Export toggle styling */
+.select-to-export-toggle {
+  font-size: 12px !important; /* Doubled from 6px - must use !important to override any conflicting rules */
+  text-transform: uppercase !important;
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease !important;
+}
+
+.select-to-export-toggle.active {
+  background-color: #00ff88 !important;
+  border-color: #00ff88 !important;
+  color: #000000 !important;
+  font-weight: bold !important;
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important;
+}
+
+/* Export NFTs Form Container - Match Collection Info styling */
+#export-nfts-form-container,
+#export-nfts #export-nfts-form-container {
+  display: flex !important;
+  width: 1557px !important;
+  max-width: 1557px !important;
+  height: 630px !important;
+  min-height: 630px !important;
+  max-height: 630px !important;
+  margin-top: 35px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 0 !important;
+  padding: 2rem !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border: 2px dashed var(--border-color) !important;
+  border-radius: 12px !important;
+  background: #222230 !important;
+  box-sizing: border-box !important;
+}
+
+/* Export NFTs Form Columns - Match Collection Info styling */
+#export-nfts-form-column-left,
+#export-nfts-form-column-right,
+#export-nfts #export-nfts-form-column-left,
+#export-nfts #export-nfts-form-column-right {
+  background: #222230 !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+/* Left column - vertical stack layout */
+#export-nfts-form-column-left,
+#export-nfts #export-nfts-form-column-left {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  justify-content: start !important;
+  align-items: start !important;
+  flex: 0 0 auto !important;
+  width: 248px !important;
+  height: 593px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  min-height: 593px !important;
+  max-height: 593px !important;
+  box-sizing: border-box !important;
+}
+
+/* Remove margin-right from all objects inside export-nfts-form-column-left */
+#export-nfts-form-column-left > *,
+#export-nfts #export-nfts-form-column-left > * {
+  margin-right: 0 !important;
+}
+
+/* Right column - Match Collection Info form-column styling */
+#export-nfts-form-column-right,
+#export-nfts #export-nfts-form-column-right {
+  flex: 0 0 auto !important;
+  width: 1128px !important;
+  height: 593px !important;
+  min-width: 1128px !important;
+  max-width: 1128px !important;
+  margin-left: 0px !important;
+  min-height: 593px !important;
+  max-height: 593px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+}
+
+/* Match Collection Info form-group, form-control, label, and form-help margins/spacing */
+#export-nfts-form-container .form-group,
+#export-nfts #export-nfts-form-container .form-group {
+  margin-bottom: 1.5rem !important;
+}
+
+#export-nfts-form-container .form-group label,
+#export-nfts #export-nfts-form-container .form-group label {
+  display: block !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: var(--text-primary) !important;
+}
+
+#export-nfts-form-container .form-control,
+#export-nfts #export-nfts-form-container .form-control {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 1.2rem 1rem !important;
+  font-size: 1.1rem !important;
+  line-height: 1.5 !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+#export-nfts-form-container textarea.form-control,
+#export-nfts #export-nfts-form-container textarea.form-control {
+  min-height: 150px !important;
+  resize: vertical !important;
+  padding: 1.2rem 1rem !important;
+}
+
+#export-nfts-form-container .form-help,
+#export-nfts #export-nfts-form-container .form-help {
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: #f39c12 !important; /* Orange color for visual consistency with tooltips */
+}
+
+#export-nfts-form-container .form-control:focus,
+#export-nfts #export-nfts-form-container .form-control:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1) !important;
+}
+
+/* Batch card styling */
+.batch-card {
+  transition: opacity 0.2s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
+  position: relative !important;
+}
+
+.batch-card:not([style*="opacity: 0.5"]) {
+  opacity: 1 !important;
+}
+
+.batch-card[style*="opacity: 0.5"] {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+
+/* Intense halo effect for batch cards selected to export (green border) */
+.batch-card[style*="#00ff48"],
+#batch-management-section .batch-card[style*="#00ff48"] {
+  box-shadow: 
+    0 0 8px rgba(0, 255, 72, 0.8),
+    0 0 12px rgba(0, 255, 72, 0.6),
+    0 0 16px rgba(0, 255, 72, 0.4) !important;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease !important;
+}
+
+/* Alternative selector for batch cards with green border */
+.batch-card[data-selected-to-export="true"] {
+  box-shadow: 
+    0 0 8px rgba(0, 255, 72, 0.8),
+    0 0 12px rgba(0, 255, 72, 0.6),
+    0 0 16px rgba(0, 255, 72, 0.4) !important;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease !important;
+}
+
+/* Batch input styling */
+.batch-input {
+  transition: border-color 0.2s ease;
+}
+
+.batch-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1);
+}
+
+/* Already Minted toggle specific styles */
+.already-minted-toggle {
+  width: auto !important;
+  height: 32px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important; /* Same size as SELECT FOR EXPORT - must use !important to override any conflicting rules */
+  font-weight: 600 !important;
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease, animation 0.5s ease !important;
+}
+
+.already-minted-toggle.active {
+  background-color: #e74c3c !important;
+  border-color: #e74c3c !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+}
+
+/* Blockchain toggles container positioning */
+.blockchain-toggles-container {
+  position: relative;
+  z-index: 1;
+  justify-items: center !important;
+  justify-self: center !important;
+}
+
+/* Ensure all blockchain toggle buttons have the same width */
+.blockchain-toggles-container .toggle-button {
+  width: 100% !important;
+  min-width: 120px !important;
+  max-width: 200px !important;
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease !important;
+}
+
+/* Center align blockchain management section title and toggles */
+#blockchain-management-section > div:first-child,
+#export-nfts #blockchain-management-section > div:first-child {
+  text-align: center !important;
+  justify-self: center !important;
+}
+
+/* Batch toggles container and batch-toggle buttons have been removed - batch selection is now done via batch cards */
+
+/* Ensure no movement on hover for all toggles (but NOT for disabled elements) */
+.toggle-button:hover:not([disabled]):not(:disabled) {
+  transform: none !important;
+  translate: none !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* CRITICAL: Prevent ALL hover effects for disabled toggle buttons */
+.toggle-button[disabled]:hover,
+.toggle-button:disabled:hover {
+  transform: none !important;
+  translate: none !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+/* Image Format and Metadata Format toggles - Ensure halo effect is visible when active */
+#jpg-toggle,
+#png-toggle,
+#json-toggle,
+#csv-toggle {
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease !important;
+}
+
+#jpg-toggle.active,
+#png-toggle.active,
+#json-toggle.active,
+#csv-toggle.active {
+  background-color: #00ff88 !important;
+  border-color: #00ff88 !important;
+  color: #000000 !important;
+  font-weight: bold !important;
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important;
+}
+
+/* Inactive state for Image Format and Metadata Format toggles */
+#jpg-toggle:not(.active),
+#png-toggle:not(.active),
+#json-toggle:not(.active),
+#csv-toggle:not(.active) {
+  background-color: #2a2a2a !important;
+  border-color: #4a4a4a !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+/* Export Progress Popup - Finished Tasks Scrollbar Styling */
+#export-progress-popup #export-finished-tasks::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+#export-progress-popup #export-finished-tasks::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 6px !important;
+}
+
+#export-progress-popup #export-finished-tasks::-webkit-scrollbar-thumb {
+  background-color: #34495e !important;
+  border-radius: 6px !important;
+  border: 2px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+#export-progress-popup #export-finished-tasks::-webkit-scrollbar-thumb:hover {
+  background-color: #4a5f7a !important;
+}
+
+/* Firefox scrollbar styling for Finished Tasks */
+#export-progress-popup #export-finished-tasks {
+  scrollbar-width: thin !important;
+  scrollbar-color: #34495e rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Export Progress Popup - Main Popup Scrollbar Styling */
+#export-progress-popup.scan-progress-popup::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+#export-progress-popup.scan-progress-popup::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 6px !important;
+}
+
+#export-progress-popup.scan-progress-popup::-webkit-scrollbar-thumb {
+  background-color: #34495e !important;
+  border-radius: 6px !important;
+  border: 2px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+#export-progress-popup.scan-progress-popup::-webkit-scrollbar-thumb:hover {
+  background-color: #4a5f7a !important;
+}
+
+/* Firefox scrollbar styling for main popup */
+#export-progress-popup.scan-progress-popup {
+  scrollbar-width: thin !important;
+  scrollbar-color: #34495e rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Export Progress Popup - Export Summary Items Scrollbar Styling */
+#export-progress-popup #export-summary-items::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+#export-progress-popup #export-summary-items::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 6px !important;
+}
+
+#export-progress-popup #export-summary-items::-webkit-scrollbar-thumb {
+  background-color: #34495e !important;
+  border-radius: 6px !important;
+  border: 2px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+#export-progress-popup #export-summary-items::-webkit-scrollbar-thumb:hover {
+  background-color: #4a5f7a !important;
+}
+
+/* Firefox scrollbar styling for Export Summary Items */
+#export-progress-popup #export-summary-items {
+  scrollbar-width: thin !important;
+  scrollbar-color: #34495e rgba(0, 0, 0, 0.2) !important;
+}

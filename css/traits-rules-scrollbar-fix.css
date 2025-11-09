@@ -1,0 +1,176 @@
+/* 
+ * TRAITS-RULES SCROLLBAR FIX
+ * 
+ * This CSS file specifically fixes the duplicate scrollbar issue on the traits-rules tab
+ * by completely hiding all custom scrollbars and forcing the browser to use only its native scrollbar.
+ * 
+ * This file should be loaded LAST to ensure it overrides all other scrollbar styles.
+ */
+
+/* Enable drag-to-scroll cursor for Traits & Rules tab */
+#traits-rules.tab-content,
+#traits-rules.tab-content.active {
+  cursor: grab !important;
+}
+
+#traits-rules.tab-content:active,
+#traits-rules.tab-content.active:active {
+  cursor: grabbing !important;
+}
+
+/* Don't change cursor for draggable elements (trait layers, etc.) */
+#traits-rules .trait-layer-bar,
+#traits-rules .trait-layer-bar *,
+#traits-rules [draggable="true"],
+#traits-rules [draggable="true"] *,
+#traits-rules button,
+#traits-rules input,
+#traits-rules select,
+#traits-rules textarea,
+#traits-rules a {
+  cursor: default !important;
+}
+
+#traits-rules .trait-layer-bar[draggable="true"] {
+  cursor: grab !important;
+}
+
+#traits-rules .trait-layer-bar[draggable="true"]:active {
+  cursor: grabbing !important;
+}
+
+/* ULTIMATE SOLUTION: Hide scrollbar but keep scroll functionality */
+html body #app .project-interface .content-area #traits-rules.tab-content,
+html body #app .project-interface .content-area #traits-rules.tab-content.active,
+#traits-rules.tab-content,
+#traits-rules.tab-content.active {
+  /* Keep scroll functionality but hide scrollbar */
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  /* Firefox - Hide scrollbar */
+  scrollbar-width: none !important;
+  /* IE and Edge - Hide scrollbar */
+  -ms-overflow-style: none !important;
+}
+
+/* Hide ALL custom webkit scrollbars for traits-rules tab */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar,
+#traits-rules.tab-content::-webkit-scrollbar,
+#traits-rules.tab-content.active::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hide ALL custom webkit scrollbars for ALL elements inside traits-rules tab */
+html body #app .project-interface .content-area #traits-rules.tab-content *::-webkit-scrollbar,
+html body #app .project-interface .content-area #traits-rules.tab-content.active *::-webkit-scrollbar,
+#traits-rules.tab-content *::-webkit-scrollbar,
+#traits-rules.tab-content.active *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hide scrollbar track */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-track,
+#traits-rules.tab-content::-webkit-scrollbar-track,
+#traits-rules.tab-content.active::-webkit-scrollbar-track {
+  display: none !important;
+}
+
+/* Hide scrollbar thumb */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-thumb,
+#traits-rules.tab-content::-webkit-scrollbar-thumb,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+/* Hide scrollbar corner */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-corner,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-corner,
+#traits-rules.tab-content::-webkit-scrollbar-corner,
+#traits-rules.tab-content.active::-webkit-scrollbar-corner {
+  display: none !important;
+}
+
+/* Hide scrollbar button (if any) */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-button,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-button,
+#traits-rules.tab-content::-webkit-scrollbar-button,
+#traits-rules.tab-content.active::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+/* Hide scrollbar thumb hover state */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-thumb:hover,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-thumb:hover,
+#traits-rules.tab-content::-webkit-scrollbar-thumb:hover,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb:hover {
+  display: none !important;
+}
+
+/* Hide scrollbar thumb active state */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-thumb:active,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-thumb:active,
+#traits-rules.tab-content::-webkit-scrollbar-thumb:active,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb:active {
+  display: none !important;
+}
+
+/* Force modal widths with maximum specificity - loads last to ensure priority */
+html body #trait-selection-modal .select-trait-container {
+  width: 962px !important;
+  min-width: 962px !important;
+  max-width: 962px !important;
+  flex: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
+
+html body #dark-traits-modal .saved-seeds-container {
+  width: 962px !important;
+  min-width: 962px !important;
+  max-width: 962px !important;
+  flex: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
+
+/* NAV-ACTIONS ALIGNMENT: Move to align with traits-rules-all-content */
+/* This file loads LAST, so this rule will override all other nav-actions rules */
+/* Using transform instead of margin because parent .nav-tabs-container uses justify-content: space-between */
+/* Transform value: -161px to align with traits-rules-all-content left edge */
+html body #app .project-interface .nav-container .nav-tabs-container .nav-actions,
+html body #app .nav-container .nav-tabs-container .nav-actions,
+html body #app .project-interface .nav-tabs-container .nav-actions,
+html body #app .nav-tabs-container .nav-actions,
+html body .nav-tabs-container .nav-actions,
+body #app .nav-tabs-container .nav-actions,
+.nav-tabs-container .nav-actions,
+html body #app .project-interface:has(.content-area:has(#general-info.tab-content.active)) .nav-tabs-container .nav-actions,
+html body #app .project-interface:has(.content-area:has(#traits-rules.tab-content.active)) .nav-tabs-container .nav-actions,
+html body #app .project-interface:has(.content-area:has(#generate-nfts.tab-content.active)) .nav-tabs-container .nav-actions,
+html body #app .project-interface:has(.content-area:has(#generate-metadata.tab-content.active)) .nav-tabs-container .nav-actions,
+html body #app .project-interface:has(.content-area:has(#export-nfts.tab-content.active)) .nav-tabs-container .nav-actions,
+html body #app .project-interface .nav-container .nav-actions,
+html body #app .nav-container .nav-actions,
+html body #app .project-interface .nav-actions,
+html body #app .nav-actions,
+html body .nav-actions,
+body #app .nav-actions,
+body .nav-tabs-container .nav-actions,
+.nav-tabs-container .nav-actions,
+.nav-actions {
+  transform: translateX(-161px) !important; /* Move 161px to the left to align with traits-rules-all-content */
+  margin-left: 0 !important; /* CRITICAL: Override styles-fix.css line 611 margin-left: auto */
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  flex-grow: 0 !important; /* Prevent growing */
+  width: auto !important; /* Auto width based on content */
+  min-width: auto !important; /* No minimum width constraint */
+  max-width: none !important; /* No maximum width constraint */
+  position: relative !important; /* Ensure positioning context */
+}

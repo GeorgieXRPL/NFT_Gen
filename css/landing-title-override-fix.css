@@ -1,0 +1,126 @@
+/* Ultra-specific selectors to override any other styles */
+html body #app .landing-page .title-container,
+body #app .landing-page .title-container,
+#app .landing-page .title-container,
+.landing-page .title-container,
+.title-container,
+[class*="title-container"],
+div[class*="title-container"] {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  text-align: right !important;
+}
+
+html body #app .landing-page .landing-title,
+body #app .landing-page .landing-title,
+#app .landing-page .landing-title,
+.landing-page .landing-title,
+.landing-title,
+[class*="landing-title"],
+h1[class*="landing-title"] {
+  letter-spacing: -1px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  font-size: 3.5rem !important;
+  background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Responsive adjustments with high specificity */
+@media (max-width: 1200px) {
+  html body #app .landing-page .title-container,
+  body #app .landing-page .title-container,
+  #app .landing-page .title-container,
+  .landing-page .title-container,
+  .title-container,
+  [class*="title-container"],
+  div[class*="title-container"],
+  html body #app .landing-page .landing-description,
+  body #app .landing-page .landing-description,
+  #app .landing-page .landing-description,
+  .landing-page .landing-description,
+  .landing-description,
+  html body #app .landing-page .feature-list,
+  body #app .landing-page .feature-list,
+  #app .landing-page .feature-list,
+  .landing-page .feature-list,
+  .feature-list,
+  html body #app .landing-page .button-container,
+  body #app .landing-page .button-container,
+  #app .landing-page .button-container,
+  .landing-page .button-container,
+  .button-container {
+    max-width: 800px !important;
+  }
+
+  html body #app .landing-page .landing-title,
+  body #app .landing-page .landing-title,
+  #app .landing-page .landing-title,
+  .landing-page .landing-title,
+  .landing-title,
+  [class*="landing-title"],
+  h1[class*="landing-title"] {
+    font-size: 3rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  html body #app .landing-page .title-container,
+  body #app .landing-page .title-container,
+  #app .landing-page .title-container,
+  .landing-page .title-container,
+  .title-container,
+  [class*="title-container"],
+  div[class*="title-container"],
+  html body #app .landing-page .landing-description,
+  body #app .landing-page .landing-description,
+  #app .landing-page .landing-description,
+  .landing-page .landing-description,
+  .landing-description,
+  html body #app .landing-page .feature-list,
+  body #app .landing-page .feature-list,
+  #app .landing-page .feature-list,
+  .landing-page .feature-list,
+  .feature-list,
+  html body #app .landing-page .button-container,
+  body #app .landing-page .button-container,
+  #app .landing-page .button-container,
+  .landing-page .button-container,
+  .button-container {
+    max-width: 400px !important;
+  }
+
+  html body #app .landing-page .landing-title,
+  body #app .landing-page .landing-title,
+  #app .landing-page .landing-title,
+  .landing-page .landing-title,
+  .landing-title,
+  [class*="landing-title"],
+  h1[class*="landing-title"] {
+    font-size: 2.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html body #app .landing-page .landing-title,
+  body #app .landing-page .landing-title,
+  #app .landing-page .landing-title,
+  .landing-page .landing-title,
+  .landing-title,
+  [class*="landing-title"],
+  h1[class*="landing-title"] {
+    font-size: 2rem !important;
+    letter-spacing: -0.5px !important;
+  }
+}

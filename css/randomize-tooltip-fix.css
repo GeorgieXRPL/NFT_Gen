@@ -1,0 +1,186 @@
+/* Randomize Tooltip Fix Styles */
+
+/* Remove all custom randomize-tooltip styles */
+.tooltip .tooltiptext.randomize-tooltip,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip,
+.normalize-rarities-btn .tooltiptext {
+  all: unset !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.tooltip .tooltiptext.randomize-tooltip br,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip br {
+  display: none !important;
+}
+
+/* Style the tier distribution for better readability */
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip {
+  counter-reset: tier-counter;
+}
+
+/* Create colored distribution indicators for tiers */
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip::before {
+  content: "Tier Distribution:" !important;
+  display: block !important;
+  font-weight: bold !important;
+  font-size: 1rem !important;
+  margin-bottom: 8px !important;
+  color: rgba(108, 92, 231, 1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding-bottom: 6px !important;
+}
+
+/* Style each tier entry */
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip::first-line {
+  font-weight: bold !important;
+}
+
+/* Apply different colors to each rarity tier */
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(1)::before,
+.randomize-rarities-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(1)::before,
+.randomize-rarities-btn .tooltiptext.randomize-tooltip:first-child::before {
+  color: #ff5555 !important; /* Mythic - red */
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(2)::before {
+  color: #ff9933 !important; /* Legendary - orange */
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(3)::before {
+  color: #9966cc !important; /* Epic - purple */
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(4)::before {
+  color: #3399ff !important; /* Rare - blue */
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(5)::before {
+  color: #33cc66 !important; /* Uncommon - green */
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip > br + text:nth-of-type(6)::before {
+  color: #ffffff !important; /* Common - white */
+}
+
+/* Ensure the tooltip is visible when hovering over the button */
+.randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Add arrow for bottom position */
+.tooltip .tooltiptext.randomize-tooltip.tooltip-bottom::after,
+.randomize-rarities-btn .tooltiptext.randomize-tooltip.tooltip-bottom::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  margin-left: -8px !important;
+  border-width: 8px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.95) transparent !important;
+  filter: drop-shadow(0 -2px 1px rgba(0,0,0,0.2)) !important;
+}
+
+/* Override any conflicting styles */
+.trait-layer-content .randomize-rarities-btn .tooltiptext.randomize-tooltip {
+  display: block !important;
+}
+
+/* Add visual progress bars to represent distribution percentages */
+.randomize-rarities-btn .tooltiptext.randomize-tooltip::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, 
+    #ff5555 0%, #ff5555 3%,  /* Mythic 3% */
+    #ff9933 3%, #ff9933 8%,  /* Legendary 5% */
+    #9966cc 8%, #9966cc 20%, /* Epic 12% */
+    #3399ff 20%, #3399ff 40%, /* Rare 20% */
+    #33cc66 40%, #33cc66 65%, /* Uncommon 25% */
+    #ffffff 65%, #ffffff 100% /* Common 35% */
+  ) !important;
+  border-radius: 0 0 8px 8px !important;
+}
+
+/* Custom bullet points for each tier */
+.randomize-rarities-btn .tooltiptext.randomize-tooltip ul,
+.randomize-tooltip ul {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+  margin: 8px 0 !important;
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip li,
+.randomize-tooltip li {
+  position: relative !important;
+  padding-left: 18px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.5 !important;
+}
+
+.randomize-rarities-btn .tooltiptext.randomize-tooltip li::before,
+.randomize-tooltip li::before {
+  content: "•" !important;
+  position: absolute !important;
+  left: 5px !important;
+  font-weight: bold !important;
+}
+
+/* Force tooltip to be always on top */
+body .randomize-rarities-btn .tooltiptext.randomize-tooltip,
+html body .randomize-rarities-btn .tooltiptext.randomize-tooltip,
+html body .randomize-tooltip {
+  z-index: 2147483647 !important; /* Maximum possible z-index */
+}
+
+.randomize-rarities-btn .tooltiptext {
+  display: none !important;
+}
+.randomize-rarities-btn:hover .tooltiptext {
+  display: block !important;
+}
+
+.trait-item,
+.traits-grid .trait-layer-trait-item,
+.traits-grid .trait-item {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 270px !important;
+  min-height: 270px !important;
+  max-height: 270px !important;
+}
+
+.trait-layer-bar.expanded .traits-grid {
+  row-gap: 10px !important;
+  column-gap: 2.5px !important;
+}
+
+.trait-layer-bar.expanded .traits-grid,
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(8, 175px) !important;
+  gap: 10px !important;
+  column-gap: 5px !important;
+  row-gap: 10px !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  justify-items: center !important;
+  min-height: 330px !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  grid-auto-flow: row !important;
+  place-items: start center !important;
+}

@@ -1,0 +1,96 @@
+/* Select Trait Modal Fixes - Force specific dimensions and alignment */
+
+/* CRITICAL: Force select-trait-rarity to exact size requested */
+#trait-selection-modal .select-trait-rarity {
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;
+  width: 37.86px !important;
+  height: 16.32px !important;
+  min-width: 37.86px !important;
+  min-height: 16.32px !important;
+  max-width: 37.86px !important;
+  max-height: 16.32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+/* CRITICAL: Ensure trait-selection-thumb is 141x165px and properly aligned */
+#trait-selection-modal .trait-selection-thumb {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  width: 141px !important;
+  height: 165px !important;
+  min-width: 141px !important;
+  min-height: 165px !important;
+  max-width: 141px !important;
+  max-height: 165px !important;
+  padding: 0 3px !important;
+  gap: 0 !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  border: 1px solid #a259e6 !important;
+  border-radius: 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* CRITICAL: Override ALL conflicting styles - Force trait-selection-img to 135x106px */
+#trait-selection-modal .trait-selection-thumb .trait-selection-img {
+  width: 135px !important;
+  height: 106px !important;
+  min-width: 135px !important;
+  min-height: 106px !important;
+  max-width: 135px !important;
+  max-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 3px auto 8px auto !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  cursor: default !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  pointer-events: none !important;
+  border: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure image inside is centered */
+#trait-selection-modal .trait-selection-thumb .trait-selection-img img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  margin: auto !important;
+  display: block !important;
+}
+
+/* Override box-sizing for all children */
+#trait-selection-modal .trait-selection-thumb,
+#trait-selection-modal .trait-selection-thumb * {
+  box-sizing: border-box !important;
+}
+
+/* CRITICAL: Ensure trait-selection-name doesn't interfere with vertical alignment and has proper spacing */
+#trait-selection-modal .trait-selection-thumb .trait-selection-name {
+  margin: 0 3px 0 3px !important;
+  padding: 0 !important;
+  text-align: center !important;
+  width: calc(100% - 6px) !important;
+  max-width: calc(100% - 6px) !important;
+  flex-shrink: 1 !important;
+  min-height: auto !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+

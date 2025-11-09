@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+When i ask you to make any visual changes to the app (styles) always search throughout the entire app files for possible contradictory code and change it in all the files it is being referenced to avoid the changes i want you to make being override by other rules (in other files or code block). This will avoid any possible conflicts.

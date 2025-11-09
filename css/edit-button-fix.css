@@ -1,0 +1,125 @@
+/* Edit Button Fix - High specificity rules to ensure button is clickable */
+
+/* Ensure the edit button is always positioned properly and has correct z-index */
+body #app .project-interface .content-area #generate-nfts .nft-trait-edit-btn,
+.nft-trait-edit-btn,
+.edit-btn,
+.batch-nft-card .edit-btn,
+button.edit-btn {
+  position: relative !important;
+  z-index: 99999 !important; /* Ultra high z-index to ensure it's above everything */
+  background: #4a90e2 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  padding: 2px 4px !important;
+  font-size: 7px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important; /* Critical to ensure clicks register */
+  width: 30px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  visibility: visible !important;
+}
+
+/* Ensure hover effect works */
+body #app .project-interface .content-area #generate-nfts .nft-trait-edit-btn:hover,
+.nft-trait-edit-btn:hover,
+.edit-btn:hover,
+.batch-nft-card .edit-btn:hover {
+  background: #357abd !important;
+  transform: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+  opacity: 1 !important;
+}
+
+/* Style active state */
+body #app .project-interface .content-area #generate-nfts .nft-trait-edit-btn:active,
+.nft-trait-edit-btn:active,
+.edit-btn:active,
+.batch-nft-card .edit-btn:active {
+  transform: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Ensure trait item has correct position for absolute positioning of edit button */
+body #app .project-interface .content-area #generate-nfts .nft-trait-info-item,
+.nft-trait-info-item {
+  position: relative !important;
+  height: 110px !important;
+}
+
+/* Removed - consolidated in final-overrides.css */
+
+/* Ensure trait items and their clickable elements have proper layering */
+body #app .project-interface .content-area #generate-nfts .nft-trait-thumb img,
+.nft-trait-thumb img {
+  z-index: 2 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Force the trait item container to enable pointer events */
+body #app,
+#app,
+.project-interface,
+.content-area,
+#generate-nfts,
+.generate-nfts-container,
+.traits-list-wrapper,
+.traits-list-column,
+.traits-list-card,
+.nft-trait-info-panel,
+.nft-trait-info-list,
+.trait-items-container,
+.nft-trait-info-item {
+  pointer-events: auto !important;
+}
+
+/* Fix for any traits displayed in square format */
+body #app .project-interface .content-area #generate-nfts .generate-nfts-container .traits-list-wrapper .traits-list-column .traits-list-card .nft-trait-info-panel .nft-trait-info-list .nft-trait-info-item {
+  overflow: visible !important; /* Ensure the edit button is not clipped */
+}
+
+.traits-list-card {
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+}
+
+/* Ensure NFT cards have proper positioning for buttons */
+.batch-nft-card {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Override any conflicting styles */
+.batch-nft-card * {
+  box-sizing: border-box !important;
+}
+
+/* Ensure button container doesn't interfere */
+.button-container {
+  position: relative !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  gap: 2px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 20px !important;
+  padding: 2px !important;
+  margin-top: 4px !important;
+}
+
+/* Override any pointer-events: none on button containers */
+.button-container * {
+  pointer-events: auto !important;
+} 

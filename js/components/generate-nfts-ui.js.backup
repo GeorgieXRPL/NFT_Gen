@@ -1,0 +1,3824 @@
+// NFT Generation UI Module
+
+console.log("Loading generate-nfts-ui.js module");
+
+// Extend or register the UI logic for NFT generation
+window.NFTApp.registerModule("generateNftsUI", {
+  projectData: null, // Store projectData for reliable access
+  // UI and panel rendering functions moved from generate-nfts.js
+  // Example:
+  // updateTraitInfoPanel: function(nft, projectData) { ... },
+  // updateSinglePreviewPanel: function(projectData, nft) { ... },
+  // showTraitSelectionModal: function(layerName, traitIndex, nft, projectData) { ... },
+  // ...other UI helpers...
+  updateTraitInfoPanel: function(nft, projectData) {
+    // --- NORMALIZE NFT.TRAITS TO MATCH PROJECT LAYERS ---
+    if (projectData && projectData.traits && nft && Array.isArray(nft.traits)) {
+      // Add missing layers
+      projectData.traits.forEach(layer => {
+        const exists = nft.traits.some(
+          t => (t.layer && (t.layer.id === layer.id || t.layer.name === layer.name)) || t.layer === layer.id || t.layer === layer.name
+        );
+        if (!exists) {
+          nft.traits.push({
+            layer: { id: layer.id, name: layer.name },
+            trait: { id: 'none', name: 'none' }
+          });
+        }
+      });
+      // Remove orphaned traits (layers that no longer exist)
+      nft.traits = nft.traits.filter(t => {
+        return projectData.traits.some(layer => (t.layer && (t.layer.id === layer.id || t.layer.name === layer.name)) || t.layer === layer.id || t.layer === layer.name);
+      });
+    }
+    // Remove ALL placeholders from the document, not just the first infoList
+    document.querySelectorAll('.nft-trait-info-list-placeholder').forEach(ph => ph.remove());
+    console.log('[DEBUG] updateTraitInfoPanel called', { nft, projectData });
+    // Always remove all placeholders at the very start
+    const infoList = document.querySelector('.nft-trait-info-list');
+    if (infoList) {
+      const placeholders = infoList.querySelectorAll('.nft-trait-info-list-placeholder');
+      placeholders.forEach(ph => { ph.remove(); console.log('[DEBUG] Placeholder REMOVED by updateTraitInfoPanel (start)'); });
+    }
+    // Add some styling to make thumbnails visible
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      .nft-trait-thumb {
+        width: 100%;
+        height: 60px; /* Reduced from auto/100px to fixed 60px */
+        max-height: 60px; /* Reduced from 100px to 60px */
+        min-height: 60px; /* Reduced from 80px to 60px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 4px; /* Reduced from 8px to 4px */
+        overflow: hidden;
+        margin: 4px 0; /* Reduced from 10px to 4px */
+        position: relative;
+      }
+      .nft-trait-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0;
+      }
+      .nft-trait-info-item {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        min-height: 60px !important;
+        max-height: none !important;
+        height: 260px !important;
+        box-sizing: border-box;
+        aspect-ratio: unset !important;
+        position: relative;
+        padding: 6px;
+        margin-bottom: 0;
+        background-color: rgba(0,0,0,0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: stretch;
+      }
+      .trait-items-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+        width: 100%;
+        overflow-y: auto;
+        flex: 1 1 auto;
+        height: 100%;
+        max-height: none;
+      }
+      .trait-info-title {
+        margin: 8px 0; /* Reduced from 12px to 8px */
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #23232b;
+      }
+      /* Make sure the trait info panel takes up proper space */
+      .nft-trait-info-panel {
+        flex: 1;
+        overflow: auto;
+        height: calc(100% - 40px) !important;
+        max-height: none !important;
+      }
+      /* Ensure proper padding around the trait list */
+      .nft-trait-info-list {
+        padding: 0 !important;
+        display: block !important;
+        height: 100% !important;
+        width: 100% !important;
+        overflow-y: auto !important;
+      }
+      /* Style for edit button */
+      .nft-trait-edit-btn {
+        position: absolute;
+        top: 4px; /* Reduced from 14px to 4px */
+        right: 4px; /* Reduced from 26px to 4px */
+        background: var(--accent-primary, #6c5ce7);
+        color: #fff;
+        border: none;
+        border-radius: 3px; /* Reduced from 8px to 3px */
+        padding: 1px 3px; /* Reduced from 8px 16px to 1px 3px */
+        font-size: 8px; /* Reduced from 16px to 8px */
+        font-weight: 500;
+        cursor: pointer;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Reduced shadow */
+      }
+      /* Ensure the trait list scrolls properly */
+      .nft-trait-info-list {
+        max-height: 100%;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #333 #1a1a1a;
+      }
+      /* Make trait items smaller */
+      .nft-trait-info-item {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        min-height: 170px;
+        height: 170px;
+        box-sizing: border-box;
+        aspect-ratio: unset !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: stretch;
+      }
+      /* Hide the rarity percentage */
+      .nft-trait-rarity {
+        display: none;
+      }
+    `;
+    document.head.appendChild(styleElement);
+    // DOM-based trait rendering logic
+    if (!infoList) return;
+    // Always sync card heights first
+    const left = document.querySelector('.left-side-column');
+    const rightCard = document.querySelector('.traits-list-card');
+    if (left && rightCard) {
+      const leftHeight = left.offsetHeight;
+      rightCard.style.height = leftHeight + 'px';
+      rightCard.style.minHeight = leftHeight + 'px';
+      rightCard.style.maxHeight = 'none'; // Remove max-height constraint
+      rightCard.style.overflowY = 'auto';
+    }
+    // Clear existing content
+    infoList.innerHTML = '';
+    // Add a title to the trait list (outside the scrollable container)
+    let traitTitle = infoList.querySelector('.trait-info-title');
+    if (!traitTitle) {
+      traitTitle = document.createElement('h3');
+      traitTitle.className = 'trait-info-title';
+      traitTitle.textContent = 'NFT Traits';
+      infoList.appendChild(traitTitle);
+    }
+    // Now create the scrollable container for trait cards only
+    let traitItemsContainer = infoList.querySelector('.trait-items-container');
+    if (!traitItemsContainer) {
+      traitItemsContainer = document.createElement('div');
+      traitItemsContainer.className = 'trait-items-container';
+      infoList.appendChild(traitItemsContainer);
+    } else {
+      traitItemsContainer.innerHTML = '';
+    }
+    // Use the traits in their original order (not reversed)
+    const traitsInOrder = [...nft.traits];
+    // Set the panel and container to appropriate heights
+    infoList.style.height = '100%';
+    infoList.style.maxHeight = 'none';
+    infoList.style.overflow = 'auto';
+    traitItemsContainer.style.width = '100%';
+    // Render all layers, showing the selected trait or 'none' for each
+    if (projectData && projectData.traits) {
+      projectData.traits.forEach((layer, idx) => {
+        // Always show all layers: find the trait for this layer in the NFT, or use 'none'
+        let traitObj = nft.traits.find(t => {
+          if (t.layer && layer.id && t.layer.id) return t.layer.id === layer.id;
+          return (t.layer && t.layer.name === layer.name) || t.layer === layer.name;
+        });
+        if (!traitObj) {
+          traitObj = { layer: layer, trait: { id: 'none', name: 'none' } };
+        }
+        const traitItem = document.createElement('div');
+        traitItem.className = 'nft-trait-info-item';
+        traitItem.style.display = 'flex';
+        traitItem.style.visibility = 'visible';
+        traitItem.style.opacity = '1';
+        traitItem.setAttribute('data-index', idx);
+        // --- [DETERMINE NONE REASON] ---
+        let noneForced = false;
+        if (traitObj.trait.name === 'none' || traitObj.trait === 'none') {
+          noneForced = isNoneForcedByRules(layer, nft, projectData);
+        }
+        // Add edit button for all traits (including 'none')
+        const editBtn = document.createElement('button');
+        editBtn.className = 'nft-trait-edit-btn';
+        editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i> Edit';
+        editBtn.setAttribute('data-layer', layer.name || '');
+        editBtn.setAttribute('data-idx', idx);
+        if (traitObj.trait.name === 'none' || traitObj.trait === 'none') {
+          if (noneForced) {
+            editBtn.onclick = (e) => {
+              e.preventDefault();
+              if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
+                window.NFTApp.getModule('notificationService').show(
+                  'This layer cannot have a trait due to active rules.','error',4000);
+              }
+            };
+          } else {
+            editBtn.onclick = () => {
+              window.NFTApp.getModule('generateNftsUI').showTraitSelectionModal(layer.name || layer, idx, nft, projectData);
+            };
+          }
+        } else {
+          editBtn.onclick = () => {
+            window.NFTApp.getModule('generateNftsUI').showTraitSelectionModal(layer.name || layer, idx, nft, projectData);
+          };
+        }
+        // Thumbnail
+        const thumbContainer = document.createElement('div');
+        thumbContainer.className = 'nft-trait-thumb';
+        thumbContainer.style.position = 'relative'; // Ensure stacking context
+        thumbContainer.style.overflow = 'visible';
+        // --- [FORBIDDEN OVERLAY LOGIC: REWRITE] ---
+        let forbidden = false;
+        let forbiddenMsg = '';
+        // Only check for forbidden overlays if this trait is not 'none'
+        if (traitObj.trait && traitObj.trait.name !== 'none' && traitObj.trait.id !== 'none') {
+          // 1. Check never-combine between-traits rules
+          if (projectData && projectData.rules && Array.isArray(projectData.rules)) {
+            for (const rule of projectData.rules) {
+              if (rule.type === 'never-combine' && rule.appliesTo === 'between-traits' && rule.firstTraits && rule.secondTraits) {
+                // Is this trait in the first group?
+                const isFirst = rule.firstTraits.some(ft => ft.id === traitObj.trait.id && ft.layerId === layer.id);
+                const isSecond = rule.secondTraits.some(st => st.id === traitObj.trait.id && st.layerId === layer.id);
+                if (isFirst) {
+                  // Is any forbidden second trait present?
+                  for (const st of rule.secondTraits) {
+                    const found = nft.traits.find(t => t.layer && t.layer.id === st.layerId && t.trait && t.trait.id === st.id);
+                    if (found) {
+                      forbidden = true;
+                      forbiddenMsg = `Forbidden: This trait ("${traitObj.trait.name}") cannot be combined with "${found.trait.name}"`;
+                      break;
+                    }
+                  }
+                }
+                if (!forbidden && isSecond) {
+                  // Is any forbidden first trait present?
+                  for (const ft of rule.firstTraits) {
+                    const found = nft.traits.find(t => t.layer && t.layer.id === ft.layerId && t.trait && t.trait.id === ft.id);
+                    if (found) {
+                      forbidden = true;
+                      forbiddenMsg = `Forbidden: This trait ("${traitObj.trait.name}") cannot be combined with "${found.trait.name}"`;
+                      break;
+                    }
+                  }
+                }
+                if (forbidden) break;
+              }
+            }
+          }
+          // 2. Check never-combine between-layers rules
+          if (!forbidden && projectData && projectData.rules && Array.isArray(projectData.rules)) {
+            for (const rule of projectData.rules) {
+              if (rule.type === 'never-combine' && rule.appliesTo === 'between-layers') {
+                const firstTrait = nft.traits.find(t => t.layer && t.layer.id === rule.firstLayerId && t.trait && t.trait.name !== 'none');
+                const secondTrait = nft.traits.find(t => t.layer && t.layer.id === rule.secondLayerId && t.trait && t.trait.name !== 'none');
+                if (firstTrait && secondTrait && (layer.id === rule.firstLayerId || layer.id === rule.secondLayerId)) {
+                  forbidden = true;
+                  forbiddenMsg = `Forbidden: Layer "${rule.firstLayerName || rule.firstLayerId}" and Layer "${rule.secondLayerName || rule.secondLayerId}" should never be combined.`;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        // --- [THUMBNAIL CONTENT] ---
+        if (traitObj.trait.name === 'none' || traitObj.trait === 'none') {
+          // Always use a .trait-selection-img container for centering
+          const imgDiv = document.createElement('div');
+          imgDiv.className = 'trait-selection-img';
+          // Add the 'none' placeholder
+          const noneSpan = document.createElement('span');
+          noneSpan.className = 'trait-none-placeholder';
+          noneSpan.textContent = 'None';
+          imgDiv.appendChild(noneSpan);
+          if (noneForced) {
+            // Add forbidden overlay
+            const forbiddenDiv = document.createElement('div');
+            forbiddenDiv.className = 'trait-forbidden-overlay';
+            forbiddenDiv.innerHTML = `<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="26" stroke="#ff2222" stroke-width="8" fill="none"/><line x1="15" y1="45" x2="45" y2="15" stroke="#ff2222" stroke-width="8" stroke-linecap="round"/></svg>`;
+            imgDiv.appendChild(forbiddenDiv);
+          }
+          // Clear and append to thumbContainer
+          thumbContainer.innerHTML = '';
+          thumbContainer.appendChild(imgDiv);
+          // Add grey overlay above the thumbnail if forced
+          if (noneForced) {
+            const greyDiv = document.createElement('div');
+            greyDiv.className = 'trait-forbidden-grey';
+            greyDiv.style.position = 'absolute';
+            greyDiv.style.top = '0';
+            greyDiv.style.left = '0';
+            greyDiv.style.width = '100%';
+            greyDiv.style.height = '100%';
+            greyDiv.style.background = 'rgba(40,40,40,0.45)';
+            greyDiv.style.zIndex = '2';
+            greyDiv.style.pointerEvents = 'none';
+            thumbContainer.appendChild(greyDiv);
+          }
+          // Custom tooltip (app style)
+          if (noneForced) {
+            const tooltipAnchor = document.createElement('span');
+            tooltipAnchor.className = 'custom-tooltip-anchor';
+            tooltipAnchor.style.position = 'absolute';
+            tooltipAnchor.style.left = '0';
+            tooltipAnchor.style.right = '0';
+            tooltipAnchor.style.bottom = '-8px';
+            tooltipAnchor.style.width = '100%';
+            tooltipAnchor.style.display = 'flex';
+            tooltipAnchor.style.justifyContent = 'center';
+            tooltipAnchor.style.pointerEvents = 'none';
+            const tooltip = document.createElement('span');
+            tooltip.className = 'custom-tooltip';
+            tooltip.textContent = getNoneForcedByRulesDetails(layer, nft, projectData);
+            tooltipAnchor.appendChild(tooltip);
+            thumbContainer.appendChild(tooltipAnchor);
+          }
+        } else {
+          let imagePath = '';
+          const traitName = traitObj.trait.name || traitObj.trait;
+          const layerName = traitObj.layer.name || traitObj.layer;
+          const layerData = projectData.traits.find(l => l.name === layerName);
+          const traitData = layerData && layerData.traits ? layerData.traits.find(t => t.name === traitName) : null;
+          if (traitData && traitData.image) {
+            imagePath = traitData.image;
+          } else if (traitData && traitData.imageData) {
+            imagePath = traitData.imageData;
+          } else if (typeof traitObj.trait === 'object' && traitObj.trait.image) {
+            imagePath = traitObj.trait.image;
+          } else if (typeof traitObj.trait === 'object' && traitObj.trait.imageData) {
+            imagePath = traitObj.trait.imageData;
+          }
+          // Clear thumbContainer before stacking overlays
+          thumbContainer.innerHTML = '';
+          if (imagePath) {
+            const img = document.createElement('img');
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            img.style.objectFit = 'contain';
+            img.style.width = 'auto';
+            img.style.height = 'auto';
+            img.src = imagePath;
+            img.alt = traitName;
+            img.onerror = function() {
+              this.onerror = null;
+              this.style.display = 'none';
+            };
+            thumbContainer.appendChild(img);
+          } else {
+            const placeholderSvg = document.createElement('div');
+            placeholderSvg.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                <rect width="100" height="100" fill="#333"/>
+                <path d="M40,42.5a7.5,7.5,0,1,0,7.5,7.5A7.5,7.5,0,0,0,40,42.5Zm16.88,4.38L50,65.62,43.12,57.5,30,73.75H70Z" fill="#666"/>
+              </svg>
+              <div style="position: absolute; bottom: 0; left: 0; right: 0; background-color: rgba(0,0,0,0.5); color: #999; font-size: 10px; text-align: center; padding: 2px;">${traitName}</div>
+            `;
+            placeholderSvg.style.display = 'flex';
+            placeholderSvg.style.flexDirection = 'column';
+            placeholderSvg.style.alignItems = 'center';
+            placeholderSvg.style.justifyContent = 'center';
+            placeholderSvg.style.width = '100%';
+            placeholderSvg.style.height = '100%';
+            placeholderSvg.style.position = 'relative';
+            thumbContainer.appendChild(placeholderSvg);
+          }
+          // Remove any previous overlays first
+          Array.from(thumbContainer.querySelectorAll('.trait-forbidden-grey, .trait-forbidden-overlay, .trait-forbidden-debug')).forEach(el => el.remove());
+          if (forbidden) {
+            // Add grey overlay above the thumbnail
+            const greyDiv = document.createElement('div');
+            greyDiv.className = 'trait-forbidden-grey';
+            greyDiv.style.position = 'absolute';
+            greyDiv.style.top = '0';
+            greyDiv.style.left = '0';
+            greyDiv.style.width = '100%';
+            greyDiv.style.height = '100%';
+            greyDiv.style.background = 'rgba(40,40,40,0.45)';
+            greyDiv.style.zIndex = '2';
+            greyDiv.style.pointerEvents = 'none';
+            thumbContainer.appendChild(greyDiv);
+            // Add forbidden icon above the grey overlay
+            const forbiddenDiv = document.createElement('div');
+            forbiddenDiv.className = 'trait-forbidden-overlay';
+            forbiddenDiv.style.position = 'absolute';
+            forbiddenDiv.style.top = '50%';
+            forbiddenDiv.style.left = '50%';
+            forbiddenDiv.style.transform = 'translate(-50%, -50%)';
+            forbiddenDiv.style.width = '40px';
+            forbiddenDiv.style.height = '40px';
+            forbiddenDiv.style.opacity = '1';
+            forbiddenDiv.style.background = 'none';
+            forbiddenDiv.style.borderRadius = '0';
+            forbiddenDiv.style.display = 'flex';
+            forbiddenDiv.style.alignItems = 'center';
+            forbiddenDiv.style.justifyContent = 'center';
+            forbiddenDiv.style.pointerEvents = 'none';
+            forbiddenDiv.style.zIndex = '2';
+            forbiddenDiv.innerHTML = `<svg width="40" height="40" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="26" stroke="#ff2222" stroke-width="8" fill="none"/><line x1="15" y1="45" x2="45" y2="15" stroke="#ff2222" stroke-width="8" stroke-linecap="round"/></svg>`;
+            thumbContainer.appendChild(forbiddenDiv);
+            thumbContainer.title = forbiddenMsg;
+          } else {
+            thumbContainer.title = '';
+          }
+        }
+        // --- [INFO CONTAINER BELOW THUMBNAIL] ---
+        // Ensure a new infoContainer is created for each trait card
+        const infoContainer = document.createElement('div');
+        infoContainer.className = 'nft-trait-info-below';
+        infoContainer.style.display = 'flex';
+        infoContainer.style.flexDirection = 'column';
+        infoContainer.style.justifyContent = 'flex-end';
+        infoContainer.style.width = '100%';
+        infoContainer.style.marginTop = '6px';
+        infoContainer.style.gap = '0';
+        // Get trait and layer names
+        let traitName = traitObj.trait && traitObj.trait.name ? traitObj.trait.name : (typeof traitObj.trait === 'string' ? traitObj.trait : '');
+        let layerName = traitObj.layer && traitObj.layer.name ? traitObj.layer.name : (typeof traitObj.layer === 'string' ? traitObj.layer : '');
+        if (!traitName) traitName = 'Unknown';
+        if (!layerName) layerName = 'Unknown';
+        // Find the correct trait rarity from projectData
+        let traitRarity = '';
+        if (traitName && layerName && projectData && projectData.traits) {
+          const layerData = projectData.traits.find(l => l.name === layerName || l.id === traitObj.layer.id);
+          if (layerData && layerData.traits) {
+            const traitData = layerData.traits.find(t => t.name === traitName || t.id === traitObj.trait.id);
+            if (traitData && typeof traitData.rarity !== 'undefined') {
+              traitRarity = traitData.rarity;
+            } else {
+              traitRarity = 0;
+            }
+          } else {
+            traitRarity = 0;
+          }
+        } else {
+          traitRarity = 0;
+        }
+        // Trait name element
+        const traitNameElem = document.createElement('div');
+        traitNameElem.className = 'nft-trait-info-trait-name';
+        if (traitName === 'none') {
+          if (isNoneForcedByRules(layer, nft, projectData)) {
+            traitNameElem.textContent = 'none';
+            traitNameElem.style.color = '#e74c3c';
+            traitNameElem.style.fontWeight = 'bold';
+          } else {
+            traitNameElem.textContent = 'none';
+            traitNameElem.style.color = '#888';
+            traitNameElem.style.fontWeight = 'normal';
+          }
+        } else if (traitName === 'Unknown') {
+          traitNameElem.textContent = 'Unknown';
+          traitNameElem.style.color = '#888';
+          traitNameElem.style.fontWeight = 'normal';
+        } else {
+          traitNameElem.textContent = traitName.length > 14 ? traitName.slice(0, 12) + '…' : traitName;
+          if (traitName.length > 14) {
+            traitNameElem.title = traitName;
+          }
+        }
+        // Bottom line: layer name (grey, left), rarity (purple, right)
+        const bottomLine = document.createElement('div');
+        bottomLine.className = 'nft-trait-info-bottom-line';
+        bottomLine.style.display = 'flex';
+        bottomLine.style.flexDirection = 'row';
+        bottomLine.style.justifyContent = 'space-between';
+        bottomLine.style.alignItems = 'center';
+        // Layer name (grey, left)
+        const layerNameElem = document.createElement('div');
+        layerNameElem.className = 'nft-trait-info-layer-name';
+        layerNameElem.textContent = layerName.length > 14 ? layerName.slice(0, 12) + '…' : layerName;
+        if (layerName.length > 14) {
+          layerNameElem.title = layerName;
+        }
+        // Rarity (purple, right)
+        const rarityElem = document.createElement('div');
+        rarityElem.className = 'nft-trait-info-rarity';
+        if (traitRarity === '' || traitRarity === null || typeof traitRarity === 'undefined') {
+          rarityElem.textContent = '—';
+        } else {
+          rarityElem.textContent = parseFloat(traitRarity).toFixed(2) + '%';
+        }
+        bottomLine.appendChild(layerNameElem);
+        bottomLine.appendChild(rarityElem);
+        infoContainer.appendChild(traitNameElem);
+        infoContainer.appendChild(bottomLine);
+        traitItem.appendChild(thumbContainer);
+        traitItem.appendChild(infoContainer);
+        traitItem.appendChild(editBtn);
+        // Create a trait card container to group thumbnail, edit button, and info
+        const traitCard = document.createElement('div');
+        traitCard.className = 'nft-trait-card';
+        traitCard.style.display = 'flex';
+        traitCard.style.flexDirection = 'column';
+        traitCard.style.alignItems = 'center';
+        traitCard.style.justifyContent = 'flex-start';
+        traitCard.style.width = '100%';
+        traitCard.style.position = 'relative';
+        // Add only the required children in order
+        traitCard.appendChild(thumbContainer);
+        traitCard.appendChild(infoContainer);
+        traitCard.appendChild(editBtn);
+        // Remove any other children or elements
+        // Append the card to the trait items container
+        traitItemsContainer.appendChild(traitCard);
+        // (Remove direct appends of thumbContainer, infoContainer, editBtn to traitItem)
+      });
+    }
+    // After rendering all traits, remove any placeholder again (guarantee)
+    if (infoList) {
+      const placeholders = infoList.querySelectorAll('.nft-trait-info-list-placeholder');
+      placeholders.forEach(ph => { ph.remove(); console.log('[DEBUG] Placeholder REMOVED by updateTraitInfoPanel (end)'); });
+    }
+    // In updateTraitInfoPanel, after getting infoList:
+    const traitsPanel = document.querySelector('.traits-list-card');
+    const traitInfoPanel = document.querySelector('.nft-trait-info-panel');
+    if (traitInfoPanel && !traitInfoPanel.querySelector('.trait-info-title')) {
+      const traitTitle = document.createElement('h3');
+      traitTitle.className = 'trait-info-title';
+      traitTitle.textContent = 'NFT Traits';
+      traitTitle.style.position = 'sticky';
+      traitTitle.style.top = '0';
+      traitTitle.style.zIndex = '2';
+      traitTitle.style.background = '#23232b';
+      traitTitle.style.margin = '0';
+      traitTitle.style.padding = '16px 0 8px 0';
+      traitTitle.style.textAlign = 'center';
+      traitTitle.style.fontSize = '16px';
+      traitTitle.style.fontWeight = '600';
+      traitInfoPanel.insertBefore(traitTitle, traitInfoPanel.firstChild);
+    }
+    // Make trait-items-container the scrollable area
+    if (infoList) {
+      let traitItemsContainer = infoList.querySelector('.trait-items-container');
+      if (!traitItemsContainer) {
+        infoList.innerHTML = '<div class="trait-items-container"></div>';
+        traitItemsContainer = infoList.querySelector('.trait-items-container');
+      }
+      traitItemsContainer.style.overflowY = 'auto';
+      traitItemsContainer.style.flex = '1 1 auto';
+      traitItemsContainer.style.height = '100%';
+      traitItemsContainer.style.maxHeight = 'none';
+    }
+    // Add dynamic height adjustment for traits panel
+    window.setTraitsPanelHeight = function() {
+      const batchPanel = document.querySelector('.batch-generation-panel');
+      const nftGrid = document.getElementById('batch-nft-grid');
+      const traitsPanel = document.querySelector('.traits-list-card');
+      if (!batchPanel || !nftGrid || !traitsPanel) return;
+      // Find the last NFT in the 10th row (index 29, or last NFT if fewer)
+      const nftCards = nftGrid.querySelectorAll('.batch-nft-card');
+      let bottom;
+      if (nftCards.length >= 30) {
+        bottom = nftCards[29].getBoundingClientRect().bottom;
+      } else if (nftCards.length > 0) {
+        bottom = nftCards[nftCards.length - 1].getBoundingClientRect().bottom;
+      } else {
+        // Fallback: just use the bottom of the batch panel
+        bottom = batchPanel.getBoundingClientRect().bottom;
+      }
+      const top = batchPanel.getBoundingClientRect().top;
+      const height = Math.max(0, bottom - top);
+      traitsPanel.style.height = height + 'px';
+      traitsPanel.style.minHeight = height + 'px';
+      traitsPanel.style.maxHeight = height + 'px';
+      traitsPanel.style.overflow = 'hidden';
+      // Make the info panel and trait list fill the space
+      const traitInfoPanel = traitsPanel.querySelector('.nft-trait-info-panel');
+      if (traitInfoPanel) {
+        traitInfoPanel.style.height = '100%';
+        traitInfoPanel.style.maxHeight = '100%';
+        traitInfoPanel.style.overflow = 'hidden';
+      }
+      const infoList = traitsPanel.querySelector('.nft-trait-info-list');
+      if (infoList) {
+        infoList.style.height = '100%';
+        infoList.style.maxHeight = '100%';
+        infoList.style.overflow = 'hidden';
+      }
+      const traitItemsContainer = traitsPanel.querySelector('.trait-items-container');
+      if (traitItemsContainer) {
+        traitItemsContainer.style.height = 'calc(100% - 40px)';
+        traitItemsContainer.style.maxHeight = 'calc(100% - 40px)';
+        traitItemsContainer.style.overflowY = 'auto';
+      }
+    };
+    window.addEventListener('resize', window.setTraitsPanelHeight);
+    setTimeout(window.setTraitsPanelHeight, 200);
+  },
+  
+  updateSinglePreviewPanel: function(projectData, nft = null) {
+    // --- ENSURE PREVIEW AND TRAIT INFO ARE CLEARED BEFORE RENDERING ---
+    const previewPanel = document.querySelector('.nft-preview-image-area');
+    if (previewPanel) previewPanel.innerHTML = '';
+    const traitInfoList = document.querySelector('.nft-trait-info-list');
+    if (traitInfoList) traitInfoList.innerHTML = '';
+    // --- END CLEAR ---
+    if (nft) window.lastGeneratedNFT = nft;
+    this.displaySingleNFT(nft);
+    // --- FORBIDDEN OVERLAY ON PREVIEW IF VIOLATIONS ---
+    // Always remove any previous overlays after rendering the preview
+    const previewPanelElem = document.querySelector('.nft-preview-image-area');
+    if (previewPanelElem) {
+      previewPanelElem.querySelectorAll('.nft-preview-forbidden-overlay').forEach(el => el.remove());
+    }
+    this.updateTraitInfoPanel(nft, projectData);
+    if (nft && projectData && window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNfts')) {
+      const violations = window.NFTApp.getModule('generateNfts').checkForRuleViolations(nft, projectData.rules);
+      // Only show if there are any violations
+      const previewContainer = document.querySelector('.nft-preview-image-area #nft-preview-container');
+      if (Array.isArray(violations) && violations.length > 0 && previewContainer) {
+        const previewItem = previewContainer.querySelector('.nft-preview-item');
+        if (previewItem) {
+          // Create overlay container
+          let overlay = previewItem.querySelector('.nft-preview-forbidden-overlay');
+          if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'nft-preview-forbidden-overlay';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '8px';
+            overlay.style.right = '8px';
+            overlay.style.zIndex = '10';
+            overlay.style.display = 'flex';
+            overlay.style.flexDirection = 'row'; // horizontal alignment
+            overlay.style.alignItems = 'center'; // vertical centering
+            overlay.style.pointerEvents = 'none';
+            overlay.style.gap = '10px'; // space between icon and tooltip
+            // Forbidden sign SVG
+            overlay.innerHTML = `<div style=\"width:40px;height:40px;display:flex;align-items:center;justify-content:center;opacity:0.95;background:none;\"><svg width=\"40\" height=\"40\" viewBox=\"0 0 60 60\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"30\" cy=\"30\" r=\"26\" stroke=\"#ff2222\" stroke-width=\"8\" fill=\"none\"/><line x1=\"15\" y1=\"45\" x2=\"45\" y2=\"15\" stroke=\"#ff2222\" stroke-width=\"8\" stroke-linecap=\"round\"/></svg></div>`;
+            // Message right of icon
+            const msg = document.createElement('div');
+            msg.className = 'nft-preview-forbidden-msg';
+            msg.style.background = 'rgba(30,0,0,0.92)';
+            msg.style.color = '#fff';
+            msg.style.fontSize = '12px';
+            msg.style.fontWeight = 'bold';
+            msg.style.padding = '6px 10px';
+            msg.style.borderRadius = '6px';
+            msg.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)';
+            msg.style.maxWidth = '220px';
+            msg.style.textAlign = 'left';
+            msg.style.pointerEvents = 'auto';
+            msg.textContent = 'This NFT breaks one or more active rules. Fix conflicts before adding to your collection.';
+            overlay.appendChild(msg);
+            // Position overlay absolutely in previewItem
+            previewItem.style.position = 'relative';
+            previewItem.appendChild(overlay);
+          }
+        }
+      }
+    }
+    // Ensure the seed input is not auto-filled with the last NFT's seed
+    setTimeout(() => {
+      const seedInput = document.getElementById('single-seed-input');
+      const seedTooltip = document.getElementById('single-seed-input-tooltip');
+      if (seedInput && seedTooltip) {
+        seedInput.value = '';
+        seedTooltip.style.opacity = '1';
+      }
+      // --- Update the seed box with the correct deterministic seed ---
+      const seedBox = document.querySelector('.nft-seed-box');
+      if (seedBox && projectData && nft) {
+        const deterministicSeed = window.NFTApp.getModule('generateNfts').computeDeterministicSeed(projectData, nft);
+        seedBox.textContent = deterministicSeed;
+        if (window.lastGeneratedNFT) window.lastGeneratedNFT.seed = deterministicSeed;
+      }
+    }, 0);
+    // --- INJECT REPLACE SELECTED NFT BUTTON IF CONDITIONS MET ---
+    setTimeout(() => {
+      const previewPanel = document.querySelector('.nft-preview-image-area');
+      const previewContainer = previewPanel && previewPanel.querySelector('#nft-preview-container');
+      const previewItem = previewContainer && previewContainer.querySelector('.nft-preview-item');
+      // Only show if batch panel exists and exactly 1 NFT is selected
+      const batchPanel = window.BatchGenerationPanel && window.BatchGenerationPanel.instance;
+      // HIDE the button if in edit mode
+      if (
+        previewPanel && previewItem &&
+        batchPanel &&
+        batchPanel.nftBatch && batchPanel.nftBatch.length > 0 &&
+        batchPanel.selectedIndexes && batchPanel.selectedIndexes.size === 1 &&
+        window.lastGeneratedNFT && window.lastGeneratedNFT.seed &&
+        batchPanel.editingIndex === null
+      ) {
+        // Remove any previous button
+        let oldBtn = previewPanel.querySelector('.replace-selected-nft-btn');
+        if (oldBtn) oldBtn.remove();
+        // Create button
+        const btn = document.createElement('button');
+        btn.className = 'replace-selected-nft-btn btn btn-primary';
+        btn.textContent = 'Replace Selected NFT';
+        btn.style.background = '#e67e22';
+        btn.style.width = '170px';
+        btn.style.height = '36px';
+        btn.style.fontSize = '15px';
+        btn.style.borderRadius = '8px';
+        btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)';
+        btn.style.position = 'absolute';
+        btn.style.right = '18px';
+        btn.style.bottom = '18px';
+        btn.style.zIndex = '31';
+        btn.style.pointerEvents = 'auto';
+        btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
+        btn.style.fontFamily = 'Archivo, Arial, sans-serif';
+        btn.title = 'Replace the selected NFT in the batch with this preview NFT (must be unique)';
+        // Tooltip (if app uses custom tooltips, add here)
+        btn.setAttribute('data-tooltip', 'Replace the selected NFT in the batch with this preview NFT (must be unique)');
+        // Click handler
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          // Get selected index
+          const selectedIdx = Array.from(batchPanel.selectedIndexes)[0];
+          // Check uniqueness (seed must not exist elsewhere in batch)
+          const previewSeed = window.lastGeneratedNFT.seed;
+          const existsElsewhere = batchPanel.nftBatch.some((nft, idx) => idx !== selectedIdx && nft.seed === previewSeed);
+          if (existsElsewhere) {
+            if (window.NFTApp.getModule('notificationService')) {
+              window.NFTApp.getModule('notificationService').show('This NFT already exists in the batch. Each NFT must be unique.', 'warning', 2500);
+            }
+            return;
+          }
+          // Replace NFT in batch
+          if (typeof batchPanel.replaceNftAtIndex === 'function') {
+            batchPanel.replaceNftAtIndex(selectedIdx, window.lastGeneratedNFT);
+          } else {
+            // Fallback: direct replace
+            batchPanel.nftBatch[selectedIdx] = JSON.parse(JSON.stringify(window.lastGeneratedNFT));
+            batchPanel.renderBatchPanels();
+          }
+          if (window.NFTApp.getModule('notificationService')) {
+            window.NFTApp.getModule('notificationService').show('NFT replaced successfully.', 'success', 2000);
+          }
+        };
+        // Ensure previewPanel is relative for absolute overlay
+        previewPanel.style.position = 'relative';
+        previewPanel.appendChild(btn);
+      } else {
+        // Remove if not needed
+        let oldBtn = previewPanel && previewPanel.querySelector('.replace-selected-nft-btn');
+        if (oldBtn) oldBtn.remove();
+      }
+    }, 0);
+  },
+  
+  randomizeSingleNFT: function(projectData, overrideRules = false) {
+    // Always validate project data before generating
+    const isValid = window.NFTApp.getModule('generateNfts').validateProjectData(projectData, true);
+    if (!isValid) {
+      this.showError('You need to add at least one trait layer and at least two traits before generating NFTs.');
+      enableNftGenButtons();
+      return;
+    }
+    disableNftGenButtons();
+    // Show loading overlay with transparent background
+    // Note: We're not clearing the preview panel, so the previous NFT stays visible
+    this.showLoadingOverlay(overrideRules ? "Generating NFT (Overriding Rules)..." : "Generating NFT...", true);
+    // Enable rule application debugging for this generation
+    window.DEBUG_RULE_APPLICATION = true;
+    console.log("============================================");
+    console.log(`NFT GENERATION STARTED: ${overrideRules ? "RULES OVERRIDDEN" : "FOLLOWING RULES"}`);
+    console.log(`Number of rules: ${projectData.rules ? projectData.rules.length : 0}`);
+    if (projectData.rules && projectData.rules.length > 0) {
+      console.log("Rule types:");
+      const ruleCounts = {};
+      projectData.rules.forEach(rule => {
+        ruleCounts[rule.type] = (ruleCounts[rule.type] || 0) + 1;
+      });
+      Object.entries(ruleCounts).forEach(([type, count]) => {
+        console.log(`- ${type}: ${count}`);
+      });
+    }
+    console.log("============================================");
+    try {
+      // Generate a seed that combines random number with timestamp to ensure uniqueness
+      const timestamp = Date.now();
+      const randomPart = Math.floor(Math.random() * 1000000000);
+      const randomSeed = randomPart + "-" + timestamp;
+      console.log("Using unique combined random seed for generation:", randomSeed);
+      // Generate a single NFT with explicit overrideRules parameter
+      // The generateSingleNFT function now returns the NFT asynchronously (Promise)
+      let nftPromise;
+      try {
+        nftPromise = window.NFTApp.getModule('generateNfts').generateSingleNFT(
+          projectData, overrideRules, randomSeed
+        );
+        nftPromise.then(nft => {
+        console.log('[DEBUG] NFT generated:', nft);
+        // Check if there are any rule violations
+        if (!overrideRules && projectData.rules && projectData.rules.length > 0) {
+            let violations = window.NFTApp.getModule("generateNfts").checkForRuleViolations(nft, projectData.rules);
+            let fixAttempts = 0;
+            const maxFixAttempts = 5;
+            // Debug: log all rules
+            console.log('[DEBUG] Project rules:', projectData.rules);
+            while (violations.length > 0 && fixAttempts < maxFixAttempts) {
+              // Debug: log current trait order
+              console.log(`[DEBUG] Fix attempt ${fixAttempts + 1}: Current trait order:`, nft.traits.map(t => t.layer && t.layer.name ? t.layer.name : (t.trait && t.trait.name ? t.trait.name : '[unknown]')).join(' -> '));
+              let fixed = false;
+              for (const violation of violations) {
+                // Layer above layer
+                let match = violation.match(/Rule Violation: Layer "(.+?)" must be rendered immediately above "(.+?)"/);
+                if (match) {
+                  const aboveName = match[1];
+                  const belowName = match[2];
+                  const aboveIdx = nft.traits.findIndex(t => t.layer && t.layer.name === aboveName);
+                  const belowIdx = nft.traits.findIndex(t => t.layer && t.layer.name === belowName);
+                  console.log(`[DEBUG] Attempting to move layer '${aboveName}' (idx ${aboveIdx}) above '${belowName}' (idx ${belowIdx})`);
+                  if (aboveIdx !== -1 && belowIdx !== -1 && aboveIdx !== belowIdx + 1) {
+                    const [aboveTrait] = nft.traits.splice(aboveIdx, 1);
+                    nft.traits.splice(belowIdx + 1, 0, aboveTrait);
+                    fixed = true;
+                    console.log(`[DEBUG] Moved layer '${aboveName}' to above '${belowName}'. New order:`, nft.traits.map(t => t.layer && t.layer.name ? t.layer.name : (t.trait && t.trait.name ? t.trait.name : '[unknown]')).join(' -> '));
+                  }
+                  continue;
+                }
+                // Trait above trait
+                match = violation.match(/Rule Violation: Trait "(.+?)" must be rendered immediately above "(.+?)"/);
+                if (match) {
+                  const aboveTraitName = match[1];
+                  const belowTraitName = match[2];
+                  const aboveIdx = nft.traits.findIndex(t => t.trait && t.trait.name === aboveTraitName);
+                  const belowIdx = nft.traits.findIndex(t => t.trait && t.trait.name === belowTraitName);
+                  console.log(`[DEBUG] Attempting to move trait '${aboveTraitName}' (idx ${aboveIdx}) above '${belowTraitName}' (idx ${belowIdx})`);
+                  if (aboveIdx !== -1 && belowIdx !== -1 && aboveIdx !== belowIdx + 1) {
+                    const [aboveTrait] = nft.traits.splice(aboveIdx, 1);
+                    nft.traits.splice(belowIdx + 1, 0, aboveTrait);
+                    fixed = true;
+                    console.log(`[DEBUG] Moved trait '${aboveTraitName}' to above '${belowTraitName}'. New order:`, nft.traits.map(t => t.layer && t.layer.name ? t.layer.name : (t.trait && t.trait.name ? t.trait.name : '[unknown]')).join(' -> '));
+                  }
+                  continue;
+                }
+                // Trait above layer
+                match = violation.match(/Rule Violation: Trait "(.+?)" must be rendered immediately above layer "(.+?)"/);
+                if (match) {
+                  const traitName = match[1];
+                  const layerName = match[2];
+                  const traitIdx = nft.traits.findIndex(t => t.trait && t.trait.name === traitName);
+                  const layerIdx = nft.traits.findIndex(t => t.layer && t.layer.name === layerName);
+                  console.log(`[DEBUG] Attempting to move trait '${traitName}' (idx ${traitIdx}) above layer '${layerName}' (idx ${layerIdx})`);
+                  if (traitIdx !== -1 && layerIdx !== -1 && traitIdx !== layerIdx + 1) {
+                    const [traitObj] = nft.traits.splice(traitIdx, 1);
+                    nft.traits.splice(layerIdx + 1, 0, traitObj);
+                    fixed = true;
+                    console.log(`[DEBUG] Moved trait '${traitName}' to above layer '${layerName}'. New order:`, nft.traits.map(t => t.layer && t.layer.name ? t.layer.name : (t.trait && t.trait.name ? t.trait.name : '[unknown]')).join(' -> '));
+                  }
+                  continue;
+                }
+                // Layer above trait
+                match = violation.match(/Rule Violation: Layer "(.+?)" must be rendered immediately above trait "(.+?)"/);
+                if (match) {
+                  const layerName = match[1];
+                  const traitName = match[2];
+                  const layerIdx = nft.traits.findIndex(t => t.layer && t.layer.name === layerName);
+                  const traitIdx = nft.traits.findIndex(t => t.trait && t.trait.name === traitName);
+                  console.log(`[DEBUG] Attempting to move layer '${layerName}' (idx ${layerIdx}) above trait '${traitName}' (idx ${traitIdx})`);
+                  if (layerIdx !== -1 && traitIdx !== -1 && layerIdx !== traitIdx + 1) {
+                    const [layerObj] = nft.traits.splice(layerIdx, 1);
+                    nft.traits.splice(traitIdx + 1, 0, layerObj);
+                    fixed = true;
+                    console.log(`[DEBUG] Moved layer '${layerName}' to above trait '${traitName}'. New order:`, nft.traits.map(t => t.layer && t.layer.name ? t.layer.name : (t.trait && t.trait.name ? t.trait.name : '[unknown]')).join(' -> '));
+                  }
+                  continue;
+                }
+              }
+              if (!fixed) break; // No more fixable violations
+              violations = window.NFTApp.getModule("generateNfts").checkForRuleViolations(nft, projectData.rules);
+              fixAttempts++;
+            }
+          if (violations.length > 0) {
+            console.error("============================================");
+            console.error("RULE VIOLATIONS DETECTED!");
+            violations.forEach((violation, index) => {
+              console.error(`Violation ${index + 1}: ${violation}`);
+            });
+            console.error("============================================");
+            this.showError("Rule violations detected. Check the console for details.");
+            } else if (fixAttempts > 0) {
+              // If we fixed something, regenerate the NFT image and update UI
+              if (window.regenerateNftImageAndSeed) {
+                window.lastGeneratedNFT = nft;
+                window.regenerateNftImageAndSeed();
+          } else {
+                this.updateSinglePreviewPanel(projectData, nft);
+                this.updateTraitInfoPanel(nft, projectData);
+              }
+          }
+        }
+        window.DEBUG_RULE_APPLICATION = false;
+        if (!nft.imageData || nft.imageData === 'undefined' || (typeof nft.imageData === 'string' && nft.imageData.includes('/undefined'))) {
+          console.error("Generated NFT has invalid image data:", nft.imageData);
+          nft.imageData = '';
+        }
+        const rarityScore = nft.averageRarityScore !== undefined ? nft.averageRarityScore.toFixed(2) : 'N/A';
+        console.log("Rarity tier:", nft.overallTier, `(${rarityScore}%)`);
+        const singleSeedToggle = document.getElementById('single-seed-toggle');
+        const singleSeedInput = document.getElementById('single-seed-input');
+        const generateSeedBtn = document.getElementById('generate-seed-nft-btn');
+        const wasSeedToggleEnabled = singleSeedToggle ? singleSeedToggle.checked : false;
+          // Do not auto-populate the seed input field with the generated NFT's seed
+          if (generateSeedBtn) {
+            generateSeedBtn.disabled = !wasSeedToggleEnabled;
+        }
+        this.updateSinglePreviewPanel(projectData, nft);
+        console.log('[DEBUG] Called updateSinglePreviewPanel with NFT:', nft);
+        this.updateTraitInfoPanel(nft, projectData);
+        // --- ENFORCE DETERMINISTIC SEED FORMAT FOR ALL NFTS ---
+        if (nft && projectData) {
+          let deterministicSeed = '';
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNfts')) {
+            deterministicSeed = window.NFTApp.getModule('generateNfts').computeDeterministicSeed(projectData, nft);
+          }
+          if (deterministicSeed) {
+            nft.seed = deterministicSeed;
+            window.lastGeneratedNFT.seed = deterministicSeed;
+            setTimeout(() => {
+              const seedBox = document.querySelector('.nft-seed-box');
+              if (seedBox) seedBox.textContent = deterministicSeed;
+              const seedNumber = document.querySelector('.seed-number');
+              if (seedNumber) seedNumber.textContent = deterministicSeed;
+            }, 0);
+          }
+        }
+        // --- END ENFORCE DETERMINISTIC SEED FORMAT ---
+        enableNftGenButtons();
+      });
+      } catch (error) {
+        console.error("Error generating NFT:", error);
+        this.showError("Failed to generate NFT: " + error.message);
+        enableNftGenButtons();
+      } finally {
+        this.hideLoadingOverlay();
+        window.DEBUG_RULE_APPLICATION = false;
+        enableNftGenButtons();
+      }
+    } catch (error) {
+      console.error("Error initiating NFT generation:", error);
+      this.showError("Failed to start NFT generation: " + error.message);
+      this.hideLoadingOverlay();
+      window.DEBUG_RULE_APPLICATION = false;
+      enableNftGenButtons();
+    }
+  },
+
+  generateSingleNFTWithSeed: function(projectData) {
+    // Always validate project data before generating
+    const isValid = window.NFTApp.getModule('generateNfts').validateProjectData(projectData, true);
+    if (!isValid) {
+      this.showError('You need to add at least one trait layer and at least two traits before generating NFTs.');
+      enableNftGenButtons();
+      return;
+    }
+    disableNftGenButtons();
+    // Get the seed input field and its value
+    const singleSeedInput = document.getElementById('single-seed-input');
+    const singleSeedToggle = document.getElementById('single-seed-toggle');
+    if (!singleSeedInput || !singleSeedInput.value) {
+      // Show notification that seed is required
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+        window.NFTApp.getModule("notificationService").show(
+          "Please enter a seed number", 
+          "warning", 
+          3000
+        );
+      }
+      enableNftGenButtons();
+      return;
+    }
+    const wasToggleEnabled = singleSeedToggle ? singleSeedToggle.checked : false;
+    const seedValue = singleSeedInput.value;
+    console.log(`Generating NFT with specific seed: ${seedValue}`);
+    this.showLoadingOverlay("Generating NFT with specific seed...", true);
+    // Always use Promise-based async NFT generation
+    let generatePromise;
+    try {
+      generatePromise = window.NFTApp.getModule('generateNfts').generateSingleNFT(
+        projectData, false, seedValue
+      );
+      if (!generatePromise || typeof generatePromise.then !== 'function') {
+        throw new Error('NFT generation did not return a Promise.');
+      }
+    } catch (err) {
+      this.hideLoadingOverlay();
+      console.error(`Error initiating NFT generation with seed ${seedValue}:`, err);
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+        window.NFTApp.getModule("notificationService").show(
+          "Error generating NFT with this seed",
+          "error",
+          3000
+        );
+      }
+      enableNftGenButtons();
+      return;
+    }
+    generatePromise.then(nft => {
+      if (!nft || !nft.imageData) {
+        throw new Error('Invalid NFT generated for this seed.');
+      }
+      window.lastGeneratedNFT = nft;
+      this.updateSinglePreviewPanel(projectData, nft);
+      this.updateTraitInfoPanel(nft, projectData);
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+        window.NFTApp.getModule("notificationService").show(
+          "NFT generated with seed: " + seedValue, 
+          "success", 
+          3000
+        );
+      }
+      setTimeout(() => {
+        if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNfts')) {
+          window.NFTApp.getModule('generateNfts').verifySeedConsistency(projectData);
+        }
+      }, 300);
+      if (singleSeedToggle && singleSeedToggle.checked !== wasToggleEnabled) {
+        singleSeedToggle.checked = wasToggleEnabled;
+        singleSeedToggle.dispatchEvent(new Event('change'));
+      }
+      console.log("Successfully generated NFT with seed:", seedValue);
+      enableNftGenButtons();
+    }).catch(err => {
+      this.hideLoadingOverlay();
+      console.error(`Error generating NFT with seed ${seedValue}:`, err);
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+        window.NFTApp.getModule("notificationService").show(
+          "Error generating NFT with this seed", 
+          "error", 
+          3000
+        );
+      }
+      enableNftGenButtons();
+    }).finally(() => {
+      this.hideLoadingOverlay();
+      enableNftGenButtons();
+    });
+  },
+
+  generateSeedNFT: function(projectData) {
+    // Call our new implementation that handles seed verification animation
+    this.generateSingleNFTWithSeed(projectData);
+  },
+
+  displaySingleNFT: function(nft) {
+    // --- ENSURE PREVIEW IS CLEARED BEFORE RENDERING ---
+    const previewPanelElem = document.querySelector('.nft-preview-image-area');
+    if (previewPanelElem) previewPanelElem.innerHTML = '';
+    // --- END CLEAR ---
+    if (nft) window.lastGeneratedNFT = nft;
+    // Set rendering flag to prevent placeholder logic
+    if (window.NFTApp) window.NFTApp.isRenderingNFT = true;
+    console.log('[DEBUG] displaySingleNFT called with NFT:', nft);
+    if (nft && nft.imageData) {
+      console.log('[DEBUG] NFT imageData:', nft.imageData.substring(0, 100));
+    }
+    // Render inside .nft-preview-panel
+    let previewContainer = previewPanelElem ? previewPanelElem.querySelector('#nft-preview-container') : null;
+    if (previewPanelElem && !previewContainer) {
+      previewContainer = document.createElement('div');
+      previewContainer.id = 'nft-preview-container';
+      previewPanelElem.appendChild(previewContainer);
+    }
+    if (!previewPanelElem || !previewContainer) {
+      console.warn('[DEBUG] .nft-preview-image-area or #nft-preview-container not found in DOM');
+      if (window.NFTApp) window.NFTApp.isRenderingNFT = false;
+      return;
+    }
+    // Remove welcome and placeholder messages if present
+    const welcomeElem = previewPanelElem.querySelector('.nft-preview-welcome');
+    if (welcomeElem && welcomeElem.parentNode) {
+      welcomeElem.parentNode.removeChild(welcomeElem);
+    }
+    const placeholderElem = previewPanelElem.querySelector('.nft-preview-placeholder');
+    if (placeholderElem && placeholderElem.parentNode) {
+      placeholderElem.parentNode.removeChild(placeholderElem);
+    }
+    // Clear previous NFT image
+    previewContainer.innerHTML = '';
+    // Render NFT image
+    if (nft && nft.imageData) {
+      const previewItem = document.createElement('div');
+      previewItem.className = 'nft-preview-item';
+      previewItem.innerHTML =
+        '<div class="nft-preview-image">' +
+          '<img src="' + nft.imageData + '" alt="NFT Preview">' +
+        '</div>';
+      previewContainer.appendChild(previewItem);
+    }
+    if (window.NFTApp) window.NFTApp.isRenderingNFT = false;
+  },
+
+  displayPreview: function(previewNFTs) {
+    const previewContainer = document.getElementById("nft-preview-container");
+    const previewGrid = previewContainer.querySelector(".nft-preview-grid");
+    previewGrid.innerHTML = "";
+    previewNFTs.forEach(function(nft) {
+      const previewItem = document.createElement("div");
+      previewItem.className = "nft-preview-item";
+      previewItem.innerHTML =
+        '<div class="nft-preview-image">' +
+          '<img src="' + nft.imageData + '" alt="NFT Preview">' +
+        '</div>';
+      previewGrid.appendChild(previewItem);
+    });
+    previewContainer.style.display = "block";
+  },
+
+  saveNFTs: function(nfts, projectData) {
+    // Create a zip file containing all NFTs
+    const zip = new JSZip();
+    // Add NFTs to zip
+    nfts.forEach((nft, index) => {
+      // Convert data URL to blob
+      const imageBlob = this.dataURLtoBlob(nft.imageData);
+      // Add image to zip
+      const imageName = `${projectData.filenamePrefix || "NFT"} #${(index + 1).toString().padStart(4, "0")}.png`;
+      zip.file(imageName, imageBlob);
+      // Create metadata
+      const metadata = {
+        name: `${projectData.filenamePrefix || "NFT"} #${(index + 1).toString().padStart(4, "0")}`,
+        description: projectData.defaultNftDescription || "",
+        image: imageName,
+        attributes: nft.traits.map(trait => ({
+          trait_type: trait.layer,
+          value: trait.trait
+        }))
+      };
+      // Add rarity_rank if enabled in settings
+      if (projectData.settings && projectData.settings.includeRarityRankInMetadata && typeof nft.rarity_rank !== 'undefined') {
+        metadata.rarity_rank = nft.rarity_rank;
+      }
+      // Add metadata to zip
+      const metadataName = `${projectData.filenamePrefix || "NFT"} #${(index + 1).toString().padStart(4, "0")}.json`;
+      zip.file(metadataName, JSON.stringify(metadata, null, 2));
+    });
+    // Generate zip file
+    zip.generateAsync({ type: "blob" }).then(content => {
+      // Create download link
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(content);
+      a.download = `${projectData.name || "NFT Collection"}.zip`;
+      // Trigger download
+      document.body.appendChild(a);
+      a.click();
+      // Clean up
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      // Show success message
+      this.showSuccess("NFT collection generated successfully!");
+    });
+  },
+
+  dataURLtoBlob: function(dataURL) {
+    const parts = dataURL.split(";base64,");
+    const contentType = parts[0].split(":")[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uInt8Array], { type: contentType });
+  },
+
+  showLoadingOverlay: function(message, transparent = false) {
+    // ... function body copied from generate-nfts.js ...
+  },
+
+  hideLoadingOverlay: function() {
+    // ... function body copied from generate-nfts.js ...
+  },
+
+  showError: function(message) {
+    // ... function body copied from generate-nfts.js ...
+  },
+
+  showSuccess: function(message) {
+    // ... function body copied from generate-nfts.js ...
+  },
+
+  showTraitSelectionModal: function(layerName, traitIndex, nft, projectData) {
+      // Remove any existing modal
+      let modal = document.getElementById('trait-selection-modal');
+      if (modal) modal.remove();
+      // Create modal overlay
+      modal = document.createElement('div');
+      modal.id = 'trait-selection-modal';
+      modal.className = 'modal-overlay';
+      modal.style.zIndex = '9999';
+    // Modal HTML with loading state in body
+      modal.innerHTML = `
+        <div class="modal-dialog" style="max-width: 640px; min-width: 320px; background: #222; border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); margin: 40px auto; padding: 0; position: relative;">
+          <button class="modal-close-btn" style="background: none; border: none; color: #aaa; font-size: 22px; cursor: pointer; position: absolute; top: 16px; right: 20px; z-index: 10;">&times;</button>
+        <div class="modal-body" style="padding: 16px 20px; min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div class="trait-list-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 120px;">
+            <div style="font-size: 16px; color: #fff; margin-bottom: 18px;">Traits list being populated</div>
+            <div class="trait-list-spinner" style="display: flex; align-items: center; justify-content: center; height: 48px;">
+              <div class="trait-spinner" style="width: 38px; height: 38px; border: 4px solid #6c5ce7; border-top: 4px solid #222; border-radius: 50%; animation: trait-spin 1s linear infinite;"></div>
+            </div>
+          </div>
+          </div>
+          <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 12px 20px 16px 20px; border-top: 1px solid #333;">
+            <button id="modal-cancel-btn" class="btn btn-secondary" style="min-width: 80px;">Cancel</button>
+            <button id="modal-apply-btn" class="btn btn-primary" style="min-width: 80px;">Apply</button>
+          </div>
+        </div>
+      `;
+    // Add spinner animation CSS if not present
+    if (!document.getElementById('trait-spinner-style')) {
+      const style = document.createElement('style');
+      style.id = 'trait-spinner-style';
+      style.textContent = `@keyframes trait-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+      document.head.appendChild(style);
+    }
+      document.body.appendChild(modal);
+      // Attach NFT and projectData to the modal for later reference
+      modal._nft = nft;
+      modal._projectData = projectData;
+      modal.style.display = 'flex';
+      setTimeout(() => { modal.style.display = 'flex'; }, 50);
+    // Close/cancel button logic (works even during loading)
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    const cancelBtn = modal.querySelector('#modal-cancel-btn');
+    if (closeBtn) closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+    if (cancelBtn) cancelBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+    // After a short delay, populate the trait list as usual (simulate calculation time)
+    setTimeout(() => {
+      // Only proceed if modal is still open
+      if (!document.body.contains(modal)) return;
+      // Replace modal body with the full trait selection UI (current implementation)
+      const modalBody = modal.querySelector('.modal-body');
+      if (!modalBody) return;
+      // --- BEGIN: Original trait list population code ---
+      modalBody.innerHTML = `
+        <div style="margin-bottom: 10px; position: relative; display: block;">
+          <input type="text" class="trait-search-input" placeholder="Search traits..." style="width: 100%; padding: 6px 10px; border-radius: 4px; border: 1px solid #444; background: #181818; color: #fff; font-size: 14px;">
+          <button class="trait-search-clear" style="background: none; border: none; color: #aaa; font-size: 16px; cursor: pointer; position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">&times;</button>
+        </div>
+        <div class="trait-count-indicator" style="font-size: 12px; color: #aaa; margin-bottom: 8px;"></div>
+        <div class="trait-selection-list"></div>
+      `;
+      // Now run the rest of the trait list population logic as before
+      const traitSelectionList = modalBody.querySelector('.trait-selection-list');
+      const layer = projectData.traits.find(l => l.name === layerName || l.id === layerName);
+      if (!layer) {
+        traitSelectionList.innerHTML = '<div style="color: #aaa;">Layer not found.</div>';
+      } else {
+        // Only use rules relevant to this layer
+        const layerRules = getRulesForLayer(projectData, layer);
+        // Add 'none' option
+        const noneThumb = document.createElement('div');
+        noneThumb.className = 'trait-selection-thumb';
+        noneThumb.setAttribute('data-trait-id', 'none');
+        noneThumb.setAttribute('data-layer-id', layer.id);
+        // Create image container for 'none' (centered)
+        const noneImgDiv = document.createElement('div');
+        noneImgDiv.className = 'trait-selection-img';
+        const noneSpan = document.createElement('span');
+        noneSpan.className = 'trait-none-placeholder';
+        noneSpan.textContent = 'None';
+        noneImgDiv.appendChild(noneSpan);
+        noneThumb.appendChild(noneImgDiv);
+        // Name
+        const noneNameDiv = document.createElement('div');
+        noneNameDiv.className = 'trait-selection-name custom-tooltip-anchor';
+        noneNameDiv.innerHTML = `<span class="trait-name-ellipsis-select">none</span><span class="custom-tooltip">none</span>`;
+        noneThumb.appendChild(noneNameDiv);
+        traitSelectionList.appendChild(noneThumb);
+        // Add trait options
+        layer.traits.forEach(trait => {
+          const thumb = document.createElement('div');
+          thumb.className = 'trait-selection-thumb';
+          thumb.setAttribute('data-trait-id', trait.id);
+          thumb.setAttribute('data-layer-id', layer.id);
+          // Image
+          const imgDiv = document.createElement('div');
+          imgDiv.className = 'trait-selection-img';
+          imgDiv.style.background = '#222';
+          imgDiv.style.borderRadius = '8px';
+          imgDiv.style.display = 'flex';
+          imgDiv.style.alignItems = 'center';
+          imgDiv.style.justifyContent = 'center';
+          imgDiv.style.overflow = 'hidden';
+          if (trait.imageData) {
+            const img = document.createElement('img');
+            img.src = trait.imageData;
+            img.alt = trait.name;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            imgDiv.appendChild(img);
+          } else {
+            imgDiv.innerHTML = `<span style="color: #666; font-size: 18px;">?</span>`;
+          }
+          // Always append image first, then name
+          thumb.appendChild(imgDiv);
+          // Name
+          const nameDiv = document.createElement('div');
+          nameDiv.className = 'trait-selection-name custom-tooltip-anchor';
+          nameDiv.innerHTML = `<span class="trait-name-ellipsis-select">${trait.name}</span><span class="custom-tooltip">${trait.name}</span>`;
+          nameDiv.style.fontSize = '14px';
+          nameDiv.style.textAlign = 'center';
+          nameDiv.style.whiteSpace = 'nowrap';
+          nameDiv.style.overflow = 'hidden';
+          nameDiv.style.textOverflow = 'ellipsis';
+          if (trait.name.length > 16) {
+            nameDiv.title = trait.name;
+          }
+          thumb.appendChild(nameDiv);
+          traitSelectionList.appendChild(thumb);
+        });
+        // --- Ensure forbidden overlays are applied after rendering all thumbs ---
+        window.NFTApp.getModule('generateNftsUI').applyForbiddenOverlaysToModal(modal, nft, projectData);
+      }
+      // --- TRAIT SEARCH/FILTER LOGIC ---
+      const searchInput = modalBody.querySelector('.trait-search-input');
+      const clearBtn = modalBody.querySelector('.trait-search-clear');
+      const traitThumbs = Array.from(traitSelectionList.querySelectorAll('.trait-selection-thumb'));
+      function filterTraits() {
+        const val = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+        traitThumbs.forEach(thumb => {
+          // Always show the 'none' option
+          if (thumb.getAttribute('data-trait-id') === 'none') {
+            thumb.style.display = '';
+            thumb.style.visibility = 'visible';
+            return;
+          }
+          const nameElem = thumb.querySelector('.trait-name-ellipsis-select');
+          const name = nameElem ? nameElem.textContent.toLowerCase() : '';
+          if (val === '' || name.includes(val)) {
+            thumb.style.display = '';
+            thumb.style.visibility = 'visible';
+            visibleCount++;
+          } else {
+            thumb.style.display = 'none'; // Remove from layout
+            thumb.style.visibility = 'hidden';
+          }
+        });
+        // Update count indicator
+        const countIndicator = modalBody.querySelector('.trait-count-indicator');
+        if (countIndicator) {
+          if (val === '') {
+            countIndicator.textContent = `${traitThumbs.length - 1} traits`;
+          } else {
+            countIndicator.textContent = `${visibleCount} trait${visibleCount === 1 ? '' : 's'} found`;
+          }
+        }
+      }
+      searchInput.addEventListener('input', filterTraits);
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filterTraits();
+        searchInput.focus();
+      });
+      filterTraits();
+      // Mark the current trait as selected by default
+      let currentTraitId = 'none';
+      let currentLayerTrait = null;
+      if (nft && nft.traits && layer) {
+        currentLayerTrait = nft.traits.find(t => {
+          if (t.layer && layer.id && t.layer.id) return t.layer.id === layer.id;
+          return (t.layer && t.layer.name === layer.name) || t.layer === layer.name;
+        });
+      }
+      if (currentLayerTrait && currentLayerTrait.trait && currentLayerTrait.trait.id) {
+        currentTraitId = currentLayerTrait.trait.id;
+      }
+      const allThumbs = traitSelectionList.querySelectorAll('.trait-selection-thumb');
+      let selectedThumb = null;
+      allThumbs.forEach(thumb => {
+        thumb.classList.remove('selected');
+        thumb.style.border = '';
+        thumb.style.boxShadow = '';
+        thumb.style.zIndex = '';
+        const indicator = thumb.querySelector('.trait-selected-indicator');
+        if (indicator) indicator.remove();
+        if (thumb.getAttribute('data-trait-id') === currentTraitId) {
+          thumb.classList.add('selected');
+          thumb.style.border = 'none';
+          thumb.style.boxShadow = '0 0 0 3px #6c5ce7';
+          thumb.style.zIndex = '20';
+          const checkmark = document.createElement('div');
+          checkmark.className = 'trait-selected-indicator';
+          checkmark.textContent = '✓';
+          checkmark.style.position = 'absolute';
+          checkmark.style.top = '5px';
+          checkmark.style.right = '5px';
+          checkmark.style.color = '#fff'; // Always white
+          checkmark.style.background = '#4CAF50'; // Always green circle
+          checkmark.style.borderRadius = '50%';
+          checkmark.style.width = '22px';
+          checkmark.style.height = '22px';
+          checkmark.style.display = 'flex';
+          checkmark.style.alignItems = 'center';
+          checkmark.style.justifyContent = 'center';
+          checkmark.style.fontWeight = 'bold';
+          checkmark.style.fontSize = '14px';
+          checkmark.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+          checkmark.style.zIndex = '40';
+          thumb.appendChild(checkmark);
+          selectedThumb = thumb;
+        }
+        // Attach click handler (only if not forbidden)
+        if (thumb.style.pointerEvents !== 'none') {
+          thumb.onclick = function() {
+          allThumbs.forEach(t => {
+            t.classList.remove('selected');
+            t.style.border = '';
+            t.style.boxShadow = '';
+            t.style.zIndex = '';
+              const ind = t.querySelector('.trait-selected-indicator');
+              if (ind) ind.remove();
+          });
+            this.classList.add('selected');
+            this.style.border = 'none';
+            this.style.boxShadow = '0 0 0 3px #6c5ce7';
+            this.style.zIndex = '20';
+            if (!this.querySelector('.trait-selected-indicator')) {
+            const checkmark = document.createElement('div');
+            checkmark.className = 'trait-selected-indicator';
+            checkmark.textContent = '✓';
+            checkmark.style.position = 'absolute';
+            checkmark.style.top = '5px';
+            checkmark.style.right = '5px';
+            checkmark.style.color = '#fff'; // Always white
+            checkmark.style.background = '#4CAF50'; // Always green circle
+            checkmark.style.borderRadius = '50%';
+            checkmark.style.width = '22px';
+            checkmark.style.height = '22px';
+            checkmark.style.display = 'flex';
+            checkmark.style.alignItems = 'center';
+            checkmark.style.justifyContent = 'center';
+            checkmark.style.fontWeight = 'bold';
+            checkmark.style.fontSize = '14px';
+            checkmark.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+            checkmark.style.zIndex = '40';
+              this.appendChild(checkmark);
+          }
+          };
+        }
+      });
+      if (selectedThumb && selectedThumb.scrollIntoView) {
+        setTimeout(() => selectedThumb.scrollIntoView({ block: 'center', behavior: 'smooth' }), 100);
+      }
+      // Do NOT call setupModalEventListeners or sortTraitsAlphabetically for click handlers anymore.
+    }, 350); // 350ms delay to ensure loading state is visible
+  },
+
+  applyTraitChange: function(modal, layerName, traitIndex, nft, projectData) {
+    const selectedThumb = modal.querySelector('.trait-selection-thumb.selected');
+    if (!selectedThumb) {
+      modal.style.display = 'none';
+      return;
+    }
+    const traitId = selectedThumb.getAttribute('data-trait-id');
+    const layerId = selectedThumb.getAttribute('data-layer-id');
+    const layer = projectData.traits.find(l => l.id === layerId);
+    let newTrait = null;
+    if (traitId === 'none') {
+      newTrait = { id: 'none', name: 'none' };
+    } else {
+      newTrait = layer.traits.find(t => t.id === traitId);
+      if (!newTrait) {
+        modal.style.display = 'none';
+        return;
+      }
+    }
+    // --- FORBIDDEN CHECK: Allow applying forbidden trait, but require confirmation ---
+    const simulatedTraits = nft.traits.map(t => ({...t}));
+    const idx = simulatedTraits.findIndex(t => (t.layer && t.layer.id === layer.id) || (t.layer && t.layer.name === layer.name) || t.layer === layer.name);
+    if (idx !== -1) {
+      simulatedTraits[idx] = { ...simulatedTraits[idx], trait: newTrait };
+    } else {
+      simulatedTraits.push({ layer, trait: newTrait });
+    }
+    const simulatedNFT = { ...nft, traits: simulatedTraits };
+    // Get ALL violations for the new NFT
+    const allViolations = window.NFTApp.getModule('generateNfts').checkForRuleViolations(simulatedNFT, projectData.rules);
+    const doApply = () => {
+      if (traitIndex < 0 || traitIndex >= nft.traits.length) {
+        modal.style.display = 'none';
+        return;
+      }
+      nft.traits[traitIndex].trait = newTrait;
+      // Regenerate the NFT using the current trait selection for full determinism
+      const generateNftsCore = window.NFTApp.getModule('generateNfts');
+      if (generateNftsCore && typeof generateNftsCore.generateSingleNFT === 'function') {
+        generateNftsCore.generateSingleNFT(projectData, true).then(newNft => {
+          window.lastGeneratedNFT = newNft;
+          // After trait change, re-check all rules and update overlays for all traits
+          window.NFTApp.getModule('generateNftsUI').updateTraitInfoPanel(newNft, projectData);
+          window.NFTApp.getModule('generateNftsUI').updateSinglePreviewPanel(projectData, newNft);
+          // Check if we need to show the Update NFT button
+          if (window.BatchGenerationPanel && window.BatchGenerationPanel.instance) {
+            window.BatchGenerationPanel.instance.checkForTraitChanges();
+          }
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+            window.NFTApp.getModule("notificationService").show(
+              "Trait updated successfully!",
+              "success",
+              3000
+            );
+          }
+          modal.style.display = 'none';
+        });
+      } else {
+        // Fallback: update both panels for forbidden overlays immediately
+        window.NFTApp.getModule('generateNftsUI').updateTraitInfoPanel(nft, projectData);
+        window.NFTApp.getModule('generateNftsUI').updateSinglePreviewPanel(projectData, nft);
+        modal.style.display = 'none';
+      }
+    };
+    if (allViolations && allViolations.length > 0) {
+      // Show confirmation modal with ALL violations (robust, always lists all, one per line)
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('confirmationModal')) {
+        // Format violations for the small text, always one per line, and remove duplicates
+        let uniqueViolations = Array.from(new Set(allViolations.map(v => v.replace(/^Rule Violation: /, '').trim())));
+        let violationsList = uniqueViolations.join('<br>');
+        // Main message and question, each on its own line, with clear formatting
+        const mainMsg = '<div style="font-size:14px;font-weight:500;color:#ff2222;line-height:1.2;margin-bottom:8px;">This trait combination does not respect one or more active rules.</div>';
+        const question = '<div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:2px;">Are you sure you want to apply this trait anyway?</div>';
+        const consequence = '<div style="font-size:13px;color:#fff;margin-bottom:10px;">This may result in an invalid or non-compliant NFT.</div>';
+        const hr = '<hr style="border:0;border-top:1px solid #444;margin:10px 0 10px 0;">';
+        const ruleHeader = '<div style="font-size:13px;color:#ffbaba;font-weight:600;margin-bottom:2px;">Rule violation(s):</div>';
+        const ruleList = `<div style="font-size:13px;color:#ffbaba;line-height:1.5;">${violationsList}</div>`;
+        // Compose the full description
+        const fullDescription = question + consequence + hr + ruleHeader + ruleList;
+        // Show modal (pass HTML for message and description)
+        window.NFTApp.getModule('confirmationModal').show(
+          'Forbidden Trait Combination',
+          mainMsg,
+          fullDescription,
+          doApply
+        );
+      } else {
+        // Fallback: just apply
+        doApply();
+      }
+      return;
+    }
+    // No violation, apply directly
+    doApply();
+  },
+
+  // --- Begin migrated UI logic from generate-nfts.js ---
+  // (Copy all UI-related functions here, including setupUI, updateSinglePreviewPanel, updateTraitInfoPanel, showTraitsListPlaceholder, clearErrorInPreviewPanel, showWelcomeMessageInPreviewPanel, showErrorInPreviewPanel, clearTraitsPanel, and all modal/trait selection UI logic)
+  // ... existing code ...
+
+  setupUI: function(projectData) {
+    let generateNftsTab = document.getElementById('generate-nfts');
+    // ... inside setupUI, after rendering the preview panel ...
+    // Set the main HTML structure first
+    generateNftsTab.innerHTML = `
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Generate NFTs
+      </h2>
+      <p class="section-description">Create and preview NFT images for your collection. Keep on addind the NFTs you like to your seeds list (using 'Randomize' button for single generation or 'Generate Batch' for multiple Generations at once). Once you have the full collection seed list full you should proceed to the generate metadata tab. </p>
+      <div class="generate-nfts-main-row" style="display: flex; flex-direction: row; gap: 12px; align-items: flex-start; width: 100%;">
+        <div class="nft-preview-panel" style="flex: 0 0 440px; max-width: 440px; min-width: 340px; display: flex; flex-direction: column; gap: 0;">
+          <div class="nft-controls-panel" style="display: flex; flex-direction: column; gap: 0; width: 100%; background: #23232b; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); padding: 18px 18px 10px 18px; margin-bottom: 18px; border: 1.5px solid #29293a;">
+            <div class="nft-collection-seed-row"></div>
+            <div class="nft-rarity-seed-row"></div>
+            <div class="nft-seedlist-random-row"></div>
+            <div class="nft-seedinput-row"></div>
+          </div>
+          <div class="nft-preview-image-area"><div id="nft-preview-container"></div></div>
+          <div id="display-full-seed-list-btn-mount"></div>
+          <div id="batch-generation-panel-mount" style="width: 100%; max-width: 100%; margin-top: 18px;"></div>
+        </div>
+        <div class="traits-list-card" style="flex: 1 1 0; min-width: 320px; max-width: 320px; display: flex; flex-direction: column;">
+          <div class="nft-trait-info-panel">
+            <ul class="nft-trait-info-list"></ul>
+          </div>
+        </div>
+        <div id="batch-nft-grid-outer" style="flex: 1 1 0; min-width: 400px; max-width: 1000px; display: flex; flex-direction: column; margin-left: 12px;"></div>
+      </div>
+    `;
+    // Now insert the button after the preview panel is present
+    setTimeout(() => {
+      const btnMount = generateNftsTab.querySelector('#display-full-seed-list-btn-mount');
+      if (btnMount && !document.getElementById('display-full-seed-list-btn')) {
+        let fullSeedListBtn = document.createElement('button');
+        fullSeedListBtn.id = 'display-full-seed-list-btn';
+        fullSeedListBtn.className = 'btn btn-primary';
+        fullSeedListBtn.style.margin = '18px 0 0 0';
+        fullSeedListBtn.style.width = '100%';
+        fullSeedListBtn.style.fontSize = '15px';
+        fullSeedListBtn.style.height = '38px';
+        fullSeedListBtn.style.position = 'relative';
+        fullSeedListBtn.innerHTML = 'Display full seed NFTs list';
+        // Tooltip
+        let tooltip = document.createElement('span');
+        tooltip.className = 'tooltiptext';
+        tooltip.textContent = 'Click to display the entire NFT collection on the Batch Generation so that it can be fine tuned';
+        tooltip.style.position = 'absolute';
+        tooltip.style.left = '110%';
+        tooltip.style.top = '50%';
+        tooltip.style.transform = 'translateY(-50%)';
+        tooltip.style.background = 'rgba(0,0,0,0.85)';
+        tooltip.style.color = '#fff';
+        tooltip.style.borderRadius = '6px';
+        tooltip.style.padding = '7px 12px';
+        tooltip.style.fontSize = '13px';
+        tooltip.style.minWidth = '260px';
+        tooltip.style.maxWidth = '340px';
+        tooltip.style.zIndex = '10';
+        tooltip.style.display = 'none';
+        fullSeedListBtn.appendChild(tooltip);
+        fullSeedListBtn.addEventListener('mouseenter', function() { tooltip.style.display = 'block'; });
+        fullSeedListBtn.addEventListener('mouseleave', function() { tooltip.style.display = 'none'; });
+        fullSeedListBtn.onclick = function() {
+          if (window.displayFullSeedListNFTs) window.displayFullSeedListNFTs();
+        };
+        btnMount.appendChild(fullSeedListBtn);
+        
+        // Add rule violation buttons
+        const ruleViolationContainer = document.createElement('div');
+        ruleViolationContainer.style.display = 'flex';
+        ruleViolationContainer.style.gap = '10px';
+        ruleViolationContainer.style.marginTop = '10px';
+        
+        // List All seeds with Rule Violations button
+        const listViolationsBtn = document.createElement('button');
+        listViolationsBtn.id = 'list-rule-violations-btn';
+        listViolationsBtn.className = 'btn btn-warning';
+        listViolationsBtn.style.flex = '1';
+        listViolationsBtn.style.fontSize = '14px';
+        listViolationsBtn.style.height = '36px';
+        listViolationsBtn.innerHTML = 'List All seeds with Rule Violations';
+        listViolationsBtn.onclick = function() {
+          console.log('List violations button clicked');
+          console.log('window.listSeedsWithRuleViolations:', window.listSeedsWithRuleViolations);
+          if (window.listSeedsWithRuleViolations) {
+            window.listSeedsWithRuleViolations();
+          } else {
+            console.error('listSeedsWithRuleViolations function not found');
+            alert('Function not available. Please refresh the page.');
+          }
+        };
+        
+        // Delete All seeds with Rule Violations button
+        const deleteViolationsBtn = document.createElement('button');
+        deleteViolationsBtn.id = 'delete-rule-violations-btn';
+        deleteViolationsBtn.className = 'btn btn-danger';
+        deleteViolationsBtn.style.flex = '1';
+        deleteViolationsBtn.style.fontSize = '14px';
+        deleteViolationsBtn.style.height = '36px';
+        deleteViolationsBtn.innerHTML = 'Delete All seeds with Rule Violations';
+        deleteViolationsBtn.onclick = function() {
+          console.log('Delete violations button clicked');
+          console.log('window.deleteSeedsWithRuleViolations:', window.deleteSeedsWithRuleViolations);
+          if (window.deleteSeedsWithRuleViolations) {
+            window.deleteSeedsWithRuleViolations();
+          } else {
+            console.error('deleteSeedsWithRuleViolations function not found');
+            alert('Function not available. Please refresh the page.');
+          }
+        };
+        
+        ruleViolationContainer.appendChild(listViolationsBtn);
+        ruleViolationContainer.appendChild(deleteViolationsBtn);
+        btnMount.appendChild(ruleViolationContainer);
+      }
+    }, 0);
+    // Mount Batch Generation Panel below the button
+    setTimeout(function() {
+      if (window.BatchGenerationPanel) {
+        var mount = document.getElementById('batch-generation-panel-mount');
+        if (mount) {
+          mount.innerHTML = '';
+          var batchPanel = new window.BatchGenerationPanel();
+          batchPanel.container.style.width = '100%';
+          batchPanel.container.style.maxWidth = '100%';
+          batchPanel.container.style.minWidth = '0';
+          mount.appendChild(batchPanel.getElement());
+        }
+      }
+    }, 0);
+    // Render NFT grid (batch results) in the right column using batch data
+    function renderBatchNftGrid() {
+      var gridOuter = document.getElementById('batch-nft-grid-outer');
+      if (!gridOuter) return;
+      gridOuter.innerHTML = '';
+      var batchPanel = window.BatchGenerationPanel && window.BatchGenerationPanel.instance;
+      if (!batchPanel || !Array.isArray(batchPanel.nftBatch)) return;
+      // Create grid container with consistent 10-column layout
+      var grid = document.createElement('div');
+      grid.className = 'batch-nft-grid';
+      grid.id = 'nft-grid'; // Use consistent ID
+      grid.style.display = 'grid';
+      grid.style.gridTemplateColumns = 'repeat(10, 118px)'; // Consistent 10 columns
+      grid.style.gap = '6px'; // Consistent gap
+      grid.style.justifyContent = 'flex-start';
+      grid.style.justifyItems = 'center';
+      grid.style.width = '1250px'; // Consistent width
+      grid.style.minWidth = '1250px';
+      grid.style.height = '1214px'; // Fixed height for consistent layout
+      grid.style.overflowY = 'auto';
+      grid.style.padding = '8px';
+      
+      // Set up the outer container for consistent layout
+      gridOuter.style.overflowX = 'auto';
+      gridOuter.style.overflowY = 'hidden';
+      gridOuter.style.width = '100%';
+      gridOuter.style.minWidth = '1300px';
+      gridOuter.style.maxWidth = '100%';
+      gridOuter.style.display = 'flex';
+      gridOuter.style.flexDirection = 'column';
+      gridOuter.style.boxSizing = 'border-box';
+      // Render NFT cards
+      batchPanel.nftBatch.forEach((nft, i) => {
+        const card = batchPanel.createNftCard(nft, i);
+        grid.appendChild(card);
+      });
+      gridOuter.appendChild(grid);
+      // --- Pagination controls for batch NFT grid ---
+let pagination = gridOuter.parentNode.querySelector('#batch-nft-pagination');
+if (!pagination) {
+  pagination = document.createElement('div');
+  pagination.id = 'batch-nft-pagination';
+  pagination.style.display = 'flex';
+  pagination.style.justifyContent = 'center';
+  pagination.style.alignItems = 'center';
+  pagination.style.gap = '8px';
+  pagination.style.marginTop = '10px';
+  gridOuter.parentNode.appendChild(pagination);
+}
+const cardsPerPage = 9 * 7;
+const totalPages = Math.ceil(batchPanel.nftBatch.length / cardsPerPage);
+if (typeof window.batchNftCurrentPage !== 'number') window.batchNftCurrentPage = 0;
+let currentPage = window.batchNftCurrentPage;
+function scrollToPage(pageIdx) {
+  const scrollX = pageIdx * (130 + 5) * 9; // 9 cards + 8 gaps
+  gridOuter.scrollTo({ left: scrollX, behavior: 'smooth' });
+  window.batchNftCurrentPage = pageIdx;
+  currentPage = pageIdx;
+  updatePagination();
+}
+function updatePagination() {
+  pagination.innerHTML = '';
+  // '<<' button
+  const firstBtn = document.createElement('button');
+  firstBtn.textContent = '<<';
+  firstBtn.disabled = currentPage === 0;
+  firstBtn.onclick = () => scrollToPage(0);
+  pagination.appendChild(firstBtn);
+  // '<' button
+  const prevBtn = document.createElement('button');
+  prevBtn.textContent = '<';
+  prevBtn.disabled = currentPage === 0;
+  prevBtn.onclick = () => scrollToPage(Math.max(0, currentPage - 1));
+  pagination.appendChild(prevBtn);
+  // Page buttons (show up to 7, centered on current page)
+  let startPage = Math.max(0, currentPage - 3);
+  let endPage = Math.min(totalPages - 1, startPage + 6);
+  if (endPage - startPage < 6) startPage = Math.max(0, endPage - 6);
+  for (let i = startPage; i <= endPage; i++) {
+    const pageBtn = document.createElement('button');
+    pageBtn.textContent = (i + 1).toString();
+    pageBtn.disabled = i === currentPage;
+    pageBtn.onclick = () => scrollToPage(i);
+    if (i === currentPage) pageBtn.style.background = '#6c5ce7';
+    pagination.appendChild(pageBtn);
+  }
+  // '>' button
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = '>';
+  nextBtn.disabled = currentPage === totalPages - 1;
+  nextBtn.onclick = () => scrollToPage(Math.min(totalPages - 1, currentPage + 1));
+  pagination.appendChild(nextBtn);
+  // '>>' button
+  const lastBtn = document.createElement('button');
+  lastBtn.textContent = '>>';
+  lastBtn.disabled = currentPage === totalPages - 1;
+  lastBtn.onclick = () => scrollToPage(totalPages - 1);
+  pagination.appendChild(lastBtn);
+}
+updatePagination();
+setTimeout(() => scrollToPage(currentPage), 0);
+    }
+    // Hook into batch panel updates
+    setTimeout(function() {
+      if (window.BatchGenerationPanel && window.BatchGenerationPanel.instance) {
+        var batchPanel = window.BatchGenerationPanel.instance;
+        // Patch renderBatchPanels to also update the grid
+        const origRender = batchPanel.renderBatchPanels.bind(batchPanel);
+        batchPanel.renderBatchPanels = function() {
+          origRender();
+          renderBatchNftGrid();
+        };
+        // Initial render
+        renderBatchNftGrid();
+      }
+    }, 100);
+
+    this.projectData = projectData; // Store projectData for later use
+    // Create a style element for dynamic CSS rules
+    const styleElement = document.createElement("style");
+    styleElement.textContent = `
+      @media (max-width: 768px) {
+        .generate-nfts-locked-group-row {
+          flex-wrap: wrap;
+      }
+      .nft-preview-section {
+          width: 100%;
+        padding-left: 0;
+      }
+      .nft-preview-group {
+        width: 100%;
+        padding-left: 0;
+      }
+      .nft-preview-container {
+        width: 100%;
+        margin-top: 0;
+      }
+      .left-column-section {
+        width: auto !important;
+          max-width: 500px;
+        min-width: 0;
+        padding: 24px;
+        padding-right: 8px !important;
+      }
+      .generate-nfts-locked-group {
+        width: 100%;
+      }
+      /* Override left padding/margin for left column alignment */
+      .left-column-section,
+      .left-column-section > * {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+        }
+      }
+
+      /* Fixed width for traits list panel */
+      .traits-list-wrapper,
+      .traits-list-card,
+      .nft-trait-info-panel,
+      .nft-trait-info-list {
+        height: 100% !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        overflow: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      /* Ensure the traits list card is always visible */
+      .traits-list-card {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+      }
+
+      /* Ensure traits info panel is always visible */
+      .nft-trait-info-panel, .nft-trait-info-list {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+      }
+    `;
+    document.head.appendChild(styleElement);
+
+    console.log("Setting up UI for generate-nfts tab");
+    // --- ENSURE THE GENERATE-NFTS TAB EXISTS AND IS VISIBLE ---
+    let tabJustCreated = false;
+    if (!generateNftsTab) {
+      const contentArea = document.querySelector('.content-area');
+      if (contentArea) {
+        generateNftsTab = document.createElement('div');
+        generateNftsTab.id = 'generate-nfts';
+        generateNftsTab.className = 'tab-content';
+        contentArea.appendChild(generateNftsTab);
+        tabJustCreated = true;
+      }
+    }
+    // --- ADD SECTION TITLE AND DESCRIPTION IF NOT PRESENT ---
+    if (generateNftsTab && !generateNftsTab.querySelector('.section-title')) {
+      const title = document.createElement('h2');
+      title.className = 'section-title';
+      title.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        Generate NFTs
+      `;
+      const desc = document.createElement('p');
+      desc.className = 'section-description';
+      desc.textContent = 'Create and preview NFT images for your collection.';
+      generateNftsTab.insertBefore(desc, generateNftsTab.firstChild);
+      generateNftsTab.insertBefore(title, desc);
+    }
+    // --- ALWAYS RENDER THE FOUR CONTROL ROWS IN A SINGLE PANEL ---
+    if (generateNftsTab) {
+      generateNftsTab.style.display = 'block';
+      generateNftsTab.classList.add('active');
+      // Add section title and description at the top, matching 'generate-metadata' tab
+      generateNftsTab.innerHTML = `
+        <h2 class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          Generate NFTs
+        </h2>
+        <p class="section-description">Create and preview NFT images for your collection.</p>
+        <div class="generate-nfts-main-row" style="display: flex; flex-direction: row; gap: 12px; align-items: flex-start; width: 100%;">
+          <div class="nft-preview-panel" style="flex: 0 0 440px; max-width: 440px; min-width: 340px; display: flex; flex-direction: column; gap: 0;">
+            <div class="nft-controls-panel" style="display: flex; flex-direction: column; gap: 0; width: 100%; background: #23232b; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); padding: 18px 18px 10px 18px; margin-bottom: 18px; border: 1.5px solid #29293a;">
+              <div class="nft-collection-seed-row"></div>
+              <div class="nft-rarity-seed-row"></div>
+              <div class="nft-seedlist-random-row"></div>
+              <div class="nft-seedinput-row"></div>
+            </div>
+            <div class="nft-preview-image-area"><div id="nft-preview-container"></div></div>
+            <div id="display-full-seed-list-btn-mount"></div>
+            <div id="batch-generation-panel-mount" style="width: 100%; max-width: 100%; margin-top: 18px;"></div>
+          </div>
+          <div class="traits-list-card" style="flex: 1 1 0; min-width: 320px; max-width: 320px; display: flex; flex-direction: column;">
+            <div class="nft-trait-info-panel">
+              <ul class="nft-trait-info-list"></ul>
+            </div>
+          </div>
+          <div id="batch-nft-grid-outer" style="flex: 1 1 0; min-width: 400px; max-width: 1000px; display: flex; flex-direction: column; margin-left: 12px;"></div>
+        </div>
+      `;
+      // Load Batch Generation Panel CSS if not already loaded
+      if (!document.getElementById('batch-generation-panel-css')) {
+        var batchCss = document.createElement('link');
+        batchCss.rel = 'stylesheet';
+        batchCss.type = 'text/css';
+        batchCss.id = 'batch-generation-panel-css';
+        batchCss.href = 'css/batch-generation-panel.css';
+        document.head.appendChild(batchCss);
+      }
+      // Mount Batch Generation Panel
+      setTimeout(function() {
+        if (window.BatchGenerationPanel) {
+          var mount = document.getElementById('batch-generation-panel-mount');
+          if (mount) {
+            mount.innerHTML = ''; // Clear previous panels
+            var batchPanel = new window.BatchGenerationPanel();
+            mount.appendChild(batchPanel.getElement());
+          }
+        }
+      }, 0);
+      // Always use an object for projectData to ensure controls render
+      this._renderControlRows(projectData || {});
+      // Always show the preview and traits panels
+      const previewPanel = generateNftsTab.querySelector('.nft-preview-image-area');
+      if (previewPanel) previewPanel.style.display = 'block';
+      const traitPanel = generateNftsTab.querySelector('.nft-trait-info-panel');
+      if (traitPanel) traitPanel.style.display = 'block';
+    }
+
+    // --- Render the collection seed row controls ---
+    const collectionSeedRow = document.querySelector('.nft-collection-seed-row');
+    if (collectionSeedRow) {
+      collectionSeedRow.innerHTML = '';
+      const rowFlex = document.createElement('div');
+      rowFlex.style.display = 'flex';
+      rowFlex.style.alignItems = 'center';
+      rowFlex.style.margin = '0'; // Remove bottom margin for perfect stacking
+      rowFlex.style.width = '100%';
+      rowFlex.style.gap = '0';
+      rowFlex.style.justifyContent = 'flex-end';
+      // (Removed Unique NFTs toggle)
+      // Collection seed toggle
+      const collectionSeedToggleLabel = document.createElement('label');
+      collectionSeedToggleLabel.style.display = 'flex';
+      collectionSeedToggleLabel.style.alignItems = 'center';
+      collectionSeedToggleLabel.style.gap = '6px';
+      // Toggle button (styled switch)
+      const toggleWrapper = document.createElement('span');
+      toggleWrapper.style.display = 'inline-flex';
+      toggleWrapper.style.alignItems = 'center';
+      toggleWrapper.style.height = '24px';
+      toggleWrapper.style.marginRight = '4px';
+      toggleWrapper.style.position = 'relative';
+      // Make the label clickable for the toggle and the text
+      const collectionSeedToggle = document.createElement('input');
+      collectionSeedToggle.type = 'checkbox';
+      collectionSeedToggle.id = 'random-seed-toggle';
+      collectionSeedToggle.style.opacity = '0';
+      collectionSeedToggle.style.position = 'absolute';
+      collectionSeedToggle.style.left = '0';
+      collectionSeedToggle.style.top = '0';
+      collectionSeedToggle.style.width = '36px';
+      collectionSeedToggle.style.height = '20px';
+      collectionSeedToggle.style.margin = '0';
+      collectionSeedToggle.style.cursor = 'pointer';
+      const toggleSlider = document.createElement('span');
+      toggleSlider.style.width = '36px';
+      toggleSlider.style.height = '20px';
+      toggleSlider.style.background = '#444';
+      toggleSlider.style.borderRadius = '12px';
+      toggleSlider.style.position = 'relative';
+      toggleSlider.style.transition = 'background 0.2s';
+      toggleSlider.style.cursor = 'pointer';
+      toggleSlider.style.display = 'inline-block';
+      // Knob
+      const toggleKnob = document.createElement('span');
+      toggleKnob.style.position = 'absolute';
+      toggleKnob.style.left = '2px';
+      toggleKnob.style.top = '2px';
+      toggleKnob.style.width = '16px';
+      toggleKnob.style.height = '16px';
+      toggleKnob.style.background = '#fff';
+      toggleKnob.style.borderRadius = '50%';
+      toggleKnob.style.transition = 'left 0.2s';
+      toggleSlider.appendChild(toggleKnob);
+      // Toggle checked state
+      function updateToggleUI() {
+        if (collectionSeedToggle.checked) {
+          toggleSlider.style.background = '#6c5ce7';
+          toggleKnob.style.left = '18px';
+        } else {
+          toggleSlider.style.background = '#444';
+          toggleKnob.style.left = '2px';
+        }
+      }
+      collectionSeedToggle.addEventListener('change', updateToggleUI);
+      // Make the whole label clickable
+      collectionSeedToggleLabel.style.cursor = 'pointer';
+      // Initial state
+      updateToggleUI();
+      toggleWrapper.appendChild(collectionSeedToggle);
+      toggleWrapper.appendChild(toggleSlider);
+      collectionSeedToggleLabel.appendChild(toggleWrapper);
+      const collectionSeedText = document.createElement('span');
+      collectionSeedText.textContent = 'General Seed';
+      collectionSeedText.className = 'seed-label';
+      collectionSeedToggleLabel.appendChild(collectionSeedText);
+      // Collection seed input
+      const collectionSeedInput = document.createElement('input');
+      collectionSeedInput.type = 'text';
+      collectionSeedInput.id = 'random-seed';
+      collectionSeedInput.placeholder = 'Seed for all NFTs';
+      collectionSeedInput.style.flex = '1';
+      collectionSeedInput.style.height = '28px';
+      collectionSeedInput.style.fontSize = '13px';
+      collectionSeedInput.style.marginLeft = '16px'; // Move 1 character to the right
+      collectionSeedInput.style.borderRadius = '4px';
+      collectionSeedInput.style.border = '1px solid #444';
+      collectionSeedInput.style.background = '#181818';
+      collectionSeedInput.style.color = '#fff';
+      collectionSeedInput.style.textAlign = 'left';
+      collectionSeedInput.disabled = true;
+      // Order: toggle/label left, input right
+      rowFlex.appendChild(collectionSeedToggleLabel);
+      rowFlex.appendChild(collectionSeedInput);
+      collectionSeedRow.appendChild(rowFlex);
+      // Always enforce unique NFTs in projectData.settings
+      if (projectData && projectData.settings) {
+        projectData.settings.generateUniqueNfts = true;
+      }
+      // Restore state from projectData.settings if present
+      const settings = (projectData && projectData.settings) ? projectData.settings : {};
+      collectionSeedToggle.checked = !!settings.useRandomSeed;
+      collectionSeedInput.value = '';
+      collectionSeedInput.disabled = !collectionSeedToggle.checked;
+      // Event listeners
+      collectionSeedToggle.addEventListener('change', () => {
+        collectionSeedInput.disabled = !collectionSeedToggle.checked;
+        if (projectData && projectData.settings) {
+          projectData.settings.useRandomSeed = collectionSeedToggle.checked;
+          // When toggled off, clear the input field and projectData.settings.randomSeed
+          if (!collectionSeedToggle.checked) {
+            collectionSeedInput.value = '';
+            projectData.settings.randomSeed = '';
+          }
+        }
+      });
+      collectionSeedInput.addEventListener('input', () => {
+        if (projectData && projectData.settings) {
+          if (collectionSeedToggle.checked) {
+            projectData.settings.randomSeed = collectionSeedInput.value;
+          }
+        }
+      });
+    }
+
+    // Ensure setupUI logic runs after DOM update so all control rows exist
+    setTimeout(() => {
+    // Setup event listeners
+    if (window.NFTApp.getModule('generateNfts')) {
+        // Use the stored projectData from the module, or fallback to window.currentProject
+        const pd = (window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData) || window.currentProject || null;
+        window.NFTApp.getModule('generateNfts').setupEventListeners(pd);
+    }
+      // --- Custom logic for seed input tooltip and toggle ---
+      // (all the rest of setupUI logic here)
+      window.NFTApp.getModule('generateNftsUI')._renderControlRows(projectData);
+    }, 0);
+    return;
+  },
+
+  // Add this method to clear errors in the preview panel
+  clearErrorInPreviewPanel: function() {
+    const previewPanel = document.querySelector('.nft-preview-image-area');
+    if (previewPanel) {
+      // Remove any error message
+      const errorElem = previewPanel.querySelector('.nft-preview-error');
+      if (errorElem) errorElem.remove();
+    }
+  },
+
+  // Add this method to show a welcome message in the preview panel
+  showWelcomeMessageInPreviewPanel: function() {
+    const previewPanel = document.querySelector('.nft-preview-image-area');
+    if (previewPanel) {
+      previewPanel.innerHTML = `
+        <div class="nft-preview-welcome" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 200px; padding: 20px; text-align: center; color: var(--text-secondary);">
+          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" style=\"width: 48px; height: 48px; margin-bottom: 16px;\">
+          <circle cx=\"12\" cy=\"12\" r=\"10\"></circle>
+            <line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line>
+            <line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line>
+        </svg>
+          <div style=\"font-size: 18px; font-weight: 600; margin-bottom: 8px;\">Welcome to the NFT Generator!</div>
+          <div style=\"font-size: 14px; line-height: 1.5;\">Start by generating an NFT to see its preview here.</div>
+      </div>
+    `;
+    }
+  },
+
+  // Add this method to show a placeholder in the traits list panel
+  showTraitsListPlaceholder: function(projectData) {
+    const infoList = document.querySelector('.nft-trait-info-list');
+    if (infoList) {
+      infoList.innerHTML = `
+      <div class="nft-trait-info-list-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 200px; padding: 20px; text-align: center; color: var(--text-secondary);">
+        <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" style=\"width: 32px; height: 32px; margin-bottom: 12px;\">
+          <path d=\"M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3\"></path>
+        </svg>
+          <div style=\"font-size: 15px; font-weight: 500; margin-bottom: 8px;\">${!projectData || !projectData.traits || projectData.traits.length === 0 ? 'No traits added yet' : 'Traits will appear here'}</div>
+          <div style=\"font-size: 13px; line-height: 1.4;\">${!projectData || !projectData.traits || projectData.traits.length === 0 ? 'Go to the Traits & Rules tab to add trait layers and traits' : 'Click one of the Generate buttons to create an NFT and see its traits'}</div>
+      </div>
+    `;
+    infoList.style.overflowY = 'auto';
+    infoList.style.maxHeight = '100%';
+      infoList.style.height = 'calc(100% - 50px)';
+    infoList.style.display = 'flex';
+    infoList.style.visibility = 'visible';
+    infoList.style.opacity = '1';
+    infoList.style.scrollbarWidth = 'thin';
+    infoList.style.scrollbarColor = '#333 #1a1a1a';
+      setTimeout(() => this.syncCardHeights && this.syncCardHeights(), 100);
+    }
+  },
+
+  // Move all the control row rendering logic into a new _renderControlRows(projectData) method on the module
+  _renderControlRows: function(projectData) {
+    // 1. Seed label, number, copy button
+    const raritySeedRow = document.querySelector('.nft-rarity-seed-row');
+    if (raritySeedRow) {
+      raritySeedRow.innerHTML = '';
+      const rowFlex = document.createElement('div');
+      rowFlex.style.display = 'flex';
+      rowFlex.style.alignItems = 'center';
+      rowFlex.style.gap = '0px';
+      rowFlex.style.height = '32px';
+      rowFlex.style.background = 'none';
+      rowFlex.style.padding = '0'; // Remove side padding for perfect stacking
+      const seedLabel = document.createElement('span');
+      seedLabel.textContent = 'Seed:';
+      seedLabel.className = 'seed-label';
+      // Removed inline marginRight to prevent conflicts with CSS
+      // No inline fontSize or fontWeight here
+      const seedBox = document.createElement('span');
+      seedBox.className = 'nft-seed-box';
+      // Removed inline styles to prevent conflicts with CSS fixed sizing
+      // Always use the current deterministic seed if available
+      let deterministicSeed = '';
+      if (window.lastGeneratedNFT && projectData) {
+        deterministicSeed = window.NFTApp.getModule('generateNfts').computeDeterministicSeed(projectData, window.lastGeneratedNFT);
+      }
+      seedBox.textContent = deterministicSeed;
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'nft-seed-copy-btn';
+      copyBtn.style.background = 'none';
+      copyBtn.style.border = 'none';
+      copyBtn.style.outline = 'none';
+      copyBtn.style.padding = '0';
+      copyBtn.style.marginLeft = '2px';
+      copyBtn.style.fontSize = '20px';
+      copyBtn.style.fontWeight = 'bold';
+      copyBtn.style.color = '#6c5ce7';
+      copyBtn.style.cursor = 'pointer';
+      copyBtn.textContent = '⧉';
+      copyBtn.onmousedown = e => e.preventDefault(); // Prevent focus outline
+      copyBtn.onclick = function() {
+        const seedBox = document.querySelector('.nft-seed-box');
+        if (seedBox && seedBox.textContent) {
+          navigator.clipboard.writeText(seedBox.textContent);
+          copyBtn.textContent = '✔';
+          copyBtn.style.color = '#27ae60';
+          setTimeout(() => {
+            copyBtn.textContent = '⧉';
+            copyBtn.style.color = '#6c5ce7';
+          }, 2000);
+        }
+      };
+      rowFlex.appendChild(seedLabel);
+      rowFlex.appendChild(seedBox);
+      rowFlex.appendChild(copyBtn);
+      raritySeedRow.appendChild(rowFlex);
+    }
+    // 2. Plus, minus, counter, randomize
+    const seedListRandomRow = document.querySelector('.nft-seedlist-random-row');
+    if (seedListRandomRow) {
+      seedListRandomRow.innerHTML = '';
+      // Outer flex: column for left/right
+      const outerFlex = document.createElement('div');
+      outerFlex.style.display = 'flex';
+      outerFlex.style.flexDirection = 'row';
+      outerFlex.style.width = '100%';
+      outerFlex.style.alignItems = 'center';
+      outerFlex.style.margin = '0';
+      // Left group: plus, minus, counter
+      const leftGroup = document.createElement('div');
+      leftGroup.style.display = 'flex';
+      leftGroup.style.alignItems = 'center';
+      leftGroup.style.gap = '12px';
+      const seedListCounter = document.createElement('span');
+      seedListCounter.id = 'seed-list-counter';
+      seedListCounter.style.fontWeight = 'bold';
+      seedListCounter.style.fontSize = '13px';
+      seedListCounter.style.marginLeft = '4px';
+      seedListCounter.style.color = '#fff';
+      function getTotalSupply(pd) {
+        if (pd && typeof pd.totalSupply !== 'undefined' && pd.totalSupply !== null && pd.totalSupply !== '') {
+          return parseInt(pd.totalSupply, 10);
+        } else if (pd && typeof pd.size !== 'undefined' && pd.size !== null && pd.size !== '') {
+          return parseInt(pd.size, 10);
+        }
+        return 1;
+      }
+      let pdForCounter = projectData || window.currentProject;
+      let totalSupply = getTotalSupply(pdForCounter);
+      if (!totalSupply || isNaN(totalSupply) || totalSupply < 1) totalSupply = 1;
+      const seedListKey = getSeedListKey(pdForCounter);
+      let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+      seedListCounter.textContent = `${seedList.length || 0} / ${totalSupply}`;
+      // Plus
+      const plusBtn = document.createElement('button');
+      plusBtn.id = 'seed-list-plus-btn';
+      plusBtn.title = 'Add last NFT seed to list';
+      plusBtn.style.width = '28px';
+      plusBtn.style.height = '28px';
+      plusBtn.style.borderRadius = '50%';
+      plusBtn.style.background = '#27ae60';
+      plusBtn.style.display = 'flex';
+      plusBtn.style.alignItems = 'center';
+      plusBtn.style.justifyContent = 'center';
+      plusBtn.style.border = 'none';
+      plusBtn.style.fontWeight = 'bold';
+      plusBtn.style.color = '#fff';
+      plusBtn.style.fontSize = '18px';
+      plusBtn.style.cursor = 'pointer';
+      plusBtn.innerHTML = '<span style="font-weight:bold;font-size:18px;">+</span>';
+      plusBtn.addEventListener('click', function() {
+        const pd = window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData ? window.NFTApp.getModule('generateNftsUI').projectData : window.currentProject;
+        const lastNFT = window.lastGeneratedNFT;
+        function getTotalSupply(pd) {
+          if (pd && typeof pd.totalSupply !== 'undefined' && pd.totalSupply !== null && pd.totalSupply !== '') {
+            return parseInt(pd.totalSupply, 10);
+          } else if (pd && typeof pd.size !== 'undefined' && pd.size !== null && pd.size !== '') {
+            return parseInt(pd.size, 10);
+          }
+          return null;
+        }
+        let totalSupply = getTotalSupply(pd);
+        if (!totalSupply || isNaN(totalSupply) || totalSupply < 1) {
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
+            window.NFTApp.getModule('notificationService').show('You must set the Total Supply in the Collection Info tab before adding seeds to the seed list.', 'error', 3500);
+          }
+          return;
+        }
+        if (!lastNFT || !lastNFT.seed) {
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
+            window.NFTApp.getModule('notificationService').show('No NFT generated to add.', 'warning', 2500);
+          }
+          return;
+        }
+        const seedListKey = getSeedListKey(pd);
+        let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+        if (seedList.some(s => s.seed === lastNFT.seed)) {
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
+            window.NFTApp.getModule('notificationService').show('Seed already in the list.', 'warning', 2500);
+          }
+          return;
+        }
+        if (seedList.length >= totalSupply) {
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
+            window.NFTApp.getModule('notificationService').show('Seed list is full.', 'warning', 2500);
+          }
+          return;
+        }
+        seedList.push({ seed: lastNFT.seed });
+        localStorage.setItem(seedListKey, JSON.stringify(seedList));
+        seedListCounter.textContent = `${seedList.length || 0} / ${totalSupply}`;
+        setSeedListCounterColor(seedListCounter, seedList.length || 0, totalSupply);
+        if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
+          window.NFTApp.getModule('notificationService').show('Seed added to the list.', 'success', 2000);
+        }
+        console.log('[DEBUG] plusBtn: seed added, counter updated:', seedList.length, totalSupply);
+      });
+      // Minus
+      const minusBtn = document.createElement('button');
+      minusBtn.id = 'seed-list-minus-btn';
+      minusBtn.title = 'Manage saved seeds';
+      minusBtn.style.width = '28px';
+      minusBtn.style.height = '28px';
+      minusBtn.style.borderRadius = '50%';
+      minusBtn.style.background = '#e74c3c';
+      minusBtn.style.display = 'flex';
+      minusBtn.style.alignItems = 'center';
+      minusBtn.style.justifyContent = 'center';
+      minusBtn.style.border = 'none';
+      minusBtn.style.fontWeight = 'bold';
+      minusBtn.style.color = '#fff';
+      minusBtn.style.fontSize = '18px';
+      minusBtn.style.cursor = 'pointer';
+      minusBtn.innerHTML = '<span style="font-weight:bold;font-size:18px;">&minus;</span>';
+      minusBtn.addEventListener('click', function() {
+        // Use the new SavedSeedsModal class
+        const modal = new window.SavedSeedsModal();
+        modal.show(pd);
+      });
+        if (modal) modal.remove();
+        modal = document.createElement('div');
+        modal.id = 'seed-list-modal';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100vw';
+        modal.style.height = '100vh';
+        modal.style.background = 'rgba(0,0,0,0.7)';
+        modal.style.zIndex = '10010';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.overflow = 'auto'; // Allow scrolling if needed
+        modal.innerHTML = `<div style="background:#222;padding:24px 16px 16px 16px;border-radius:10px;width:1400px !important;min-width:1400px !important;max-width:1400px !important;height:700px !important;min-height:700px !important;max-height:700px !important;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;">
+          <div style='display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;'>
+            <span style='font-size:18px;font-weight:bold;color:#fff;'>Saved Seeds</span>
+            <div style='display:flex;gap:8px;'>
+              <button id='copy-seed-list-btn' style='background:#6c5ce7;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:13px;cursor:pointer;'>Copy All</button>
+              <button id='import-seed-list-btn' style='background:#27ae60;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:13px;cursor:pointer;'>Import</button>
+              <button id='close-seed-list-modal' style='background:none;border:none;color:#fff;font-size:22px;cursor:pointer;'>&times;</button>
+            </div>
+          </div>
+          <div id='seed-list-modal-content' style='min-height:490px;height:490px;max-height:490px;overflow-y:auto;'></div>
+          <div id='seed-list-pagination' style='display:flex;justify-content:center;align-items:center;margin-top:12px;gap:12px;'></div>
+        </div>`;
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+        setTimeout(() => { modal.style.display = 'flex'; }, 50);
+        console.log('[DEBUG] Modal created and appended to body');
+        modal.querySelector('#close-seed-list-modal').onclick = () => modal.remove();
+        function closeOnEscSeedList(e) {
+          if (e.key === 'Escape') {
+            if (document.getElementById('seed-list-modal')) {
+              modal.remove();
+              document.removeEventListener('keydown', closeOnEscSeedList);
+            }
+          }
+        }
+        document.addEventListener('keydown', closeOnEscSeedList);
+
+        const pd = window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData ? window.NFTApp.getModule('generateNftsUI').projectData : window.currentProject;
+        const seedListKey = getSeedListKey(pd);
+        let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+        console.log('[DEBUG] Seed list modal opened:', {
+          projectData: pd,
+          seedListKey: seedListKey,
+          seedListLength: seedList.length,
+          seedList: seedList
+        });
+        
+        // Debug: Check all localStorage keys related to seeds
+        console.log('[DEBUG] All localStorage keys:', Object.keys(localStorage).filter(key => key.includes('nftSeedList')));
+        console.log('[DEBUG] Raw localStorage data for key:', localStorage.getItem(seedListKey));
+        console.log('[DEBUG] Loaded seed list from localStorage:', seedList);
+        const contentDiv = modal.querySelector('#seed-list-modal-content');
+        const copyAllBtn = modal.querySelector('#copy-seed-list-btn');
+        const importBtn = modal.querySelector('#import-seed-list-btn');
+        const paginationDiv = modal.querySelector('#seed-list-pagination');
+        console.log('[DEBUG] Modal elements found:', {
+          contentDiv: !!contentDiv,
+          copyAllBtn: !!copyAllBtn,
+          importBtn: !!importBtn,
+          paginationDiv: !!paginationDiv
+        });
+        
+        // Initialize the modal content
+        if (!contentDiv) {
+          console.log('[ERROR] contentDiv not found!');
+        }
+        let currentPage = 1;
+        const pageSize = 30; // Always 30 per page (10×3 grid)
+
+        // --- Caching for generated NFT images by seed (session only) ---
+        const nftImageCache = {};
+
+        async function getImageForSeed(seed) {
+          console.log('[DEBUG] getImageForSeed called for seed:', seed);
+          if (nftImageCache[seed]) {
+            console.log('[DEBUG] Found cached image for seed:', seed);
+            return nftImageCache[seed];
+          }
+          // Try to get from lastGeneratedNFT if matches
+          if (window.lastGeneratedNFT && window.lastGeneratedNFT.seed === seed && window.lastGeneratedNFT.imageData) {
+            console.log('[DEBUG] Found image in lastGeneratedNFT for seed:', seed);
+            nftImageCache[seed] = window.lastGeneratedNFT.imageData;
+            return window.lastGeneratedNFT.imageData;
+          }
+          // Try to generate NFT for this seed using the projectData
+          if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNfts')) {
+            try {
+              console.log('[DEBUG] Generating NFT for seed:', seed);
+              const nft = await window.NFTApp.getModule('generateNfts').generateSingleNFT(pd, false, seed);
+              if (nft && nft.imageData) {
+                console.log('[DEBUG] Successfully generated NFT image for seed:', seed);
+                nftImageCache[seed] = nft.imageData;
+                return nft.imageData;
+              } else {
+                console.log('[DEBUG] NFT generation failed for seed:', seed, 'nft:', nft);
+              }
+            } catch (e) {
+              console.log('[DEBUG] Error generating NFT for seed:', seed, 'error:', e);
+              // Ignore errors, fallback to null
+            }
+          } else {
+            console.log('[DEBUG] generateNfts module not available');
+          }
+          console.log('[DEBUG] No image found for seed:', seed);
+          return null;
+        }
+
+        // --- Modal for large NFT preview ---
+        function showLargePreview(imageData) {
+          let overlay = document.getElementById('nft-large-preview-overlay');
+          if (overlay) overlay.remove();
+          overlay = document.createElement('div');
+          overlay.id = 'nft-large-preview-overlay';
+          overlay.style.position = 'fixed';
+          overlay.style.top = '0';
+          overlay.style.left = '0';
+          overlay.style.width = '100vw';
+          overlay.style.height = '100vh';
+          overlay.style.background = 'rgba(0,0,0,0.85)';
+          overlay.style.display = 'flex';
+          overlay.style.alignItems = 'center';
+          overlay.style.justifyContent = 'center';
+          overlay.style.zIndex = '10020';
+          overlay.innerHTML = `<div style='background:#222;padding:24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:90vw;max-height:90vh;display:flex;align-items:center;justify-content:center;'><img src='${imageData}' alt='NFT Preview' style='max-width:80vw;max-height:80vh;display:block;border-radius:8px;box-shadow:0 2px 16px rgba(0,0,0,0.4);'></div>`;
+          document.body.appendChild(overlay);
+          function closeOverlay() { overlay.remove(); document.removeEventListener('keydown', escHandler); }
+          overlay.onclick = (e) => { if (e.target === overlay) closeOverlay(); };
+          function escHandler(e) { if (e.key === 'Escape') closeOverlay(); }
+          document.addEventListener('keydown', escHandler);
+        }
+
+        async function renderPage(page) {
+          console.log('[DEBUG] renderPage called with page:', page, 'seedList.length:', seedList.length);
+          console.log('[DEBUG] contentDiv exists:', !!contentDiv);
+          console.log('[DEBUG] paginationDiv exists:', !!paginationDiv);
+          contentDiv.innerHTML = '';
+          if (!seedList.length) {
+            console.log('[DEBUG] No seeds found, showing empty message');
+            contentDiv.innerHTML = `<div style='color:#fff;text-align:center;margin-top:40px;'>No saved seeds.</div>`;
+            paginationDiv.innerHTML = '';
+            return;
+          }
+          const totalPages = Math.ceil(seedList.length / pageSize);
+          // Clamp page
+          if (page < 1) page = 1;
+          if (page > totalPages) page = totalPages;
+          currentPage = page;
+          // Always show exactly 30 seeds per page (if available)
+          let start = (page - 1) * pageSize;
+          let end = Math.min(start + pageSize, seedList.length);
+          const pageSeeds = seedList.slice(start, end);
+          const list = document.createElement('div');
+          list.style.display = 'grid';
+          list.style.gridTemplateColumns = 'repeat(10, 118px)'; // Match batch grid exactly
+          list.style.gap = '6px';
+          list.style.padding = '8px 0';
+          list.style.width = '1250px';
+          list.style.height = '270px';
+          list.style.overflow = 'visible';
+          list.style.justifyContent = 'center';
+          list.style.justifyItems = 'center';
+          
+          for (const seedObj of pageSeeds) {
+            console.log('[DEBUG] Processing seed:', seedObj);
+            
+            // Create NFT card similar to batch generation panel
+            const card = document.createElement('div');
+            card.className = 'batch-nft-card';
+            card.style.position = 'relative';
+            card.style.width = '100%';
+            card.style.height = '150px';
+            card.style.background = '#1a1a1a';
+            card.style.border = '2px solid #333';
+            card.style.borderRadius = '6px';
+            card.style.overflow = 'visible';
+            card.style.position = 'relative';
+            card.style.display = 'flex';
+            card.style.flexDirection = 'column';
+            card.style.alignItems = 'center';
+            card.style.justifyContent = 'flex-start';
+            card.style.cursor = 'pointer';
+            card.style.padding = '8px';
+            card.style.boxSizing = 'border-box';
+            card.style.border = '1px solid #333'; // Normal border
+            // card.style.boxShadow = '0 0 10px blue'; // Remove debug glow
+            
+            // Seed number display - full seed
+            const seedDiv = document.createElement('div');
+            seedDiv.className = 'seed-number';
+            seedDiv.textContent = `Seed: ${seedObj.seed}`;
+            seedDiv.style.fontSize = '7px';
+            seedDiv.style.lineHeight = '1.2';
+            seedDiv.style.marginBottom = '6px';
+            seedDiv.style.width = '100%';
+            seedDiv.style.height = '30px';
+            seedDiv.style.textAlign = 'center';
+            seedDiv.style.wordBreak = 'break-all';
+            seedDiv.style.display = 'flex';
+            seedDiv.style.alignItems = 'center';
+            seedDiv.style.justifyContent = 'center';
+            seedDiv.style.background = 'rgba(0,0,0,0.5)';
+            seedDiv.style.borderRadius = '3px';
+            seedDiv.style.padding = '2px';
+            seedDiv.style.color = '#fff';
+            // Thumbnail container
+            const thumb = document.createElement('div');
+            thumb.className = 'seed-list-thumb';
+            thumb.style.position = 'relative';
+            thumb.style.width = '100px';
+            thumb.style.height = '100px';
+            thumb.style.borderRadius = '4px';
+            thumb.style.overflow = 'visible'; // Changed from 'hidden' to 'visible'
+            thumb.style.background = '#2a2a2e';
+            thumb.style.display = 'flex';
+            thumb.style.flexDirection = 'column';
+            thumb.style.alignItems = 'center';
+            thumb.style.justifyContent = 'center';
+            thumb.style.color = '#888';
+            thumb.style.fontSize = '8px';
+            thumb.style.textAlign = 'center';
+            thumb.style.padding = '0'; // Removed padding that might interfere
+            thumb.style.cursor = 'pointer';
+            thumb.style.marginBottom = '8px';
+            
+            // Show loading state initially
+            thumb.innerHTML = `<div>Loading...</div><div style="font-size:7px;margin-top:2px;">${seedObj.seed.substring(0, 6)}...</div>`;
+            
+            // Generate thumbnail asynchronously
+            (async () => {
+              try {
+                console.log('[DEBUG] Generating thumbnail for seed:', seedObj.seed);
+                const imageData = await getImageForSeed(seedObj.seed);
+                if (imageData) {
+                  console.log('[DEBUG] Successfully got image data for seed:', seedObj.seed);
+                  const img = document.createElement('img');
+                  img.src = imageData;
+                  img.style.width = '100px';
+                  img.style.height = '100px';
+                  img.style.maxWidth = '100px';
+                  img.style.maxHeight = '100px';
+                  img.style.objectFit = 'contain';
+                  img.style.objectPosition = 'center';
+                  img.style.borderRadius = '3px';
+                  img.style.display = 'block';
+                  thumb.innerHTML = '';
+                  thumb.appendChild(img);
+                } else {
+                  console.log('[DEBUG] No image data for seed:', seedObj.seed);
+                  thumb.innerHTML = `<div>No Image</div><div style="font-size:7px;margin-top:2px;">${seedObj.seed.substring(0, 6)}...</div>`;
+                }
+              } catch (error) {
+                console.error('[DEBUG] Error generating thumbnail for seed:', seedObj.seed, error);
+                thumb.innerHTML = `<div>Error</div><div style="font-size:7px;margin-top:2px;">${seedObj.seed.substring(0, 6)}...</div>`;
+              }
+            })();
+            
+            // Add click handler for full-size image popup
+            thumb.addEventListener('click', async () => {
+              try {
+                const imageData = await getImageForSeed(seedObj.seed);
+                if (imageData) {
+                  showLargePreview(imageData);
+                } else {
+                  alert('No image available for this seed');
+                }
+              } catch (error) {
+                console.error('Error showing large preview:', error);
+                alert('Error loading image');
+              }
+            });
+            
+            card.appendChild(thumb);
+            card.appendChild(seedDiv);
+            
+            // Add three buttons: edit, copy, delete
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+            buttonContainer.style.position = 'relative';
+            buttonContainer.style.marginTop = '4px';
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.gap = '2px';
+            buttonContainer.style.width = '100%';
+            buttonContainer.style.justifyContent = 'center';
+            buttonContainer.style.visibility = 'visible';
+            buttonContainer.style.opacity = '1';
+            buttonContainer.style.background = 'rgba(0,255,0,0.5)'; // Debug green background
+            buttonContainer.style.minHeight = '20px';
+            buttonContainer.style.padding = '2px';
+            buttonContainer.style.zIndex = '100';
+            buttonContainer.style.border = '2px solid blue'; // Debug border
+            
+            // Edit button
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.textContent = 'Edit';
+            editBtn.style.background = '#f39c12';
+            editBtn.style.color = 'white';
+            editBtn.style.border = 'none';
+            editBtn.style.borderRadius = '3px';
+            editBtn.style.padding = '2px 4px';
+            editBtn.style.fontSize = '7px';
+            editBtn.style.cursor = 'pointer';
+            editBtn.style.visibility = 'visible';
+            editBtn.style.opacity = '1';
+            editBtn.style.display = 'block';
+            editBtn.style.width = '30px';
+            editBtn.style.height = '16px';
+            editBtn.style.margin = '0';
+            editBtn.style.border = '1px solid white'; // Debug border
+            editBtn.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              // TODO: Implement edit functionality
+              alert('Edit functionality not implemented yet');
+            });
+            
+            // Copy button
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = 'Copy';
+            copyBtn.style.background = '#6c5ce7';
+            copyBtn.style.color = 'white';
+            copyBtn.style.border = 'none';
+            copyBtn.style.borderRadius = '3px';
+            copyBtn.style.padding = '2px 4px';
+            copyBtn.style.fontSize = '7px';
+            copyBtn.style.cursor = 'pointer';
+            copyBtn.style.visibility = 'visible';
+            copyBtn.style.opacity = '1';
+            copyBtn.style.display = 'block';
+            copyBtn.style.width = '30px';
+            copyBtn.style.height = '16px';
+            copyBtn.style.margin = '0';
+            copyBtn.style.border = '1px solid white'; // Debug border
+            copyBtn.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              try {
+                await navigator.clipboard.writeText(seedObj.seed);
+                copyBtn.textContent = 'Copied!';
+                copyBtn.style.background = '#27ae60';
+                setTimeout(() => {
+                  copyBtn.textContent = 'Copy';
+                  copyBtn.style.background = '#6c5ce7';
+                }, 1500);
+              } catch (error) {
+                console.error('Failed to copy seed:', error);
+                alert('Failed to copy seed to clipboard');
+              }
+            });
+            
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.style.background = '#e74c3c';
+            deleteBtn.style.color = 'white';
+            deleteBtn.style.border = 'none';
+            deleteBtn.style.borderRadius = '3px';
+            deleteBtn.style.padding = '2px 4px';
+            deleteBtn.style.fontSize = '7px';
+            deleteBtn.style.cursor = 'pointer';
+            deleteBtn.style.visibility = 'visible';
+            deleteBtn.style.opacity = '1';
+            deleteBtn.style.display = 'block';
+            deleteBtn.style.width = '30px';
+            deleteBtn.style.height = '16px';
+            deleteBtn.style.margin = '0';
+            deleteBtn.style.border = '1px solid white'; // Debug border
+            deleteBtn.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              if (confirm(`Are you sure you want to delete seed ${seedObj.seed}?`)) {
+                try {
+                  // Remove from localStorage
+                  let latestSeedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+                  const seedIndex = latestSeedList.findIndex(s => s.seed === seedObj.seed);
+                  if (seedIndex !== -1) {
+                    latestSeedList.splice(seedIndex, 1);
+                    localStorage.setItem(seedListKey, JSON.stringify(latestSeedList));
+                    
+                    // Update the seedList variable
+                    seedList = latestSeedList;
+                    
+                    // Update seed counter if it exists
+                    const seedListCounter = document.getElementById('seed-list-counter');
+                    if (seedListCounter) {
+                      const totalSupply = getTotalSupply(pd);
+                      seedListCounter.textContent = `${seedList.length} / ${totalSupply}`;
+                    }
+                    
+                    // Re-render the page
+                    safeRenderPage();
+                    
+                    // Show success message
+                    if (window.NFTApp.getModule('notificationService')) {
+                      window.NFTApp.getModule('notificationService').show('Seed deleted successfully', 'success', 2000);
+                    }
+                  }
+                } catch (error) {
+                  console.error('Failed to delete seed:', error);
+                  alert('Failed to delete seed');
+                }
+              }
+            });
+            
+            buttonContainer.appendChild(editBtn);
+            buttonContainer.appendChild(copyBtn);
+            buttonContainer.appendChild(deleteBtn);
+            card.appendChild(buttonContainer);
+            
+            console.log('[DEBUG] Card elements created:', {
+              card: card,
+              thumb: thumb,
+              seedDiv: seedDiv,
+              buttonContainer: buttonContainer,
+              editBtn: editBtn,
+              copyBtn: copyBtn,
+              deleteBtn: deleteBtn
+            });
+            
+            list.appendChild(card);
+          }
+          console.log('[DEBUG] Appending list to contentDiv, list children count:', list.children.length);
+          contentDiv.appendChild(list);
+          console.log('[DEBUG] List appended, contentDiv children count:', contentDiv.children.length);
+          // Pagination
+          paginationDiv.innerHTML = '';
+          if (totalPages > 1) {
+            // --- Show only 7 page buttons at a time ---
+            let pageWindowStart = Math.max(1, currentPage - 3);
+            let pageWindowEnd = Math.min(totalPages, pageWindowStart + 6);
+            if (pageWindowEnd - pageWindowStart < 6) {
+              pageWindowStart = Math.max(1, pageWindowEnd - 6);
+            }
+            // << button
+            const firstBtn = document.createElement('button');
+            firstBtn.textContent = '<<';
+            firstBtn.style.background = '#333';
+            firstBtn.style.color = '#fff';
+            firstBtn.style.border = 'none';
+            firstBtn.style.borderRadius = '4px';
+            firstBtn.style.margin = '0 2px';
+            firstBtn.style.padding = '4px 10px';
+            firstBtn.style.cursor = 'pointer';
+            firstBtn.disabled = (currentPage === 1);
+            firstBtn.onclick = () => {
+              if (currentPage !== 1) {
+                currentPage = 1;
+                renderPage(1);
+              }
+            };
+            paginationDiv.appendChild(firstBtn);
+            // < button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '<';
+            prevBtn.style.background = '#333';
+            prevBtn.style.color = '#fff';
+            prevBtn.style.border = 'none';
+            prevBtn.style.borderRadius = '4px';
+            prevBtn.style.margin = '0 2px';
+            prevBtn.style.padding = '4px 10px';
+            prevBtn.style.cursor = 'pointer';
+            prevBtn.disabled = (currentPage === 1);
+            prevBtn.onclick = () => {
+              if (currentPage > 1) {
+                currentPage = currentPage - 1;
+                renderPage(currentPage);
+              }
+            };
+            paginationDiv.appendChild(prevBtn);
+            // Page number buttons (max 7)
+            for (let i = pageWindowStart; i <= pageWindowEnd; i++) {
+              const pageBtn = document.createElement('button');
+              pageBtn.textContent = i;
+              pageBtn.style.background = i === currentPage ? '#6c5ce7' : '#333';
+              pageBtn.style.color = '#fff';
+              pageBtn.style.border = 'none';
+              pageBtn.style.borderRadius = '4px';
+              pageBtn.style.margin = '0 2px';
+              pageBtn.style.padding = '4px 10px';
+              pageBtn.style.cursor = 'pointer';
+              if (i === currentPage) pageBtn.disabled = true;
+              pageBtn.onclick = () => {
+                currentPage = i;
+                renderPage(i);
+              };
+              paginationDiv.appendChild(pageBtn);
+            }
+            // > button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '>';
+            nextBtn.style.background = '#333';
+            nextBtn.style.color = '#fff';
+            nextBtn.style.border = 'none';
+            nextBtn.style.borderRadius = '4px';
+            nextBtn.style.margin = '0 2px';
+            nextBtn.style.padding = '4px 10px';
+            nextBtn.style.cursor = 'pointer';
+            nextBtn.disabled = (currentPage === totalPages);
+            nextBtn.onclick = () => {
+              if (currentPage < totalPages) {
+                currentPage = currentPage + 1;
+                renderPage(currentPage);
+              }
+            };
+            paginationDiv.appendChild(nextBtn);
+            // >> button
+            const lastBtn = document.createElement('button');
+            lastBtn.textContent = '>>';
+            lastBtn.style.background = '#333';
+            lastBtn.style.color = '#fff';
+            lastBtn.style.border = 'none';
+            lastBtn.style.borderRadius = '4px';
+            lastBtn.style.margin = '0 2px';
+            lastBtn.style.padding = '4px 10px';
+            lastBtn.style.cursor = 'pointer';
+            lastBtn.disabled = (currentPage === totalPages);
+            lastBtn.onclick = () => {
+              if (currentPage !== totalPages) {
+                currentPage = totalPages;
+                renderPage(totalPages);
+              }
+            };
+            paginationDiv.appendChild(lastBtn);
+          }
+        }
+        // --- Show last page by default when modal opens ---
+        const totalPagesInit = Math.ceil(seedList.length / pageSize);
+        console.log('[DEBUG] About to call renderPage, totalPagesInit:', totalPagesInit, 'seedList.length:', seedList.length);
+        
+        // Force renderPage to be called
+        setTimeout(() => {
+          console.log('[DEBUG] Calling renderPage after timeout');
+          renderPage(1);
+        }, 100);
+        
+        if (totalPagesInit > 0) {
+          currentPage = totalPagesInit;
+          renderPage(currentPage);
+        } else {
+          renderPage(1);
+        }
+        
+        // Test element removed - debugging is now in place
+        // Remove any duplicate call to renderPage(currentPage) after this block.
+        // After deleting or importing seeds, clamp currentPage to totalPages before calling renderPage
+        function safeRenderPage() {
+          const totalPages = Math.ceil(seedList.length / pageSize);
+          if (currentPage > totalPages) currentPage = totalPages;
+          if (currentPage < 1) currentPage = 1;
+          renderPage(currentPage);
+        }
+        if (copyAllBtn) {
+          copyAllBtn.onclick = function() {
+            let latestSeedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+            const seeds = latestSeedList.map(s => s.seed).join('\n');
+            navigator.clipboard.writeText(seeds).then(() => {
+              copyAllBtn.textContent = 'Copied!';
+              setTimeout(() => { copyAllBtn.textContent = 'Copy All'; }, 1500);
+            });
+          };
+        }
+        if (importBtn) {
+          importBtn.onclick = function() {
+            const input = prompt('Paste or enter seed numbers (one per line):');
+            if (!input) return;
+            const newSeeds = input.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            let latestSeedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+            let added = 0;
+            let skippedDuplicates = 0;
+            let skippedSupply = 0;
+            let totalSupply = getTotalSupply(pd);
+            if (!totalSupply || isNaN(totalSupply) || totalSupply < 1) totalSupply = 1;
+            for (const seed of newSeeds) {
+              if (latestSeedList.some(s => s.seed === seed)) {
+                skippedDuplicates++;
+                continue;
+              }
+              if (latestSeedList.length + added >= totalSupply) {
+                skippedSupply++;
+                continue;
+              }
+              latestSeedList.push({ seed });
+              added++;
+            }
+            if (added > 0) {
+              localStorage.setItem(seedListKey, JSON.stringify(latestSeedList));
+              seedList = latestSeedList;
+              safeRenderPage();
+              // Update the counter immediately
+              seedListCounter.textContent = `${seedList.length || 0} / ${totalSupply}`;
+              setSeedListCounterColor(seedListCounter, seedList.length || 0, totalSupply);
+              let msg = `Imported ${added} new seed${added === 1 ? '' : 's'}.`;
+              if (skippedDuplicates > 0) msg += ` Skipped ${skippedDuplicates} duplicate${skippedDuplicates === 1 ? '' : 's'}.`;
+              if (skippedSupply > 0) msg += ` Skipped ${skippedSupply} due to supply limit.`;
+              if (window.NFTApp.getModule('notificationService')) {
+                window.NFTApp.getModule('notificationService').show(
+                  msg,
+                  'success',
+                  3000
+                );
+              }
+            } else {
+              let msg = 'No new seeds were added.';
+              if (skippedDuplicates > 0) msg += ` Skipped ${skippedDuplicates} duplicate${skippedDuplicates === 1 ? '' : 's'}.`;
+              if (skippedSupply > 0) msg += ` Skipped ${skippedSupply} due to supply limit.`;
+              if (window.NFTApp.getModule('notificationService')) {
+                window.NFTApp.getModule('notificationService').show(
+                  msg,
+                  'info',
+                  3000
+                );
+              }
+            }
+          };
+        }
+        renderPage(currentPage);
+      });
+      leftGroup.appendChild(plusBtn);
+      leftGroup.appendChild(minusBtn);
+      leftGroup.appendChild(seedListCounter);
+      outerFlex.appendChild(leftGroup);
+      // Right group: randomize button
+      const rightGroup = document.createElement('div');
+      rightGroup.style.display = 'flex';
+      rightGroup.style.flex = '1';
+      rightGroup.style.justifyContent = 'flex-end';
+      rightGroup.style.marginRight = '14px'; // Move Randomize button 14px left
+      const randomizeBtn = document.createElement('button');
+      randomizeBtn.id = 'randomize-nft-btn';
+      randomizeBtn.className = 'btn btn-primary';
+      randomizeBtn.style.minWidth = '115px';
+      randomizeBtn.style.width = '115px';
+      randomizeBtn.style.height = '32px';
+      randomizeBtn.style.fontSize = '14px';
+      randomizeBtn.style.marginRight = '0';
+      randomizeBtn.style.display = 'flex';
+      randomizeBtn.style.alignItems = 'center';
+      randomizeBtn.style.justifyContent = 'center';
+      randomizeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 6px;"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>Randomize';
+      randomizeBtn.addEventListener('click', function() {
+        const projectData = window.NFTApp.getModule('generateNftsUI').projectData;
+        if (!projectData) {
+          alert('Project data not loaded.');
+          return;
+        }
+        window.NFTApp.getModule('generateNftsUI').randomizeSingleNFT(projectData, false);
+      });
+      rightGroup.appendChild(randomizeBtn);
+      outerFlex.appendChild(rightGroup);
+      seedListRandomRow.appendChild(outerFlex);
+    }
+    // 3. Seed toggle, label, input, Generate Seed
+    const seedInputRow = document.querySelector('.nft-seedinput-row');
+    if (seedInputRow) {
+      seedInputRow.innerHTML = '';
+      // Create a column container
+      const columnContainer = document.createElement('div');
+      columnContainer.style.display = 'flex';
+      columnContainer.style.flexDirection = 'column';
+      columnContainer.style.gap = '8px';
+      columnContainer.style.width = '100%';
+
+      // First row: toggle only
+      const toggleRow = document.createElement('div');
+      toggleRow.style.display = 'flex';
+      toggleRow.style.alignItems = 'center';
+      toggleRow.style.width = '100%';
+      toggleRow.style.margin = '0';
+      const toggleLabel = document.createElement('label');
+      toggleLabel.className = 'toggle-label';
+      toggleLabel.style.display = 'flex';
+      toggleLabel.style.alignItems = 'center';
+      toggleLabel.style.gap = '6px';
+      const singleSeedToggle = document.createElement('input');
+      singleSeedToggle.type = 'checkbox';
+      singleSeedToggle.id = 'single-seed-toggle';
+      singleSeedToggle.style.margin = '0 4px 0 0';
+      const slider = document.createElement('span');
+      slider.className = 'toggle-slider';
+      slider.style.marginRight = '4px';
+      toggleLabel.appendChild(singleSeedToggle);
+      toggleLabel.appendChild(slider);
+      const labelText = document.createElement('span');
+      labelText.className = 'toggle-text';
+      labelText.textContent = 'Seed NFT';
+      toggleLabel.appendChild(labelText);
+      toggleRow.appendChild(toggleLabel);
+      columnContainer.appendChild(toggleRow);
+
+      // Second row: input and button
+      const inputRow = document.createElement('div');
+      inputRow.style.display = 'flex';
+      inputRow.style.alignItems = 'center';
+      inputRow.style.width = '100%';
+      inputRow.style.gap = '0'; // Remove gap to control alignment
+
+      // Input container (flex: 1)
+      const inputContainer = document.createElement('div');
+      inputContainer.style.flex = '1';
+      inputContainer.style.display = 'flex';
+      inputContainer.style.alignItems = 'center';
+      inputContainer.style.marginRight = '0';
+
+      const seedInput = document.createElement('input');
+      seedInput.type = 'text';
+      seedInput.id = 'single-seed-input';
+      seedInput.placeholder = 'Paste Seed';
+      seedInput.style.flex = '1';
+      seedInput.style.height = '28px';
+      seedInput.style.fontSize = '13px';
+      seedInput.style.margin = '0'; // Remove margin to avoid offset
+      seedInput.style.borderRadius = '4px';
+      seedInput.style.border = '1px solid #444';
+      seedInput.style.background = '#181818';
+      seedInput.style.color = '#fff';
+      seedInput.value = '';
+      seedInput.disabled = true;
+      inputContainer.appendChild(seedInput);
+      inputRow.appendChild(inputContainer);
+
+      // Button container (right-aligned)
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.alignItems = 'center';
+      buttonContainer.style.justifyContent = 'flex-end';
+      buttonContainer.style.width = 'auto';
+      buttonContainer.style.minWidth = '115px';
+      buttonContainer.style.marginRight = '14px'; // Move Generate Seed button 14px left
+
+      const generateSeedBtn = document.createElement('button');
+      generateSeedBtn.id = 'generate-seed-nft-btn';
+      generateSeedBtn.className = 'btn btn-primary';
+      generateSeedBtn.textContent = 'Generate Seed';
+      generateSeedBtn.style.minWidth = '115px';
+      generateSeedBtn.style.width = '115px';
+      generateSeedBtn.style.height = '28px';
+      generateSeedBtn.style.fontSize = '13px';
+      generateSeedBtn.disabled = true;
+      buttonContainer.appendChild(generateSeedBtn);
+      inputRow.appendChild(buttonContainer);
+      columnContainer.appendChild(inputRow);
+
+      seedInputRow.appendChild(columnContainer);
+      singleSeedToggle.addEventListener('change', function() {
+        seedInput.disabled = !this.checked;
+        generateSeedBtn.disabled = !this.checked;
+      });
+      seedInput.disabled = !singleSeedToggle.checked;
+      generateSeedBtn.disabled = !singleSeedToggle.checked;
+      generateSeedBtn.addEventListener('click', () => {
+        const pd = (window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData) || window.currentProject || null;
+        if (pd) {
+          window.NFTApp.getModule('generateNftsUI').generateSeedNFT(pd);
+        }
+      });
+    }
+    // Ensure seed counter always displays correct value by default
+    const seedListCounter = document.getElementById('seed-list-counter');
+    if (seedListCounter) {
+      function getTotalSupply(pd) {
+        if (pd && typeof pd.totalSupply !== 'undefined' && pd.totalSupply !== null && pd.totalSupply !== '') {
+          return parseInt(pd.totalSupply, 10);
+        } else if (pd && typeof pd.size !== 'undefined' && pd.size !== null && pd.size !== '') {
+          return parseInt(pd.size, 10);
+        }
+        return 1;
+      }
+      let pd = window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData ? window.NFTApp.getModule('generateNftsUI').projectData : window.currentProject;
+      let totalSupply = getTotalSupply(pd);
+      if (!totalSupply || isNaN(totalSupply) || totalSupply < 1) totalSupply = 1;
+      const seedListKey = getSeedListKey(pd);
+      let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+      seedListCounter.textContent = `${seedList.length || 0} / ${totalSupply}`;
+      setSeedListCounterColor(seedListCounter, seedList.length || 0, totalSupply);
+    }
+  },
+
+  // Overlay Save NFT button in preview area
+  showSaveNftOverlay: function(callback) {
+    this.removeSaveNftOverlay();
+    const previewPanel = document.querySelector('.nft-preview-image-area');
+    if (!previewPanel) return;
+    // Create overlay container
+    const overlay = document.createElement('div');
+    overlay.className = 'save-nft-preview-overlay';
+    overlay.style.position = 'absolute';
+    overlay.style.right = '18px';
+    overlay.style.bottom = '18px';
+    overlay.style.zIndex = '30';
+    overlay.style.display = 'flex';
+    overlay.style.flexDirection = 'column';
+    overlay.style.alignItems = 'flex-end';
+    overlay.style.pointerEvents = 'none';
+    // Create Update NFT Seed button
+    const btn = document.createElement('button');
+    btn.textContent = 'Update NFT Seed';
+    btn.className = 'btn btn-primary';
+    // Force green background to override .btn-primary
+    btn.style.background = '#00971c'; // Always green, overrides .btn-primary
+    btn.style.width = '140px';
+    btn.style.height = '36px';
+    btn.style.fontSize = '15px';
+    btn.style.borderRadius = '8px';
+    btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)';
+    btn.style.margin = '0';
+    btn.style.pointerEvents = 'auto';
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      if (typeof callback === 'function') callback();
+      this.removeSaveNftOverlay();
+    };
+    overlay.appendChild(btn);
+    // Ensure previewPanel is relative for absolute overlay
+    previewPanel.style.position = 'relative';
+    previewPanel.appendChild(overlay);
+  },
+  removeSaveNftOverlay: function() {
+    const previewPanel = document.querySelector('.nft-preview-image-area');
+    if (!previewPanel) return;
+    const overlay = previewPanel.querySelector('.save-nft-preview-overlay');
+    if (overlay) overlay.remove();
+  },
+}); 
+
+// Helper to get project-specific seed list key
+function getSeedListKey(project) {
+  return 'nftSeedList_' + (project && project.name ? encodeURIComponent(project.name) : 'default');
+}
+
+// The rest of the setup (event listeners, etc.) can be added as needed
+if (window.NFTApp.getModule('generateNfts')) {
+  // Use the stored projectData from the module, or fallback to window.currentProject
+  const pd = (window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData) || window.currentProject || null;
+  window.NFTApp.getModule('generateNfts').setupEventListeners(pd);
+}
+
+// Instead, add this global function to render the controls after the project interface is created
+window.renderInitialGenerateNftsControls = function() {
+  if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI')) {
+    window.NFTApp.getModule('generateNftsUI').setupUI({});
+  }
+};
+
+// Define style for 'none' trait name
+const noneStyle = 'color: #888; font-size: 10px; text-align: center; width: 100%;';
+
+// --- [ADDED UTILITY FUNCTIONS FOR BUTTON GUARDING] ---
+function disableNftGenButtons() {
+  const genBtn = document.getElementById('generate-seed-nft-btn');
+  const randBtn = document.getElementById('randomize-nft-btn');
+  if (genBtn) genBtn.disabled = true;
+  if (randBtn) randBtn.disabled = true;
+}
+function enableNftGenButtons() {
+  const genBtn = document.getElementById('generate-seed-nft-btn');
+  const randBtn = document.getElementById('randomize-nft-btn');
+  if (genBtn) genBtn.disabled = false;
+  if (randBtn) randBtn.disabled = false;
+}
+// --- [END BUTTON GUARDING UTILS] ---
+
+// --- [HELPER: IS NONE FORCED BY RULES] ---
+function isNoneForcedByRules(layer, nft, projectData) {
+  if (!layer || !layer.traits || !projectData || !projectData.rules || !projectData.rules.length) {
+    console.log('[DEBUG][isNoneForcedByRules] Early exit: missing layer/traits/projectData/rules', {layer, nft, projectData});
+    return false;
+  }
+  const generateNfts = window.NFTApp.getModule('generateNfts');
+  if (!generateNfts || typeof generateNfts.checkForRuleViolations !== 'function') {
+    console.log('[DEBUG][isNoneForcedByRules] Early exit: generateNfts/checkForRuleViolations missing');
+    return false;
+  }
+  // Log the rules being checked for this layer
+  const relevantRules = (projectData.rules || []).filter(rule => {
+    if (rule.type === 'never-combine' && rule.appliesTo === 'between-traits') {
+      return (rule.firstLayerId === layer.id || rule.secondLayerId === layer.id);
+    }
+    return false;
+  });
+  console.log(`[DEBUG][isNoneForcedByRules] Checking layer '${layer.name}' (id: ${layer.id}) with relevant rules:`, relevantRules);
+  let allForbidden = true;
+  for (const trait of layer.traits) {
+    // Simulate NFT with this trait selected for this layer
+    const simulatedTraits = nft.traits.map(t => ({...t}));
+    const idx = simulatedTraits.findIndex(t => (t.layer && t.layer.id === layer.id) || (t.layer && t.layer.name === layer.name) || t.layer === layer.name);
+    if (idx !== -1) {
+      simulatedTraits[idx] = { ...simulatedTraits[idx], trait };
+    } else {
+      simulatedTraits.push({ layer, trait });
+    }
+    const simulatedNFT = { ...nft, traits: simulatedTraits };
+    const violations = generateNfts.checkForRuleViolations(simulatedNFT, projectData.rules);
+    // Log the violations for this trait
+    console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}': violations:`, violations);
+    // If any trait is allowed, not forced-none
+    if (!violations || violations.length === 0) {
+      console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is allowed (no violations)`, {trait, layer, violations});
+      allForbidden = false;
+      break;
+    }
+    // Only count as forced-none if every trait is forbidden by a never-combine rule that mentions this trait
+    const hasNeverCombine = violations.some(v => v.includes('should never be combined') && v.includes(trait.name));
+    if (!hasNeverCombine) {
+      console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is not forbidden by never-combine (no direct mention)`, {trait, layer, violations});
+      allForbidden = false;
+      break;
+    } else {
+      console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is forbidden by never-combine (direct mention)`, {trait, layer, violations});
+    }
+  }
+  if (allForbidden) {
+    console.log(`[DEBUG][isNoneForcedByRules] Layer '${layer.name}' is forced to none by rules (all traits forbidden by never-combine)`);
+  } else {
+    console.log(`[DEBUG][isNoneForcedByRules] Layer '${layer.name}' is NOT forced to none (at least one trait allowed)`);
+  }
+  return allForbidden;
+}
+// --- [END HELPER] ---
+
+// --- [HELPER: IS TRAIT FORBIDDEN BY RULES] ---
+function getTraitRuleViolation(layer, trait, nft, projectData) {
+  if (!layer || !trait || !projectData || !projectData.rules || !projectData.rules.length) return null;
+  // Exclude 'none' traits from forbidden overlay logic
+  if (trait.id === 'none' || trait.name === 'none' || trait === 'none') return null;
+  const generateNfts = window.NFTApp.getModule('generateNfts');
+  if (!generateNfts || typeof generateNfts.checkForRuleViolations !== 'function') return null;
+  // Only check for forbidden if this trait is explicitly listed in a never-combine rule
+  let isTraitInNeverCombine = false;
+  for (const rule of projectData.rules) {
+    if (rule.type === 'never-combine' && rule.appliesTo === 'between-traits' && rule.firstTraits && rule.secondTraits) {
+      for (const ft of rule.firstTraits) {
+        if (trait.id === ft.id && layer.id === ft.layerId) {
+          isTraitInNeverCombine = true;
+        }
+      }
+      for (const st of rule.secondTraits) {
+        if (trait.id === st.id && layer.id === st.layerId) {
+          isTraitInNeverCombine = true;
+        }
+      }
+    }
+  }
+  if (!isTraitInNeverCombine) return null;
+  // Simulate NFT with this trait selected for this layer
+  const simulatedTraits = nft.traits.map(t => ({...t}));
+  const idx = simulatedTraits.findIndex(t => (t.layer && t.layer.id === layer.id) || (t.layer && t.layer.name === layer.name) || t.layer === layer.name);
+  if (idx !== -1) {
+    simulatedTraits[idx] = { ...simulatedTraits[idx], trait };
+  } else {
+    simulatedTraits.push({ layer, trait });
+  }
+  const simulatedNFT = { ...nft, traits: simulatedTraits };
+  // Now check if the forbidden pair is present
+  for (const rule of projectData.rules) {
+    if (rule.type === 'never-combine' && rule.appliesTo === 'between-traits' && rule.firstTraits && rule.secondTraits) {
+      // Check if this trait is a firstTrait and the NFT has a forbidden secondTrait
+      for (const ft of rule.firstTraits) {
+        if (trait.id === ft.id && layer.id === ft.layerId) {
+          for (const st of rule.secondTraits) {
+            const found = simulatedNFT.traits.find(t => t.layer && t.layer.id === rule.secondLayerId && t.trait && t.trait.id === st.id);
+            if (found) {
+              return `Forbidden: This trait ("${trait.name}") cannot be combined with "${found.trait.name}"`;
+            }
+          }
+        }
+      }
+      // Check if this trait is a secondTrait and the NFT has a forbidden firstTrait
+      for (const st of rule.secondTraits) {
+        if (trait.id === st.id && layer.id === st.layerId) {
+          for (const ft of rule.firstTraits) {
+            const found = simulatedNFT.traits.find(t => t.layer && t.layer.id === rule.firstLayerId && t.trait && t.trait.id === ft.id);
+            if (found) {
+              return `Forbidden: This trait ("${trait.name}") cannot be combined with "${found.trait.name}"`;
+            }
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+// ... existing code ...
+
+window.NFTApp.getModule('generateNftsUI').applyForbiddenOverlaysToModal = function(modal, nft, projectData) {
+  console.log('[DEBUG] applyForbiddenOverlaysToModal called', {modal, nft, projectData});
+  if (!modal) return;
+  const allThumbs = modal.querySelectorAll('.trait-selection-thumb');
+  const layerMap = {};
+  if (projectData && projectData.traits) {
+    projectData.traits.forEach(layer => {
+      layerMap[layer.id] = layer;
+      layerMap[layer.name] = layer;
+    });
+  }
+  allThumbs.forEach(thumb => {
+    const traitId = thumb.getAttribute('data-trait-id');
+    const layerId = thumb.getAttribute('data-layer-id');
+    const layer = layerMap[layerId] || layerMap[thumb.getAttribute('data-layer-name')] || null;
+    let trait = null;
+    if (layer && layer.traits) {
+      trait = layer.traits.find(t => t.id === traitId || t.name === traitId);
+    }
+    // Special case for 'none'
+    if (traitId === 'none') {
+      return;
+    }
+    let forbidden = false;
+    let forbiddenMsg = '';
+    if (layer && trait) {
+      // Simulate NFT with this trait selected for this layer
+      const simulatedTraits = nft && nft.traits ? nft.traits.map(t => ({...t})) : [];
+      const idx = simulatedTraits.findIndex(t => (t.layer && (t.layer.id === layer.id || t.layer.name === layer.name)) || t.layer === layer.id || t.layer === layer.name);
+      if (idx !== -1) {
+        simulatedTraits[idx] = { ...simulatedTraits[idx], trait };
+      } else {
+        simulatedTraits.push({ layer, trait });
+      }
+      const simulatedNFT = { ...nft, traits: simulatedTraits };
+      // --- Check all never-combine rules robustly ---
+      if (Array.isArray(projectData.rules)) {
+        for (const rule of projectData.rules) {
+          if (rule.type === 'never-combine') {
+            // between-traits
+            if (rule.appliesTo === 'between-traits' && rule.firstTraits && rule.secondTraits) {
+              // Check if this trait is in firstTraits or secondTraits (by id or name)
+              const isFirst = rule.firstTraits.some(ft => (ft.id === trait.id && ft.layerId === layer.id) || (ft.name === trait.name && ft.layerId === layer.id));
+              const isSecond = rule.secondTraits.some(st => (st.id === trait.id && st.layerId === layer.id) || (st.name === trait.name && st.layerId === layer.id));
+              if (isFirst) {
+                for (const st of rule.secondTraits) {
+                  const found = simulatedNFT.traits.find(t => (t.layer && (t.layer.id === st.layerId || t.layer.name === st.layerName)) && t.trait && (t.trait.id === st.id || t.trait.name === st.name));
+                  if (found) {
+                    forbidden = true;
+                    forbiddenMsg = `Forbidden: This trait ("${trait.name}") cannot be combined with "${found.trait.name}"`;
+                    break;
+                  }
+                }
+              }
+              if (!forbidden && isSecond) {
+                for (const ft of rule.firstTraits) {
+                  const found = simulatedNFT.traits.find(t => (t.layer && (t.layer.id === ft.layerId || t.layer.name === ft.layerName)) && t.trait && (t.trait.id === ft.id || t.trait.name === ft.name));
+                  if (found) {
+                    forbidden = true;
+                    forbiddenMsg = `Forbidden: This trait ("${trait.name}") cannot be combined with "${found.trait.name}"`;
+                    break;
+                  }
+                }
+              }
+              if (forbidden) break;
+            }
+            // between-layers
+            if (rule.appliesTo === 'between-layers' && rule.firstLayerId && rule.secondLayerId) {
+              const firstTrait = simulatedNFT.traits.find(t => (t.layer && (t.layer.id === rule.firstLayerId || t.layer.name === rule.firstLayerName)) && t.trait && t.trait.name !== 'none');
+              const secondTrait = simulatedNFT.traits.find(t => (t.layer && (t.layer.id === rule.secondLayerId || t.layer.name === rule.secondLayerName)) && t.trait && t.trait.name !== 'none');
+              if (firstTrait && secondTrait && (layer.id === rule.firstLayerId || layer.id === rule.secondLayerId || layer.name === rule.firstLayerName || layer.name === rule.secondLayerName)) {
+                forbidden = true;
+                forbiddenMsg = `Forbidden: Layer "${rule.firstLayerName || rule.firstLayerId}" and Layer "${rule.secondLayerName || rule.secondLayerId}" should never be combined.`;
+                break;
+              }
+            }
+            // layer-to-traits or traits-to-layer
+            if ((rule.appliesTo === 'layer-to-traits' || rule.appliesTo === 'traits-to-layer') && rule.layerId && rule.traits) {
+              // If this trait is in the forbidden list for this layer
+              if (layer.id === rule.layerId || layer.name === rule.layerName) {
+                for (const t of rule.traits) {
+                  if (trait.id === t.id || trait.name === t.name) {
+                    forbidden = true;
+                    forbiddenMsg = `Forbidden: Trait "${trait.name}" cannot be used in Layer "${layer.name}" due to rules.`;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      // Debug log for each trait
+      console.log(`[DEBUG][applyForbiddenOverlaysToModal] Trait: ${trait.name} (Layer: ${layer.name}) Forbidden: ${forbidden} Msg: ${forbiddenMsg}`);
+      // Only add overlays if forbidden, never remove overlays
+      const imgDiv = thumb.querySelector('.trait-selection-img') || thumb;
+      if (forbidden) {
+        // Add grey overlay if not present
+        if (!imgDiv.querySelector('.trait-forbidden-grey')) {
+          const greyDiv = document.createElement('div');
+          greyDiv.className = 'trait-forbidden-grey';
+          greyDiv.style.position = 'absolute';
+          greyDiv.style.top = '0';
+          greyDiv.style.left = '0';
+          greyDiv.style.width = '100%';
+          greyDiv.style.height = '100%';
+          greyDiv.style.background = 'rgba(40,40,40,0.45)';
+          greyDiv.style.zIndex = '1';
+          greyDiv.style.pointerEvents = 'none';
+          imgDiv.appendChild(greyDiv);
+        }
+        // Add forbidden sign if not present
+        if (!imgDiv.querySelector('.trait-forbidden-overlay')) {
+          const forbiddenDiv = document.createElement('div');
+          forbiddenDiv.className = 'trait-forbidden-overlay';
+          forbiddenDiv.style.position = 'absolute';
+          forbiddenDiv.style.top = '50%';
+          forbiddenDiv.style.left = '50%';
+          forbiddenDiv.style.transform = 'translate(-50%, -50%)';
+          forbiddenDiv.style.width = '40px';
+          forbiddenDiv.style.height = '40px';
+          forbiddenDiv.style.opacity = '1';
+          forbiddenDiv.style.background = 'none';
+          forbiddenDiv.style.borderRadius = '0';
+          forbiddenDiv.style.display = 'flex';
+          forbiddenDiv.style.alignItems = 'center';
+          forbiddenDiv.style.justifyContent = 'center';
+          forbiddenDiv.style.pointerEvents = 'none';
+          forbiddenDiv.style.zIndex = '2';
+          forbiddenDiv.innerHTML = `<svg width="40" height="40" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="26" stroke="#ff2222" stroke-width="8" fill="none"/><line x1="15" y1="45" x2="45" y2="15" stroke="#ff2222" stroke-width="8" stroke-linecap="round"/></svg>`;
+          imgDiv.appendChild(forbiddenDiv);
+        }
+        thumb.title = forbiddenMsg || 'This trait is forbidden by current rules.';
+      } else {
+        thumb.title = '';
+      }
+    }
+  });
+};
+
+// Helper to filter rules for a specific layer
+function getRulesForLayer(projectData, layer) {
+  if (!projectData || !projectData.rules || !layer) return [];
+  return projectData.rules.filter(rule => {
+    // between-layers
+    if (rule.firstLayerId && rule.secondLayerId) {
+      return rule.firstLayerId === layer.id || rule.secondLayerId === layer.id;
+    }
+    // between-traits
+    if (rule.firstTraits && rule.secondTraits) {
+      return (rule.firstTraits.some(t => t.layerId === layer.id) || rule.secondTraits.some(t => t.layerId === layer.id));
+    }
+    // layer-to-traits or traits-to-layer
+    if (rule.layerId) {
+      if (rule.layerId === layer.id) return true;
+      if (rule.traits && rule.traits.some(t => t.layerId === layer.id)) return true;
+    }
+    return false;
+  });
+}
+
+// --- [HELPER: GET NONE FORCED BY RULES DETAILS] ---
+function getNoneForcedByRulesDetails(layer, nft, projectData) {
+  if (!layer || !layer.traits || !projectData || !projectData.rules || !projectData.rules.length) return 'This layer cannot have a trait due to active rules.';
+  const generateNfts = window.NFTApp.getModule('generateNfts');
+  if (!generateNfts || typeof generateNfts.checkForRuleViolations !== 'function') return 'This layer cannot have a trait due to active rules.';
+  // Collect all violations for each trait
+  let traitViolations = [];
+  for (const trait of layer.traits) {
+    const simulatedTraits = nft.traits.map(t => ({...t}));
+    const idx = simulatedTraits.findIndex(t => (t.layer && t.layer.id === layer.id) || (t.layer && t.layer.name === layer.name) || t.layer === layer.name);
+    if (idx !== -1) {
+      simulatedTraits[idx] = { ...simulatedTraits[idx], trait };
+    } else {
+      simulatedTraits.push({ layer, trait });
+    }
+    const simulatedNFT = { ...nft, traits: simulatedTraits };
+    const violations = generateNfts.checkForRuleViolations(simulatedNFT, projectData.rules) || [];
+    traitViolations.push(new Set(violations));
+  }
+  // Find violations that are present for every trait
+  let commonViolations = [];
+  if (traitViolations.length > 0) {
+    commonViolations = Array.from(traitViolations[0]);
+    for (let i = 1; i < traitViolations.length; i++) {
+      commonViolations = commonViolations.filter(v => traitViolations[i].has(v));
+    }
+  }
+  // Log for debugging
+  console.log('[DEBUG][getNoneForcedByRulesDetails] commonViolations:', commonViolations);
+  // Only keep unique, user-friendly layer-to-layer or trait-to-layer rules
+  let filtered = [];
+  let seen = new Set();
+  for (let v of commonViolations) {
+    // Only keep rules that are about layers or traits never being combined
+    let match = v.match(/Layers? "(.+?)" and "(.+?)" should never be combined/);
+    if (match) {
+      let msg = `Layers "${match[1]}" and "${match[2]}" should never be combined`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Layer "(.+?)" and Layer "(.+?)" should never be combined/);
+    if (match) {
+      let msg = `Layers "${match[1]}" and "${match[2]}" should never be combined`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    // Optionally, add trait-to-layer or trait-to-trait only if all traits are blocked by this
+    match = v.match(/Trait "(.+?)" should never be combined with Layer "(.+?)"/);
+    if (match) {
+      let msg = `Trait "${match[1]}" and Layer "${match[2]}" should never be combined`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Layer "(.+?)" should never be combined with Trait "(.+?)"/);
+    if (match) {
+      let msg = `Layer "${match[1]}" and Trait "${match[2]}" should never be combined`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    // Only include trait-to-trait if it blocks all traits (rare)
+    match = v.match(/Traits? "(.+?)" and "(.+?)" should never be combined/);
+    if (match) {
+      let msg = `Traits "${match[1]}" and "${match[2]}" should never be combined`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    // --- NEW: Match immediately above/below rules ---
+    match = v.match(/Layer "(.+?)" must be rendered immediately above trait "(.+?)"/);
+    if (match) {
+      let msg = `Layer "${match[1]}" must be rendered immediately above trait "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Trait "(.+?)" must be rendered immediately above layer "(.+?)"/);
+    if (match) {
+      let msg = `Trait "${match[1]}" must be rendered immediately above layer "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Layer "(.+?)" must be rendered immediately below trait "(.+?)"/);
+    if (match) {
+      let msg = `Layer "${match[1]}" must be rendered immediately below trait "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Trait "(.+?)" must be rendered immediately below layer "(.+?)"/);
+    if (match) {
+      let msg = `Trait "${match[1]}" must be rendered immediately below layer "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    // --- NEW: Match immediately above/below rules (trait/layer to trait/layer) ---
+    match = v.match(/Trait "(.+?)" must be rendered immediately above "(.+?)"/);
+    if (match) {
+      let msg = `Trait "${match[1]}" must be rendered immediately above "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Trait "(.+?)" must be rendered immediately below "(.+?)"/);
+    if (match) {
+      let msg = `Trait "${match[1]}" must be rendered immediately below "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Layer "(.+?)" must be rendered immediately above "(.+?)"/);
+    if (match) {
+      let msg = `Layer "${match[1]}" must be rendered immediately above "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+    match = v.match(/Layer "(.+?)" must be rendered immediately below "(.+?)"/);
+    if (match) {
+      let msg = `Layer "${match[1]}" must be rendered immediately below "${match[2]}"`;
+      if (!seen.has(msg)) { filtered.push(msg); seen.add(msg); }
+      continue;
+    }
+  }
+  if (filtered.length > 0) return 'Blocked by rules for all traits in this layer:\n\n' + filtered.join('\n');
+  // If no filtered, but there are commonViolations, show them directly
+  if (commonViolations.length === 1) return 'Blocked by rules for all traits in this layer:\n\n' + commonViolations[0];
+  if (commonViolations.length > 1) return 'Blocked by rules for all traits in this layer:\n\n' + commonViolations.join('\n');
+  return 'This layer cannot have a trait due to active rules.';
+}
+// --- [END HELPER] ---
+
+// Listen for total-supply-updated event to refresh the seed-list-counter
+if (typeof window !== 'undefined') {
+  window.addEventListener('total-supply-updated', function() {
+    if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI')) {
+      // Update the module's projectData from window.currentProject
+      if (window.currentProject) {
+        window.NFTApp.getModule('generateNftsUI').projectData = window.currentProject;
+      }
+      if (typeof window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter === 'function') {
+        window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter();
+      }
+    }
+  });
+}
+
+// Add a method to refresh the seed-list-counter
+if (!window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter) {
+  window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter = function() {
+    const seedListCounter = document.getElementById('seed-list-counter');
+    if (seedListCounter) {
+      function getTotalSupply(pd) {
+        // --- FIX: Always use the latest value from the input field if present ---
+        const totalSupplyInput = document.getElementById('total-supply');
+        if (totalSupplyInput && totalSupplyInput.value) {
+          return parseInt(totalSupplyInput.value, 10) || 1;
+        }
+        if (pd && typeof pd.totalSupply !== 'undefined' && pd.totalSupply !== null && pd.totalSupply !== '') {
+          return parseInt(pd.totalSupply, 10);
+        } else if (pd && typeof pd.size !== 'undefined' && pd.size !== null && pd.size !== '') {
+          return parseInt(pd.size, 10);
+        }
+        return 1;
+      }
+      let pd = window.NFTApp.getModule('generateNftsUI') && window.NFTApp.getModule('generateNftsUI').projectData ? window.NFTApp.getModule('generateNftsUI').projectData : window.currentProject;
+      let totalSupply = getTotalSupply(pd);
+      if (!totalSupply || isNaN(totalSupply) || totalSupply < 1) totalSupply = 1;
+      const seedListKey = getSeedListKey(pd);
+      let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+      seedListCounter.textContent = `${seedList.length || 0} / ${totalSupply}`;
+      setSeedListCounterColor(seedListCounter, seedList.length || 0, totalSupply);
+      console.log('[DEBUG] refreshSeedListCounter called:', seedList.length, totalSupply);
+    }
+  }
+}
+
+// At the end of the module registration, after all other setup:
+
+// Ensure seed-list-counter updates immediately when total supply changes
+window.addEventListener('DOMContentLoaded', function() {
+  const totalSupplyInput = document.getElementById('total-supply');
+  if (totalSupplyInput) {
+    // Listen for input events
+    totalSupplyInput.addEventListener('input', function() {
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI')) {
+        const val = parseInt(totalSupplyInput.value, 10) || 0;
+        if (window.NFTApp.getModule('generateNftsUI').projectData) {
+          window.NFTApp.getModule('generateNftsUI').projectData.totalSupply = val;
+          window.NFTApp.getModule('generateNftsUI').projectData.size = val;
+        }
+        if (window.currentProject) {
+          window.currentProject.totalSupply = val;
+          window.currentProject.size = val;
+        }
+        // --- FIX: Only re-render control rows, then refresh counter ONCE after DOM is updated ---
+        if (typeof window.NFTApp.getModule('generateNftsUI')._renderControlRows === 'function') {
+          window.NFTApp.getModule('generateNftsUI')._renderControlRows(window.NFTApp.getModule('generateNftsUI').projectData);
+          console.log('[DEBUG] totalSupplyInput: _renderControlRows called after supply change');
+          setTimeout(function() {
+            if (typeof window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter === 'function') {
+              window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter();
+              console.log('[DEBUG] totalSupplyInput: refreshSeedListCounter called after re-render (setTimeout)');
+            }
+          }, 0);
+        }
+      }
+    });
+    // Listen for programmatic changes
+    const observer = new MutationObserver(function() {
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI')) {
+        if (typeof window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter === 'function') {
+          window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter();
+        }
+      }
+    });
+    observer.observe(totalSupplyInput, { attributes: true, childList: false, subtree: false, characterData: false });
+  }
+});
+
+// Remove any dynamically injected grid styles for .trait-items-container
+const prevGridStyle = document.getElementById('trait-items-container-grid-style');
+if (prevGridStyle) prevGridStyle.remove();
+// Only inject flex column style for .trait-items-container
+const styleElement = document.createElement('style');
+styleElement.id = 'trait-items-container-flex-style';
+styleElement.textContent = `
+  .trait-items-container {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    max-height: none !important;
+    gap: 10px !important;
+    grid-template-columns: unset !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+`;
+document.head.appendChild(styleElement);
+
+// --- RUNTIME FIX: FORCE TRAIT ITEMS CONTAINER TO FLEX COLUMN, REMOVE GRID ---
+(function enforceTraitItemsContainerFlex() {
+  function fixTraitItemsContainers() {
+    document.querySelectorAll('.trait-items-container').forEach(container => {
+      container.style.display = 'flex';
+      container.style.flexDirection = 'column';
+      container.style.overflowY = 'auto';
+      container.style.flex = '1 1 auto';
+      container.style.height = '100%';
+      container.style.maxHeight = 'none';
+      container.style.gap = '10px';
+      container.style.gridTemplateColumns = 'unset';
+      container.style.padding = '0';
+      container.style.boxSizing = 'border-box';
+    });
+    // Remove any style tags that set .trait-items-container to grid
+    document.querySelectorAll('style').forEach(styleTag => {
+      if (styleTag.textContent && styleTag.textContent.includes('.trait-items-container') && styleTag.textContent.includes('display: grid')) {
+        styleTag.parentNode.removeChild(styleTag);
+      }
+    });
+  }
+  // Run on DOMContentLoaded and after any major DOM update
+  document.addEventListener('DOMContentLoaded', fixTraitItemsContainers);
+  // Also run after any click, as a fallback for dynamic UI
+  document.body && document.body.addEventListener('click', () => setTimeout(fixTraitItemsContainers, 100));
+  // Expose for manual debugging
+  window.fixTraitItemsContainers = fixTraitItemsContainers;
+})();
+
+// ... existing code ...
+    // --- FINAL RUNTIME FIX: Remove grid classes/styles from .trait-items-container ---
+    setTimeout(() => {
+      document.querySelectorAll('.trait-items-container').forEach(container => {
+        container.classList.remove('traits-grid');
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.overflowY = 'auto';
+        container.style.flex = '1 1 auto';
+        container.style.height = '100%';
+        container.style.maxHeight = 'none';
+        container.style.gap = '10px';
+        container.style.gridTemplateColumns = 'unset';
+        container.style.padding = '0';
+        container.style.boxSizing = 'border-box';
+      });
+    }, 50);
+// ... existing code ...
+
+// Helper to set seed counter color based on fullness
+function setSeedListCounterColor(seedListCounter, count, total) {
+  if (!seedListCounter) return;
+  let percent = total > 0 ? (count / total) : 0;
+  if (count === total) {
+    seedListCounter.style.color = '#00ff18'; // green
+  } else if (percent >= 0.95) {
+    seedListCounter.style.color = '#ff0000'; // red
+  } else if (percent >= 0.90) {
+    seedListCounter.style.color = '#e74c3c'; // orange
+  } else if (percent >= 0.80) {
+    seedListCounter.style.color = '#fcff00'; // yellow
+  } else {
+    seedListCounter.style.color = '#fff'; // default
+  }
+}
+

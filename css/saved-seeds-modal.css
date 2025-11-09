@@ -1,0 +1,2863 @@
+/* 
+ * Saved Seeds Modal - Clean CSS
+ * No conflicts with existing styles
+ */
+
+.saved-seeds-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saved-seeds-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saved-seeds-container {
+  background: #222;
+  border-radius: 12px;
+  width: 1400px;
+  max-width: 95vw;
+  height: 800px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important; /* Ensure tooltips can extend beyond container */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transition: none !important; /* Prevent stretch effect */
+}
+
+.saved-seeds-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #333;
+  background: #1a1a1a;
+  position: relative;
+  gap: 20px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.saved-seeds-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #444;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10002 !important; /* Highest z-index in entire modal - above everything including tooltips (10001) */
+}
+
+.saved-seeds-close-btn:hover {
+  background: #ff4444;
+  transform: scale(1.1);
+}
+
+.saved-seeds-close-btn:active {
+  transform: scale(0.95);
+}
+
+/* Preserve close button styles when tooltip is added */
+.saved-seeds-close-btn.tooltip,
+.tooltip.saved-seeds-close-btn {
+  position: absolute !important;
+  top: 15px !important;
+  right: 15px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border: none !important;
+  background: #444 !important;
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 100 !important;
+}
+
+.saved-seeds-close-btn.tooltip:hover,
+.tooltip.saved-seeds-close-btn:hover {
+  background: #ff4444 !important;
+  transform: scale(1.1) !important;
+}
+
+.saved-seeds-close-btn.tooltip:active,
+.tooltip.saved-seeds-close-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.saved-seeds-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 200px;
+  flex-shrink: 0;
+}
+
+.saved-seeds-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin: 0;
+  font-family: 'Archivo', sans-serif;
+  white-space: nowrap;
+}
+
+.saved-seeds-tip {
+  color: #888;
+  font-size: 12px;
+  font-style: italic;
+  font-family: 'Archivo', sans-serif;
+  margin: 0;
+  line-height: 1.3;
+  max-width: 100%; /* Ensure tip doesn't overflow */
+  text-align: left !important; /* Do not justify this text */
+  text-justify: none !important; /* Do not justify this text */
+  word-wrap: break-word; /* Allow long words to wrap */
+  overflow-wrap: break-word; /* Allow overflow to wrap */
+}
+
+/* Ensure "Write a personalized description for this NFT." stays on one line */
+#nft-description-modal .saved-seeds-tip {
+  white-space: normal !important; /* Allow natural wrapping but respect space after period */
+}
+
+/* Use non-breaking space or CSS to keep first sentence together */
+#nft-description-modal .saved-seeds-tip::first-line {
+  white-space: nowrap; /* Prevent first line from breaking */
+}
+
+.saved-seeds-actions {
+  display: flex;
+  flex-wrap: nowrap; /* Keep everything in one line */
+  gap: 8px;
+  align-items: center;
+  width: auto;
+  height: 46px;
+  position: relative;
+  margin-left: auto;
+  margin-right: 50px;
+  justify-content: flex-end;
+  overflow: visible !important; /* Allow halo effects to extend beyond container */
+}
+
+/* Rarity Toggle Styles */
+.rarity-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+}
+
+.rarity-toggle-label {
+  font-size: 14px;
+  color: #ccc;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rarity-toggle-checkbox {
+  display: none;
+}
+
+.rarity-toggle-slider {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background: #444;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid #555;
+}
+
+.rarity-toggle-slider::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #888;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.rarity-toggle-checkbox:checked + .rarity-toggle-slider {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+}
+
+.rarity-toggle-checkbox:checked + .rarity-toggle-slider::before {
+  transform: translateX(26px);
+  background: #fff;
+}
+
+/* Rarity Tips */
+.rarity-error-tip {
+  color: #e74c3c;
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 6px;
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+.rarity-outdated-tip {
+  color: #e74c3c;
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 4px;
+  cursor: help;
+  display: inline-block;
+}
+
+/* Permanent outdated text below toggle */
+.rarity-outdated-text {
+  color: #e74c3c;
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  margin-top: 4px;
+  font-weight: 500;
+  cursor: help;
+  line-height: 1.2;
+}
+
+/* Permanent updated text below toggle */
+.rarity-updated-text {
+  color: #27ae60;
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  margin-top: 4px;
+  font-weight: 500;
+  cursor: help;
+  line-height: 1.2;
+}
+
+/* Rarity Error Popup */
+.rarity-error-popup {
+  color: #e74c3c;
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  padding: 12px 16px;
+  background: #222;
+  border: 2px solid #e74c3c;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 350px;
+  line-height: 1.4;
+  z-index: 10001;
+  pointer-events: none;
+  animation: fadeInTooltip 0.2s ease-in-out;
+}
+
+.rarity-error-popup::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #e74c3c;
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.saved-seeds-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  height: 23px;
+  min-width: fit-content;
+}
+
+.copy-all-btn {
+  background: #6c5ce7;
+  color: #fff;
+  width: 60px !important; /* Fixed width to prevent size change when text changes */
+  min-width: 60px !important;
+  max-width: 60px !important;
+  padding: 4px 8px;
+  height: 28px;
+  font-size: 11px;
+  overflow: hidden; /* Hide overflow to maintain fixed size */
+  text-overflow: ellipsis;
+}
+
+.copy-all-btn:hover {
+  background: #5b4dc7;
+}
+
+.import-btn {
+  background: #27ae60;
+  color: #fff;
+  width: fit-content;
+  padding: 4px 8px;
+  height: 28px;
+  font-size: 11px;
+  min-width: 50px;
+}
+
+.import-btn:hover {
+  background: #229954;
+}
+
+.clear-btn {
+  background: #e74c3c;
+  color: #fff;
+  width: fit-content;
+  padding: 4px 8px;
+  height: 28px;
+  font-size: 11px;
+  min-width: 50px;
+}
+
+.clear-btn:hover {
+  background: #c0392b;
+}
+
+.calculate-rarity-btn {
+  background: #6c5ce7;
+  color: #fff;
+  width: 64px;
+  height: 46px;
+  padding: 4px 6px;
+  font-size: 10px;
+  white-space: normal;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  flex-shrink: 0; /* Prevent shrinking */
+  overflow: visible !important; /* Allow halo effects to extend beyond button */
+  position: relative; /* Ensure z-index works */
+}
+
+.calculate-rarity-btn .calculate-text,
+.calculate-rarity-btn .rarity-text {
+  display: block;
+  line-height: 1.1;
+}
+
+.calculate-rarity-btn:hover {
+  background: #5a4fcf;
+}
+
+.filter-violations-btn {
+  background: #f39c12;
+  color: #fff;
+  width: 119.17px;
+  height: 21px;
+  padding: 2px 4px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  position: absolute; /* Position absolutely to occupy same space */
+  top: 0;
+  left: 0;
+  transition: visibility 0s, opacity 0.2s ease;
+}
+
+.filter-violations-btn.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.filter-violations-btn:hover {
+  background: #e67e22;
+}
+
+.filter-violations-btn.active {
+  background: #27ae60;
+}
+
+.filter-violations-btn.active:hover {
+  background: #229954;
+}
+
+/* Preserve Rule Violations button color when wrapped in tooltip */
+#saved-seeds-modal .tooltip .filter-violations-btn {
+  background: #f39c12 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .filter-violations-btn.active {
+  background: #27ae60 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .filter-violations-btn:hover {
+  background: #e67e22 !important;
+}
+
+/* Preserve ALL button colors when wrapped in tooltip containers */
+#saved-seeds-modal .tooltip .search-rarity-btn,
+#saved-seeds-modal .tooltip.search-rarity-btn {
+  background: #6c5ce7 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .search-rarity-btn:hover,
+#saved-seeds-modal .tooltip.search-rarity-btn:hover {
+  background: #5a4fcf !important;
+}
+
+#saved-seeds-modal .tooltip .search-trait-btn,
+#saved-seeds-modal .tooltip.search-trait-btn {
+  background: #6c5ce7 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .search-trait-btn:hover,
+#saved-seeds-modal .tooltip.search-trait-btn:hover {
+  background: #5a4fcf !important;
+}
+
+#saved-seeds-modal .tooltip .clear-trait-search-btn,
+#saved-seeds-modal .tooltip.clear-trait-search-btn {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .clear-trait-search-btn:hover,
+#saved-seeds-modal .tooltip.clear-trait-search-btn:hover {
+  background: #c0392b !important;
+}
+
+#saved-seeds-modal .tooltip .clear-search-btn,
+#saved-seeds-modal .tooltip.clear-search-btn {
+  background: #666 !important;
+  color: #999 !important;
+}
+#saved-seeds-modal .tooltip .clear-search-btn.active,
+#saved-seeds-modal .tooltip.clear-search-btn.active {
+  background: #f39c12 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .clear-search-btn.active:hover,
+#saved-seeds-modal .tooltip.clear-search-btn.active:hover {
+  background: #e67e22 !important;
+}
+
+#saved-seeds-modal .tooltip .copy-all-btn,
+#saved-seeds-modal .tooltip.copy-all-btn {
+  background: #6c5ce7 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .copy-all-btn:hover,
+#saved-seeds-modal .tooltip.copy-all-btn:hover {
+  background: #5b4dc7 !important;
+}
+
+#saved-seeds-modal .tooltip .import-btn,
+#saved-seeds-modal .tooltip.import-btn {
+  background: #27ae60 !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .import-btn:hover,
+#saved-seeds-modal .tooltip.import-btn:hover {
+  background: #229954 !important;
+}
+
+#saved-seeds-modal .tooltip .clear-btn,
+#saved-seeds-modal .tooltip.clear-btn {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .clear-btn:hover,
+#saved-seeds-modal .tooltip.clear-btn:hover {
+  background: #c0392b !important;
+}
+
+#saved-seeds-modal .tooltip .delete-all-btn,
+#saved-seeds-modal .tooltip.delete-all-btn {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+#saved-seeds-modal .tooltip .delete-all-btn:hover,
+#saved-seeds-modal .tooltip.delete-all-btn:hover {
+  background: #c0392b !important;
+}
+
+.delete-all-btn {
+  background: #e74c3c;
+  color: #fff;
+  width: 119.17px; /* Same width as filter button */
+  height: 21px;
+  padding: 2px 4px;
+  font-size: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute; /* Position absolutely to occupy same space */
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.delete-all-btn.visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.delete-all-btn:hover {
+  background: #c0392b;
+}
+
+.delete-all-btn.disabled {
+  background: #7f8c8d;
+  color: #bdc3c7;
+  cursor: not-allowed;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.delete-all-btn.disabled:hover {
+  background: #7f8c8d;
+}
+
+/* Override grid alignment when showing violation search */
+.saved-seeds-grid:has(.violation-search-container) {
+  align-content: center !important;
+  justify-content: center !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Fallback for browsers that don't support :has() */
+.saved-seeds-grid .violation-search-container {
+  grid-column: 1 / -1 !important;
+  grid-row: 1 / -1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 40px 20px !important;
+  text-align: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 400px !important;
+  position: relative !important;
+}
+
+.violation-search-status {
+  margin-bottom: 20px !important;
+  text-align: center !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.violation-search-title {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  margin-bottom: 10px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.violation-search-progress {
+  font-size: 14px !important;
+  color: #bdc3c7 !important;
+  margin-bottom: 5px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.violation-search-count {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #e74c3c !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+/* Progress popup window */
+.violation-progress-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  border: 2px solid #6c5ce7;
+  border-radius: 12px;
+  padding: 30px;
+  z-index: 10020;
+  min-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+}
+
+.violation-progress-popup .progress-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 15px;
+  font-family: 'Archivo', sans-serif;
+}
+
+.violation-progress-popup .progress-text {
+  font-size: 16px;
+  color: #bdc3c7;
+  margin-bottom: 10px;
+}
+
+.violation-progress-popup .progress-count {
+  font-size: 18px;
+  font-weight: 500;
+  color: #e74c3c;
+  margin-bottom: 20px;
+}
+
+.violation-progress-popup .progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #000000;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.violation-progress-popup .progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.violation-progress-popup .cancel-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+}
+
+.violation-progress-popup .cancel-btn:hover {
+  background: #c0392b;
+}
+
+.violation-cancel-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+  margin-top: 20px;
+}
+
+.violation-cancel-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Rarity Calculation Popup */
+/* Rarity calculation popup now uses scan-progress-popup styles */
+.rarity-calculation-popup {
+  /* Styles are applied via inline CSS in showRarityCalculationPopup() to match scan-progress-popup */
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-popup-content {
+  background: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.rarity-popup-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.rarity-popup-text {
+  font-size: 16px;
+  color: #ccc;
+  margin-bottom: 8px;
+}
+
+.rarity-popup-details {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
+.rarity-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #444;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.rarity-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.rarity-popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.rarity-cancel-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.rarity-cancel-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+.rarity-cancel-btn:active {
+  transform: translateY(0);
+}
+
+/* Rarity Status Container */
+.rarity-status-container {
+  min-width: 70px;
+  max-width: 70px;
+  width: 70px;
+  height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 8px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  margin: 0;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.rarity-status-line1 {
+  color: #ccc;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+  line-height: 1.2;
+}
+
+.trait-rarities-status-line1 {
+  color: #ccc;
+  font-size: 10px !important; /* Match rerender-text-line1 font size */
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+  line-height: 1.2;
+}
+
+.rarity-status-label {
+  color: #ccc;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-status-text {
+  color: #888;
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+  line-height: 1.2;
+}
+
+.rarity-status-text.updated {
+  color: #00ff30;
+}
+
+.rarity-status-text.outdated {
+  color: #888;
+}
+
+/* Rarity Search Container */
+.rarity-search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin: 0;
+  height: 46px;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.rarity-search-label {
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  font-family: 'Archivo', sans-serif !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 28px !important; /* match input & search button height */
+  min-height: 28px !important;
+  width: 87.8px !important; /* fixed width across both states */
+  min-width: 87.8px !important;
+  max-width: 87.8px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  background: #6c5ce7 !important; /* default */
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: background 0.15s ease, box-shadow 0.15s ease !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Toggle states */
+#saved-seeds-modal .rarity-search-label.mode-rarity { background: #6c5ce7 !important; }
+#saved-seeds-modal .rarity-search-label.mode-rarity:hover { background: #5a4fcf !important; }
+#saved-seeds-modal .rarity-search-label.mode-position { background: #27ae60 !important; }
+#saved-seeds-modal .rarity-search-label.mode-position:hover { background: #229954 !important; }
+
+/* Keep label color when wrapped with tooltip */
+#saved-seeds-modal .tooltip .rarity-search-label { color: #fff !important; }
+
+.rarity-search-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.rarity-search-input-wrapper .rarity-search-input {
+  width: 44px;
+  height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  font-family: 'Archivo', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.rarity-search-input {
+  width: 44px;
+  height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  font-family: 'Archivo', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.rarity-search-input:focus {
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.rarity-search-input::placeholder {
+  color: #888;
+  font-size: 11px;
+}
+
+/* Trait Search Container */
+.trait-search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin: 0;
+  height: 46px;
+  flex-shrink: 0;
+}
+
+.trait-search-label {
+  color: #ccc;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+}
+
+.trait-search-input {
+  width: 70px;
+  height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  font-size: 12px;
+  font-family: 'Archivo', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.trait-search-input:focus {
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.trait-search-input::placeholder {
+  color: #888;
+  font-size: 11px;
+}
+
+.search-trait-btn {
+  background: #6c5ce7;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 8px;
+  height: 28px;
+  min-width: 50px;
+  transition: background 0.2s ease;
+}
+
+.search-trait-btn:hover {
+  background: #5a4fcf;
+}
+
+.clear-trait-search-btn {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 8px;
+  height: 28px;
+  min-width: 50px;
+  transition: background 0.2s ease;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.clear-trait-search-btn:hover {
+  background: #c0392b;
+}
+
+/* Seeds Container */
+.seeds-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin: 0;
+  height: 46px;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.seeds-label {
+  color: #ccc;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: 'Archivo', sans-serif;
+}
+
+.search-rarity-btn {
+  background: #6c5ce7;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 8px;
+  height: 28px;
+  min-width: 50px;
+}
+
+.search-rarity-btn:hover {
+  background: #5a4fcf;
+}
+
+.clear-search-btn {
+  background: #666;
+  color: #999;
+  font-size: 11px;
+  padding: 4px 8px;
+  height: 28px;
+  min-width: 50px;
+  display: inline-block;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.clear-search-btn:hover {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.clear-search-btn.active {
+  background: #f39c12;
+  color: #fff;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.clear-search-btn.active:hover {
+  background: #e67e22;
+}
+
+.close-btn {
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  padding: 4px 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.saved-seeds-grid {
+  flex: 1;
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important; /* Use minmax to prevent resizing */
+  gap: 7px;
+  padding: 20px;
+  padding-bottom: 40px; /* Extra bottom padding to ensure gap between last row and modal bottom */
+  overflow-y: auto;
+  align-content: start;
+  min-height: calc(100% + 28px); /* Increase height by 28px */
+  transition: none !important; /* Prevent stretch effect */
+  will-change: auto !important;
+  grid-auto-rows: auto !important; /* Prevent row height animation */
+  contain: layout style !important; /* Prevent cascading layout changes */
+  grid-auto-flow: row !important; /* Ensure consistent row flow */
+  scrollbar-gutter: stable !important; /* Reserve space for scrollbar to prevent stretching */
+}
+
+.saved-seed-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: visible !important; /* allow tooltips to overflow outside card */
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  height: 180px !important; /* Fixed height to prevent stretching */
+  width: 100% !important; /* Fixed width */
+  box-sizing: border-box !important; /* Prevent padding from causing resize */
+}
+
+.saved-seed-card:hover {
+  border-color: #6c5ce7;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+  /* transform removed to prevent card resizing */
+}
+
+/* Drag and Drop Styles */
+.saved-seed-card.dragging {
+  opacity: 0.7;
+  transform: rotate(8deg) scale(1.05);
+  z-index: 1000;
+  cursor: grabbing !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 2px solid #6c5ce7;
+}
+
+.saved-seed-card[draggable="true"] {
+  cursor: grab !important;
+}
+
+.saved-seed-card[draggable="true"]:active {
+  cursor: grabbing !important;
+}
+
+/* Drop target styles */
+.saved-seed-card.drop-target {
+  border: 2px dashed #6c5ce7;
+  background: rgba(108, 92, 231, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.saved-seed-card.drop-target::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px dashed #6c5ce7;
+  border-radius: 8px;
+  background: rgba(108, 92, 231, 0.05);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.saved-seed-card.drag-over {
+  border: 2px solid #6c5ce7;
+  background: rgba(108, 92, 231, 0.2);
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+}
+
+.saved-seed-card.drag-over::before {
+  opacity: 1;
+  background: rgba(108, 92, 231, 0.15);
+}
+
+/* Grid container */
+#saved-seeds-grid {
+  position: relative;
+}
+
+/* Drag mode styles */
+.drag-mode .saved-seed-card:not(.dragging) {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Enhanced visual feedback for drop targets */
+.drag-mode .saved-seed-card.drop-target:not(.dragging) {
+  animation: pulse-drop-target 1.5s ease-in-out infinite;
+}
+
+/* Empty card styles for deleted positions during search */
+.saved-seed-card.empty-card {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: default;
+}
+
+.saved-seed-card.empty-card:hover {
+  border-color: #444;
+  box-shadow: none;
+  transform: none;
+}
+
+.saved-seed-card.empty-card .empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+}
+
+.saved-seed-card.empty-card .empty-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.saved-seed-card.empty-card .empty-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+}
+
+.saved-seed-card.empty-card .disabled-btn {
+  background: #444;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Unified NFT Card Styles - Consistent across all modals */
+.unified-nft-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.unified-nft-card:hover {
+  border-color: #555;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  /* transform removed to prevent card resizing */
+}
+
+.unified-nft-card .seed-card-thumbnail {
+  width: 100%;
+  height: 120px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+  isolation: auto !important; /* Don't create stacking context that limits z-index */
+  z-index: auto !important;
+}
+
+.unified-nft-card .seed-card-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  position: relative !important;
+  z-index: 1 !important; /* Lower than description button */
+  pointer-events: none !important; /* Allow clicks to pass through to description button */
+  isolation: auto !important; /* Don't create stacking context */
+}
+
+/* Description button for unified cards - ensure maximum z-index */
+.unified-nft-card .seed-card-thumbnail .seed-desc-btn,
+#saved-seeds-modal .unified-nft-card .seed-card-thumbnail .seed-desc-btn {
+  position: absolute !important;
+  bottom: 4px !important;
+  right: 6px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.5) !important; /* Default: 50% transparent black */
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 4px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  z-index: 999999 !important; /* Maximum z-index to ensure it's above all thumbnail elements including rendered images */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  isolation: auto !important; /* Don't create new stacking context */
+}
+
+/* Unified card description button states */
+.unified-nft-card .seed-card-thumbnail .seed-desc-btn:hover,
+#saved-seeds-modal .unified-nft-card .seed-card-thumbnail .seed-desc-btn:hover {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+.unified-nft-card .seed-card-thumbnail .seed-desc-btn.has-description,
+#saved-seeds-modal .unified-nft-card .seed-card-thumbnail .seed-desc-btn.has-description {
+  background: #f39c12 !important;
+  background-color: #f39c12 !important;
+  color: #fff !important;
+  border-color: #e67e22 !important;
+}
+
+.unified-nft-card .seed-card-thumbnail .seed-desc-btn.no-description,
+#saved-seeds-modal .unified-nft-card .seed-card-thumbnail .seed-desc-btn.no-description {
+  background: rgba(0, 0, 0, 0.5) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.unified-nft-card .seed-card-info {
+  width: 100.41px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  overflow: visible !important; /* Allow tooltips to overflow */
+}
+
+.unified-nft-card .seed-card-number {
+  font-size: 10px;
+  color: #ccc;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 500;
+  word-break: break-all;
+  line-height: 1.1;
+  height: 18px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.unified-nft-card .seed-card-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow: visible !important; /* Allow tooltips to overflow */
+}
+
+.unified-nft-card .seed-card-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 8px;
+  font-family: 'Archivo', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  position: relative !important;
+  z-index: 10000 !important; /* High z-index to ensure buttons are above other elements */
+}
+
+/* Button width adjustments: -1px for edit/copy, +7px for delete */
+.unified-nft-card .seed-card-btn.edit-btn,
+.unified-nft-card .seed-card-btn.copy-btn {
+  min-width: 31px !important;
+  width: 31px !important;
+}
+
+.unified-nft-card .seed-card-btn.delete-btn {
+  min-width: 39px !important;
+  width: 39px !important;
+}
+
+.unified-nft-card .seed-card-btn:hover {
+  background: #555;
+}
+
+.unified-nft-card .seed-card-btn.edit-btn:hover {
+  background: #4a90e2;
+}
+
+.unified-nft-card .seed-card-btn.copy-btn:hover {
+  background: #7ed321;
+}
+
+.unified-nft-card .seed-card-btn.delete-btn:hover {
+  background: #e74c3c;
+}
+
+/* Compact size overrides */
+.unified-nft-card[style*="118px"] .seed-card-thumbnail {
+  height: 80px;
+}
+
+.unified-nft-card[style*="118px"] .seed-card-number {
+  font-size: 8px;
+  height: 16px;
+}
+
+.unified-nft-card[style*="118px"] .seed-card-btn {
+  font-size: 8px;
+  padding: 3px 6px;
+}
+
+/* Large size overrides */
+.unified-nft-card[style*="200px"] .seed-card-thumbnail {
+  height: 160px;
+}
+
+.unified-nft-card[style*="200px"] .seed-card-number {
+  font-size: 12px;
+  height: 24px;
+}
+
+.unified-nft-card[style*="200px"] .seed-card-btn {
+  font-size: 11px;
+  padding: 6px 12px;
+}
+
+/* Batch generation specific overrides - Higher specificity to override existing styles */
+.batch-nft-card.unified-nft-card {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  margin: 4px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  width: 118px !important;
+  height: 118px !important;
+  min-width: 118px !important;
+  min-height: 118px !important;
+  max-width: 118px !important;
+  max-height: 118px !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  justify-content: space-between !important;
+  will-change: auto !important; /* Prevent layout thrashing */
+  transform: none !important; /* Reset any transforms that could cause resize */
+}
+
+.batch-nft-card.unified-nft-card:hover {
+  border-color: #555 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  /* Note: transform removed to prevent card size changes */
+}
+
+.batch-nft-card.unified-nft-card.selected {
+  border-color: #4a90e2 !important;
+  background-color: rgba(74, 144, 226, 0.1) !important;
+}
+
+.batch-nft-card.unified-nft-card.editing {
+  border-color: #4a90e2 !important;
+  background-color: rgba(74, 144, 226, 0.1) !important;
+}
+
+/* Override thumbnail styling for batch cards */
+.batch-nft-card.unified-nft-card .seed-card-thumbnail {
+  width: 100% !important;
+  height: 80px !important;
+  background: #2a2a2a !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-bottom: 8px !important;
+  isolation: auto !important; /* Don't create stacking context that limits z-index */
+  z-index: auto !important;
+}
+
+.batch-nft-card.unified-nft-card .seed-card-thumbnail img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 4px !important;
+  display: block !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  z-index: 1 !important; /* Lower than description button */
+  pointer-events: none !important; /* Allow clicks to pass through to description button */
+  isolation: auto !important; /* Don't create stacking context */
+}
+
+/* Override seed number styling for batch cards */
+.batch-nft-card.unified-nft-card .seed-card-number {
+  font-size: 8px !important;
+  color: #ccc !important;
+  font-family: 'Archivo', sans-serif !important;
+  font-weight: 500 !important;
+  word-break: break-all !important;
+  line-height: 1.1 !important;
+  height: 18px !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+}
+
+/* Ensure rarity rank and NFT number are visible on batch cards */
+.batch-nft-card.unified-nft-card .seed-card-rarity {
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 1000 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.batch-nft-card.unified-nft-card .seed-card-number-display {
+  position: absolute !important;
+  bottom: 4px !important;
+  left: 4px !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 1000 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Rarity Search Progress Popup */
+.rarity-search-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.rarity-search-popup-content {
+  background: #2a2a2a; /* Match standard modal grey background */
+  border-radius: 12px;
+  padding: 24px;
+  width: 400px;
+  max-width: 90vw;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.rarity-search-popup h3 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-search-popup .search-info {
+  color: #ccc;
+  font-size: 14px;
+  margin-bottom: 20px;
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-search-progress {
+  width: 100%;
+  height: 8px;
+  background: #000000;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.rarity-search-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #6c5ce7, #a084ff);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.rarity-search-status {
+  color: #6c5ce7;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-search-results {
+  color: #27ae60;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-search-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.rarity-search-close-btn {
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+}
+
+.rarity-search-close-btn:hover {
+  background: #5a4fcf;
+}
+
+.rarity-search-cancel-btn,
+.cancel-search-btn {
+  background: #e74c3c !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-family: 'Archivo', sans-serif !important;
+  height: 32px !important; /* Normalized height to match other buttons */
+  min-height: 32px !important;
+  max-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+.rarity-search-cancel-btn:hover {
+  background: #c0392b;
+}
+
+/* Preserve cancel-search-btn color in rarity search popup when wrapped in tooltip */
+.rarity-search-popup .tooltip .cancel-search-btn,
+.rarity-search-popup .tooltip.cancel-search-btn,
+.rarity-search-popup .cancel-search-btn,
+#cancel-rarity-search-btn,
+.rarity-search-popup #cancel-rarity-search-btn,
+.rarity-search-popup .tooltip #cancel-rarity-search-btn {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+.rarity-search-popup .tooltip .cancel-search-btn:hover,
+.rarity-search-popup .tooltip.cancel-search-btn:hover,
+.rarity-search-popup .cancel-search-btn:hover,
+#cancel-rarity-search-btn:hover,
+.rarity-search-popup #cancel-rarity-search-btn:hover,
+.rarity-search-popup .tooltip #cancel-rarity-search-btn:hover {
+  background: #c0392b !important;
+}
+
+
+@keyframes pulse-drop-target {
+  0%, 100% {
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.4);
+  }
+  50% {
+    border-color: #a29bfe;
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+  }
+}
+
+.seed-card-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2a2a2e;
+  width: 100.41px;
+  height: 100.41px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: visible !important; /* allow tooltip overflow */
+  /* Don't use isolation - it creates stacking context that limits z-index */
+  isolation: auto !important;
+  z-index: auto !important;
+}
+
+.seed-card-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  position: relative !important;
+  z-index: 1 !important; /* Lower than description button */
+  /* Ensure image doesn't create new stacking context */
+  isolation: auto !important;
+  pointer-events: none !important; /* Allow clicks to pass through to description button when overlapped */
+}
+
+/* Violation overlay uses inline styles to match NFT Traits modal exactly */
+
+.seed-card-rarity {
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 400 !important; /* below tooltips */
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.seed-card-number-display {
+  position: absolute !important;
+  bottom: 4px !important;
+  left: 4px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 500 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Description icon button aligned in the top-right inside thumbnail */
+.seed-card-thumbnail .seed-desc-btn {
+  position: absolute !important;
+  bottom: 4px !important; /* align vertically with seed-card-number-display */
+  right: 6px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.5) !important; /* Default: 50% transparent black */
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 4px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  z-index: 999999 !important; /* Maximum z-index to ensure it's above all thumbnail elements including rendered images */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  /* Ensure button stays on top even when thumbnail image is rendered */
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  isolation: auto !important; /* Don't create new stacking context */
+}
+.seed-card-thumbnail .seed-desc-btn:hover { background: rgba(0, 0, 0, 0.7) !important; }
+.seed-card-thumbnail .seed-desc-btn.has-description { background: #f39c12 !important; background-color: #f39c12 !important; color: #fff !important; border-color: #e67e22 !important; }
+.seed-card-thumbnail .seed-desc-btn.no-description { background: rgba(0, 0, 0, 0.5) !important; background-color: rgba(0, 0, 0, 0.5) !important; color: #fff !important; border-color: rgba(255, 255, 255, 0.3) !important; }
+
+/* Tooltips on card controls - compact sizing and top placement */
+#saved-seeds-modal .seed-card-thumbnail .tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-buttons .tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-thumbnail .seed-desc-btn.tooltip .tooltiptext {
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  max-width: 240px !important;
+  z-index: 2147483647 !important; /* Maximum z-index to ensure it's above all elements */
+  position: fixed !important; /* Use fixed positioning to escape parent containers and prevent clipping */
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important; /* Will be set dynamically via JavaScript */
+}
+
+.seed-card-rarity.loading {
+  background: rgba(255, 165, 0, 0.8);
+  color: #000;
+  animation: pulse-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-loading {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Rarity Calculation Tip */
+.rarity-calculation-tip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 2px solid #6c5ce7;
+}
+
+.rarity-tip-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.rarity-tip-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #6c5ce7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.seed-card-loading,
+.no-image,
+.error-image {
+  color: #888;
+  font-size: 12px;
+  text-align: center;
+}
+
+.seed-card-info {
+  width: 100.41px;
+  padding: 8px;
+  background: #1a1a1a;
+  border-radius: 0 0 8px 8px;
+  box-sizing: border-box;
+  overflow: visible !important; /* Allow tooltips to overflow */
+}
+
+.seed-card-number {
+  color: #fff;
+  font-size: 6px;
+  font-family: monospace;
+  text-align: center;
+  margin-bottom: 8px;
+  word-break: break-all;
+  line-height: 1.1;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-radius: 4px;
+  height: 18px; /* Fixed height for exactly 2 lines */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+.seed-card-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  overflow: visible !important; /* Allow tooltips to overflow */
+}
+
+.seed-card-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  font-family: 'Archivo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  background: #444;
+  color: #fff;
+  position: relative !important;
+  z-index: 10000 !important; /* High z-index to ensure buttons are above other elements */
+}
+
+.edit-btn {
+  background: #f39c12;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background: #e67e22;
+}
+
+.copy-btn {
+  background: #6c5ce7;
+  color: #fff;
+}
+
+.copy-btn:hover {
+  background: #5b4dc7;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+.saved-seeds-pagination {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: transparent;
+  flex-wrap: nowrap;
+  flex: 0 0 960px;
+  max-width: 960px;
+  width: 960px;
+}
+
+/* Saved Seeds Footer */
+.saved-seeds-footer {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  padding: 16px 24px !important;
+  border-top: 1px solid #333 !important;
+  background: #1a1a1a !important;
+  position: relative !important;
+  height: auto !important;
+  min-height: auto !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Violations Rules Container */
+/* Violations Rules Container - horizontal layout with left group and buttons */
+.violations-rules-container {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-start;
+  height: 46px;
+  min-height: 46px;
+  flex-shrink: 0;
+  transition: opacity 0.5s ease !important;
+  opacity: 1 !important;
+}
+
+/* Hidden state while typing in trait search */
+#saved-seeds-modal .violations-rules-container.violations-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Left group: stacks button row and checkbox vertically */
+.violations-left-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: center;
+  height: 46px;
+}
+
+/* Top row: contains "Rule Violations NFTs" and "Delete All" buttons in the SAME SPACE */
+.violations-top-row {
+  position: relative;
+  width: 119.17px; /* Fixed width to match filter-violations-btn */
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Auto-fix toggle - checkbox only, displays below the violations button row */
+.auto-fix-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  height: auto;
+  margin-top: 2px;
+}
+
+.auto-fix-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px; /* Slightly smaller to fit under button */
+  color: #ecf0f1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Preserve Auto-fix toggle color when tooltip is applied */
+#saved-seeds-modal .tooltip.auto-fix-toggle label,
+#saved-seeds-modal .auto-fix-toggle.tooltip label {
+  color: #ecf0f1 !important;
+  background: transparent !important;
+}
+
+.auto-fix-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+/* Legacy rerender-container (no longer used but keep for compatibility) */
+.rerender-container {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  height: auto;
+  width: 100%;
+  visibility: visible !important;
+}
+
+/* Re-render Button - matches Calculate Rarity button style exactly */
+.rerender-btn {
+  background: #6c5ce7 !important;
+  color: #fff !important;
+  width: 70px !important;
+  height: 46px !important; /* Same height as Calculate Rarity button */
+  padding: 4px 6px !important;
+  font-size: 10px !important;
+  white-space: normal !important; /* Allow text wrapping */
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important; /* Stack text in two lines */
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.2 !important;
+  border: none !important;
+  border-radius: 6px !important; /* Match Calculate Rarity button corners */
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-weight: 500 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  overflow: visible !important; /* Allow halo effects to extend beyond button */
+}
+
+.rerender-btn .rerender-text-line1,
+.rerender-btn .rerender-text-line2 {
+  display: block !important;
+  line-height: 1.1 !important;
+  white-space: normal !important; /* Allow wrapping for "Thumbnails / NFTs" */
+}
+
+.rerender-btn:hover {
+  background: #5a4fcf !important; /* Match Calculate button hover */
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3) !important;
+}
+
+.rerender-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 1px 4px rgba(108, 92, 231, 0.2) !important;
+}
+
+.rerender-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.rerender-btn:disabled:hover {
+  background: #6c5ce7 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Allow tooltip to work even when button is disabled */
+.rerender-btn:disabled[title] {
+  pointer-events: auto !important;
+}
+
+/* Rerender button container */
+.rerender-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  overflow: visible !important; /* Allow halo effects to extend beyond container */
+}
+
+
+/* Updated button state - green with halo effect */
+.rerender-btn.button-updated,
+.calculate-rarity-btn.button-updated {
+  background: #27ae60 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 48, 0.6), 0 0 12px rgba(0, 255, 48, 0.4) !important;
+  transition: all 0.3s ease !important;
+  z-index: 10 !important; /* Ensure halo overlaps other elements */
+  position: relative; /* Ensure z-index works */
+  overflow: visible !important; /* Allow halo effects to extend beyond button */
+}
+
+.rerender-btn.button-updated:hover,
+.calculate-rarity-btn.button-updated:hover {
+  background: #229954 !important;
+  box-shadow: 0 0 10px rgba(0, 255, 48, 0.8), 0 0 15px rgba(0, 255, 48, 0.5) !important;
+}
+
+/* Outdated button state - return to original purple */
+.rerender-btn.button-outdated,
+.calculate-rarity-btn.button-outdated {
+  background: #6c5ce7 !important;
+  box-shadow: none !important;
+}
+
+.rerender-btn:disabled:hover[title] {
+  pointer-events: auto !important;
+}
+
+/* Scan Progress Popup - Default background and white text for all popup windows (excluding modals and generation progress popups) */
+/* NOTE: Exclude violation-progress-popup (used for generating NFTs) - it has its own styling */
+.scan-progress-popup:not(.violation-progress-popup),
+.rarity-calculation-popup:not(.violation-progress-popup),
+#success-popup-overlay .scan-progress-popup:not(.violation-progress-popup) {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2c3e50 !important; /* Default popup background color */
+  color: #ffffff !important; /* Default white text */
+  padding: 30px 50px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid #34495e;
+  z-index: 10002 !important;
+  font-family: 'Archivo', sans-serif;
+  text-align: center;
+  min-width: 350px;
+}
+
+/* Ensure violation-progress-popup keeps its original styling (NOT affected by #2c3e50 rule) */
+/* These are used for "Generating NFTs" windows and should NOT use #2c3e50 background */
+.violation-progress-popup,
+#violation-progress-popup {
+  background: #222 !important; /* Keep original dark background */
+  border: 2px solid #6c5ce7 !important; /* Keep original purple border */
+  color: #fff !important; /* Keep white text */
+  /* Do NOT override with #2c3e50 - these are generation progress windows, not scan/info popups */
+}
+
+/* Exception: Generate Batch popup should use #2c3e50 background like other app popups */
+#batch-progress-popup {
+  background: #2c3e50 !important; /* Use app popup background color */
+  border: 1px solid #34495e !important; /* Match scan popup border style */
+  color: #ffffff !important; /* White text */
+}
+
+/* Ensure text elements inside popups are white by default (but allow colored elements like buttons/percentages) */
+/* NOTE: Exclude violation-progress-popup which has its own text colors */
+.scan-progress-popup:not(.violation-progress-popup) .scan-title,
+.scan-progress-popup:not(.violation-progress-popup) .scan-subtitle,
+.scan-progress-popup:not(.violation-progress-popup) .scan-eta,
+.scan-progress-popup:not(.violation-progress-popup) .scan-progress-info,
+.rarity-calculation-popup:not(.violation-progress-popup) .scan-title,
+.rarity-calculation-popup:not(.violation-progress-popup) .scan-subtitle,
+#success-popup-overlay .scan-progress-popup:not(.violation-progress-popup) div {
+  color: #ffffff !important; /* White text for text elements */
+}
+
+/* Specific colored elements keep their colors (percentage, counts, buttons) */
+
+.scan-progress-popup .scan-percentage {
+  color: #3498db; /* Keep blue for percentage - can be changed if needed */
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+}
+
+.scan-progress-popup .scan-dots {
+  display: inline-flex;
+  gap: 2px;
+  align-items: baseline;
+  vertical-align: baseline;
+  margin-left: 5px;
+}
+
+.scan-progress-popup .scan-dots span {
+  width: 5px;
+  height: 5px;
+  background: #3498db;
+  border-radius: 50%;
+  display: inline-block;
+  animation: scanDotPulse 1.4s infinite ease-in-out;
+  align-self: baseline;
+  margin-bottom: 4px;
+  will-change: opacity, transform;
+}
+
+.scan-progress-popup .scan-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.scan-progress-popup .scan-dots span:nth-child(2) {
+  animation-delay: 0.466s;
+}
+
+.scan-progress-popup .scan-dots span:nth-child(3) {
+  animation-delay: 0.933s;
+}
+
+@keyframes scanDotPulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.scan-progress-popup .scan-counts-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin: 0 auto;
+  width: fit-content;
+  gap: 5px;
+}
+
+.scan-progress-popup .scan-violations-count {
+  color: #e74c3c;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.scan-progress-popup .scan-fixed-count {
+  color: #27ae60;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.scan-progress-popup .scan-cancel-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+}
+
+.scan-progress-popup .scan-cancel-btn:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+.scan-progress-popup .scan-cancel-btn:active {
+  transform: scale(0.95);
+}
+
+/* Loading Popup */
+.loading-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999 !important;
+  font-family: 'Archivo', sans-serif;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.loading-content {
+  background: #2c3e50;
+  padding: 30px 50px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid #34495e;
+}
+
+.loading-text {
+  color: #ecf0f1;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Loading dots animation - overridden by final-overrides.css */
+.loading-dots {
+  display: inline-block !important;
+  animation: loadingDotsBounce 1.5s infinite !important;
+  color: #6c5ce7 !important;
+  font-weight: bold !important;
+}
+
+/* Old dotPulse animation removed - using loadingDotsBounce from final-overrides.css */
+
+/* Success indicator animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fix-success-indicator {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Fixed NFT styling */
+.saved-seeds-card.violations-fixed {
+  border: 2px solid #27ae60;
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.pagination-btn {
+  padding: 6px 12px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+  /* Fixed width to prevent stretching when page numbers change (1, 2, 3 digits) */
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #555;
+  border-color: #666;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn.active {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+}
+
+.pagination-btn.active:hover {
+  background: #5b4dc7;
+}
+
+/* Special styling for jump buttons */
+.pagination-btn[title*="Jump 10 pages"] {
+  background: #e67e22;
+  border-color: #e67e22;
+  font-weight: bold;
+  /* Fixed width same as other buttons */
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+}
+
+.pagination-btn[title*="Jump 10 pages"]:hover:not(:disabled) {
+  background: #d35400;
+  border-color: #d35400;
+}
+
+.pagination-btn[title*="Go to first page"],
+.pagination-btn[title*="Go to last page"] {
+  background: #27ae60;
+  border-color: #27ae60;
+  font-weight: bold;
+  /* Fixed width same as other buttons */
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+}
+
+.pagination-btn[title*="Go to first page"]:hover:not(:disabled),
+.pagination-btn[title*="Go to last page"]:hover:not(:disabled) {
+  background: #229954;
+  border-color: #229954;
+}
+
+.no-seeds {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #888;
+  font-size: 16px;
+  padding: 40px;
+  font-family: 'Archivo', sans-serif;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1500px) {
+  .saved-seeds-container {
+    width: 95vw;
+    height: 90vh;
+  }
+  
+  .saved-seeds-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .saved-seeds-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Cross-page drag and drop styles */
+.pagination-btn.drag-hover {
+  background: #4a90e2 !important;
+  border-color: #4a90e2 !important;
+  color: white !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5) !important;
+  z-index: 1000 !important;
+}
+
+.pagination-btn.drag-over-page {
+  background-color: #4a90e2 !important;
+  color: white !important;
+  transform: scale(1.1) !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+.pagination-btn.drag-over-page:hover {
+  background-color: #357abd !important;
+  transform: scale(1.15) !important;
+}
+
+
+
+/* Unified Counter Container - Right-aligned within pagination */
+.unified-counter-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  background: transparent !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  box-shadow: none !important;
+  min-height: 66px !important; /* Ensure container height accommodates both counters */
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  z-index: 100 !important; /* Ensure it's above pagination controls */
+  position: relative !important;
+  order: 2 !important; /* Ensure it appears on the right side */
+  margin-left: 48px !important; /* Move 24px more to the right (total 48px from original position) */
+  margin-right: 23px !important; /* Move container 23px to the right */
+}
+
+/* Total NFTs Listed Counter */
+.total-listed-counter {
+  width: 130px !important;
+  height: 50px !important;
+  background: #3498db !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+.total-listed-content {
+  text-align: center;
+  color: #fff;
+  font-family: 'Archivo', sans-serif;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.total-listed-line-1 {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.9;
+  line-height: 1.2;
+}
+
+.total-listed-line-2 {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.total-listed-line-2 span {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Collection Space Counter - Ensure no margin-right conflicts */
+.collection-space-counter,
+#saved-seeds-collection-space-counter.collection-space-counter,
+.saved-seeds-footer .collection-space-counter {
+  position: relative !important;
+  width: 130px !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  background: #ef4444 !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  align-self: center !important; /* Vertically align to center of container */
+}
+
+/* Ensure footer displays counter properly next to pagination */
+.saved-seeds-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  position: relative !important;
+}
+
+#saved-seeds-pagination {
+  flex: 0 0 960px !important; /* Fixed width of 960px */
+  max-width: 960px !important;
+  width: 960px !important;
+  order: 1 !important;
+  margin-left: 140px !important; /* Move 140px to the right */
+}
+
+#saved-seeds-collection-space-counter {
+  order: 2 !important; /* Place on the right side */
+  margin-left: 110px !important; /* Move 110px to the right */
+  align-self: center !important; /* Vertically center with pagination */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Pagination - With embedded counters */
+.saved-seeds-pagination,
+#saved-seeds-pagination {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 16px !important;
+  margin: 0 !important;
+  flex-wrap: nowrap !important;
+  min-height: 66px !important;
+  height: 66px !important; /* Fixed height to prevent stretching */
+  position: relative !important;
+  transition: none !important; /* Prevent stretch effects */
+  /* Fixed width to prevent container from stretching */
+  width: 960px !important;
+  max-width: 960px !important;
+  flex: 0 0 960px !important;
+}
+
+/* Grid - Prevent stretch effects during page changes */
+.saved-seeds-grid {
+  min-height: 360px !important; /* Fixed height to prevent stretching */
+  transition: none !important; /* Disable transitions that cause stretch */
+}
+
+/* Pagination controls - Left side */
+.saved-seeds-pagination .pagination-btn,
+.saved-seeds-pagination button {
+  flex-shrink: 0 !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+/* Pagination controls container - Left side */
+.saved-seeds-pagination > * {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  flex-wrap: wrap !important;
+  order: 1 !important; /* Ensure pagination controls appear on the left */
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+/* Ensure pagination buttons don't overlap counters and have fixed width */
+.saved-seeds-pagination .pagination-btn {
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+  /* Force fixed width for all pagination buttons to prevent stretching */
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  box-sizing: border-box !important;
+}
+
+.space-counter-content {
+  text-align: center !important;
+  color: #fff !important;
+  font-family: 'Archivo', sans-serif !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-content: center !important;
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 2px !important;
+  vertical-align: middle !important;
+  box-sizing: border-box !important;
+}
+
+/* CRITICAL: Override all conflicting rules with maximum specificity */
+#saved-seeds-collection-space-counter .space-counter-content,
+#saved-seeds-collection-space-counter .space-counter-title,
+#saved-seeds-collection-space-counter .space-counter-value,
+#saved-seeds-collection-space-counter .space-counter-label {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+
+#saved-seeds-collection-space-counter .space-counter-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-content: center !important;
+  gap: 2px !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.space-counter-title,
+#saved-seeds-collection-space-counter .space-counter-title {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  opacity: 0.9 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+.space-counter-value,
+#saved-seeds-collection-space-counter .space-counter-value {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+.space-counter-label,
+#saved-seeds-collection-space-counter .space-counter-label {
+  font-size: 8px !important;
+  font-weight: 500 !important;
+  opacity: 0.8 !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  line-height: 1 !important;
+  height: auto !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}

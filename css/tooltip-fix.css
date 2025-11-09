@@ -1,0 +1,445 @@
+/* Tooltip Styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltiptext {
+  visibility: hidden;
+  position: absolute;
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+  background-color: #333;
+  color: #f39c12;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
+/* Tooltips are now controlled by JavaScript in tooltip-handler-consolidated.js */
+/* This prevents immediate display via CSS :hover */
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+}
+
+/* CRITICAL: Explicitly hide tooltips for disabled elements */
+.tooltip[disabled]:hover .tooltiptext,
+.tooltip:disabled:hover .tooltiptext,
+.tooltip[disabled] .tooltiptext,
+.tooltip:disabled .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Arrow styles */
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  border-width: 5px;
+  border-style: solid;
+}
+
+/* Top tooltip (default) */
+.tooltiptext {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+}
+
+/* Export tab tooltips use fixed positioning controlled by JavaScript - override default positioning */
+#export-nfts .tooltiptext {
+  /* JavaScript sets position via inline styles - don't use default CSS positioning */
+  position: fixed !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+.tooltiptext::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Bottom tooltip */
+.tooltip-bottom {
+  top: 125%;
+  bottom: auto;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+.tooltip-bottom::after {
+  bottom: 100%;
+  top: auto;
+  border-color: transparent transparent #333 transparent;
+}
+
+/* Left-aligned tooltip */
+.tooltip-left {
+  transform: translateX(0);
+  left: 0;
+}
+
+.tooltip-left::after {
+  left: 10px;
+  transform: translateX(0);
+}
+
+/* Right-aligned tooltip */
+.tooltip-right {
+  transform: translateX(0);
+  right: 0;
+  left: auto;
+}
+
+.tooltip-right::after {
+  right: 10px;
+  left: auto;
+  transform: translateX(0);
+}
+
+/* Ensure tooltips have proper width and wrapping for longer content */
+.tooltiptext {
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Remove all custom randomize-tooltip styles */
+.randomize-tooltip {
+  all: unset !important;
+  display: none !important;
+}
+
+/* ============================================
+   GLOBAL TOOLTIP Z-INDEX AND POSITIONING FIXES
+   ============================================ */
+
+/* CRITICAL: Ensure ALL tooltips across the entire app have the highest z-index */
+.tooltiptext,
+.tooltip .tooltiptext,
+html body .tooltiptext,
+html body .tooltip .tooltiptext,
+#traits-rules .tooltiptext,
+#traits-rules .tooltip .tooltiptext,
+#traits-rules .rule-actions .tooltip-text,
+#traits-rules .trait-layer-header .tooltiptext,
+#traits-rules .combination-rule-modal .tooltiptext,
+#traits-rules .combination-rule-modal .custom-tooltip {
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+}
+
+/* CRITICAL: Ensure tooltips positioned by JavaScript maintain their positioning */
+/* Don't override JavaScript-set positioning for export tab tooltips */
+#export-nfts .tooltip .tooltiptext[style*="top"],
+#export-nfts .tooltip .tooltiptext[style*="left"],
+#export-nfts .tooltip .tooltiptext[style*="top: "],
+#export-nfts .tooltip .tooltiptext[style*="left: "] {
+  /* JavaScript sets position via inline styles - don't override */
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  /* CRITICAL: Remove any CSS positioning that might conflict with JavaScript inline styles */
+  bottom: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  /* Ensure transform doesn't interfere with positioning */
+  transform: none !important;
+}
+
+/* ============================================
+   EXPORT TAB TOOLTIP FIXES
+   ============================================ */
+
+/* CRITICAL: Disable CSS hover rules for export tab tooltips - JavaScript controls them with 1-second delay */
+/* Prevent CSS :hover from showing tooltips immediately - let JavaScript handle the delay */
+/* Force all export tab tooltips to stay hidden and off-screen initially - JavaScript will position them */
+/* Only apply default hidden state to tooltips that don't have inline styles set by JavaScript */
+#export-nfts .tooltip .tooltiptext:not([style*="visibility: visible"]):not([style*="visibility:visible"]):not([style*="opacity: 1"]):not([style*="opacity:1"]) {
+  /* Keep tooltips hidden and off-screen initially - JavaScript will position them */
+  visibility: hidden !important;
+  opacity: 0 !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  transform: none !important;
+  /* Override any CSS positioning that might place them incorrectly */
+  bottom: auto !important;
+  right: auto !important;
+}
+
+/* CRITICAL: Allow JavaScript to show tooltips when it sets inline styles - this must override the default hidden state */
+/* Higher specificity to ensure JavaScript-controlled tooltips are visible and positioned correctly */
+#export-nfts .tooltip .tooltiptext[style*="visibility: visible"],
+#export-nfts .tooltip .tooltiptext[style*="visibility:visible"],
+#export-nfts .tooltip .tooltiptext[style*="opacity: 1"],
+#export-nfts .tooltip .tooltiptext[style*="opacity:1"],
+#export-nfts .tooltip:hover .tooltiptext[style*="visibility: visible"],
+#export-nfts .tooltip:hover .tooltiptext[style*="visibility:visible"],
+#export-nfts .tooltip:hover .tooltiptext[style*="opacity: 1"],
+#export-nfts .tooltip:hover .tooltiptext[style*="opacity:1"] {
+  /* Allow JavaScript to show tooltips when it sets inline styles */
+  visibility: visible !important;
+  opacity: 1 !important;
+  /* CRITICAL: Ensure fixed positioning and highest z-index when JavaScript shows tooltip */
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  /* CRITICAL: Remove any CSS positioning that might conflict with JavaScript inline styles */
+  bottom: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  /* Ensure transform doesn't interfere with positioning */
+  transform: none !important;
+  /* Don't override top/left - JavaScript sets these via inline styles for correct positioning */
+  /* JavaScript's inline styles will take precedence over CSS */
+}
+
+/* Fix Merge Metadata Files tooltip - JavaScript fully controls this tooltip */
+/* Don't force opacity or visibility - let JavaScript handle fade in/out */
+/* The tooltip is appended to body, so we can't use CSS :hover selectors reliably */
+
+/* Ensure Merge Metadata Files tooltip is properly styled and doesn't get hidden */
+#merge-metadata-files-tooltip,
+#merge-metadata-files-btn .tooltiptext,
+#export-nfts #merge-metadata-files-tooltip,
+#export-nfts #merge-metadata-files-btn .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: #f39c12 !important;
+  pointer-events: none !important;
+  /* Don't force opacity/visibility here - let JavaScript control it */
+  /* But ensure it can be shown when needed */
+}
+
+/* CRITICAL: Let JavaScript fully control the tooltip visibility and opacity */
+/* Don't interfere with JavaScript's fade in/out transitions */
+/* Only ensure the tooltip can be displayed when JavaScript wants it visible */
+#merge-metadata-files-tooltip[style*="visibility: visible"],
+#merge-metadata-files-tooltip[style*="visibility:visible"] {
+  /* Only ensure display is set when visibility is visible - let JavaScript control opacity */
+  display: block !important;
+  /* Don't force opacity - JavaScript controls it for smooth transitions */
+}
+
+/* ============================================
+   GLOBAL TOOLTIP OPACITY FIX
+   Tooltips should ONLY be visible (opacity: 1) or not visible (opacity: 0, visibility: hidden)
+   NEVER transparent/partial opacity
+   Exception: Only hide tooltips on generate-nfts tab when objects are greyed out (disabled/loading)
+   ============================================ */
+
+/* CRITICAL: Ensure ALL tooltips show at full opacity when visible - NEVER transparent */
+/* This applies globally across the entire app */
+.tooltiptext[style*="opacity: 1"],
+.tooltiptext[style*="opacity:1"],
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
+.tooltip .tooltiptext[style*="visibility: visible"],
+.tooltip .tooltiptext[style*="visibility:visible"] {
+  opacity: 1 !important;
+}
+
+/* Fix inactive tooltips in export tab - show at full opacity even when parent has opacity: 0.5 */
+#export-nfts .tooltip[style*="opacity: 0.5"] .tooltiptext,
+#export-nfts .tooltip[style*="opacity:0.5"] .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity: 0.5"] .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity:0.5"] .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity: 0.5"] .tooltiptext[style*="opacity"],
+#export-nfts .export-option-toggle[style*="opacity:0.5"] .tooltiptext[style*="opacity"] {
+  opacity: 1 !important;
+}
+
+/* Show tooltips for inactive elements in export tab - full opacity when visible */
+#export-nfts .tooltip[style*="opacity: 0.5"]:hover .tooltiptext,
+#export-nfts .tooltip[style*="opacity:0.5"]:hover .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity: 0.5"]:hover .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity:0.5"]:hover .tooltiptext {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ensure all tooltips in export tab show at full opacity on hover, regardless of parent opacity */
+#export-nfts .tooltip:hover .tooltiptext,
+#export-nfts .tooltip[style*="opacity"]:hover .tooltiptext,
+#export-nfts .export-option-toggle:hover .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity: 0.5"]:hover .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity:0.5"]:hover .tooltiptext {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* CRITICAL: Export option toggle tooltips must always be fully opaque when visible */
+/* Target all possible states - active, inactive, greyed out */
+#export-nfts .export-option-toggle .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity: 0.5"] .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity:0.5"] .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity: 1"] .tooltiptext,
+#export-nfts .export-option-toggle[style*="opacity:1"] .tooltiptext,
+#export-nfts .export-option-toggle .tooltiptext[style*="opacity: 1"],
+#export-nfts .export-option-toggle .tooltiptext[style*="opacity:1"],
+#export-nfts .export-option-toggle[style*="opacity: 0.5"] .tooltiptext[style*="opacity: 1"],
+#export-nfts .export-option-toggle[style*="opacity:0.5"] .tooltiptext[style*="opacity:1"] {
+  opacity: 1 !important;
+}
+
+/* Ensure tooltips always show at full opacity when visible, regardless of parent opacity */
+/* This works for both CSS-controlled and JavaScript-controlled tooltips */
+#export-nfts .tooltiptext[style*="opacity: 1"],
+#export-nfts .tooltiptext[style*="opacity:1"],
+#export-nfts .tooltip:hover .tooltiptext {
+  opacity: 1 !important;
+}
+
+/* CRITICAL: Prevent tooltips from inheriting parent opacity - they should always be fully opaque when visible */
+/* Only set default opacity for tooltips that don't have inline styles (CSS-controlled) */
+.tooltiptext:not([style*="opacity"]) {
+  opacity: 0 !important; /* Hidden by default for CSS-controlled tooltips */
+}
+
+/* When tooltips are visible (via inline style or hover), ensure they're fully opaque */
+.tooltiptext[style*="opacity: 1"],
+.tooltiptext[style*="opacity:1"],
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  opacity: 1 !important; /* Fully visible when shown - NEVER transparent */
+}
+
+/* ============================================
+   BLOCKCHAIN TOGGLE BUTTONS TOOLTIP FIXES
+   ============================================ */
+
+/* CRITICAL: Ensure blockchain toggle buttons maintain their inline styles when tooltip is applied */
+/* Override the general .toggle-button.tooltip rule from final-overrides.css */
+/* Blockchain toggles have inline styles set by JavaScript that must be preserved */
+/* Use maximum specificity to override final-overrides.css - must come AFTER final-overrides.css in cascade */
+html body #export-nfts .blockchain-toggles-container .toggle-button.tooltip,
+html body #export-nfts .blockchain-toggles-container .toggle-button.tooltip:hover,
+html body #export-nfts .blockchain-toggles-container button.tooltip,
+html body #export-nfts .blockchain-toggles-container button.tooltip:hover,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:hover,
+#export-nfts .blockchain-toggles-container button.tooltip,
+#export-nfts .blockchain-toggles-container button.tooltip:hover,
+.blockchain-toggles-container .toggle-button.tooltip,
+.blockchain-toggles-container .toggle-button.tooltip:hover,
+.blockchain-toggles-container button.tooltip,
+.blockchain-toggles-container button.tooltip:hover {
+  position: relative !important;
+  display: inline-block !important;
+  /* CRITICAL: Remove ALL style overrides from final-overrides.css - let inline styles (set by JavaScript) control everything */
+  /* Inline styles have higher specificity than CSS, so JavaScript-set styles will take precedence */
+  background-color: revert !important;
+  background: revert !important;
+  border: revert !important;
+  border-color: revert !important;
+  border-width: revert !important;
+  border-style: revert !important;
+  color: revert !important;
+  /* Let inline styles (set by JavaScript) control background, border, color, opacity */
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  /* CRITICAL: Don't override font-size, font-weight, padding, height - let JavaScript inline styles control them */
+  font-size: revert !important;
+  font-weight: revert !important;
+  padding: revert !important;
+  height: revert !important;
+  min-height: revert !important;
+  max-height: revert !important;
+  border-radius: revert !important;
+}
+
+/* Ensure blockchain tooltips don't interfere with button layout */
+.blockchain-toggles-container .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  pointer-events: none !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  max-width: 320px !important;
+  width: 320px !important;
+  min-width: 320px !important;
+  text-align: center !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: none !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+/* Show blockchain tooltips on hover */
+.blockchain-toggles-container .tooltip:hover .tooltiptext,
+.blockchain-toggles-container .toggle-button.tooltip:hover .tooltiptext,
+.blockchain-toggles-container button.tooltip:hover .tooltiptext {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Prevent tooltip from affecting button flex properties and dimensions */
+/* Let the existing CSS rules in export-nfts-module.css control these */
+.blockchain-toggles-container .toggle-button.tooltip,
+.blockchain-toggles-container button.tooltip {
+  /* Don't override flex or dimension properties - let existing CSS rules handle them */
+  /* The export-nfts-module.css already has rules for .blockchain-toggles-container .toggle-button */
+}
+
+/* ============================================
+   BATCH CARD TOOLTIPS - SELECT FOR EXPORT & ALREADY MINTED
+   Ensure these tooltips appear above all batch card buttons
+   ============================================ */
+
+/* CRITICAL: Ensure SELECT FOR EXPORT and ALREADY MINTED tooltips have the highest z-index */
+/* These tooltips are appended to body to escape stacking contexts */
+[id^="select-for-export-tooltip-"],
+[id*="select-for-export-tooltip"],
+[id^="already-minted-tooltip-"],
+[id*="already-minted-tooltip"],
+.select-to-export-toggle .tooltiptext,
+.already-minted-toggle .tooltiptext {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+}
+
+/* More specific selectors for batch card tooltips */
+.batch-card .select-to-export-toggle .tooltiptext,
+.batch-card .already-minted-toggle .tooltiptext,
+#batch-management-section .select-to-export-toggle .tooltiptext,
+#batch-management-section .already-minted-toggle .tooltiptext,
+#export-nfts .select-to-export-toggle .tooltiptext,
+#export-nfts .already-minted-toggle .tooltiptext,
+#export-nfts #batch-management-section .select-to-export-toggle .tooltiptext,
+#export-nfts #batch-management-section .already-minted-toggle .tooltiptext {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}

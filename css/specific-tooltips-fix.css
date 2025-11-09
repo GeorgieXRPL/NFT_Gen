@@ -1,0 +1,156 @@
+/**
+ * Specific Tooltips Fix Styles
+ * These styles apply only to the specific tooltips we're targeting
+ */
+
+/* Base tooltip style */
+.specific-tooltip {
+  position: fixed !important;
+  z-index: 9999999 !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: white !important;
+  border-radius: 6px !important;
+  padding: 10px 14px !important;
+  font-size: 0.85rem !important;
+  line-height: 1.5 !important;
+  text-align: left !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  max-width: 300px !important;
+  width: max-content !important;
+}
+
+/* Arrow for tooltip pointing down */
+.specific-tooltip::after {
+  content: "" !important;
+  position: absolute !important;
+  top: -10px !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+/* Arrow for tooltip pointing up */
+.specific-tooltip.tooltip-top::after {
+  top: auto !important;
+  bottom: -10px !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
+}
+
+/* Trait button tooltip specific styles */
+.specific-tooltip.trait-button-tooltip {
+  font-size: 0.8rem !important;
+  padding: 6px 10px !important;
+}
+
+/* Rule button tooltip specific styles */
+.specific-tooltip.rule-button-tooltip {
+  font-size: 0.8rem !important;
+  padding: 6px 10px !important;
+  text-align: center !important;
+}
+
+/* Ensure tooltips are visible within containers with overflow hidden */
+.trait-layer-header,
+.trait-layer-content,
+.trait-layer-bar,
+.trait-layers-container,
+.nav-tabs-container,
+.nav-actions,
+.trait-layer-actions,
+.trait-layer-position,
+.modal,
+.modal-body,
+.modal-content,
+.dropdown-menu,
+.trait-item,
+.trait-details,
+.trait-actions,
+.rule-actions {
+  overflow: visible !important;
+}
+
+/* Remove all custom randomize-tooltip styles */
+.specific-tooltip.randomize-tooltip {
+  all: unset !important;
+  display: none !important;
+}
+
+.specific-tooltip.randomize-tooltip br {
+  display: none !important;
+}
+
+.randomize-tooltip, .randomize-rarities-btn .tooltiptext.randomize-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.randomize-rarities-btn .tooltiptext {
+  display: none !important;
+}
+.randomize-rarities-btn:hover .tooltiptext {
+  display: block !important;
+}
+
+.trait-details {
+  width: 175px !important;
+  height: 50px !important;
+  min-width: 175px !important;
+  min-height: 50px !important;
+  max-width: 175px !important;
+  max-height: 50px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Override trait-details height when trait layers are expanded */
+.trait-layer-bar.expanded .trait-item .trait-details {
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+}
+
+.trait-item,
+.traits-grid .trait-layer-trait-item,
+.traits-grid .trait-item {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 300px !important;
+  min-height: 300px !important;
+  max-height: 300px !important;
+}
+
+.trait-layer-bar.expanded .traits-grid {
+  row-gap: 10px !important;
+  column-gap: 2.5px !important;
+}
+
+.trait-layer-bar.expanded .traits-grid,
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(8, 1fr) !important;
+  gap: 10px !important;
+  column-gap: 5px !important;
+  row-gap: 10px !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+  justify-items: stretch !important;
+  min-height: 330px !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  grid-auto-flow: row !important;
+  place-items: start !important;
+}

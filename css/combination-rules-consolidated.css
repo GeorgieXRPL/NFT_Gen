@@ -1,0 +1,1030 @@
+/* =========================================
+   CONSOLIDATED COMBINATION RULES STYLING
+   This file contains all styles for the combination rules functionality,
+   including the modal, dropdowns, and rule items.
+   ========================================= */
+
+/* ===== COMBINATION RULES SECTION ===== */
+.combination-rules-section {
+  margin-top: 1.5rem;
+}
+
+.combination-rules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.combination-rules-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Add Combination Rule Button */
+#add-combination-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 0;
+  margin-top: 0;
+  height: 38px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+#add-combination-rule svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Rules Container */
+.combination-rules-container {
+  margin-top: 20px;
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+/* ===== RULES LIST ===== */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 0 !important; /* Remove bottom indentation as per user requirement */
+  margin-bottom: 0 !important;
+}
+
+/* Rule item styling */
+.rule-item {
+  background-color: #2d2a3e;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rule-item:nth-child(even) {
+  background-color: #252236;
+}
+
+.rule-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Rule header */
+.rule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.rule-item:nth-child(even) .rule-header {
+  background-color: #252236;
+}
+
+/* Rule type */
+.rule-type {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  gap: 6px;
+}
+
+/*
+  Ensure all .rule-type and .rule-type-*-icon classes and their icons display the correct color for each rule type in the Add Combination Rule modal.
+  Add !important to color and stroke as needed. Ensure .rule-type svg uses fill: none and stroke-width: 2 for clarity.
+*/
+.rule-type svg {
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 8px !important;
+  fill: none !important;
+  stroke-width: 2 !important;
+}
+
+.rule-type-never { color: #ff6b6b !important; }
+.rule-type-always { color: #51cf66 !important; }
+.rule-type-conditional { color: #fcc419 !important; }
+.rule-type-top { color: #3498db !important; }
+.rule-type-bottom { color: #fcc419 !important; }
+.rule-type-above { color: #006cff !important; }
+.rule-type-below { color: #ff6600 !important; }
+
+/* Rule type icons */
+.rule-type-never-icon { stroke: #ff6b6b !important; fill: none !important; }
+.rule-type-always-icon { stroke: #51cf66 !important; fill: none !important; }
+.rule-type-conditional-icon { stroke: #fcc419 !important; fill: none !important; }
+.rule-type-top-icon { stroke: #3498db !important; fill: none !important; }
+.rule-type-bottom-icon { stroke: #fcc419 !important; fill: none !important; }
+.rule-type-above-icon { stroke: #006cff !important; fill: none !important; }
+.rule-type-below-icon { stroke: #ff6600 !important; fill: none !important; }
+
+/* Immediately Above/Below use different colors */
+.rule-item[data-rule-type="immediately-above"] .rule-type-above-icon { stroke: #9000ff !important; }
+.rule-item[data-rule-type="immediately-below"] .rule-type-below-icon { stroke: #ffe400 !important; }
+.rule-item[data-rule-type="immediately-above"] .rule-type-above { color: #9000ff !important; }
+.rule-item[data-rule-type="immediately-below"] .rule-type-below { color: #ffe400 !important; }
+
+/* Rule applies to text */
+.rule-applies-to-text {
+  color: white !important;
+  opacity: 0.9 !important;
+}
+
+/* Rule Actions */
+.rule-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.rule-actions .action-btn {
+  background: none;
+  border: none;
+  color: #a9a9b2;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.rule-actions .action-btn:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rule-actions .action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Rule Details */
+.rule-details {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.rule-detail {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.5rem;
+}
+
+.rule-detail:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rule-detail-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  color: #a9a9b2;
+  padding-top: 3px;
+}
+
+.rule-detail-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* New rule detail content container */
+.rule-detail-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* New rule detail header style */
+.rule-detail-header {
+  font-weight: 600;
+  color: #e2e2e2;
+  font-size: 0.85rem;
+  margin-bottom: 3px;
+}
+
+/* Layer name below the header */
+.rule-detail-sublabel {
+  color: #a9a9b2;
+  font-size: 0.7rem;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+
+/* Values (trait names) */
+.rule-detail-value {
+  color: #fff;
+  word-break: break-word;
+  font-size: 0.8rem;
+  padding-left: 0.5rem;
+}
+
+/* Legacy styles kept for backward compatibility */
+.rule-detail-label {
+  font-weight: 600;
+  margin-right: 6px;
+  color: #a9a9b2;
+  min-width: 100px;
+  font-size: 0.8rem;
+}
+
+/* Icon colors */
+.trait-icon {
+  color: #a29bfe; /* Purple color for traits */
+}
+
+.layer-icon {
+  color: #74b9ff; /* Blue color for layers */
+}
+
+/* Rule description trait names list styling */
+.rule-description-traits-list {
+  display: inline-block;
+  word-break: break-word;
+  font-size: 0.8rem;
+  color: #fff !important;
+}
+
+/* ===== COMBINATION RULE MODAL CORE STYLES ===== */
+.combination-rule-modal {
+  max-width: 1200px;
+  width: 95%;
+  max-height: calc(90vh + 100px);
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1a23;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+.combination-rule-modal .modal-header {
+  position: sticky;
+  top: 0;
+  background-color: #1a1a23;
+  z-index: 10;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+.combination-rule-modal .modal-title {
+  color: #6c5ce7;
+  font-weight: var(--font-weight-semibold);
+}
+/* ===== MODAL CLOSE BUTTON ===== */
+.combination-rule-modal .combination-rule-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #444;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.combination-rule-modal .combination-rule-close-btn:hover {
+  background: #ff4444;
+  transform: scale(1.1);
+}
+
+.combination-rule-modal .combination-rule-close-btn:active {
+  transform: scale(0.95);
+}
+
+/* Preserve combination rule close button styles when tooltip is added */
+.combination-rule-modal .combination-rule-close-btn.tooltip,
+.combination-rule-modal .tooltip.combination-rule-close-btn {
+  position: absolute !important;
+  top: 15px !important;
+  right: 15px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border: none !important;
+  background: #444 !important;
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.combination-rule-modal .combination-rule-close-btn.tooltip:hover,
+.combination-rule-modal .tooltip.combination-rule-close-btn:hover {
+  background: #ff4444 !important;
+  transform: scale(1.1) !important;
+}
+
+.combination-rule-modal .combination-rule-close-btn.tooltip:active,
+.combination-rule-modal .tooltip.combination-rule-close-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.combination-rule-modal .modal-body {
+  padding: 20px;
+  flex: 1;
+  text-align: left;
+  align-items: stretch;
+  background-color: #1a1a23;
+  overflow: visible !important;
+}
+.combination-rule-modal .modal-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: #1a1a23;
+  z-index: 10;
+  padding: 1rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ===== TRAITS SELECTION AREA ===== */
+/* CRITICAL: Commented out to allow combination-rule-modal.css to control overflow */
+/* .combination-rule-modal .traits-selection-container {
+  overflow: visible !important;
+} */
+.traits-selection-header {
+  padding: 8px;
+  background-color: #2d2a3e;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.traits-selection-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.traits-selection-actions .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  font-weight: var(--font-weight-medium);
+}
+/* Overflow controlled by combination-rule-modal.css */
+/* .traits-selection-list {
+  overflow-y: auto !important;
+  max-height: 340px !important;
+} */
+/* Hide scrollbars for traits selection lists in combination rule modal */
+.combination-rule-modal .traits-selection-list::-webkit-scrollbar,
+#first-traits-list::-webkit-scrollbar,
+#second-traits-list::-webkit-scrollbar,
+.combination-rule-modal .traits-selection-container::-webkit-scrollbar,
+.combination-rule-modal .combination-rule-body::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.combination-rule-modal .traits-selection-list::-webkit-scrollbar-track,
+.combination-rule-modal .traits-selection-list::-webkit-scrollbar-thumb,
+.combination-rule-modal .traits-selection-list::-webkit-scrollbar-thumb:hover,
+.combination-rule-modal .traits-selection-container::-webkit-scrollbar-track,
+.combination-rule-modal .traits-selection-container::-webkit-scrollbar-thumb,
+.combination-rule-modal .combination-rule-body::-webkit-scrollbar-track,
+.combination-rule-modal .combination-rule-body::-webkit-scrollbar-thumb {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Hide scrollbars for first-traits-list and second-traits-list - Firefox */
+#first-traits-list,
+#second-traits-list,
+.combination-rule-modal .traits-selection-list,
+.combination-rule-modal .traits-selection-container,
+.combination-rule-modal .combination-rule-body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Nuclear option with maximum specificity - overrides ALL other scrollbar rules */
+html body #app #combination-rule-modal *::-webkit-scrollbar,
+html body #app #combination-rule-modal #first-traits-list::-webkit-scrollbar,
+html body #app #combination-rule-modal #second-traits-list::-webkit-scrollbar,
+html body #app #combination-rule-modal .traits-selection-list::-webkit-scrollbar,
+html body #app #combination-rule-modal .traits-selection-container::-webkit-scrollbar,
+html body #app #combination-rule-modal .combination-rule-body::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+html body #app #combination-rule-modal *,
+html body #app #combination-rule-modal #first-traits-list,
+html body #app #combination-rule-modal #second-traits-list,
+html body #app #combination-rule-modal .traits-selection-list,
+html body #app #combination-rule-modal .traits-selection-container,
+html body #app #combination-rule-modal .combination-rule-body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.trait-selection-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+.trait-selection-label:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.trait-checkbox:checked + .trait-selection-label {
+  background-color: rgba(108, 92, 231, 0.2);
+  border: 1px solid var(--accent-primary);
+}
+.combination-rule-modal .trait-selection-thumbnail {
+  width: 90px;
+  height: 90px;
+  min-width: 90px;
+  min-height: 90px;
+  max-width: 90px;
+  max-height: 90px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+  background-color: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.combination-rule-modal .trait-selection-thumbnail img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.combination-rule-modal .trait-selection-name,
+.combination-rule-modal .trait-name-ellipsis {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: block !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 4px !important;
+  margin-right: auto !important;
+  margin-bottom: 0 !important;
+  margin-left: 5px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  color: #fff !important;
+  padding: 4px 8px !important;
+  position: relative !important;
+}
+
+/* Override for trait-checkbox-label: trait-selection-name padding removed */
+.combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  order: 3 !important;
+}
+.empty-traits-message {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+/* Scrollbar styling controlled by combination-rule-modal.css */
+/* .combination-rule-modal .traits-selection-container::-webkit-scrollbar {
+  width: 8px;
+  background: #18181a;
+}
+.combination-rule-modal .traits-selection-container::-webkit-scrollbar-track {
+  background: #18181a;
+  border-radius: 4px;
+}
+.combination-rule-modal .traits-selection-container::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 4px;
+}
+.combination-rule-modal .traits-selection-container::-webkit-scrollbar-thumb:hover {
+  background: #333;
+} */
+
+/* ===== RESPONSIVE STYLING ===== */
+@media (max-width: 768px) {
+  .traits-selection-list {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  .combination-rule-modal .custom-dropdown-options {
+    max-height: 250px;
+  }
+}
+@media (max-width: 480px) {
+  .traits-selection-list {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}
+
+/* Ensure dropdowns stack above selectors and labels in the Combination Rule modal */
+.combination-rule-modal .custom-dropdown,
+.combination-rule-modal .custom-dropdown-selected {
+  position: relative !important;
+  z-index: 1000000 !important;
+}
+.combination-rule-modal .custom-dropdown-options {
+  position: absolute !important;
+  z-index: 1000002 !important;
+}
+
+.trait-checkbox-label {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: rgba(0,0,0,0.04);
+}
+.trait-checkbox-label.selected {
+  border: 3px solid #6c5ce7 !important;
+  box-shadow: 0 0 0 2px rgba(108,92,231,0.15) !important;
+  background: rgba(108,92,231,0.08) !important;
+}
+.trait-checkbox-thumb {
+  border: none !important;
+  box-shadow: none !important;
+}
+.nft-trait-thumb {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* --- CRITICAL: UNIFY TOOLTIP STYLE FOR COMBINATION RULES --- */
+.combination-rule-modal .custom-tooltip,
+.combination-rule-modal .custom-tooltip-anchor:hover .custom-tooltip,
+.combination-rule-modal .trait-grid-item:hover .custom-tooltip,
+.combination-rule-modal .trait-selection-name.custom-tooltip-anchor:hover > .custom-tooltip,
+.combination-rule-modal .trait-selection-name.custom-tooltip-anchor > .custom-tooltip,
+.combination-rule-modal .tooltiptext {
+  background: #181818 !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+  outline: none !important;
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+}
+
+/* Remove tooltips from first-layer and second-layer dropdown menus */
+.combination-rule-modal #first-layer.tooltip,
+.combination-rule-modal #second-layer.tooltip,
+.combination-rule-modal #first-layer.tooltip .tooltiptext,
+.combination-rule-modal #second-layer.tooltip .tooltiptext,
+.combination-rule-modal .first-selector .form-control.tooltip,
+.combination-rule-modal .second-selector .form-control.tooltip,
+.combination-rule-modal .first-selector .form-control.tooltip .tooltiptext,
+.combination-rule-modal .second-selector .form-control.tooltip .tooltiptext,
+.combination-rule-modal .first-selector .custom-dropdown.tooltip,
+.combination-rule-modal .second-selector .custom-dropdown.tooltip,
+.combination-rule-modal .first-selector .custom-dropdown.tooltip .tooltiptext,
+.combination-rule-modal .second-selector .custom-dropdown.tooltip .tooltiptext,
+.combination-rule-modal .first-selector .custom-dropdown-selected.tooltip,
+.combination-rule-modal .second-selector .custom-dropdown-selected.tooltip,
+.combination-rule-modal .first-selector .custom-dropdown-selected.tooltip .tooltiptext,
+.combination-rule-modal .second-selector .custom-dropdown-selected.tooltip .tooltiptext {
+  pointer-events: none !important;
+}
+
+.combination-rule-modal #first-layer.tooltip .tooltiptext,
+.combination-rule-modal #second-layer.tooltip .tooltiptext,
+.combination-rule-modal .first-selector .form-control.tooltip .tooltiptext,
+.combination-rule-modal .second-selector .form-control.tooltip .tooltiptext,
+.combination-rule-modal .first-selector .custom-dropdown.tooltip .tooltiptext,
+.combination-rule-modal .second-selector .custom-dropdown.tooltip .tooltiptext,
+.combination-rule-modal .first-selector .custom-dropdown-selected.tooltip .tooltiptext,
+.combination-rule-modal .second-selector .custom-dropdown-selected.tooltip .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Sticky header for trait selection area - overridden by combination-rule-modal.css */
+/* .combination-rule-modal .traits-selection-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #2d2a3e;
+} */
+
+.combination-rule-modal .trait-grid-item {
+  width: 142px !important;
+  min-width: 142px !important;
+  max-width: 142px !important;
+  height: 165px !important;
+  min-height: 165px !important;
+  max-height: 165px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.traits-list-for-rule-grid {
+  width: 598px !important;
+  min-width: 598px !important;
+  max-width: 598px !important;
+  max-height: 750px !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, 142px) !important;
+  grid-auto-rows: 165px !important;
+  gap: 10px !important;
+  margin: 0 auto 4px auto !important;
+  align-items: start !important;
+  align-content: start !important;
+  overflow-y: auto !important;
+  overflow-x: visible !important;
+  box-sizing: border-box !important;
+  contain: none !important;
+  isolation: auto !important;
+}
+.trait-grid-item {
+  height: 165px !important;
+  min-height: 165px !important;
+  max-height: 165px !important;
+  margin-bottom: 2px !important;
+  padding-bottom: 0 !important;
+  padding-top: 0 !important;
+  position: relative !important;
+  will-change: transform, z-index !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 142px !important;
+  min-width: 142px !important;
+  max-width: 142px !important;
+}
+
+#combination-rule-modal .trait-grid-item.trait-checkbox-label:hover {
+  transform: translateZ(0) !important;
+  z-index: 99990 !important;
+}
+
+#combination-rule-modal .trait-grid-item.trait-checkbox-label.selected {
+  transform: translateZ(0) scale(1.02) !important;
+  z-index: 99995 !important;
+}
+
+#combination-rule-modal .trait-grid-item.trait-checkbox-label.selected:hover {
+  transform: translateZ(0) scale(1.05) !important;
+  z-index: 99998 !important;
+}
+.trait-selection-name.custom-tooltip-anchor {
+  min-height: auto !important;
+  height: auto !important;
+  margin-top: 4px !important;
+  margin-bottom: 0 !important;
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+}
+.trait-name-ellipsis-combo {
+  width: 137.7px !important;
+  min-width: 137.7px !important;
+  max-width: 137.7px !important;
+  height: 15.58px !important;
+  min-height: 15.58px !important;
+  max-height: 15.58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+.custom-tooltip-anchor .custom-tooltip {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.custom-tooltip-anchor:hover .custom-tooltip {
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Only show 'Randomize Rarities (tiered)' tooltip on hover */
+.tooltip[data-tooltip-id="randomize-tiered"] .tooltiptext {
+  display: none;
+}
+.tooltip[data-tooltip-id="randomize-tiered"]:hover .tooltiptext {
+  display: block;
+}
+
+/* Make trait name easier to hover for tooltip */
+#combination-rule-modal .trait-selection-name.custom-tooltip-anchor {
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  display: block !important;
+  position: relative !important;
+}
+
+/* Debug: Add outline to tooltip when visible */
+.combination-rule-modal .custom-tooltip-anchor:hover .custom-tooltip {
+  outline: 2px solid #6c5ce7;
+}
+
+/* Show tooltip when hovering thumbnail or name */
+.combination-rule-modal .trait-grid-item:hover .custom-tooltip,
+.combination-rule-modal .custom-tooltip-anchor:hover .custom-tooltip {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  outline: 2px solid #6c5ce7;
+}
+
+/* If hovering the thumbnail, position tooltip below the thumbnail */
+.combination-rule-modal .trait-checkbox-thumb:hover + .trait-selection-name .custom-tooltip {
+  top: 120%;
+  left: 50%;
+  bottom: auto;
+  transform: translateX(-50%);
+}
+
+/* Only allow overflow for tooltip anchor and tooltip */
+.combination-rule-modal .custom-tooltip-anchor {
+  overflow: visible !important;
+}
+
+/* Minimal robust tooltip CSS for debugging and correct display */
+.combination-rule-modal .custom-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: 120%;
+  transform: translateX(-50%);
+  background: #181818;
+  color: #fff;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: pre;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  display: none !important;
+}
+
+.combination-rule-modal .custom-tooltip-anchor:hover .custom-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#combination-rule-modal.modal-overlay,
+#combination-rule-modal .combination-rule-modal {
+  overflow: visible !important;
+}
+
+/* Debug: Force tooltip to show on hover with high specificity */
+.combination-rule-modal .trait-selection-name.custom-tooltip-anchor:hover > .custom-tooltip {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  border: 2px solid red !important;
+  background: #222 !important;
+  color: #fff !important;
+  z-index: 99999 !important;
+}
+
+/* Debug: Always show tooltip for the first trait name */
+.combination-rule-modal .trait-selection-name.custom-tooltip-anchor > .custom-tooltip {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  border: 2px solid blue !important;
+  background: #0ff !important;
+  color: #000 !important;
+  z-index: 2147483647 !important;
+}
+
+/* Super-generic debug rule: should affect all .custom-tooltip elements */
+.custom-tooltip {
+  background: #f0f !important;
+  color: #fff !important;
+  border: 2px solid green !important;
+  opacity: 1 !important;
+  z-index: 99999 !important;
+  position: absolute !important;
+}
+
+.combination-rule-modal .trait-selection-name,
+.combination-rule-modal .trait-name-ellipsis,
+.combination-rule-modal .trait-selection-name:hover,
+.combination-rule-modal .trait-name-ellipsis:hover {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: #fff !important;
+  width: 100% !important;
+  font-size: 11px !important;
+  position: relative !important;
+  display: block !important;
+}
+
+/* Exception: trait-checkbox-label .trait-selection-name should use margin-top: auto for bottom alignment */
+.combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  margin-top: auto !important;
+}
+
+.combination-rule-modal .trait-name-ellipsis,
+.combination-rule-modal .trait-name-ellipsis:hover {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0px auto 0 auto !important;
+  margin-top: 4px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  color: #fff !important;
+  position: relative !important;
+}
+
+.trait-details,
+.trait-controls,
+.trait-name.custom-tooltip-anchor {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.trait-item > .trait-image,
+.trait-item > .trait-image img {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1 !important;
+  border: none !important;
+}
+
+.trait-item {
+  gap: 0 !important;
+}
+
+.trait-rarity-input {
+  width: 75px !important;
+  text-align: right !important;
+}
+
+.combination-rule-modal .trait-checkbox-label {
+  width: 142px !important;
+  min-width: 142px !important;
+  max-width: 142px !important;
+  height: 165px !important;
+  min-height: 165px !important;
+  max-height: 165px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+.combination-rule-modal .trait-checkbox-thumb {
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  height: 106px !important;
+  min-height: 106px !important;
+  max-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  position: static !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  box-sizing: border-box !important;
+  order: 1 !important;
+}
+
+/* Create a spacer element effect by using flex-grow on thumb wrapper or use order to position name last */
+.combination-rule-modal .trait-checkbox-label {
+  position: relative !important;
+}
+
+/* Create invisible spacers to center thumb vertically above the name */
+/* The ::before pseudo-element acts as a flex spacer above the thumb */
+.combination-rule-modal .trait-checkbox-label::before {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  order: 0 !important;
+  width: 100% !important;
+}
+
+/* The ::after pseudo-element acts as a flex spacer between thumb and name */
+.combination-rule-modal .trait-checkbox-label::after {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  order: 2 !important;
+  width: 100% !important;
+}
+
+/* Name comes after spacer, pushed to bottom */
+.combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  order: 3 !important;
+  margin-top: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.combination-rule-modal .trait-grid-item .trait-selection-name,
+.combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  width: 136px !important;
+  max-width: 136px !important;
+  min-width: 136px !important;
+  margin-top: 0 !important;
+  margin-right: auto !important;
+  margin-bottom: 0 !important;
+  margin-left: 5px !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 400 !important;
+  flex-shrink: 0 !important;
+  order: 3 !important;
+}
+.combination-rule-modal .nft-trait-thumb {
+  width: 90px !important;
+  min-width: 90px !important;
+  max-width: 90px !important;
+  height: 90px !important;
+  min-height: 90px !important;
+  max-height: 90px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Removed duplicate traits-list-for-rule-grid rule - now handled by the main rule above */
+

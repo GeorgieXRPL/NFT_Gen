@@ -1,0 +1,135 @@
+/* Enlarge trait layer rarity slider to fit available space */
+.trait-layer-header-rarity {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin-top: 0.25rem !important;
+  min-width: 200px !important; /* Increased from 120px */
+  flex: 1 !important; /* Added to take available space */
+  max-width: 400px !important; /* Added to prevent excessive width */
+  margin-right: 1rem !important; /* Added spacing */
+}
+
+.trait-layer-header-rarity-slider {
+  width: auto !important; /* Changed from fixed 50px to auto */
+  flex: 1 !important; /* Take all available space */
+  -webkit-appearance: none !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+  background-color: #000 !important;
+  border: 1px solid var(--slider-track-border) !important;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+/* Improve the slider thumb for better usability */
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 18px !important; /* Increased from default */
+  height: 18px !important; /* Increased from default */
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important; /* Added border for visibility */
+  margin-top: -5px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  margin-top: -5px !important;
+}
+
+/* Hover effect for better interactivity */
+.trait-layer-header-rarity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 5px var(--accent-primary) !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-thumb:hover {
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 5px var(--accent-primary) !important;
+}
+
+/* Keep the value input at a fixed width */
+.trait-layer-header-rarity-value {
+  font-size: 0.85rem !important;
+  font-weight: var(--font-weight-medium) !important;
+  width: 60px !important; /* Fixed width at 60px */
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+  padding: 0.25rem !important;
+  text-align: center !important;
+  transition: color 0.3s ease !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+/* Adjust layout for smaller screens */
+@media (max-width: 768px) {
+  .trait-layer-header-rarity {
+    max-width: 250px !important;
+    min-width: 150px !important;
+  }
+
+  .trait-layer-header {
+    flex-wrap: wrap !important;
+  }
+
+  .trait-layer-info {
+    flex-basis: 100% !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* Ensure proper spacing for other header elements */
+.trait-layer-position {
+  margin-left: auto !important; /* Push to the right */
+  margin-right: 0.5rem !important;
+}
+
+.trait-layer-actions {
+  margin-left: 0 !important;
+}
+
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header {
+  box-shadow: none !important;
+}

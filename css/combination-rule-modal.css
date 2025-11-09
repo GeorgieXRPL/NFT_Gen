@@ -1,0 +1,867 @@
+/* 
+ * Combination Rule Modal - Matching Dark NFT Traits/Select Trait modal style
+ * This file contains styles for the combination rule modal to match the visual appearance
+ * of the Dark NFT Traits Configuration and Select Trait modals
+ */
+
+/* Combination Rule Modal Container */
+#combination-rule-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#combination-rule-modal .combination-rule-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#combination-rule-modal .combination-rule-container {
+  background: #222;
+  border-radius: 12px;
+  width: 1311px !important;
+  min-width: 1311px !important;
+  max-width: 1311px !important;
+  flex: none !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  height: 800px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: visible !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+#combination-rule-modal .combination-rule-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #333;
+  background: #1a1a1a;
+  position: relative;
+  gap: 20px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+#combination-rule-modal .combination-rule-title-container {
+  flex: 1;
+}
+
+#combination-rule-modal .combination-rule-title {
+  color: #fff;
+  margin: 0 0 4px 0;
+  font-family: 'Archivo', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+#combination-rule-modal .combination-rule-tip {
+  color: #ccc;
+  margin: 0;
+  font-size: 14px;
+}
+
+#combination-rule-modal .combination-rule-close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 32px;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-weight: bold;
+}
+
+#combination-rule-modal .combination-rule-close-btn:hover {
+  color: #fff;
+}
+
+#combination-rule-modal .combination-rule-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: visible !important;
+  overflow-y: auto;
+  padding: 20px 24px;
+  background: #222;
+}
+
+#combination-rule-modal .combination-rule-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #333;
+  background: #1a1a1a;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+#combination-rule-modal .rule-controls-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+#combination-rule-modal .rule-controls-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+#combination-rule-modal .form-group {
+  margin-bottom: 16px;
+}
+
+#combination-rule-modal .form-group label {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-family: 'Archivo', sans-serif;
+}
+
+#combination-rule-modal .rule-selectors {
+  display: flex;
+  gap: 20px;
+  position: relative; /* Allows absolute positioning of warning */
+  margin-top: 50px; /* Reserve space for warning message */
+  overflow: visible !important;
+}
+
+/* Fixed space for warning message - prevents content shift */
+#combination-rule-modal .warning-space {
+  height: 50px;
+  margin-bottom: 0;
+  position: relative;
+}
+
+/* Warning message positioned absolutely to not affect layout */
+#combination-rule-modal #same-layer-warning.validation-warning {
+  position: absolute;
+  top: -50px;
+  left: 0;
+  right: 0;
+  margin: 0 !important;
+  z-index: 10;
+  font-size: 0.85rem !important;
+  color: #d32f2f !important;
+  padding: 8px 12px !important;
+  background-color: rgba(211, 47, 47, 0.1) !important;
+  border-radius: 4px !important;
+  border-left: 4px solid #d32f2f !important;
+}
+
+#combination-rule-modal .first-selector,
+#combination-rule-modal .second-selector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 623px !important;
+  width: 623px !important;
+  max-width: 623px !important;
+  overflow: visible !important;
+}
+
+#combination-rule-modal .traits-selection-container {
+  margin-top: 12px;
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 0;
+  overflow: visible !important; /* Allow overflow for halo effects */
+  max-height: 300px;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  isolation: auto !important; /* Changed from isolate to auto to allow overflow */
+}
+
+#combination-rule-modal .traits-selection-header {
+  padding: 8px;
+  background-color: #333;
+  border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  border-radius: 6px 6px 0 0;
+  flex-shrink: 0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+#combination-rule-modal .traits-selection-header span {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+#combination-rule-modal .traits-selection-actions {
+  display: flex;
+  gap: 8px;
+}
+
+#combination-rule-modal .traits-selection-actions .btn {
+  padding: 4px 12px;
+  font-size: 13px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+}
+
+#combination-rule-modal .traits-selection-actions .btn-secondary {
+  background: #555;
+  color: #fff;
+}
+
+#combination-rule-modal .traits-selection-actions .btn-secondary:hover {
+  background: #666;
+}
+
+#combination-rule-modal .traits-selection-list {
+  display: grid !important;
+  grid-template-columns: repeat(4, 142px) !important;
+  gap: 15px !important;
+  justify-content: start !important;
+  overflow-y: auto !important;
+  overflow-x: visible !important; /* Allow horizontal overflow for halo effects */
+  flex: 1 !important;
+  min-height: 0 !important;
+  padding: 20px !important; /* Increased padding to accommodate halo effects (was 12px) */
+  contain: none !important;
+  isolation: auto !important;
+}
+
+/* Trait Selection Cards - Match Select Trait modal (142x165px) */
+#combination-rule-modal .trait-checkbox-label {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  width: 142px !important;
+  height: 165px !important;
+  min-width: 142px !important;
+  min-height: 165px !important;
+  max-width: 142px !important;
+  max-height: 165px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  border: 1px solid #a259e6 !important;
+  border-radius: 6px !important;
+  padding: 4px 3px 8px 3px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: visible !important; /* Changed from hidden to visible to allow halo effects */
+  transition: all 0.2s ease !important;
+  will-change: transform, z-index !important;
+}
+
+#combination-rule-modal .trait-checkbox-label .trait-checkbox-thumb {
+  overflow: hidden !important;
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  order: 1 !important;
+}
+
+/* Create invisible spacers to center thumb vertically above the name */
+/* The ::before pseudo-element acts as a flex spacer above the thumb */
+#combination-rule-modal .trait-checkbox-label::before {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  order: 0 !important;
+  width: 100% !important;
+}
+
+/* The ::after pseudo-element acts as a flex spacer between thumb and name */
+#combination-rule-modal .trait-checkbox-label::after {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  order: 2 !important;
+  width: 100% !important;
+}
+
+/* Ensure trait-selection-name is ordered last and pushed to bottom */
+#combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  order: 3 !important;
+  margin-top: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+#combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  overflow: hidden !important;
+  font-weight: 400 !important;
+  width: 136px !important;
+  max-width: 136px !important;
+  min-width: 136px !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+#combination-rule-modal .trait-checkbox-label:hover {
+  border-color: #a259e6 !important;
+  overflow: visible !important;
+  z-index: 99990 !important;
+  position: relative !important;
+  transform: translateZ(0) !important;
+  box-shadow: 0 4px 12px rgba(162, 89, 230, 0.4) !important; /* Halo effect on hover */
+}
+
+#combination-rule-modal .trait-checkbox-label.selected {
+  border: 3px solid #e17055 !important;
+  border-width: 3px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  box-shadow: 0 0 20px rgba(225, 112, 85, 0.6) !important;
+  transform: translateZ(0) scale(1.02) !important;
+  transition: all 0.2s ease !important;
+  z-index: 99995 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+#combination-rule-modal .trait-checkbox-label.selected .trait-selection-name {
+  margin-top: auto !important;
+}
+
+#combination-rule-modal .trait-checkbox-label.selected:hover {
+  transform: translateZ(0) scale(1.05) !important;
+  box-shadow: 0 0 25px rgba(225, 112, 85, 0.8) !important;
+  z-index: 99998 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+#combination-rule-modal .trait-checkbox-thumb {
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  height: 106px !important;
+  min-height: 106px !important;
+  max-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  pointer-events: auto !important;
+  border: none !important;
+  order: 1 !important;
+}
+
+/* Create invisible spacer to center thumb vertically above the name */
+#combination-rule-modal .trait-checkbox-label::after {
+  content: '' !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  order: 2 !important;
+}
+
+/* Ensure trait-selection-name is ordered last and pushed to bottom */
+#combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  order: 3 !important;
+}
+
+#combination-rule-modal .trait-checkbox-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  margin: auto !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+
+/* Ensure trait-grid-item is clickable for selection */
+#combination-rule-modal .trait-grid-item {
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+/* Rarity badge - matching Dark NFT Traits Configuration style */
+#combination-rule-modal .combination-rule-trait-rarity {
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;
+  color: #8b5cf6 !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+/* VIEW button - matching Dark NFT Traits Configuration style */
+#combination-rule-modal .combination-rule-trait-view-btn {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  background: #f39c12 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  z-index: 100 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: background 0.2s ease !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Archivo', sans-serif !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#combination-rule-modal .combination-rule-trait-view-btn:hover {
+  background: #e67e22 !important;
+}
+
+#combination-rule-modal .combination-rule-trait-view-btn:active {
+  background: #d35400 !important;
+}
+
+/* Override any conflicting styles from combination-rules-consolidated.css */
+#combination-rule-modal .trait-selection-thumbnail {
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  height: 106px !important;
+  min-height: 106px !important;
+  max-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  margin: 0 auto 0 auto !important;
+}
+
+#combination-rule-modal .trait-selection-thumbnail img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 !important;
+}
+
+/* General trait-selection-name styling */
+#combination-rule-modal .trait-selection-name {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 25px !important;
+  text-align: center !important;
+  color: #fff !important;
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  font-family: 'Archivo', sans-serif !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 3 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Override conflicting rules from trait-layers-consolidated.css */
+#combination-rule-modal .trait-name,
+#combination-rule-modal .trait-selection-name {
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: none !important;
+}
+
+/* Ensure trait-checkbox-label .trait-selection-name keeps its width after general override */
+#combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  width: 136px !important;
+  max-width: 136px !important;
+  min-width: 136px !important;
+}
+
+/* Specific styling for trait-selection-name inside trait-grid-item - must come after to override */
+#combination-rule-modal .trait-grid-item .trait-selection-name,
+#combination-rule-modal .trait-checkbox-label .trait-selection-name {
+  width: 136px !important;
+  max-width: 136px !important;
+  min-width: 136px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  font-weight: 400 !important;
+  flex-shrink: 0 !important;
+  order: 3 !important;
+}
+
+#combination-rule-modal .trait-name-ellipsis {
+  width: 133.44px !important;
+  min-width: 133.44px !important;
+  max-width: 133.44px !important;
+  height: 29.14px !important;
+  min-height: 29.14px !important;
+  max-height: 29.14px !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  font-family: 'Archivo', sans-serif !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #fff !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+
+#combination-rule-modal .rule-description {
+  margin-top: 16px;
+  padding: 12px;
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+
+#combination-rule-modal .rule-description p {
+  color: #ccc;
+  margin: 0;
+  font-size: 14px;
+}
+
+#combination-rule-modal .btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#combination-rule-modal .btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+#combination-rule-modal .btn-secondary:hover {
+  background: #5a6268;
+}
+
+#combination-rule-modal .btn-primary {
+  background: #6c5ce7;
+  color: #fff;
+}
+
+#combination-rule-modal .btn-primary:hover {
+  background: #5a4cd6;
+}
+
+/* Form controls */
+#combination-rule-modal .form-control {
+  width: 100%;
+  padding: 8px 12px;
+  background: #000000 !important; /* Black background for dropdown menus */
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'Archivo', sans-serif;
+  transition: border-color 0.2s ease;
+}
+
+#combination-rule-modal .form-control:focus {
+  outline: none;
+  border-color: #6c5ce7;
+  background: #000000 !important; /* Keep black background when focused */
+}
+
+/* Black background for dropdown options when expanded */
+#combination-rule-modal .form-control option,
+#combination-rule-modal #first-layer option,
+#combination-rule-modal #second-layer option,
+.combination-rule-modal .form-control option,
+.combination-rule-modal #first-layer option,
+.combination-rule-modal #second-layer option {
+  background: #000000 !important; /* Black background for dropdown options */
+  color: #ffffff !important;
+}
+
+/* Hide scrollbars while keeping scrolling */
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar {
+  width: 0px;
+  display: none;
+}
+
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar {
+  width: 0px;
+  display: none;
+}
+
+#combination-rule-modal #first-traits-list::-webkit-scrollbar,
+#combination-rule-modal #second-traits-list::-webkit-scrollbar {
+  width: 0px;
+  display: none;
+}
+
+#combination-rule-modal .combination-rule-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+#combination-rule-modal .combination-rule-body::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+#combination-rule-modal .combination-rule-body::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+#combination-rule-modal .combination-rule-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Override conflicting rules from combination-rules-consolidated.css */
+#combination-rule-modal .traits-selection-container {
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#combination-rule-modal .traits-selection-header {
+  flex-shrink: 0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+#combination-rule-modal .traits-selection-list {
+  overflow-y: auto !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+}
+
+#combination-rule-modal .first-selector .traits-selection-container,
+#combination-rule-modal .second-selector .traits-selection-container {
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#combination-rule-modal .first-selector .traits-selection-list,
+#combination-rule-modal .second-selector .traits-selection-list {
+  overflow-y: auto !important;
+  overflow-x: visible !important; /* Allow horizontal overflow for halo effects */
+  flex: 1 !important;
+  min-height: 0 !important;
+  max-height: 300px !important;
+  contain: none !important;
+  padding: 20px !important; /* Increased padding to accommodate halo effects */
+}
+
+/* Ensure dropdowns stack above layer selectors and lists */
+#combination-rule-modal .custom-dropdown,
+#combination-rule-modal .custom-dropdown-selected {
+  position: relative !important;
+  z-index: 1000000 !important;
+}
+
+#combination-rule-modal .custom-dropdown-options {
+  position: absolute !important;
+  z-index: 1000002 !important;
+}
+
+/* In case consolidated styles set modal body overflow, force visible here */
+#combination-rule-modal .modal-body,
+#combination-rule-modal .combination-rule-body {
+  overflow: visible !important;
+}
+
+#combination-rule-modal #first-traits-list,
+#combination-rule-modal #second-traits-list {
+  overflow-y: auto !important;
+  scrollbar-width: none !important; /* Firefox - Hide scrollbar */
+  -ms-overflow-style: none !important; /* IE and Edge - Hide scrollbar */
+}
+
+/* Completely hide scrollbars for first-traits-list and second-traits-list */
+#combination-rule-modal #first-traits-list::-webkit-scrollbar,
+#combination-rule-modal #second-traits-list::-webkit-scrollbar,
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar,
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar,
+#combination-rule-modal .combination-rule-body::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+#combination-rule-modal #first-traits-list::-webkit-scrollbar-track,
+#combination-rule-modal #second-traits-list::-webkit-scrollbar-track,
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar-track,
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar-track {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+#combination-rule-modal #first-traits-list::-webkit-scrollbar-thumb,
+#combination-rule-modal #second-traits-list::-webkit-scrollbar-thumb,
+#combination-rule-modal .traits-selection-list::-webkit-scrollbar-thumb,
+#combination-rule-modal .traits-selection-container::-webkit-scrollbar-thumb {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Firefox - Completely hide scrollbars */
+#combination-rule-modal #first-traits-list,
+#combination-rule-modal #second-traits-list,
+#combination-rule-modal .traits-selection-list,
+#combination-rule-modal .traits-selection-container {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* IE and Edge - Hide scrollbars */
+#combination-rule-modal #first-traits-list::-ms-overflow-style,
+#combination-rule-modal #second-traits-list::-ms-overflow-style,
+#combination-rule-modal .traits-selection-list::-ms-overflow-style,
+#combination-rule-modal .traits-selection-container::-ms-overflow-style {
+  scrollbar-width: none !important;
+}
+
+/* Empty state message */
+#combination-rule-modal .empty-traits-message {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ==========================================
+   MAXIMUM SPECIFICITY - HIDE ALL SCROLLBARS IN MODAL
+   ========================================== */
+
+/* Nuclear option: Hide ALL scrollbars in the combination rule modal - OVERRIDES EVERYTHING */
+#combination-rule-modal *::-webkit-scrollbar,
+html body #app #combination-rule-modal *::-webkit-scrollbar,
+body #app #combination-rule-modal *::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Firefox - Nuclear option */
+#combination-rule-modal *,
+html body #app #combination-rule-modal *,
+body #app #combination-rule-modal * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Override any conflicting rules with maximum specificity */
+html body #app #combination-rule-modal #first-traits-list::-webkit-scrollbar,
+html body #app #combination-rule-modal #second-traits-list::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+

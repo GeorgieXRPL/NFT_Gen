@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ Check across the entire app files for conflicts on these issues and update them all.
+

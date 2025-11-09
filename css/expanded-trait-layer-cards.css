@@ -1,0 +1,400 @@
+/* 
+ * Expanded Trait Layer Cards - Matching Edit Combination Rule modal style
+ * This file contains styles for trait cards in expanded trait layer headers
+ * Matching the exact dimensions, colors, and styling from combination-rule-modal.css
+ */
+
+/* Trait card container - matching combination-rule-modal .trait-checkbox-label */
+.expanded-trait-layer-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  width: 142px !important;
+  height: 165px !important;
+  min-width: 142px !important;
+  min-height: 165px !important;
+  max-width: 142px !important;
+  max-height: 165px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  border: 1px solid #a259e6 !important;
+  border-radius: 6px !important;
+  padding: 4px 3px 8px 3px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: visible !important;
+  transition: all 0.2s ease !important;
+  will-change: transform, z-index !important;
+}
+
+/* Create invisible spacers to center thumb vertically above the name */
+.expanded-trait-layer-card::before {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  order: 0 !important;
+  width: 100% !important;
+}
+
+.expanded-trait-layer-card::after {
+  content: '' !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  order: 2 !important;
+  width: 100% !important;
+}
+
+.expanded-trait-layer-card:hover {
+  border-color: #a259e6 !important;
+  overflow: visible !important;
+  z-index: 99990 !important;
+  position: relative !important;
+  transform: translateZ(0) !important;
+  box-shadow: 0 4px 12px rgba(162, 89, 230, 0.4) !important;
+}
+
+.expanded-trait-layer-card.selected {
+  border: 3px solid #e17055 !important;
+  border-width: 3px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  box-shadow: 0 0 20px rgba(225, 112, 85, 0.6) !important;
+  transform: translateZ(0) scale(1.02) !important;
+  transition: all 0.2s ease !important;
+  z-index: 99995 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.expanded-trait-layer-card.selected:hover {
+  transform: translateZ(0) scale(1.05) !important;
+  box-shadow: 0 0 25px rgba(225, 112, 85, 0.8) !important;
+  z-index: 99998 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Trait thumbnail - matching combination-rule-modal .trait-checkbox-thumb */
+.expanded-trait-layer-card-thumb {
+  width: 136px !important;
+  min-width: 136px !important;
+  max-width: 136px !important;
+  height: 106px !important;
+  min-height: 106px !important;
+  max-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  pointer-events: auto !important;
+  border: none !important;
+  order: 1 !important;
+}
+
+.expanded-trait-layer-card-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  margin: auto !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+
+/* Rarity badge - matching combination-rule-modal .combination-rule-trait-rarity */
+.expanded-trait-layer-card-rarity {
+  position: absolute !important;
+  top: 4px !important;
+  left: 4px !important;
+  color: #8b5cf6 !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+/* Buttons container - positioned at top right */
+.expanded-trait-layer-card-buttons {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2px !important;
+  align-items: center !important;
+  z-index: 100 !important;
+  pointer-events: auto !important;
+}
+
+/* Delete button - icon only, smaller width, same height as VIEW - moved 7px to the left */
+.expanded-trait-layer-card-delete-btn {
+  position: relative !important;
+  left: -7px !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  background: #e74c3c !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: background 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 10px !important;
+}
+
+.expanded-trait-layer-card-delete-btn:hover {
+  background: #c0392b !important;
+}
+
+.expanded-trait-layer-card-delete-btn:active {
+  background: #a93226 !important;
+}
+
+.expanded-trait-layer-card-delete-btn svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+/* Replace Image button - icon only, smaller width, same height as VIEW - moved 4px to the left */
+.expanded-trait-layer-card-replace-btn {
+  position: relative !important;
+  left: -4px !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  background: #3498db !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: background 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 10px !important;
+}
+
+.expanded-trait-layer-card-replace-btn:hover {
+  background: #2980b9 !important;
+}
+
+.expanded-trait-layer-card-replace-btn:active {
+  background: #21618c !important;
+}
+
+.expanded-trait-layer-card-replace-btn svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}
+
+/* VIEW button - matching combination-rule-modal .combination-rule-trait-view-btn */
+.expanded-trait-layer-card-view-btn {
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  background: #f39c12 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: background 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Archivo', sans-serif !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.expanded-trait-layer-card-view-btn:hover {
+  background: #e67e22 !important;
+}
+
+.expanded-trait-layer-card-view-btn:active {
+  background: #d35400 !important;
+}
+
+/* Trait name - matching combination-rule-modal .trait-selection-name */
+.expanded-trait-layer-card-name {
+  order: 3 !important;
+  margin-top: 0 !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+  font-weight: 400 !important;
+  width: 136px !important;
+  max-width: 136px !important;
+  min-width: 136px !important;
+  margin-bottom: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 25px !important;
+  text-align: center !important;
+  color: #fff !important;
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 3 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+}
+
+.expanded-trait-layer-card-name span {
+  width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Rarity slider container - positioned below buttons */
+.expanded-trait-layer-card-rarity-slider-container {
+  position: absolute !important;
+  bottom: 18px !important; /* Moved 5px up (from 13px to 18px) */
+  left: 4px !important;
+  right: 4px !important;
+  width: calc(100% - 8px) !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 5 !important;
+  pointer-events: auto !important;
+}
+
+.expanded-trait-layer-card-rarity-slider {
+  width: 100% !important;
+  height: 4px !important;
+  background: transparent !important; /* Slider track background is handled by webkit/moz pseudo-elements */
+  border-radius: 2px !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  cursor: pointer !important;
+}
+
+/* Slider track background - black like trait layer header slider */
+.expanded-trait-layer-card-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 4px !important;
+  border-radius: 2px !important;
+}
+
+.expanded-trait-layer-card-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 12px !important;
+  height: 12px !important;
+  background: #8b5cf6 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  margin-top: -4px !important; /* Center 12px thumb on 4px track: (12-4)/2 = 4px */
+}
+
+.expanded-trait-layer-card-rarity-slider::-moz-range-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  background: #8b5cf6 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  /* Firefox automatically centers based on track height */
+}
+
+.expanded-trait-layer-card-rarity-slider::-moz-range-track {
+  background: #000 !important; /* Black background like trait layer header slider */
+  height: 4px !important;
+  border-radius: 2px !important;
+}
+
+/* Grid container for trait cards */
+.expanded-trait-layer-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(10, 142px) !important;
+  gap: 10px !important; /* Equal spacing between columns and rows */
+  justify-content: center !important; /* Center the grid horizontally */
+  overflow-y: auto !important;
+  overflow-x: visible !important;
+  padding: 20px !important;
+  margin: 0 auto !important; /* Additional centering */
+  width: fit-content !important; /* Allow grid to shrink to content width */
+  max-width: 100% !important; /* Prevent overflow */
+}
+
+.expanded-trait-layer-cards-grid-item {
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+/* Center the expanded-trait-layer-cards-grid inside trait-layer-content.expanded */
+.trait-layer-content.expanded .expanded-trait-layer-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(10, 142px) !important;
+  gap: 10px !important;
+  justify-content: center !important; /* Center the grid horizontally */
+  align-content: start !important; /* Align content to top */
+  overflow-y: auto !important;
+  overflow-x: visible !important;
+  padding: 20px !important;
+  margin: 0 auto !important; /* Additional centering */
+  width: fit-content !important; /* Allow grid to shrink to content width */
+  max-width: 100% !important; /* Prevent overflow */
+  box-sizing: border-box !important;
+}
+

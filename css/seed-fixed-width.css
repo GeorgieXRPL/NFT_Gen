@@ -1,0 +1,115 @@
+/* 
+ * Seed Controls Fixed Width
+ * This CSS ensures the seed label, number and copy button all have fixed sizes
+ * to maintain consistent layout when adding additional elements
+ */
+
+/* Fixed width for the entire seed info container */
+.nft-seed-info {
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+  background: rgba(0,0,0,0.15) !important;
+  padding: 5px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+  box-sizing: border-box !important;
+}
+
+/* Fixed width for "Seed:" label */
+.nft-seed-info span:first-child {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+  font-weight: 500 !important;
+}
+
+/* Fixed width for the seed number */
+.nft-seed-info .seed-number {
+  width: 70px !important;
+  min-width: 70px !important;
+  max-width: 70px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  position: relative !important;
+}
+
+/* Fixed width for the copy button */
+.nft-seed-info .copy-icon {
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+}
+
+/* Animation for copy success */
+@keyframes copy-success-pulse {
+  0% { color: inherit; transform: scale(1); }
+  50% { color: #7ed957; transform: scale(1.2); }
+  100% { color: inherit; transform: scale(1); }
+}
+
+.nft-seed-info .copy-icon-success {
+  animation: copy-success-pulse 1.5s ease;
+  color: #7ed957 !important;
+}
+
+/* Seed verification animation */
+@keyframes seed-verification-pulse {
+  0% { background-color: transparent; }
+  50% { background-color: rgba(126, 217, 87, 0.2); }
+  100% { background-color: transparent; }
+}
+
+.seed-number.seed-verification-active {
+  animation: seed-verification-pulse 1.5s ease infinite;
+  border-radius: 4px !important;
+}
+
+/* Tooltip for seed verification */
+.seed-number .seed-tooltip {
+  position: absolute !important;
+  top: -30px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background-color: rgba(126, 217, 87, 0.9) !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+  opacity: 0;
+  transition: opacity 0.3s ease !important;
+}
+
+.seed-number .seed-tooltip:after {
+  content: '' !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(126, 217, 87, 0.9) transparent transparent transparent !important;
+}
+
+/* Also update the seed toggle in the controls to have fixed width */
+.seed-controls .toggle-text {
+  width: 40px !important;
+  min-width: 40px !important;
+} 

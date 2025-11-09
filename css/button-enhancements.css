@@ -1,0 +1,110 @@
+/* Enhanced button hover effects */
+.btn-new,
+.btn-load,
+.btn-save {
+  transition: all 0.3s ease !important;
+  border-width: 2px !important;
+}
+
+.btn-new:hover {
+  background-color: rgba(255, 118, 117, 0.25) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(255, 118, 117, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-new:hover svg {
+  color: #ff9a98 !important;
+}
+
+.btn-load:hover {
+  background-color: rgba(52, 152, 219, 0.25) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-load:hover svg {
+  color: #5dade2 !important;
+}
+
+.btn-save:hover {
+  background-color: rgba(0, 184, 148, 0.25) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0, 184, 148, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-save:hover svg {
+  color: #1dd1a1 !important;
+}
+
+/* Make sure the trait layer header slider is properly sized */
+.trait-layer-header {
+  box-shadow: none !important;
+}
+
+.trait-layer-header-rarity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  min-width: 120px !important;
+}
+
+.trait-layer-header-rarity-slider {
+  width: 50px !important;
+  -webkit-appearance: none;
+  height: 8px !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+  background-color: #000 !important;
+  border: 1px solid var(--slider-track-border);
+  outline: none;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 1;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  margin-top: -5px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-thumb {
+  margin-top: -5px !important;
+}
+
+.trait-layer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px !important;
+}
+
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}

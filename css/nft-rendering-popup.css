@@ -1,0 +1,218 @@
+/* NFT Rendering Popup - Visible on all tabs */
+/* Match the style of "Calculating Rarity Ranks" popup exactly */
+.nft-rendering-popup {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background: #2c3e50 !important;
+  color: #ffffff !important;
+  padding: 30px 50px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid #34495e;
+  z-index: 99999 !important;
+  font-family: 'Archivo', sans-serif;
+  text-align: center;
+  width: 253px !important;
+  max-width: 253px !important;
+  min-width: 253px !important;
+  height: 266px !important;
+  max-height: 266px !important;
+  min-height: 266px !important;
+  pointer-events: none;
+  visibility: visible;
+  opacity: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+/* Legacy support for tab-specific selectors */
+#generate-nfts .nft-rendering-popup {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 99999 !important;
+}
+
+/* Override any conflicting width rules from other CSS files */
+#generate-nfts .nft-rendering-popup.scan-progress-popup,
+.nft-rendering-popup.scan-progress-popup {
+  width: 253px !important;
+  max-width: 253px !important;
+  min-width: 253px !important;
+  height: 266px !important;
+  max-height: 266px !important;
+  min-height: 266px !important;
+}
+
+/* Popup Title */
+.nft-rendering-popup .nft-rendering-popup-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff !important;
+  margin-bottom: 8px;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  font-family: 'Archivo', sans-serif;
+  text-align: center !important; /* Keep centered */
+  width: 100%;
+  display: block !important;
+  box-sizing: border-box;
+  transform: translate(-2px, 6px); /* Moved 26px to the left (from 24px to -2px) */
+}
+
+/* Task List Container */
+.nft-rendering-popup .nft-rendering-task-list {
+  position: relative; /* Enable absolute positioning for children */
+  width: auto;
+  height: auto;
+  align-self: flex-start; /* Change from center to flex-start to left-align */
+  transform: translate(-24px, 13px); /* Moved 10px more to the left (from -14px to -24px), tasks remain aligned to each other */
+  /* Remove flex to prevent stretching */
+}
+
+/* Task Item - No fixed height, natural flow */
+.nft-rendering-popup .nft-task-item {
+  position: relative;
+  display: flex; /* Use flex for natural alignment */
+  align-items: center; /* Vertically center items */
+  width: auto;
+  font-size: 14px;
+  font-family: 'Archivo', sans-serif;
+  white-space: nowrap; /* Prevent text wrapping */
+  margin-bottom: 6px; /* Spacing between items */
+  gap: 8px; /* Space between elements */
+}
+
+/* Task Status Icon (checkmark or empty) - Now in front of text */
+.nft-rendering-popup .task-status {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  flex-shrink: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+  margin-left: 10px !important; /* Moved 10px to the left (from 20px to 10px) */
+}
+
+/* Task Text */
+.nft-rendering-popup .task-text {
+  display: inline-block;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Task Dots - baseline aligned */
+.nft-rendering-popup .task-dots {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline; /* Baseline align with text */
+  vertical-align: baseline; /* Baseline align with text */
+  margin-left: 4px;
+  margin-right: 4px;
+  gap: 2px;
+}
+
+.nft-rendering-popup .task-dots span {
+  width: 5px;
+  height: 5px;
+  background: #3498db;
+  border-radius: 50%;
+  display: inline-block;
+  animation: scanDotPulse 1.4s infinite ease-in-out;
+  vertical-align: baseline; /* Baseline align with text */
+  margin-bottom: 0; /* Remove margin-bottom that was pushing dots down */
+}
+
+.nft-rendering-popup .task-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.nft-rendering-popup .task-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.nft-rendering-popup .task-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes scanDotPulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Task States */
+.nft-rendering-popup .task-pending .task-text {
+  color: #888 !important;
+}
+
+.nft-rendering-popup .task-in-progress .task-text {
+  color: #3498db !important;
+}
+
+.nft-rendering-popup .task-completed .task-status {
+  color: #27ae60 !important;
+}
+
+.nft-rendering-popup .task-completed .task-text {
+  color: #27ae60 !important;
+}
+
+/* Loading message (shown initially, before tasks) */
+.nft-rendering-popup .nft-rendering-loading-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.nft-rendering-popup .loading-line-1,
+.nft-rendering-popup .loading-line-2 {
+  font-size: 16px;
+  color: #95a5a6;
+  font-family: 'Archivo', sans-serif;
+  line-height: 1.4;
+}
+
+.nft-rendering-popup .loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.nft-rendering-popup .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #333;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
