@@ -1,0 +1,10 @@
+/**
+ * Fix for error icon in expanded trait layers
+ * Removes the unwanted error icon that appears on the left side of expanded trait layers
+ */
+
+/* Remove the error icon from expanded trait layers */
+.trait-layer-bar.expanded::before {
+  display: none !important;
+  content: none !important;
+} 

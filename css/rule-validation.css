@@ -1,0 +1,49 @@
+/* Rule validation error styles */
+.validation-error {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+  background-color: #333333;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.conflict-error {
+  background-color: #333333;
+  border-left: 4px solid #d32f2f;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  color: #ffffff;
+}
+
+.error-highlight {
+  border: 2px solid #d32f2f !important;
+  background-color: rgba(211, 47, 47, 0.1) !important;
+}
+
+/* Specific element highlighting */
+.trait-checkbox.error-highlight + label,
+.trait-selection-item.error-highlight {
+  border: 2px solid #d32f2f !important;
+  background-color: rgba(211, 47, 47, 0.1) !important;
+  border-radius: 4px;
+}
+
+/* Animation for error highlight */
+@keyframes errorPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(211, 47, 47, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
+  }
+}
+
+.error-highlight {
+  animation: errorPulse 1.5s infinite;
+}

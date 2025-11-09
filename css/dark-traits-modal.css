@@ -1,0 +1,386 @@
+/* 
+ * Dark NFTs Modal - Independent CSS
+ * Completely separate from Saved Seeds modal to avoid conflicts
+ */
+
+/* Dark Traits Modal Container */
+#dark-traits-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#dark-traits-modal .saved-seeds-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#dark-traits-modal .saved-seeds-container {
+  background: #222;
+  border-radius: 12px;
+  width: 1255px;
+  max-width: 95vw;
+  height: 750px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+#dark-traits-modal .saved-seeds-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #333;
+  background: #1a1a1a;
+  position: relative;
+  gap: 20px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+#dark-traits-modal .saved-seeds-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px;
+}
+
+#dark-traits-modal .saved-seeds-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #333;
+  background: #1a1a1a;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Dark Traits List Container - Independent Grid System */
+#dark-traits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* Dark Traits Layer Section */
+.dark-traits-layer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dark-traits-layer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.dark-traits-layer-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  font-family: 'Archivo', sans-serif;
+}
+
+.dark-traits-layer-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dark-traits-layer-count {
+  font-size: 12px;
+  color: #888;
+  font-family: 'Archivo', sans-serif;
+}
+
+.dark-traits-select-all-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Archivo', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark-traits-select-all-btn:hover {
+  background: #0056b3;
+}
+
+.dark-traits-select-all-btn.unselect-all {
+  background: #dc3545 !important;
+  color: #fff !important;
+}
+
+.dark-traits-select-all-btn.unselect-all:hover {
+  background: #c82333 !important;
+}
+
+/* Dark Traits Grid - Independent Grid System */
+.dark-traits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 141px);
+  gap: 10px;
+  padding: 8px;
+  justify-content: start;
+  overflow: visible;
+  height: auto;
+}
+
+/* Dark Trait Cards - ALWAYS 141x165px - Maximum specificity */
+#dark-traits-modal .trait-selection-thumb.dark-trait-thumb,
+#dark-traits-modal .dark-trait-thumb,
+.dark-traits-modal .trait-selection-thumb.dark-trait-thumb,
+.dark-traits-modal .dark-trait-thumb,
+.trait-selection-thumb.dark-trait-thumb,
+.dark-trait-thumb {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 141px !important;
+  height: 165px !important;
+  min-width: 141px !important;
+  min-height: 165px !important;
+  max-width: 141px !important;
+  max-height: 165px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  border: 1px solid transparent !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+}
+
+.dark-trait-thumb:hover {
+  border-color: #a259e6;
+}
+
+/* Dark Trait Thumbnail - Centered with specific dimensions - Force size */
+.dark-trait-thumb .trait-selection-img {
+  width: 135px !important;
+  height: 106px !important;
+  max-width: 135px !important;
+  max-height: 106px !important;
+  min-width: 135px !important;
+  min-height: 106px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  cursor: default !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  pointer-events: none !important;
+  border: none !important;
+}
+
+.dark-trait-thumb .trait-selection-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Dark Trait Text Container - Bottom Left (like NFT Traits) - Maximum specificity */
+#dark-traits-modal .dark-trait-thumb .dark-nfts-trait-selection-text-container,
+.dark-traits-modal .dark-trait-thumb .dark-nfts-trait-selection-text-container,
+.dark-trait-thumb .dark-nfts-trait-selection-text-container {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 137.7px !important;
+  height: 28.58px !important;
+  padding: 4px 8px !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  flex-shrink: 0 !important;
+  border-radius: 0 0 6px 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* Dark Trait Layer Name - Top */
+.dark-trait-thumb .dark-nfts-trait-selection-layer-name {
+  display: none;
+}
+
+/* Dark Trait Name - Bottom - Maximum specificity to override ALL conflicts */
+#dark-traits-modal .trait-selection-thumb.dark-trait-thumb .dark-nfts-trait-selection-name,
+#dark-traits-modal .dark-trait-thumb .dark-nfts-trait-selection-name,
+.dark-traits-modal .trait-selection-thumb.dark-trait-thumb .dark-nfts-trait-selection-name,
+.dark-traits-modal .dark-trait-thumb .dark-nfts-trait-selection-name,
+.trait-selection-thumb.dark-trait-thumb .dark-nfts-trait-selection-name,
+.dark-trait-thumb .dark-nfts-trait-selection-name {
+  position: static !important;
+  width: 137.7px !important;
+  height: 15.58px !important;
+  min-width: 137.7px !important;
+  min-height: 15.58px !important;
+  max-width: 137.7px !important;
+  max-height: 15.58px !important;
+  text-align: left !important;
+  color: #fff !important;
+  background: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  font-family: 'Archivo', sans-serif !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Dark Trait Rarity - Top Left Corner */
+.dark-trait-thumb .dark-nfts-trait-selection-rarity {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  color: #8b5cf6;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'Archivo', sans-serif;
+  z-index: 4;
+  pointer-events: none;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Dark Trait VIEW Button */
+.dark-trait-view-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 34px;
+  min-width: 34px;
+  max-width: 34px;
+  height: 20px;
+  min-height: 20px;
+  max-height: 20px;
+  background: #f39c12;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Archivo', sans-serif;
+}
+
+.dark-trait-view-btn:hover {
+  background: #e67e22;
+}
+
+/* Dark Trait Selection States - Force orange border with halo effect - Maximum specificity */
+#dark-traits-modal .trait-selection-thumb.dark-trait-thumb.selected,
+#dark-traits-modal .dark-trait-thumb.selected,
+.dark-traits-modal .trait-selection-thumb.dark-trait-thumb.selected,
+.dark-traits-modal .dark-trait-thumb.selected,
+.trait-selection-thumb.dark-trait-thumb.selected,
+.dark-trait-thumb.selected {
+  border-color: #e17055 !important;
+  border-width: 3px !important;
+  background: rgba(20, 20, 20, 0.3) !important;
+  box-shadow: 0 0 15px rgba(225, 112, 85, 0.5) !important;
+  transform: scale(1.02) !important;
+  transition: all 0.2s ease !important;
+  z-index: 2000 !important;
+}
+
+.dark-trait-thumb.selected:hover {
+  transform: scale(1.05) !important;
+}
+
+.dark-trait-thumb.unselected {
+  border-width: 1px;
+}
+
+/* Batch Generation Modal - Dark Traits Edit Button */
+.batch-dark-traits-edit-btn {
+  position: absolute !important;
+  top: -18px !important;
+  right: -14px !important;
+  width: 40px !important;
+  height: 20px !important;
+  border-radius: 4px !important;
+  background: #e17055 !important;
+  color: #fff !important;
+  border: 2px solid #000 !important;
+  font-size: 8px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  display: none;
+  z-index: 1000 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.2s ease !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Archivo', sans-serif !important;
+}
+
+.batch-dark-traits-edit-btn:hover {
+  background: #d63031 !important;
+  transform: scale(1.1) !important;
+}
+
+.batch-dark-traits-edit-btn:active {
+  transform: scale(0.95) !important;
+}

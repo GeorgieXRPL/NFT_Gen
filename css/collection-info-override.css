@@ -1,0 +1,348 @@
+/* Override for Collection Info tab form container to ensure it stretches to right edge */
+body #app .project-interface .content-area #general-info .form-container {
+  width: 100% !important;
+  max-width: calc(100% - 48px) !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+  box-sizing: border-box !important;
+  padding: 2.5rem !important;
+  border-radius: 12px !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Override any section titles and descriptions to maintain consistency */
+body #app .project-interface .content-area #general-info .section-title,
+body #app .project-interface .content-area #general-info .section-description {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure the two-column form has consistent styling */
+body #app .project-interface .content-area #general-info .two-column-form {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 2rem !important;
+}
+
+/* Form column styling for consistent layout */
+body #app .project-interface .content-area #general-info .form-column {
+  flex: 1 !important;
+  min-width: 400px !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+/* Form controls styling to ensure consistent appearance */
+body #app .project-interface .content-area #general-info .form-control {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 1.2rem 1rem !important;
+  font-size: 1.1rem !important;
+  line-height: 1.5 !important;
+  transition: all 0.2s ease !important;
+  border-radius: 8px !important;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Make textareas taller for more comfortable text entry */
+body #app .project-interface .content-area #general-info textarea.form-control {
+  min-height: 150px !important;
+  resize: vertical !important;
+  padding: 1.2rem 1rem !important;
+}
+
+/* Specifically target the collection description textarea to make it even taller */
+body #app .project-interface .content-area #general-info #collection-description {
+  min-height: 180px !important;
+}
+
+/* Ensure form groups maintain proper spacing */
+body #app .project-interface .content-area #general-info .form-group {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Consistently style labels */
+body #app .project-interface .content-area #general-info .form-group label {
+  display: block !important;
+  margin-bottom: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: var(--text-primary) !important;
+}
+
+/* Style form help text consistently */
+body #app .project-interface .content-area #general-info .form-help {
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Add focus effect to make active fields more noticeable */
+body #app .project-interface .content-area #general-info .form-control:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.1) !important;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  body #app .project-interface .content-area #general-info .form-column {
+    min-width: 300px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body #app .project-interface .content-area #general-info .form-container {
+    padding: 1.5rem !important;
+  }
+  
+  body #app .project-interface .content-area #general-info .form-control {
+    padding: 1rem 0.75rem !important;
+    font-size: 1rem !important;
+  }
+}
+
+/*
+  Ensure proper spacing below the navigation menu for the Collection Info tab.
+*/
+body #app .project-interface .content-area#general-info,
+body #app .project-interface .content-area #general-info {
+  /* padding-top moved to main.css for consistency */
+  margin-top: 0 !important;
+}
+/* Removed conflicting margin-top rule - now handled by section-header */
+
+/*
+  Set .content-area in the Collection Info tab (#general-info) to exactly 1557px width and center it horizontally. Ensure no conflicting width/max-width rules apply.
+*/
+body #app .project-interface .content-area#general-info,
+body #app .project-interface .content-area #general-info {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/*
+  Apply the same styles as trait-layers-dropzone to .form-container.two-column-form in the Collection Info tab for visual consistency.
+*/
+body #app .project-interface .content-area #general-info .form-container.two-column-form {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+  margin-bottom: 2rem !important;
+  padding: 2rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border: 2px dashed var(--border-color) !important;
+  border-radius: 12px !important;
+  background: #222230 !important;
+  box-sizing: border-box !important;
+}
+
+/* --- FINAL OVERRIDE: ENSURE COLLECTION INFO TITLE IS NEVER CUT --- */
+body #app .project-interface .content-area #general-info .section-title {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  height: auto !important;
+  z-index: 2 !important;
+}
+
+/* --- FINAL OVERRIDE: REDUCE SPACE BETWEEN SECTION TITLE AND DESCRIPTION IN COLLECTION INFO TAB --- */
+body #app .project-interface .content-area #general-info .section-title {
+  margin-bottom: 0.3rem !important;
+}
+body #app .project-interface .content-area #general-info .section-description {
+  margin-top: 0.3rem !important;
+}
+
+/* Collection Info section header rules moved to main.css for consistency */
+
+/* --- DEBUG: Ensure Collection Info section title is visible --- */
+body #app .project-interface .content-area #general-info .section-title {
+  display: inline-block !important;
+  margin-right: 1rem !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+  vertical-align: baseline !important;
+  font-size: 1.8rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body #app .project-interface .content-area #general-info .section-title svg {
+  vertical-align: baseline !important;
+  margin-right: 0.75rem !important;
+}
+
+body #app .project-interface .content-area #general-info .section-description {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  line-height: 1.2 !important;
+  vertical-align: baseline !important;
+  text-align: left !important;
+  font-size: 1rem !important;
+}
+
+/* --- OVERRIDE CONFLICTING RULES: Force inline display for Collection Info tab --- */
+#general-info.tab-content.active .section-header {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  margin-top: 0 !important;
+  margin-bottom: 2rem !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#general-info.tab-content.active .section-title,
+#general-info.tab-content.active .section-description {
+  display: inline !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+#general-info.tab-content.active .section-title {
+  display: inline-block !important;
+  margin-right: 1rem !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+  vertical-align: baseline !important;
+  font-size: 1.8rem !important;
+}
+
+#general-info.tab-content.active .section-title svg {
+  vertical-align: baseline !important;
+  margin-right: 0.75rem !important;
+}
+
+#general-info.tab-content.active .section-description {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  line-height: 1.2 !important;
+  vertical-align: baseline !important;
+  text-align: left !important;
+  font-size: 1rem !important;
+}
+
+/* ========================================
+   CONSOLIDATED COLLECTION INFO TAB RULES
+   ======================================== */
+
+/* TAB SCROLLING CONTROL - FROZEN STATE */
+#general-info.tab-content,
+html body #app .project-interface .content-area #general-info,
+#general-info.tab-content.active,
+html body #app .project-interface .content-area .tab-content#general-info,
+html body #app .project-interface .content-area .tab-content#general-info.active,
+#collection-info {
+  /* Freeze the tab - no scrolling - minimum height */
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+  position: relative !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  
+  /* Hide scrollbars - All browsers */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Hide scrollbar for Collection Info tab - Webkit browsers */
+#general-info.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #general-info::-webkit-scrollbar,
+#general-info.tab-content.active::-webkit-scrollbar,
+.tab-content#general-info::-webkit-scrollbar,
+.tab-content#general-info.active::-webkit-scrollbar,
+.tab-content#general-info.tab-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Collection Info specific content area rules moved to general tab padding */
+
+/* Remove all bottom margins and padding from general-info content */
+body #app .project-interface .content-area #general-info,
+body #app .project-interface .content-area #general-info .form-container,
+body #app .project-interface .content-area #general-info .two-column-form,
+body #app .project-interface .content-area #general-info .form-column:last-child,
+body #app .project-interface .content-area #general-info .form-group:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* FORM CONTAINER SPACING */
+html body #app .project-interface .content-area #general-info .form-container {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* SECTION DESCRIPTION SPACING */
+#general-info .section-description {
+  margin-bottom: 0 !important;
+}
+
+/* REMOVE ALL EMPTY SPACE FROM COLLECTION INFO TAB */
+#general-info .form-container:last-child,
+#general-info .form-group:last-child,
+#general-info .section-description:last-child,
+#general-info .two-column-form,
+#general-info .form-group:last-child,
+#general-info *:last-child {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* General tab content styles moved to main.css */
+
+/* CONTENT AREA GENERAL STYLES */
+.content-area,
+#general-info .content-area,
+#traits-rules .content-area,
+#generate-metadata .content-area,
+#export-nfts .content-area {
+  /* Additional content area styles if needed */
+} 

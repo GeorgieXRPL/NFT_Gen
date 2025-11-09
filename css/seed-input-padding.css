@@ -1,0 +1,11 @@
+/* Seed Input Padding Fix
+   This CSS adds 5px padding to the left side of seed input fields
+   to improve readability and make the text start 5px from the edge
+*/
+
+/* Target both of the seed input fields */
+#random-seed, 
+#single-seed-input {
+  padding-left: 15px !important; /* 10px default + 5px extra */
+  /* No width set here to avoid conflicts */
+} 

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFT Collection Creator Pro</title>
+  
+  <!-- NFTApp Guard - must be loaded first to catch any overwrites -->
+  <script src="js/nftapp-guard.js"></script>
+  
+  <!-- Global error handler - load this first to catch any JavaScript errors -->
+  <script src="js/error-handler.js"></script>
+  
+  <!-- Improved Resource error handler - load this second to catch any resource loading errors -->
+  <script src="js/resource-error-handler-improved.js"></script>
+  
+  <!-- File Protocol Handler - fixes issues when running from file:// protocol -->
+  <script src="js/file-protocol-handler.js"></script>
+  
+  <!-- Index HTML Reference Fix - specifically fixes resources trying to load from index.html -->
+  <script src="js/index-html-reference-fix.js"></script>
+  
+  <!-- Resource Path Fix - load this early to fix file:// protocol path issues -->
+  <script src="js/resource-path-fix.js"></script>
+  
+  <!-- Favicon generator script - adds a favicon dynamically -->
+  <script src="js/favicon.js"></script>
+  
+  <!-- Image path fix script - handles broken image sources -->
+  <script src="js/image-path-fix.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Core CSS files -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/button-enhancements.css">
+  <link rel="stylesheet" href="css/tooltip-fix.css">
+  <link rel="stylesheet" href="css/custom-dropdown.css">
+  <link rel="stylesheet" href="css/styles-fix.css">
+  <link rel="stylesheet" href="css/integer-input.css">
+  <link rel="stylesheet" href="css/combination-rules-consolidated.css">
+  <link rel="stylesheet" href="css/trait-layers-consolidated.css">
+  <!-- <link rel="stylesheet" href="css/trait-layer-slider-fix.css"> - moved to trait-layers-consolidated.css -->
+  <link rel="stylesheet" href="css/tooltips-consolidated.css">
+  <link rel="stylesheet" href="css/rule-validation.css">
+  <link rel="stylesheet" href="css/navigation-black-background-fix.css">
+  <!-- <link rel="stylesheet" href="css/trait-layer-slider-max-width.css"> - moved to trait-layers-consolidated.css -->
+  <link rel="stylesheet" href="css/rarity-status-indicator.css">
+  <link rel="stylesheet" href="css/randomize-tooltip-fix.css">
+  <link rel="stylesheet" href="css/generate-nfts.css">
+  <link rel="stylesheet" href="css/traits-panel-fix.css">
+  <link rel="stylesheet" href="css/traits-panel-override.css">
+  <link rel="stylesheet" href="css/edit-button-fix.css">
+  <link rel="stylesheet" href="css/font-archivo-override.css">
+  <link rel="stylesheet" href="css/seed-input-padding.css">
+  <link rel="stylesheet" href="css/seed-fixed-width.css">
+  <!-- <link rel="stylesheet" href="css/trait-layers-enhancements.css"> - moved to trait-layers-consolidated.css -->
+  <!-- <link rel="stylesheet" href="css/trait-layers-drag-drop.css"> - moved to trait-layers-consolidated.css -->
+  <link rel="stylesheet" href="css/trait-folders-drag-drop.css">
+  <!-- <link rel="stylesheet" href="css/trait-layers-drag-drop-enhanced.css"> - moved to trait-layers-consolidated.css -->
+  <!-- <link rel="stylesheet" href="css/trait-layers-header-fix.css"> - moved to trait-layers-consolidated.css -->
+  <!-- <link rel="stylesheet" href="css/trait-layers-error-icon-fix.css"> - moved to trait-layers-consolidated.css -->
+  <!-- <link rel="stylesheet" href="css/trait-buttons-fix.css"> - moved to trait-layers-consolidated.css -->
+  <link rel="stylesheet" href="css/enhanced-randomize-tooltip.css">
+  <link rel="stylesheet" href="css/combination-rules-warning.css">
+  <!-- The collection-info-override.css must be loaded last to ensure its styles take precedence -->
+  <link rel="stylesheet" href="css/collection-info-override.css">
+  <link rel="stylesheet" href="css/saved-seeds-modal.css">
+  <link rel="stylesheet" href="css/dark-traits-modal.css">
+  <link rel="stylesheet" href="css/select-trait-modal.css">
+  <link rel="stylesheet" href="css/batch-generation-modal.css">
+  <link rel="stylesheet" href="css/hide-scrollbars-specific-tabs.css">
+  <link rel="stylesheet" href="css/nfts-collection-modal-fix.css">
+  <link rel="stylesheet" href="css/nft-edit-modal-alignment-fix.css">
+  <link rel="stylesheet" href="css/final-overrides.css">
+  <!-- Traits Rules Scrollbar Fix - MUST be loaded last to override all other scrollbar styles -->
+  <link rel="stylesheet" href="css/traits-rules-scrollbar-fix.css">
+
+  <script>
+    // Cache-busting for all local CSS and JS files
+    (function() {
+      var version = Date.now();
+      // Update CSS links
+      document.querySelectorAll('link[rel="stylesheet"]').forEach(function(link) {
+        if (link.href && link.href.indexOf('http') !== 0 && link.href.indexOf('?v=') === -1) {
+          link.href += (link.href.indexOf('?') === -1 ? '?v=' : '&v=') + version;
+        }
+      });
+      // Update JS scripts
+      document.querySelectorAll('script[src]').forEach(function(script) {
+        if (script.src && script.src.indexOf('http') !== 0 && script.src.indexOf('?v=') === -1) {
+          script.src += (script.src.indexOf('?') === -1 ? '?v=' : '&v=') + version;
+        }
+      });
+    })();
+  </script>
+</head>
+<body>
+  <div id="app">
+    <!-- Project interface will be loaded here -->
+  </div>
+
+  <!-- Core scripts - load app.js first to ensure NFTApp is defined -->
+  <script src="js/app.js"></script>
+  <script src="js/modules.js"></script>
+  
+  <!-- Third-party libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+  <!-- Other core scripts -->
+  <script src="js/custom-dropdown.js"></script>
+  <script src="js/utils/common-utils.js"></script>
+  <script src="js/components/trait-layers.js"></script>
+  <script src="js/components/combination-rules.js"></script>
+  <script src="js/traits-rules-layout-fix.js"></script>
+  <script src="js/components/combination-rules-enhanced-validation.js"></script>
+  <script src="js/components/project-interface.js"></script>
+  <script src="js/components/navigation.js"></script>
+  <script src="js/components/general-info.js"></script>
+  <script src="js/components/confirmation-modal.js"></script>
+  <script src="js/services/seed-service.js"></script>
+  <script src="js/services/project-service.js"></script>
+  <script src="js/services/memory-manager.js"></script>
+  <script src="js/services/memory-migration.js"></script>
+
+  <!-- Load nft-generator.js before generate-nfts.js -->
+  <script src="js/utils/nft-generator.js"></script>
+
+  <script src="js/components/generate-nfts.js"></script>
+  <script src="js/components/nft-edit-modal.js"></script>
+  <script src="js/components/saved-seeds-modal.js"></script>
+  <script src="js/components/batch-generation-modal.js"></script>
+  <script src="js/components/generate-nfts-ui.js"></script>
+  <script src="js/tab-scroll-control.js"></script>
+  <script src="js/simple-tab-test.js"></script>
+  <script src="js/auto-tab-freeze.js"></script>
+  <script src="js/auto-localstorage-cleanup.js"></script>
+  <script src="js/force-tab-freeze-fix.js"></script>
+
+  <script>
+    // DIFFERENT APPROACH: Use height constraint to freeze tabs
+    function freezeTabs() {
+      // Freeze Collection Info tab
+      const collectionInfo = document.getElementById('collection-info') || document.getElementById('general-info');
+      if (collectionInfo) {
+        collectionInfo.style.height = 'calc(100vh - 120px)';
+        collectionInfo.style.maxHeight = 'calc(100vh - 120px)';
+        collectionInfo.style.overflow = 'hidden';
+        collectionInfo.style.position = 'relative';
+      }
+      
+      // Freeze Generate NFTs tab
+      const generateNfts = document.getElementById('generate-nfts');
+      if (generateNfts) {
+        generateNfts.style.height = 'calc(100vh - 120px)';
+        generateNfts.style.maxHeight = 'calc(100vh - 120px)';
+        generateNfts.style.overflow = 'hidden';
+        generateNfts.style.position = 'relative';
+      }
+    }
+    
+    // Run when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', freezeTabs);
+    } else {
+      freezeTabs();
+    }
+    
+    // Run every 3 seconds to keep tabs frozen
+    setInterval(freezeTabs, 3000);
+  </script>
+
+  <script>
+    // Initialize the application when the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("DOM content loaded, initializing app...");
+      
+      // Initialize all modules
+      if (window.NFTApp && window.NFTApp.initModules) {
+        window.NFTApp.initModules();
+      }
+      
+      // Start with a new project
+      if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("projectService")) {
+        window.NFTApp.getModule("projectService").startNew();
+      }
+    });
+  </script>
+
+  <!-- Additional enhancements and fixes -->
+  <script src="js/randomize-tooltip-fix.js"></script>
+  <script src="js/traits-panel-force-fix.js"></script>
+  <script src="js/edit-button-fix.js"></script>
+  
+  <!-- Seed Toggle Fix - ensures seed toggle stays in the state set by the user -->
+  <script src="js/seed-toggle-fix.js"></script>
+  
+  <!-- Load trait layers enhancement script last -->
+  <script src="js/trait-layers-enhancement.js"></script>
+  
+  <!-- Load enhanced drag and drop functionality -->
+  <script src="js/trait-layers-drag-drop-enhanced.js"></script>
+  
+  <!-- Load the folder drag and drop functionality -->
+  <script src="js/components/trait-folders-drag-drop.js"></script>
+  
+  <!-- Load the trait image preview functionality -->
+  <script src="js/trait-image-preview.js"></script>
+  
+  <!-- Load the enhanced randomize tooltip functionality -->
+  <script src="js/enhanced-randomize-tooltip.js"></script>
+  
+  <!-- Trait Image Loader for fixing broken images in trait selection modal -->
+  <script src="js/trait-image-loader.js"></script>
+  
+  <!-- Trait Selection Handler for improved trait editing -->
+  <script src="js/trait-selection-handler.js"></script>
+  
+  <!-- Container test script for debugging -->
+  <script src="js/container-test.js"></script>
+
+  <!-- Confirmation Modal (global, hidden by default) -->
+  <div id="confirmation-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999999 !important;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;font-family:'Archivo',sans-serif;">
+    <div style="background:#2a2a2a;padding:30px;border-radius:12px;min-width:400px;max-width:600px;box-shadow:0 8px 32px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:stretch;border:1px solid #444;position:relative;">
+      <button id="close-confirmation-modal" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#95a5a6;font-size:28px;cursor:pointer;line-height:1;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#95a5a6'">&times;</button>
+      <div id="confirmation-message" style="font-size:18px;font-weight:600;color:#ecf0f1;margin-bottom:12px;padding-right:40px;line-height:1.4;"></div>
+      <div id="confirmation-description" style="font-size:14px;color:#bdc3c7;margin-bottom:24px;line-height:1.6;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px;">
+        <button id="cancel-confirmation" style="background:#555;color:#fff;border:none;border-radius:6px;padding:10px 24px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Archivo',sans-serif;transition:all 0.2s ease;" onmouseover="this.style.background='#666'" onmouseout="this.style.background='#555'">Cancel</button>
+        <button id="confirm-action" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:10px 24px;font-size:14px;font-weight:500;cursor:pointer;font-family:'Archivo',sans-serif;transition:all 0.2s ease;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">Confirm</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

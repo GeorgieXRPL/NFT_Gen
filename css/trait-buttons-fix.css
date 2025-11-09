@@ -1,0 +1,99 @@
+/**
+ * Trait Buttons Fix
+ * 
+ * This CSS file provides targeted fixes for making trait action buttons 
+ * (specifically delete and rename) work properly in expanded trait layers.
+ * 
+ * It uses high specificity selectors to override any other CSS that might
+ * be blocking pointer events.
+ */
+
+/* Primary fix for delete and rename trait buttons */
+html body .trait-layer-bar.expanded .trait-item .trait-actions .action-btn.delete-trait,
+html body .trait-layer-bar.expanded .trait-item .trait-actions .action-btn.rename-trait,
+html body .trait-layer-content.expanded .trait-item .trait-actions .action-btn.delete-trait,
+html body .trait-layer-content.expanded .trait-item .trait-actions .action-btn.rename-trait {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 10000 !important; /* Extremely high z-index to ensure buttons are on top */
+  position: relative !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix for trait actions container */
+html body .trait-layer-bar.expanded .trait-item .trait-actions,
+html body .trait-layer-content.expanded .trait-item .trait-actions {
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+  position: relative !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix for trait item container */
+html body .trait-layer-bar.expanded .trait-item,
+html body .trait-layer-content.expanded .trait-item {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 9998 !important;
+}
+
+/* Visual feedback for delete button hover states */
+html body .trait-layer-bar.expanded .trait-item .trait-actions .action-btn.delete-trait:hover,
+html body .trait-layer-content.expanded .trait-item .trait-actions .action-btn.delete-trait:hover {
+  color: #ff5252 !important;
+  background-color: rgba(255, 82, 82, 0.2) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Visual feedback for rename button hover states */
+html body .trait-layer-bar.expanded .trait-item .trait-actions .action-btn.rename-trait:hover,
+html body .trait-layer-content.expanded .trait-item .trait-actions .action-btn.rename-trait:hover {
+  color: #ffcc00 !important;
+  background-color: rgba(255, 204, 0, 0.2) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Fix SVG icons inside buttons to make sure they don't interfere with click events */
+html body .trait-layer-bar.expanded .trait-item .trait-actions .action-btn svg,
+html body .trait-layer-content.expanded .trait-item .trait-actions .action-btn svg {
+  pointer-events: none !important;
+}
+
+/* Add a subtle transition to buttons for better UX */
+html body .trait-layer-bar.expanded .trait-item .trait-actions .action-btn,
+html body .trait-layer-content.expanded .trait-item .trait-actions .action-btn {
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* Add smooth animation for trait items in expanded layers */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply staggered animation to trait items */
+.trait-layer-content.expanded .trait-item {
+  animation: fadeInUp 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* Create staggered effect for animations */
+.trait-layer-content.expanded .trait-item:nth-child(1) { animation-delay: 0.05s; }
+.trait-layer-content.expanded .trait-item:nth-child(2) { animation-delay: 0.1s; }
+.trait-layer-content.expanded .trait-item:nth-child(3) { animation-delay: 0.15s; }
+.trait-layer-content.expanded .trait-item:nth-child(4) { animation-delay: 0.2s; }
+.trait-layer-content.expanded .trait-item:nth-child(5) { animation-delay: 0.25s; }
+.trait-layer-content.expanded .trait-item:nth-child(6) { animation-delay: 0.3s; }
+.trait-layer-content.expanded .trait-item:nth-child(7) { animation-delay: 0.35s; }
+.trait-layer-content.expanded .trait-item:nth-child(8) { animation-delay: 0.4s; }
+.trait-layer-content.expanded .trait-item:nth-child(9) { animation-delay: 0.45s; }
+.trait-layer-content.expanded .trait-item:nth-child(10) { animation-delay: 0.5s; }
+.trait-layer-content.expanded .trait-item:nth-child(n+11) { animation-delay: 0.55s; } 

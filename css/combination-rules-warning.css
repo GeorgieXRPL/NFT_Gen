@@ -1,0 +1,220 @@
+/* Styling for the combination rules warning */
+.combination-rules-warning {
+  display: flex;
+  align-items: center;
+  background-color: rgba(51, 51, 51, 0.1); /* Very light background */
+  color: #ffcc00;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  margin-left: 0; /* Reset margin-left since parent container handles positioning */
+  font-size: 0.8em;
+  width: 100%; /* Full width of parent container */
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 204, 0, 0.3); /* Subtle yellow border */
+  border-left: 3px solid #ffcc00; /* Stronger left border for emphasis */
+}
+
+.combination-rules-warning .warning-icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  margin-right: 10px;
+  stroke: #ffcc00;
+  color: #ffcc00;
+}
+
+/* Add specific styling for SVG inside warning icon */
+.combination-rules-warning svg {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  stroke: #ffcc00;
+  color: #ffcc00;
+}
+
+/* Make warning stand out on darker backgrounds */
+.combination-rules-warning span {
+  color: #ffcc00;
+  font-size: 0.9em;
+}
+
+/* Styling for the rules list */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Updated rule-item styling with consistent dark grey border */
+.rule-item {
+  border: 1px solid #444; /* Dark grey border for all rules */
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #292736; /* Dark background for all rule items */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.75rem;
+}
+
+/* Style for odd-numbered rules */
+.rule-item-odd .rule-header {
+  background-color: #2d2a3e; /* Dark purple-grey for odd rules */
+}
+
+/* Style for even-numbered rules */
+.rule-item-even .rule-header {
+  background-color: #252236; /* Darker purple-grey for even rules */
+}
+
+/* Basic rule header styling */
+.rule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #444; /* Dark grey border */
+}
+
+.rule-type {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #fff; /* White text for better contrast */
+}
+
+.rule-type svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.rule-type-never {
+  color: #e53935;
+}
+
+.rule-type-never-icon {
+  stroke: #e53935;
+}
+
+.rule-type-always {
+  color: #43a047;
+}
+
+.rule-type-always-icon {
+  stroke: #43a047;
+}
+
+.rule-type-conditional {
+  color: #1e88e5;
+}
+
+.rule-type-conditional-icon {
+  stroke: #1e88e5;
+}
+
+.rule-type-top {
+  color: #8e24aa;
+}
+
+.rule-type-top-icon {
+  stroke: #8e24aa;
+}
+
+.rule-type-bottom {
+  color: #fcc419;
+}
+
+.rule-type-bottom-icon {
+  stroke: #fcc419;
+}
+
+.rule-applies-to-text {
+  font-weight: normal;
+  color: #ddd; /* Light grey color instead of dark grey */
+  margin-left: 4px;
+}
+
+.rule-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.action-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: #666;
+}
+
+.rule-details {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #1e1c2e; /* Darker background for rule details */
+  color: #ddd; /* Light text color for readability */
+}
+
+.rule-detail {
+  display: flex;
+  align-items: flex-start;
+}
+
+.rule-detail-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.layer-icon svg {
+  stroke: #1e88e5;
+}
+
+.trait-icon svg {
+  stroke: #8e24aa;
+}
+
+.rule-detail-label {
+  font-weight: 600;
+  margin-right: 8px;
+  min-width: 100px;
+}
+
+.rule-detail-value {
+  flex: 1;
+  color: #fff; /* White text for values */
+}
+
+.rule-detail-sublabel {
+  color: #a9a9b2; /* Light grey for better visibility in dark mode */
+  font-size: 0.9em;
+}
+
+/* Rule detail headers should be more visible */
+.rule-detail-header {
+  font-weight: 600;
+  color: #e2e2e2; /* Light grey color for headers */
+  font-size: 0.85rem;
+  margin-bottom: 3px;
+}

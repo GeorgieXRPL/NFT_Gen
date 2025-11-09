@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Always proceed with caution making changes one at a time to prevent not breaking the app from working and to prevent multiple erros at once that will be more difficult to solve.

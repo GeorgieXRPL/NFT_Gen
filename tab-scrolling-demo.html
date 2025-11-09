@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Scrolling Control - Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .demo-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .demo-button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .demo-button:hover {
+            background: #45a049;
+        }
+        .demo-button.disable {
+            background: #f44336;
+        }
+        .demo-button.disable:hover {
+            background: #da190b;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #333;
+        }
+        .code-block {
+            background: #000;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Tab Scrolling Control System</h1>
+        
+        <div class="demo-section">
+            <h2>Current Configuration</h2>
+            <div id="current-config" class="status">
+                Loading configuration...
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Individual Tab Control</h2>
+            <p>Enable or disable scrolling for specific tabs:</p>
+            
+            <h3>Collection Info Tab (Currently: SCROLL DISABLED)</h3>
+            <button class="demo-button" onclick="enableTabScrolling('general-info')">Enable Scrolling</button>
+            <button class="demo-button disable" onclick="disableTabScrolling('general-info')">Disable Scrolling</button>
+            <button class="demo-button" onclick="toggleTabScrolling('general-info')">Toggle Scrolling</button>
+            
+            <h3>Traits & Rules Tab (Currently: SCROLL ENABLED)</h3>
+            <button class="demo-button" onclick="enableTabScrolling('traits-rules')">Enable Scrolling</button>
+            <button class="demo-button disable" onclick="disableTabScrolling('traits-rules')">Disable Scrolling</button>
+            <button class="demo-button" onclick="toggleTabScrolling('traits-rules')">Toggle Scrolling</button>
+            
+            <h3>Generate NFTs Tab (Currently: SCROLL DISABLED)</h3>
+            <button class="demo-button" onclick="enableTabScrolling('generate-nfts')">Enable Scrolling</button>
+            <button class="demo-button disable" onclick="disableTabScrolling('generate-nfts')">Disable Scrolling</button>
+            <button class="demo-button" onclick="toggleTabScrolling('generate-nfts')">Toggle Scrolling</button>
+            
+            <h3>Generate Metadata Tab (Currently: SCROLL DISABLED - You'll decide later)</h3>
+            <button class="demo-button" onclick="enableTabScrolling('generate-metadata')">Enable Scrolling</button>
+            <button class="demo-button disable" onclick="disableTabScrolling('generate-metadata')">Disable Scrolling</button>
+            <button class="demo-button" onclick="toggleTabScrolling('generate-metadata')">Toggle Scrolling</button>
+            
+            <h3>Export NFTs Tab (Currently: SCROLL DISABLED - You'll decide later)</h3>
+            <button class="demo-button" onclick="enableTabScrolling('export-nfts')">Enable Scrolling</button>
+            <button class="demo-button disable" onclick="disableTabScrolling('export-nfts')">Disable Scrolling</button>
+            <button class="demo-button" onclick="toggleTabScrolling('export-nfts')">Toggle Scrolling</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>Bulk Configuration</h2>
+            <button class="demo-button" onclick="enableAllScrolling()">Enable All Scrolling</button>
+            <button class="demo-button disable" onclick="disableAllScrolling()">Disable All Scrolling</button>
+            <button class="demo-button" onclick="resetToDefaults()">Reset to Defaults</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>Debug Mode</h2>
+            <button class="demo-button" onclick="enableDebugMode()">Enable Debug Mode</button>
+            <button class="demo-button disable" onclick="disableDebugMode()">Disable Debug Mode</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>Usage Examples</h2>
+            
+            <h3>JavaScript API</h3>
+            <div class="code-block">
+// Enable scrolling for a specific tab
+TabScrollingController.enableScrolling('general-info');
+
+// Disable scrolling for a specific tab
+TabScrollingController.disableScrolling('generate-metadata');
+
+// Toggle scrolling for a specific tab
+TabScrollingController.toggleScrolling('traits-rules');
+
+// Set configuration for multiple tabs
+TabScrollingController.setScrollingConfig({
+    'general-info': true,
+    'traits-rules': false,
+    'generate-nfts': true,
+    'generate-metadata': false,
+    'export-nfts': false
+});
+
+// Get current configuration
+const config = TabScrollingController.getScrollingConfig();
+
+// Reset to defaults
+TabScrollingController.resetToDefaults();
+            </div>
+
+            <h3>CSS Classes</h3>
+            <div class="code-block">
+/* Add to HTML for explicit control */
+&lt;div id="general-info" class="tab-content scroll-enabled"&gt;
+&lt;div id="generate-metadata" class="tab-content scroll-disabled"&gt;
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo functions
+        function enableTabScrolling(tabId) {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.enableScrolling(tabId);
+                updateStatus();
+            }
+        }
+
+        function disableTabScrolling(tabId) {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.disableScrolling(tabId);
+                updateStatus();
+            }
+        }
+
+        function toggleTabScrolling(tabId) {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.toggleScrolling(tabId);
+                updateStatus();
+            }
+        }
+
+        function enableAllScrolling() {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.setScrollingConfig({
+                    'general-info': true,
+                    'traits-rules': true,
+                    'generate-nfts': true,
+                    'generate-metadata': true,
+                    'export-nfts': true
+                });
+                updateStatus();
+            }
+        }
+
+        function disableAllScrolling() {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.setScrollingConfig({
+                    'general-info': false,
+                    'traits-rules': false,
+                    'generate-nfts': false,
+                    'generate-metadata': false,
+                    'export-nfts': false
+                });
+                updateStatus();
+            }
+        }
+
+        function resetToDefaults() {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.resetToDefaults();
+                updateStatus();
+            }
+        }
+
+        function enableDebugMode() {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.enableDebugMode();
+            }
+        }
+
+        function disableDebugMode() {
+            if (window.TabScrollingController) {
+                window.TabScrollingController.disableDebugMode();
+            }
+        }
+
+        function updateStatus() {
+            if (window.TabScrollingController) {
+                const config = window.TabScrollingController.getScrollingConfig();
+                const configHtml = Object.entries(config)
+                    .map(([tabId, canScroll]) => 
+                        `&lt;strong&gt;${tabId}&lt;/strong&gt;: ${canScroll ? '✅ SCROLL ENABLED' : '❌ SCROLL DISABLED'}`
+                    )
+                    .join('&lt;br&gt;');
+                
+                document.getElementById('current-config').innerHTML = configHtml;
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            setTimeout(updateStatus, 100);
+        });
+    </script>
+</body>
+</html>

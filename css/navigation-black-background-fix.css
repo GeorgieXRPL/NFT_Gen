@@ -1,0 +1,94 @@
+/* Force black background on all navigation elements */
+.nav-container,
+.nav-container *,
+.nav-header,
+.nav-header *,
+.nav-tabs-container,
+.nav-tabs-container *,
+.nav-tabs,
+.nav-tabs *,
+.nav-header-content,
+.nav-header-content *,
+.nav-actions,
+.nav-actions *,
+.project-actions,
+.project-actions * {
+  background-color: #000000 !important;
+}
+
+/* Ensure no borders are visible in the navigation area */
+.nav-container,
+.nav-header,
+.nav-tabs-container,
+.nav-tabs,
+.nav-header-content,
+.nav-actions,
+.project-actions {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Ensure the navigation container has a black background */
+body .nav-container {
+  background-color: #000000 !important;
+  border-bottom: none !important;
+}
+
+/* Ensure the navigation header has a black background */
+body .nav-header {
+  background-color: #000000 !important;
+}
+
+/* Ensure the navigation tabs container has a black background */
+body .nav-tabs-container {
+  background-color: #000000 !important;
+}
+
+/* Ensure the navigation tabs have a black background */
+body .nav-tabs {
+  background-color: #000000 !important;
+}
+
+/* Ensure the navigation header content has a black background */
+body .nav-header-content {
+  background-color: #000000 !important;
+}
+
+/* Ensure the navigation actions have a black background */
+body .nav-actions {
+  background-color: #000000 !important;
+}
+
+/* Ensure the project actions have a black background */
+body .project-actions {
+  background-color: #000000 !important;
+}
+
+/* Ensure the buttons in the navigation area have a transparent background */
+body .nav-actions .btn,
+body .project-actions .btn {
+  background-color: transparent !important;
+}
+
+/* Override any hover effects that might change the background */
+body .nav-container *:hover,
+body .nav-header *:hover,
+body .nav-tabs-container *:hover,
+body .nav-tabs *:hover,
+body .nav-header-content *:hover,
+body .nav-actions *:hover,
+body .project-actions *:hover {
+  background-color: #000000 !important;
+}
+
+/* Only exception is for nav-tabs that should show hover effect */
+body .nav-tab:hover:not(.active) {
+  background-color: rgba(108, 92, 231, 0.1) !important;
+}
+
+body .nav-tab.active {
+  background-color: #000000 !important;
+}

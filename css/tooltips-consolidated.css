@@ -1,0 +1,241 @@
+/* Consolidated Tooltip Styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Base tooltip text styling */
+.tooltiptext {
+  visibility: hidden;
+  position: absolute;
+  z-index: 999999;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: normal;
+  max-width: 300px;
+  width: max-content;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  word-wrap: break-word;
+}
+
+/* Show tooltip on hover */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Tooltip positioning */
+.tooltip .tooltiptext {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+/* Bottom tooltip */
+.tooltip.tooltip-bottom .tooltiptext {
+  bottom: auto;
+  top: 125%;
+}
+
+.tooltip.tooltip-bottom .tooltiptext::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+}
+
+/* Left tooltip */
+.tooltip.tooltip-left .tooltiptext {
+  right: 125%;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.tooltip.tooltip-left .tooltiptext::after {
+  top: 50%;
+  left: 100%;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent rgba(0, 0, 0, 0.9);
+}
+
+/* Right tooltip */
+.tooltip.tooltip-right .tooltiptext {
+  left: 125%;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+.tooltip.tooltip-right .tooltiptext::after {
+  top: 50%;
+  right: 100%;
+  left: auto;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-color: transparent rgba(0, 0, 0, 0.9) transparent transparent;
+}
+
+/* Add specific styling for rule action button tooltips */
+.rule-actions .tooltip .tooltiptext {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+/* Ensure rule action tooltips are positioned correctly */
+.rule-actions .tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+/* Remove all custom randomize-tooltip styles */
+.tooltip .tooltiptext.randomize-tooltip,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.tooltip .tooltiptext.randomize-tooltip br,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip br {
+  display: none !important;
+}
+
+/* Ensure tooltips are visible within containers with overflow hidden */
+.trait-layer-header,
+.trait-layer-content,
+.trait-layer-bar,
+.trait-layers-container,
+.nav-tabs-container,
+.nav-actions,
+.trait-layer-actions,
+.trait-layer-position,
+.modal,
+.modal-body,
+.modal-content,
+.dropdown-menu,
+.trait-item,
+.trait-details,
+.trait-actions {
+  overflow: visible !important;
+}
+
+/* Ensure tooltips don't get cut off by parent containers */
+body {
+  overflow-x: hidden;
+}
+
+/* Rule Button Tooltips */
+.rule-actions .action-btn {
+  position: relative;
+}
+
+.rule-actions .action-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  z-index: 1000;
+  bottom: auto;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  white-space: nowrap;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  text-align: center;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.rule-actions .action-btn .tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+}
+
+.rule-actions .action-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Ensure tooltips are always on top */
+.tooltip-text {
+  z-index: 9999 !important;
+}
+
+.randomize-rarities-tiered-btn .tooltiptext {
+  display: none !important;
+}
+.randomize-rarities-tiered-btn:hover .tooltiptext {
+  display: block !important;
+}
+
+.trait-details {
+  width: 178px !important;
+  height: 50px !important;
+  min-width: 178px !important;
+  min-height: 50px !important;
+  max-width: 178px !important;
+  max-height: 50px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.trait-item,
+.traits-grid .trait-item {
+  width: 175px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  height: 300px !important;
+  min-height: 300px !important;
+  max-height: 300px !important;
+}
+
+.trait-layer-bar.expanded .traits-grid,
+.traits-grid {
+  display: grid !important;
+  grid-template-columns: repeat(8, 1fr) !important;
+  gap: 10px 2.5px !important;
+  width: 100% !important;
+  align-items: flex-start !important;
+  justify-items: stretch !important;
+  min-height: 330px !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  grid-auto-flow: row !important;
+  place-items: start !important;
+}

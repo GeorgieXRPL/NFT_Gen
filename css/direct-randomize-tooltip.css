@@ -1,0 +1,72 @@
+/**
+ * Direct Randomize Tooltip Styles
+ * These styles apply to the directly injected tooltip
+ */
+
+/* Position the button as relative for tooltip positioning */
+.randomize-rarities-tiered-btn {
+  position: relative !important;
+}
+
+/* Style the direct tooltip */
+.randomize-direct-tooltip {
+  display: none !important;
+  position: absolute !important;
+  z-index: 9999999 !important;
+  bottom: auto !important;
+  top: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin-top: 10px !important;
+
+  /* Styling */
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: white !important;
+  text-align: left !important;
+  border-radius: 6px !important;
+  padding: 12px 16px !important;
+
+  /* Size and text */
+  width: 250px !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+
+  /* Shadow for better visibility */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+
+  /* Prevent tooltip from blocking mouse events */
+  pointer-events: none !important;
+}
+
+/* Arrow for the tooltip */
+.randomize-direct-tooltip::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -10px !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+/* Add spacing between lines */
+.randomize-direct-tooltip br {
+  margin-bottom: 4px !important;
+}
+
+/* Show the tooltip on hover */
+.randomize-rarities-tiered-btn:hover .randomize-direct-tooltip {
+  display: block !important;
+}
+
+/* Ensure the tooltip is visible when trait layer is expanded */
+.trait-layer-content.expanded .randomize-rarities-tiered-btn .randomize-direct-tooltip,
+.trait-rarity-actions .randomize-rarities-tiered-btn .randomize-direct-tooltip {
+  display: none !important;
+}
+
+.trait-layer-content.expanded .randomize-rarities-tiered-btn:hover .randomize-direct-tooltip,
+.trait-rarity-actions .randomize-rarities-tiered-btn:hover .randomize-direct-tooltip {
+  display: block !important;
+}

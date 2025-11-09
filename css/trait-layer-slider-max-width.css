@@ -1,0 +1,123 @@
+/* Aggressive fix for trait layer rarity slider width */
+.trait-layer-header .trait-layer-header-rarity {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin-top: 0.25rem !important;
+  min-width: 300px !important;
+  flex: 1 1 auto !important;
+  max-width: none !important;
+  margin-right: 1rem !important;
+  width: 100% !important;
+}
+
+/* Make the slider take up all available space */
+.trait-layer-header .trait-layer-header-rarity .trait-layer-header-rarity-slider {
+  width: 100% !important;
+  min-width: 200px !important;
+  flex: 1 1 auto !important;
+  -webkit-appearance: none !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+  background-color: #000 !important;
+  border: 1px solid var(--slider-track-border) !important;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Larger thumb for better usability */
+.trait-layer-header .trait-layer-header-rarity .trait-layer-header-rarity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  margin-top: -5px !important;
+}
+
+.trait-layer-header .trait-layer-header-rarity .trait-layer-header-rarity-slider::-moz-range-thumb {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: var(--accent-primary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  margin-top: -5px !important;
+}
+
+/* Ensure the info section doesn't take too much space */
+.trait-layer-header .trait-layer-info {
+  flex: 0 0 auto !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  margin-right: 10px !important;
+}
+
+/* Make sure the position controls and actions don't take too much space */
+.trait-layer-header .trait-layer-position,
+.trait-layer-header .trait-layer-actions {
+  flex: 0 0 auto !important;
+}
+
+/* Ensure drag handle is visible and properly sized */
+.trait-layer-header .trait-layer-drag-handle {
+  margin-right: 1rem !important;
+  cursor: grab;
+  flex: 0 0 auto !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Ensure the header has proper layout */
+.trait-layer-header {
+  display: flex !important;
+  align-items: center !important;
+  padding: 1rem !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  border-radius: 12px !important;
+  flex-wrap: nowrap !important;
+  width: 1557px !important;
+  max-width: 1557px !important;
+  box-shadow: none !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-header {
+  width: 1557px !important;
+  max-width: 1557px !important;
+}
+
+.trait-layer-drag-handle,
+.trait-layer-drag-handle .tooltip,
+.trait-layer-drag-handle .tooltiptext,
+.trait-layer-drag-handle .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity,
+.trait-layer-header-rarity .tooltip,
+.trait-layer-header-rarity .tooltiptext,
+.trait-layer-header-rarity .custom-tooltip {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.trait-layer-header-rarity-slider::-webkit-slider-runnable-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}
+
+.trait-layer-header-rarity-slider::-moz-range-track {
+  background: #000 !important;
+  height: 8px !important;
+  border-radius: 8px !important;
+}

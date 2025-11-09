@@ -1,0 +1,101 @@
+/* Tooltip Styles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltiptext {
+  visibility: hidden;
+  position: absolute;
+  z-index: 10000;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Arrow styles */
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  border-width: 5px;
+  border-style: solid;
+}
+
+/* Top tooltip (default) */
+.tooltiptext {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+}
+
+.tooltiptext::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Bottom tooltip */
+.tooltip-bottom {
+  top: 125%;
+  bottom: auto;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+.tooltip-bottom::after {
+  bottom: 100%;
+  top: auto;
+  border-color: transparent transparent #333 transparent;
+}
+
+/* Left-aligned tooltip */
+.tooltip-left {
+  transform: translateX(0);
+  left: 0;
+}
+
+.tooltip-left::after {
+  left: 10px;
+  transform: translateX(0);
+}
+
+/* Right-aligned tooltip */
+.tooltip-right {
+  transform: translateX(0);
+  right: 0;
+  left: auto;
+}
+
+.tooltip-right::after {
+  right: 10px;
+  left: auto;
+  transform: translateX(0);
+}
+
+/* Ensure tooltips have proper width and wrapping for longer content */
+.tooltiptext {
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Remove all custom randomize-tooltip styles */
+.randomize-tooltip {
+  all: unset !important;
+  display: none !important;
+}

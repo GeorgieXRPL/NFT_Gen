@@ -1,0 +1,86 @@
+/* 
+ * TRAITS-RULES SCROLLBAR FIX
+ * 
+ * This CSS file specifically fixes the duplicate scrollbar issue on the traits-rules tab
+ * by completely hiding all custom scrollbars and forcing the browser to use only its native scrollbar.
+ * 
+ * This file should be loaded LAST to ensure it overrides all other scrollbar styles.
+ */
+
+/* ULTIMATE SOLUTION: Hide ALL custom scrollbars and force native scrollbar only */
+html body #app .project-interface .content-area #traits-rules.tab-content,
+html body #app .project-interface .content-area #traits-rules.tab-content.active,
+#traits-rules.tab-content,
+#traits-rules.tab-content.active {
+  /* Force native scrollbar only */
+  scrollbar-width: auto !important;
+  -ms-overflow-style: scrollbar !important;
+}
+
+/* Hide ALL custom webkit scrollbars for traits-rules tab */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar,
+#traits-rules.tab-content::-webkit-scrollbar,
+#traits-rules.tab-content.active::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hide ALL custom webkit scrollbars for ALL elements inside traits-rules tab */
+html body #app .project-interface .content-area #traits-rules.tab-content *::-webkit-scrollbar,
+html body #app .project-interface .content-area #traits-rules.tab-content.active *::-webkit-scrollbar,
+#traits-rules.tab-content *::-webkit-scrollbar,
+#traits-rules.tab-content.active *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Hide scrollbar track */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-track,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-track,
+#traits-rules.tab-content::-webkit-scrollbar-track,
+#traits-rules.tab-content.active::-webkit-scrollbar-track {
+  display: none !important;
+}
+
+/* Hide scrollbar thumb */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-thumb,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-thumb,
+#traits-rules.tab-content::-webkit-scrollbar-thumb,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+/* Hide scrollbar corner */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-corner,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-corner,
+#traits-rules.tab-content::-webkit-scrollbar-corner,
+#traits-rules.tab-content.active::-webkit-scrollbar-corner {
+  display: none !important;
+}
+
+/* Hide scrollbar button (if any) */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-button,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-button,
+#traits-rules.tab-content::-webkit-scrollbar-button,
+#traits-rules.tab-content.active::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+/* Hide scrollbar thumb hover state */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-thumb:hover,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-thumb:hover,
+#traits-rules.tab-content::-webkit-scrollbar-thumb:hover,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb:hover {
+  display: none !important;
+}
+
+/* Hide scrollbar thumb active state */
+html body #app .project-interface .content-area #traits-rules.tab-content::-webkit-scrollbar-thumb:active,
+html body #app .project-interface .content-area #traits-rules.tab-content.active::-webkit-scrollbar-thumb:active,
+#traits-rules.tab-content::-webkit-scrollbar-thumb:active,
+#traits-rules.tab-content.active::-webkit-scrollbar-thumb:active {
+  display: none !important;
+}

@@ -1,0 +1,72 @@
+/**
+ * Force Randomize Tooltip Styles
+ * These styles ensure the randomize tooltip is always displayed correctly
+ * with high specificity selectors and !important rules
+ */
+
+/* Base tooltip container */
+.randomize-rarities-tiered-btn {
+  position: relative !important;
+}
+
+/* Tooltip content */
+.randomize-tooltip-content {
+  position: absolute !important;
+  z-index: 9999999 !important; /* Ultra high z-index */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s !important;
+
+  /* Styling */
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: white !important;
+  text-align: left !important;
+  border-radius: 6px !important;
+  padding: 12px 16px !important;
+
+  /* Size and text */
+  width: 250px !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+
+  /* Shadow for better visibility */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+
+  /* Arrow */
+  pointer-events: none !important;
+}
+
+/* Arrow for the tooltip */
+.randomize-tooltip-content::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -10px !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+/* Add spacing between lines */
+.randomize-tooltip-content br {
+  margin-bottom: 4px !important;
+}
+
+/* Override any conflicting styles */
+.trait-layer-content .randomize-rarities-tiered-btn .randomize-tooltip-content,
+.trait-rarity-actions .randomize-rarities-tiered-btn .randomize-tooltip-content {
+  display: block !important;
+}
+
+/* Ensure the tooltip is visible when trait layer is expanded */
+.trait-layer-content.expanded .randomize-rarities-tiered-btn:hover .randomize-tooltip-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* General hover state */
+.randomize-rarities-tiered-btn:hover .randomize-tooltip-content {
+  visibility: visible !important;
+  opacity: 1 !important;
+}

@@ -1,0 +1,341 @@
+/* 
+ * NFTs Collection Modal - Pagination and Collection Space Counter Fix
+ * Ensures pagination controls and collection space counter are always visible
+ */
+
+/* Force pagination container to be visible - Enhanced specificity */
+#saved-seeds-modal #saved-seeds-pagination,
+.saved-seeds-modal #saved-seeds-pagination,
+.saved-seeds-modal .saved-seeds-pagination,
+#saved-seeds-modal .saved-seeds-pagination {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 16px 20px !important;
+  background: transparent !important;
+  flex-wrap: wrap !important;
+  flex: 1 !important;
+  min-height: 40px !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Force footer to be visible - Enhanced specificity */
+#saved-seeds-modal .saved-seeds-footer,
+.saved-seeds-modal .saved-seeds-footer,
+.saved-seeds-modal .saved-seeds-footer,
+#saved-seeds-modal .saved-seeds-footer {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-top: 1px solid #333 !important;
+  background: #1a1a1a !important;
+  position: relative !important;
+  min-height: 60px !important;
+  padding: 16px 24px !important;
+  gap: 12px !important;
+  z-index: 10 !important;
+}
+
+/* Force pagination buttons to be visible - Enhanced specificity */
+#saved-seeds-modal .pagination-btn,
+.saved-seeds-modal .pagination-btn,
+.saved-seeds-modal .pagination-btn,
+#saved-seeds-modal .pagination-btn {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  padding: 6px 12px !important;
+  border: 1px solid #444 !important;
+  border-radius: 4px !important;
+  background: #333 !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-family: 'Archivo', sans-serif !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Pagination button hover states */
+#saved-seeds-modal .pagination-btn:hover:not(:disabled),
+.saved-seeds-modal .pagination-btn:hover:not(:disabled) {
+  background: #555 !important;
+  border-color: #666 !important;
+}
+
+/* Pagination button disabled state */
+#saved-seeds-modal .pagination-btn:disabled,
+.saved-seeds-modal .pagination-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Pagination button active state */
+#saved-seeds-modal .pagination-btn.active,
+.saved-seeds-modal .pagination-btn.active {
+  background: #6c5ce7 !important;
+  border-color: #6c5ce7 !important;
+}
+
+/* Special styling for jump buttons */
+#saved-seeds-modal .pagination-btn[title*="Jump 10 pages"],
+.saved-seeds-modal .pagination-btn[title*="Jump 10 pages"] {
+  background: #e67e22 !important;
+  border-color: #e67e22 !important;
+  font-weight: bold !important;
+}
+
+#saved-seeds-modal .pagination-btn[title*="Go to first page"],
+#saved-seeds-modal .pagination-btn[title*="Go to last page"],
+.saved-seeds-modal .pagination-btn[title*="Go to first page"],
+.saved-seeds-modal .pagination-btn[title*="Go to last page"] {
+  background: #27ae60 !important;
+  border-color: #27ae60 !important;
+  font-weight: bold !important;
+}
+
+/* Force collection space counter to be visible */
+#saved-seeds-modal #saved-seeds-collection-space-counter,
+#saved-seeds-modal .collection-space-counter,
+.saved-seeds-modal #saved-seeds-collection-space-counter,
+.saved-seeds-modal .collection-space-counter {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  width: 120px !important;
+  height: 50px !important;
+  background: #ef4444 !important;
+  border-radius: 6px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  z-index: 1000 !important;
+  margin-right: 0 !important;
+  margin-left: 34px !important;
+  margin-top: -8px !important;
+}
+
+/* Collection space counter content */
+#saved-seeds-modal .space-counter-content,
+.saved-seeds-modal .space-counter-content {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  flex-direction: column !important;
+  text-align: center !important;
+  color: #fff !important;
+  font-family: 'Archivo', sans-serif !important;
+}
+
+/* Collection space counter title */
+#saved-seeds-modal .space-counter-title,
+.saved-seeds-modal .space-counter-title {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
+  opacity: 0.9 !important;
+}
+
+/* Collection space counter value */
+#saved-seeds-modal .space-counter-value,
+.saved-seeds-modal .space-counter-value {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin-bottom: 1px !important;
+  line-height: 1 !important;
+}
+
+/* Collection space counter label */
+#saved-seeds-modal .space-counter-label,
+.saved-seeds-modal .space-counter-label {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 8px !important;
+  font-weight: 500 !important;
+  opacity: 0.8 !important;
+}
+
+/* Override any conflicting styles from other CSS files */
+#saved-seeds-modal .saved-seeds-footer *,
+.saved-seeds-modal .saved-seeds-footer * {
+  display: revert !important;
+  visibility: revert !important;
+  opacity: revert !important;
+}
+
+/* CRITICAL: Force pagination to always be visible - Override ALL possible conflicts */
+#saved-seeds-modal .saved-seeds-pagination,
+.saved-seeds-modal .saved-seeds-pagination,
+#saved-seeds-modal #saved-seeds-pagination,
+.saved-seeds-modal #saved-seeds-pagination {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  min-height: 40px !important;
+  width: 100% !important;
+  max-width: none !important;
+  overflow: visible !important;
+}
+
+/* CRITICAL: Force footer to always be visible - Override ALL possible conflicts */
+#saved-seeds-modal .saved-seeds-footer,
+.saved-seeds-modal .saved-seeds-footer {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  min-height: 60px !important;
+  width: 100% !important;
+  max-width: none !important;
+  overflow: visible !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* CRITICAL: Force pagination buttons to always be visible */
+#saved-seeds-modal .pagination-btn,
+.saved-seeds-modal .pagination-btn {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  pointer-events: auto !important;
+}
+
+/* CRITICAL: Force pagination empty message to be visible */
+#saved-seeds-modal .pagination-empty-message,
+.saved-seeds-modal .pagination-empty-message {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  color: #95a5a6 !important;
+  font-size: 14px !important;
+  font-family: 'Archivo', sans-serif !important;
+}
+
+/* CRITICAL: Force collection space counter to always be visible */
+#saved-seeds-modal #saved-seeds-collection-space-counter,
+.saved-seeds-modal #saved-seeds-collection-space-counter,
+#saved-seeds-modal .collection-space-counter,
+.saved-seeds-modal .collection-space-counter {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  width: 120px !important;
+  height: 50px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: translate(34px, 4px) !important;
+}
+
+/* CRITICAL: Ensure modal container allows footer to be visible */
+#saved-seeds-modal .saved-seeds-container,
+.saved-seeds-modal .saved-seeds-container {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: visible !important;
+  min-height: 800px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* CRITICAL: Ensure footer is always at the bottom and visible */
+#saved-seeds-modal .saved-seeds-footer,
+.saved-seeds-modal .saved-seeds-footer {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  min-height: 60px !important;
+  width: 100% !important;
+  max-width: none !important;
+  overflow: visible !important;
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Ensure the grid doesn't overlap the footer */
+#saved-seeds-modal #saved-seeds-grid,
+.saved-seeds-modal #saved-seeds-grid {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding-bottom: 20px !important;
+  max-height: calc(100% - 200px) !important;
+  min-height: 400px !important;
+}
+
+/* Cross-page drag and drop styles for pagination buttons */
+#saved-seeds-modal .pagination-btn.drag-over-page,
+.saved-seeds-modal .pagination-btn.drag-over-page {
+  background-color: #4a90e2 !important;
+  color: white !important;
+  transform: scale(1.1) !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5) !important;
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1500px) {
+  #saved-seeds-modal .saved-seeds-container,
+  .saved-seeds-modal .saved-seeds-container {
+    width: 95vw !important;
+    height: 90vh !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  #saved-seeds-modal .saved-seeds-grid,
+  .saved-seeds-modal .saved-seeds-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  #saved-seeds-modal .saved-seeds-grid,
+  .saved-seeds-modal .saved-seeds-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #saved-seeds-modal .saved-seeds-grid,
+  .saved-seeds-modal .saved-seeds-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}

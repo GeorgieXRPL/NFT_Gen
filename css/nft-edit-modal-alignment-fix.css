@@ -1,0 +1,133 @@
+/* 
+ * NFT Edit Modal - Trait Info List Center Alignment Fix
+ * Ensures trait info lists are properly center aligned
+ */
+
+/* Force center alignment for NFT edit modal trait info list */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list,
+.nft-edit-traits-list-card .nft-edit-trait-info-list,
+.nft-trait-info-list {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  padding: 16px 8px 60px 8px !important;
+  margin: 0 !important;
+  list-style: none !important;
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Force center alignment for trait info items */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .nft-trait-info-item,
+.nft-edit-traits-list-card .nft-edit-trait-info-list .nft-trait-info-item,
+.nft-trait-info-list .nft-trait-info-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 141px !important;
+  min-width: 141px !important;
+  max-width: 141px !important;
+  height: 165px !important;
+  min-height: 165px !important;
+  max-height: 165px !important;
+  margin: 0 auto 10px auto !important;
+  position: relative !important;
+  background: none !important;
+  border-radius: 20px !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* Force center alignment for trait info text containers */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text,
+.nft-edit-traits-list-card .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text,
+.nft-trait-info-list .nft-trait-info-item .nft-trait-info-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  background: rgba(20, 20, 20, 0.75) !important;
+  color: #fff !important;
+  border-radius: 0 0 20px 20px !important;
+  padding: 10px 10px 14px 10px !important;
+  z-index: 2 !important;
+  gap: 2px !important;
+  top: auto !important;
+  pointer-events: none !important;
+}
+
+/* Force left alignment for trait names and layer names */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text #edit-nft-trait-name,
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text #edit-nft-trait-layer-name,
+.nft-edit-traits-list-card .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text #edit-nft-trait-name,
+.nft-edit-traits-list-card .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text #edit-nft-trait-layer-name,
+.nft-trait-info-list .nft-trait-info-item .nft-trait-info-text #edit-nft-trait-name,
+.nft-trait-info-list .nft-trait-info-item .nft-trait-info-text #edit-nft-trait-layer-name {
+  text-align: left !important;
+  width: 100% !important;
+}
+
+/* Force center alignment for trait thumbnails */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-thumb,
+.nft-edit-traits-list-card .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-thumb,
+.nft-trait-info-list .nft-trait-info-item .nft-trait-thumb {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 141px !important;
+  height: 141px !important;
+  border-radius: 20px !important;
+  object-fit: cover !important;
+  background: #333 !important;
+  border: 1px solid #222 !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Force center alignment for edit modal trait cards */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .edit-modal-nft-trait-card,
+.nft-edit-traits-list-card .nft-edit-trait-info-list .edit-modal-nft-trait-card,
+.nft-trait-info-list .edit-modal-nft-trait-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 141px !important;
+  height: 165px !important;
+  min-width: 141px !important;
+  min-height: 165px !important;
+  max-width: 141px !important;
+  max-height: 165px !important;
+  position: relative !important;
+}
+
+/* Override any conflicting styles from other CSS files - but keep text alignment as specified */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list *,
+.nft-edit-traits-list-card .nft-edit-trait-info-list *,
+.nft-trait-info-list * {
+  /* Remove text-align override to allow individual elements to control their alignment */
+}
+
+/* Ensure the trait info panel itself is centered */
+.nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel,
+.nft-edit-traits-list-card .nft-edit-trait-info-panel,
+.nft-trait-info-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+}

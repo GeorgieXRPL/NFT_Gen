@@ -1,0 +1,92 @@
+/**
+ * Injected Tooltips Styles
+ * These styles apply to tooltips that are directly injected into elements
+ */
+
+/* Position the button as relative for tooltip positioning */
+.randomize-rarities-btn,
+.rule-actions .action-btn {
+  position: relative !important;
+}
+
+/* Base injected tooltip style */
+.injected-tooltip {
+  display: none !important;
+  position: absolute !important;
+  z-index: 9999999 !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  color: white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+}
+
+/* Randomize tooltip specific styles */
+.injected-tooltip.randomize-tooltip {
+  bottom: auto !important;
+  top: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin-top: 10px !important;
+  width: 250px !important;
+  padding: 12px 16px !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+  text-align: left !important;
+}
+
+/* Rule tooltip specific styles */
+.injected-tooltip.rule-tooltip {
+  bottom: auto !important;
+  top: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin-top: 10px !important;
+  padding: 6px 10px !important;
+  font-size: 0.8rem !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+/* Arrow for tooltips */
+.injected-tooltip::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -10px !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+/* Add spacing between lines in randomize tooltip */
+.injected-tooltip.randomize-tooltip br {
+  margin-bottom: 4px !important;
+}
+
+/* Show tooltips on hover */
+.randomize-rarities-btn:hover .injected-tooltip,
+.rule-actions .action-btn:hover .injected-tooltip {
+  display: block !important;
+}
+
+/* Ensure tooltips are visible when trait layer is expanded */
+.trait-layer-content.expanded .randomize-rarities-btn .injected-tooltip,
+.trait-rarity-actions .randomize-rarities-btn .injected-tooltip {
+  display: none !important;
+}
+
+.trait-layer-content.expanded .randomize-rarities-btn:hover .injected-tooltip,
+.trait-rarity-actions .randomize-rarities-btn:hover .injected-tooltip {
+  display: block !important;
+}
+
+.randomize-rarities-tiered-btn,
+.randomize-rarities-tiered-btn:hover .injected-tooltip,
+.trait-layer-content.expanded .randomize-rarities-tiered-btn .injected-tooltip,
+.trait-rarity-actions .randomize-rarities-tiered-btn .injected-tooltip,
+.trait-layer-content.expanded .randomize-rarities-tiered-btn:hover .injected-tooltip,
+.trait-rarity-actions .randomize-rarities-tiered-btn:hover .injected-tooltip {
+  display: none !important;
+}
