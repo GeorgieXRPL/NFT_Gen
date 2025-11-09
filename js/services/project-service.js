@@ -1247,8 +1247,8 @@
               // The popup is shown 100ms after project load, so we should wait at least that long
               // Counter updates will be handled by hideNftRenderingPopup -> animateNftCountAfterLoad
               // Skip counter updates here - they will happen after popup closes
-                  updateCountersNow();
-                  forceCounterUpdate();
+              // REMOVED: updateCountersNow() and forceCounterUpdate() calls to prevent green flash
+              // Counters will be updated after "Please Wait" popup is hidden
                   
                   // CRITICAL: Ensure saved-seeds-modal instance exists and loads seedList on project load
               // This ensures saved seeds are always counted when a project loads

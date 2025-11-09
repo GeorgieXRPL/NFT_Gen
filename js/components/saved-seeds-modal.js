@@ -1881,6 +1881,22 @@ class SavedSeedsModal {
       }
       popup.remove();
       console.log('[DEBUG] Please Wait popup hidden');
+      
+      // CRITICAL: Update counters after "Please Wait" popup is hidden
+      // This ensures counters show colors only after loading is complete
+      setTimeout(() => {
+        if (window.updateAllCounters) {
+          window.updateAllCounters();
+        } else {
+          if (window.updateNftCountPanel) {
+            window.updateNftCountPanel();
+          }
+          const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && typeof generateNftsUI.refreshSeedListCounter === 'function') {
+            generateNftsUI.refreshSeedListCounter(true);
+          }
+        }
+      }, 100);
     };
     
     // Set up click listener on the popup content (not the overlay) for immediate close after finishing

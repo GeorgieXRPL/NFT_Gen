@@ -917,6 +917,7 @@ html body #app #generate-nfts.tab-content.active .traits-section {
 
 .stacking-order-info.tooltip svg {
   color: #f39c12 !important; /* Orange color to match tooltips */
+  stroke: #f39c12 !important; /* Orange stroke to match tooltips */
   flex-shrink: 0 !important; /* Prevent icon from shrinking */
 }
 
@@ -2903,6 +2904,7 @@ html body #app #traits-rules .stacking-order-info {
 
 html body #app #traits-rules .stacking-order-info svg {
   color: #f39c12 !important; /* Orange color to match tooltips */
+  stroke: #f39c12 !important; /* Orange stroke to match tooltips */
 }
 
 html body #app #traits-rules .stacking-order-info p {
@@ -7496,6 +7498,7 @@ html body #app #traits-rules .stacking-order-info {
 
 html body #app #traits-rules .stacking-order-info svg {
   color: #f39c12 !important; /* Orange color to match tooltips */
+  stroke: #f39c12 !important; /* Orange stroke to match tooltips */
 }
 
 html body #app #traits-rules .stacking-order-info p {

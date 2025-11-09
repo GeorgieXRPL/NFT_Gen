@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   background-color: rgba(51, 51, 51, 0.1); /* Very light background */
-  color: #ffcc00;
+  color: #f39c12;
   padding: 10px 12px;
   border-radius: 6px;
   margin-bottom: 12px;
@@ -11,8 +11,8 @@
   font-size: 0.8em;
   width: 100%; /* Full width of parent container */
   box-sizing: border-box;
-  border: 1px solid rgba(255, 204, 0, 0.3); /* Subtle yellow border */
-  border-left: 3px solid #ffcc00; /* Stronger left border for emphasis */
+  border: 1px solid rgba(243, 156, 18, 0.3); /* Subtle orange border */
+  border-left: 3px solid #f39c12; /* Stronger left border for emphasis */
 }
 
 .combination-rules-warning .warning-icon {
@@ -23,8 +23,8 @@
   max-width: 16px;
   max-height: 16px;
   margin-right: 10px;
-  stroke: #ffcc00;
-  color: #ffcc00;
+  stroke: #f39c12;
+  color: #f39c12;
 }
 
 /* Add specific styling for SVG inside warning icon */
@@ -35,13 +35,13 @@
   min-height: 16px;
   max-width: 16px;
   max-height: 16px;
-  stroke: #ffcc00;
-  color: #ffcc00;
+  stroke: #f39c12;
+  color: #f39c12;
 }
 
 /* Make warning stand out on darker backgrounds */
 .combination-rules-warning span {
-  color: #ffcc00;
+  color: #f39c12;
   font-size: 0.9em;
 }
 

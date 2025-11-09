@@ -6180,7 +6180,9 @@ window.NFTApp.registerModule("generateNftsUI", {
           if (!popup) {
             popup = document.querySelector('.nft-rendering-popup');
           }
-          if (popup) {
+          // Also check for "Please Wait" popup - don't show colors while it's visible
+          const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+          if (popup || pleaseWaitPopup) {
             console.log('[DEBUG] updateNftCountPanel: Popup is still showing, skipping update');
             return; // Don't update while popup is visible
           }
@@ -7950,7 +7952,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       darkNftsRow.style.justifyContent = 'flex-end';
       darkNftsRow.style.position = 'relative';
       darkNftsRow.style.overflow = 'visible';
-      darkNftsRow.style.transform = 'translateY(4px)'; // Move Dark NFTs button 34px down from previous position (-30px + 34px = 4px)
+      // Removed translateY transform to restore button to its correct position above Seed NFT toggle
       
       // Create Dark NFTs toggle button
       const duplicateGenerateSeedBtn = document.createElement('button');

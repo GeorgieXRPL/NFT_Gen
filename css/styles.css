@@ -1398,6 +1398,7 @@ body {
 
 .stacking-order-info svg {
   color: #f39c12 !important; /* Orange color to match tooltips */
+  stroke: #f39c12 !important; /* Orange stroke to match tooltips */
   margin-right: 0.75rem;
   width: var(--icon-size);
   height: var(--icon-size);

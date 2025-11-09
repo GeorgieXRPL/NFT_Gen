@@ -4982,8 +4982,9 @@ const exportNftsModuleDefinition = {
         </div>
       </div>
       <div style="margin-bottom: 16px; padding: 12px; background: rgba(52, 152, 219, 0.1); border-left: 3px solid #3498db; border-radius: 4px;">
-        <strong style="color: #3498db;">Export Process:</strong><br>
-        Once started, all selected batches will be exported automatically without any further user intervention. The process will continue until all batches are complete.
+        <strong style="color: #3498db;">Export Process:</strong><br><br>
+        Once started, all selected batches will be exported<br>
+        automatically without any further user intervention.
       </div>
       <div style="color: #bdc3c7; font-size: 13px;">
         Make sure you have enough free disk space before proceeding. If you<br>need to free up space or export fewer batches at a time, click <strong>"Cancel"</strong> now.

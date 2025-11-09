@@ -336,6 +336,16 @@ window.NFTApp = window.NFTApp || {};
     this.updateCheckConflictsButtonState(projectData)
   },
 
+  // Setup tooltip for rule action buttons (edit, delete, move up/down)
+  setupRuleActionTooltip: function(btn, tooltip) {
+    if (!btn || !tooltip) return;
+    
+    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+    if (tooltipManager && tooltipManager.setupTooltip) {
+      tooltipManager.setupTooltip(btn, tooltip);
+    }
+  },
+
   // Add a combination rule
   addCombinationRule: function (projectData) {
     console.log("Add combination rule function called")
@@ -3094,7 +3104,7 @@ window.NFTApp = window.NFTApp || {};
       const warningDiv = document.createElement("div")
       warningDiv.className = "combination-rules-warning"
       warningDiv.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="#f39c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
         <line x1="12" y1="9" x2="12" y2="13"></line>
         <line x1="12" y1="17" x2="12.01" y2="17"></line>
