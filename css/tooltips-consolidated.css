@@ -307,15 +307,16 @@ html body .rule-actions .action-btn .tooltip-text {
 }
 
 /* Saved Seeds modal: button tooltips should anchor to their buttons and show above them */
+/* Note: seed-card-buttons tooltips use position: fixed in nft-action-buttons-tooltips.css for maximum z-index */
 #saved-seeds-modal .rarity-search-container .tooltip .tooltiptext,
 #saved-seeds-modal .trait-search-container .tooltip .tooltiptext,
-#saved-seeds-modal .seeds-container .tooltip .tooltiptext,
-#saved-seeds-modal .seed-card-buttons .tooltip .tooltiptext {
+#saved-seeds-modal .seeds-container .tooltip .tooltiptext {
   position: absolute !important;
   top: 125% !important;
   bottom: auto !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
+  z-index: 2147483647 !important; /* Maximum z-index to ensure visibility */
 }
 
 /* NFTs Collection modal - unify ALL tooltips to the app default style and sizing */

@@ -6908,12 +6908,12 @@ window.NFTApp.registerModule("generateNftsUI", {
     if (infoList) {
       infoList.innerHTML = `
       <div class="nft-trait-info-list-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 732px; min-height: 732px; max-height: 732px; padding: 20px; color: var(--text-secondary); position: relative; overflow: hidden; overflow-y: hidden; overflow-x: hidden; flex-shrink: 0; box-sizing: border-box;">
-        <div style="display: block; overflow: hidden; overflow-y: hidden; overflow-x: hidden; position: relative; width: 100%; max-width: 180px; text-align: center;">
+        <div style="display: block; overflow: visible; overflow-y: visible; overflow-x: visible; position: relative; width: 100%; max-width: 180px; text-align: center; box-sizing: border-box;">
           <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" style=\"width: 32px; height: 32px; margin: 0 39px 12px 39px; display: block; overflow: hidden; position: relative;\">
             <path d=\"M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3\"></path>
           </svg>
-          <div style=\"font-size: 15px; font-weight: 500; margin-bottom: 8px; display: block; overflow: hidden; overflow-y: hidden; overflow-x: hidden; white-space: normal; word-wrap: break-word; position: relative; text-align: justify; width: 120px;\">${!projectData || !projectData.traits || projectData.traits.length === 0 ? 'No traits added yet' : 'Traits will appear here'}</div>
-          <div style=\"font-size: 13px; line-height: 1.4; display: block; overflow: hidden; overflow-y: hidden; overflow-x: hidden; white-space: normal; word-wrap: break-word; position: relative; text-align: justify; width: 120px;\">${!projectData || !projectData.traits || projectData.traits.length === 0 ? 'Go to the Traits & Rules tab to add trait layers and traits' : 'Click one of the Generate buttons to create an NFT and see its traits'}</div>
+          <div style=\"font-size: 15px; font-weight: 500; margin-bottom: 8px; display: block; overflow: visible; overflow-y: visible; overflow-x: visible; white-space: normal; word-wrap: break-word; word-break: break-word; position: relative; text-align: center; width: 100%; max-width: 180px; box-sizing: border-box;\">${!projectData || !projectData.traits || projectData.traits.length === 0 ? 'No traits added yet' : 'Traits will appear here'}</div>
+          <div style=\"font-size: 13px; line-height: 1.4; display: block; overflow: visible; overflow-y: visible; overflow-x: visible; white-space: normal; word-wrap: break-word; word-break: break-word; position: relative; text-align: center; width: 100%; max-width: 180px; box-sizing: border-box;\">${!projectData || !projectData.traits || projectData.traits.length === 0 ? 'Go to the Traits & Rules tab to add trait layers and traits' : 'Click one of the Generate buttons to create an NFT and see its traits'}</div>
         </div>
       </div>
     `;

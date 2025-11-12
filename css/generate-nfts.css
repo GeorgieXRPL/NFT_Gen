@@ -1908,7 +1908,7 @@ button#single-seed-toggle.tooltip:disabled:hover {
   display: flex !important;
   flex-direction: column;
   margin: 0 auto !important; /* Center horizontally within traits-list-card */
-  overflow: hidden;
+  overflow: visible !important; /* Changed from hidden to visible to prevent first card clipping */
   visibility: visible !important;
   opacity: 1 !important;
 }

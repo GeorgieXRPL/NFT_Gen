@@ -1009,7 +1009,7 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
   min-height: 732px !important;
   max-height: 732px !important;
   flex: none !important; /* Prevent flex sizing */
-  overflow: hidden;
+  overflow: visible !important; /* Changed from hidden to visible to prevent first card clipping */
 }
 
 /* Ensure the traits panel has proper height */

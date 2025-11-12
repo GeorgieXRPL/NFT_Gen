@@ -157,6 +157,8 @@
   isolation: isolate !important; /* Create new stacking context */
   contain: layout style paint !important; /* Strong isolation */
   transform: translateZ(0) !important; /* Hardware acceleration */
+  will-change: transform, opacity !important; /* Optimize for transform and opacity changes */
+  backface-visibility: hidden !important; /* Improve rendering performance */
 }
 
 /* Ensure seed card buttons have relative positioning for tooltips */

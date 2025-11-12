@@ -1280,6 +1280,8 @@
   border-radius: 8px;
   padding: 8px;
   margin: 4px;
+  overflow: visible !important; /* Allow tooltips to overflow */
+  position: relative !important; /* Ensure proper positioning context */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1380,6 +1382,8 @@
   align-items: center;
   gap: 6px;
   overflow: visible !important; /* Allow tooltips to overflow */
+  position: relative !important; /* Ensure proper positioning context */
+  z-index: auto !important; /* Allow tooltips to create their own stacking context */
 }
 
 .unified-nft-card .seed-card-number {
@@ -1404,6 +1408,8 @@
   justify-content: center;
   flex-wrap: wrap;
   overflow: visible !important; /* Allow tooltips to overflow */
+  position: relative !important; /* Ensure proper positioning context */
+  z-index: auto !important; /* Allow tooltips to create their own stacking context */
 }
 
 .unified-nft-card .seed-card-btn {
@@ -1876,6 +1882,10 @@
   bottom: auto !important;
   left: auto !important;
   transform: none !important; /* Will be set dynamically via JavaScript */
+  isolation: isolate !important; /* Create new stacking context */
+  contain: layout style paint !important; /* Strong isolation */
+  will-change: transform, opacity !important; /* Optimize for transform and opacity changes */
+  backface-visibility: hidden !important; /* Improve rendering performance */
 }
 
 .seed-card-rarity.loading {
