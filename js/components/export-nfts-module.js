@@ -3128,7 +3128,7 @@ const exportNftsModuleDefinition = {
     titleContainer.style.justifySelf = "center";
     
     const titleLine1 = document.createElement("div");
-    titleLine1.textContent = "Blockchains where you want to mint your collection:";
+    titleLine1.textContent = "Select Blockchains where you want to set your Metadata";
     titleLine1.style.fontSize = "12px";
     titleLine1.style.marginBottom = "4px";
     titleLine1.style.textAlign = "center";
@@ -4840,23 +4840,23 @@ const exportNftsModuleDefinition = {
       }
     } else {
       // Set green border with green halo effect when all batches respect max
-      maxNftsInput.style.setProperty("border", "2px solid #27ae60", "important");
-      maxNftsInput.style.setProperty("color", "#27ae60", "important"); // Green text color when all respect max
+      maxNftsInput.style.setProperty("border", "2px solid #00ff48", "important");
+      maxNftsInput.style.setProperty("color", "#00ff48", "important"); // Green text color when all respect max (matches batch cards)
       maxNftsInput.style.setProperty("box-shadow", `
-        0 0 8px rgba(39, 174, 96, 0.8),
-        0 0 12px rgba(39, 174, 96, 0.6),
-        0 0 16px rgba(39, 174, 96, 0.4)
+        0 0 8px rgba(0, 255, 72, 0.8),
+        0 0 12px rgba(0, 255, 72, 0.6),
+        0 0 16px rgba(0, 255, 72, 0.4)
       `, "important");
-      // Update "NFTs" label color to green
+      // Update "NFTs" label color to green (matches batch cards)
       if (nftsLabelInside) {
-        nftsLabelInside.style.setProperty("color", "#27ae60", "important");
+        nftsLabelInside.style.setProperty("color", "#00ff48", "important");
       }
       if (maxNftsCard) {
-        maxNftsCard.style.setProperty("border", "2px solid #27ae60", "important");
+        maxNftsCard.style.setProperty("border", "2px solid #00ff48", "important");
         maxNftsCard.style.setProperty("box-shadow", `
-          0 0 8px rgba(39, 174, 96, 0.8),
-          0 0 12px rgba(39, 174, 96, 0.6),
-          0 0 16px rgba(39, 174, 96, 0.4)
+          0 0 8px rgba(0, 255, 72, 0.8),
+          0 0 12px rgba(0, 255, 72, 0.6),
+          0 0 16px rgba(0, 255, 72, 0.4)
         `, "important");
       }
     }
@@ -7548,7 +7548,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
         selectAllBatchesToggle.classList.add("tooltip");
         const selectAllBatchesTooltip = document.createElement("span");
         selectAllBatchesTooltip.className = "tooltiptext";
-        selectAllBatchesTooltip.innerHTML = "When activated, this will select all batches for export (excluding batches marked as already minted). When deactivated, it will restore the previous selection state.";
+        selectAllBatchesTooltip.innerHTML = "When activated, this will select all batches for export (excluding batches marked as already exported). When deactivated, it will restore the previous selection state.";
         selectAllBatchesTooltip.style.visibility = "hidden";
         selectAllBatchesTooltip.style.width = "320px";
         selectAllBatchesTooltip.style.minWidth = "320px";
@@ -8290,7 +8290,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     toggle.id = `already-minted-toggle-${batchNumber}`;
     toggle.type = "button";
     toggle.className = "toggle-button already-minted-toggle";
-    toggle.textContent = "ALREADY MINTED";
+    toggle.textContent = "ALREADY EXPORTED";
     toggle.style.padding = "6px 8px";
     toggle.style.border = "2px solid #4a4a4a";
     toggle.style.borderRadius = "6px";
@@ -8317,7 +8317,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     toggle.classList.add("tooltip");
     const alreadyMintedTooltip = document.createElement("span");
     alreadyMintedTooltip.className = "tooltiptext";
-    alreadyMintedTooltip.innerHTML = "When activated, this batch will be marked as already minted and will be excluded from export. The batch card will be locked with a red border and the batch input will be disabled.";
+    alreadyMintedTooltip.innerHTML = "When activated, this batch will be marked as already exported and will be excluded from export. The batch card will be locked with a red border and the batch input will be disabled.";
     alreadyMintedTooltip.style.visibility = "hidden";
     alreadyMintedTooltip.style.width = "320px";
     alreadyMintedTooltip.style.minWidth = "320px";

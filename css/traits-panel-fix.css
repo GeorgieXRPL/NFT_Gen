@@ -53,6 +53,8 @@
   overflow: hidden;
   visibility: visible !important;
   opacity: 1 !important;
+  margin-left: 0 !important; /* Remove margin-left */
+  margin-top: 4px !important; /* Move panel 4px down */
 }
 
 /* Removed - consolidated in final-overrides.css */

@@ -2306,12 +2306,14 @@ body {
 .spinner {
   animation: spinner-rotate 2s linear infinite;
   transform-origin: center;
+  will-change: transform; /* Hint to browser for better animation performance */
 }
 
 .spinner .path {
   stroke: var(--accent-primary);
   stroke-linecap: round;
   animation: spinner-dash 1.5s ease-in-out infinite;
+  will-change: stroke-dasharray, stroke-dashoffset; /* Hint to browser for better animation performance */
 }
 
 .loading-text {
@@ -3497,10 +3499,12 @@ body {
   width: 170px !important;
   min-width: 170px !important;
   max-width: 170px !important;
-  height: 702px !important; /* Fixed height to prevent layout shifts */
-  min-height: 702px !important;
-  max-height: 702px !important;
+  height: 697px !important; /* Fixed height to prevent layout shifts */
+  min-height: 697px !important;
+  max-height: 697px !important;
   flex: none !important; /* Prevent flex sizing */
+  margin-left: 0 !important; /* Remove margin-left */
+  margin-top: 4px !important; /* Move panel 4px down */
 }
 
 /* Removed - consolidated in final-overrides.css */
@@ -4050,10 +4054,12 @@ input:checked + .toggle-slider:before {
   width: 170px !important;
   min-width: 170px !important;
   max-width: 170px !important;
-  height: 702px !important; /* Fixed height to prevent layout shifts */
-  min-height: 702px !important;
-  max-height: 702px !important;
+  height: 697px !important; /* Fixed height to prevent layout shifts */
+  min-height: 697px !important;
+  max-height: 697px !important;
   flex: none !important; /* Prevent flex sizing */
+  margin: 4px auto 0 auto !important; /* 4px margin-top, auto left/right for horizontal centering */
+  margin-top: 4px !important; /* Explicitly set margin-top to 4px */
 }
 
 /* Ensure NFT trait info list has proper bottom padding for non-scrollable margin */

@@ -98,5 +98,5 @@ if (-not $SkipPush) {
     Write-ColorOutput $InfoColor "`nPush skipped as requested."
 }
 
-Write-ColorOutput $SuccessColor "`n✓ All done! Commit process completed successfully."
+Write-ColorOutput $SuccessColor "`n[SUCCESS] All done! Commit process completed successfully."
 

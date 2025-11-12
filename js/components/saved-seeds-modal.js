@@ -1882,6 +1882,15 @@ class SavedSeedsModal {
       popup.remove();
       console.log('[DEBUG] Please Wait popup hidden');
       
+      // CRITICAL: Update button states after "Please Wait" popup is hidden
+      // This ensures buttons are enabled only after all tasks are completed
+      setTimeout(() => {
+        const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+        if (generateNftsUI && generateNftsUI._updateAllButtonStates) {
+          generateNftsUI._updateAllButtonStates();
+        }
+      }, 100);
+      
       // CRITICAL: Update counters after "Please Wait" popup is hidden
       // This ensures counters show colors only after loading is complete
       setTimeout(() => {
@@ -11468,11 +11477,13 @@ class SavedSeedsModal {
       }
       
       // Default fallback (shouldn't happen in normal use)
-      console.warn('[DEBUG] getTotalSupply: No valid total supply found, using default 10000');
-      return 10000;
+      // CRITICAL: Return 1 instead of 10000 to prevent counter from showing "10000 / 10000" with green background
+      console.warn('[DEBUG] getTotalSupply: No valid total supply found, using default 1');
+      return 1;
     } catch (error) {
       console.error('[DEBUG] Error in getTotalSupply:', error);
-      return 10000;
+      // CRITICAL: Return 1 instead of 10000 to prevent counter from showing "10000 / 10000" with green background
+      return 1;
     }
   }
 
@@ -14088,6 +14099,19 @@ window.SavedSeedsModal = SavedSeedsModal;
 
 // Global unified counter update system
 window.updateAllCounters = function() {
+  // CRITICAL: Check if "Please Wait" popup is showing - don't update counters until it's hidden
+  const generateNftsTab = document.getElementById('generate-nfts');
+  let popup = generateNftsTab ? generateNftsTab.querySelector('.nft-rendering-popup') : null;
+  if (!popup) {
+    popup = document.querySelector('.nft-rendering-popup');
+  }
+  // Also check for "Please Wait" popup
+  const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+  if (popup || pleaseWaitPopup) {
+    console.log('[DEBUG] updateAllCounters: Popup is still showing, skipping counter updates');
+    return; // Don't update counters while popup is visible
+  }
+  
   // console.log('[DEBUG] updateAllCounters called - updating all 4 counters');
   
   try {

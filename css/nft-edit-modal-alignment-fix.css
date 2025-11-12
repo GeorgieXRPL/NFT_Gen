@@ -130,4 +130,6 @@
   width: 100% !important;
   height: 100% !important;
   overflow: visible !important;
+  margin-left: 0 !important; /* Remove margin-left */
+  margin-top: 4px !important; /* Move panel 4px down */
 }

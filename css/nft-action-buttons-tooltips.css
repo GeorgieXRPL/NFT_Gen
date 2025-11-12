@@ -553,6 +553,16 @@ html body #single-seed-toggle:disabled:hover .tooltiptext,
   max-height: 32px !important;
 }
 
+/* Seed NFT button when disabled - match Dark NFTs button text color exactly */
+#single-seed-toggle.tooltip[disabled],
+#single-seed-toggle.tooltip:disabled,
+#single-seed-toggle[disabled],
+#single-seed-toggle:disabled,
+.toggle-button#single-seed-toggle[disabled],
+.toggle-button#single-seed-toggle:disabled {
+  color: #a0a0b0 !important; /* Match Dark NFTs button text color when disabled */
+}
+
 /* Seed NFT button hover state - only when enabled and not active */
 #single-seed-toggle.tooltip:hover:not([disabled]):not(:disabled):not(.active),
 #single-seed-toggle:hover:not([disabled]):not(:disabled):not(.active),
@@ -621,13 +631,14 @@ button#single-seed-toggle.toggle-button:disabled:hover,
 button#single-seed-toggle.tooltip[disabled]:hover,
 button#single-seed-toggle.tooltip:disabled:hover {
   /* Maintain greyed out appearance on hover - no visual changes */
-  background-color: #2a2a2a !important;
-  background: #2a2a2a !important;
-  border-color: #4a4a4a !important;
-  border: 2px solid #4a4a4a !important;
-  color: #ffffff !important;
-  opacity: inherit !important; /* Maintain disabled opacity if set */
-  cursor: default !important; /* Default cursor, not pointer */
+  background-color: #23232b !important; /* Match disabled state background */
+  background: #23232b !important;
+  border-color: #84a0b0 !important; /* Match disabled state border */
+  border: 2px solid #84a0b0 !important;
+  color: #a0a0b0 !important; /* Match disabled state text color */
+  opacity: 0.6 !important; /* Match disabled state opacity */
+  cursor: not-allowed !important; /* Show not-allowed cursor when disabled */
+  pointer-events: none !important; /* Completely prevent hover interactions */
   height: 32px !important;
   min-height: 32px !important;
   max-height: 32px !important;
@@ -649,7 +660,7 @@ button#single-seed-toggle.tooltip:disabled:hover {
 /* Dark NFTs button - preserve absolute positioning from inline styles and all button styles */
 #generate-dark-nfts.tooltip,
 #generate-dark-nfts {
-  position: absolute !important; /* Must match inline style: position: absolute */
+  position: relative !important; /* Use relative positioning to stay in normal flow */
   display: flex !important; /* Preserve flex layout */
   align-items: center !important; /* Ensure text is vertically centered */
   justify-content: center !important; /* Ensure text is horizontally centered */
@@ -664,13 +675,14 @@ button#single-seed-toggle.tooltip:disabled:hover {
   height: 32px !important; /* Must be 32px, not 40px */
   min-height: 32px !important;
   max-height: 32px !important;
-  font-size: 14px !important; /* Match Seed NFT toggle font-size */
+  font-size: 14px !important; /* Match Seed NFT toggle font-size - CRITICAL: No font size changes on hover */
   font-weight: 500 !important; /* Match Seed NFT toggle font-weight */
   line-height: 1 !important; /* Reset line-height to prevent text stretching */
   white-space: nowrap !important; /* Prevent "Dark NFTs" text from wrapping to multiple lines */
   z-index: 1000 !important; /* Higher than NFT preview panel (z-index: 5) */
   cursor: pointer !important; /* Default cursor for enabled state */
-  /* Position values (top, left) are set inline in JS - don't override them */
+  margin-top: 0 !important; /* Reset margin - parent container handles vertical alignment */
+  align-self: center !important; /* Vertically center within parent flex container */
 }
 
 /* Dark NFTs button when disabled/greyed out - base state (not hovering) */
@@ -689,18 +701,25 @@ button#single-seed-toggle.tooltip:disabled:hover {
   cursor: default !important; /* Default cursor, not forbidden sign */
 }
 
-/* Override general toggle-button:hover rule for Dark NFTs when inactive (not disabled) */
+/* Override general toggle-button:hover rule for Dark NFTs when inactive (not disabled) - COMPLETELY REMOVE ALL HOVER EFFECTS */
 .toggle-button:hover#generate-dark-nfts:not(.active):not([disabled]):not(:disabled),
 #generate-dark-nfts.toggle-button:hover:not(.active):not([disabled]):not(:disabled) {
-  background-color: #2a2a2a !important;
-  background: #2a2a2a !important;
-  border-color: #4a4a4a !important;
-  border: 2px solid #4a4a4a !important;
-  color: #ffffff !important;
-  cursor: pointer !important;
+  background-color: #2a2a2a !important; /* Maintain same appearance - no hover effect */
+  border-color: #4a4a4a !important; /* Maintain same appearance - no hover effect */
+  font-size: 14px !important; /* No font size change on hover */
+  font-weight: 500 !important; /* No font weight change on hover */
+  line-height: 1 !important; /* Prevent text stretching */
+  height: 32px !important; /* No height change on hover */
+  min-height: 32px !important;
+  max-height: 32px !important;
+  transform: none !important; /* No transform on hover */
+  box-shadow: none !important; /* No shadow change on hover */
+  transition: none !important; /* Disable all transitions on hover */
+  color: #ffffff !important; /* Maintain text color */
+  cursor: pointer !important; /* Maintain cursor */
 }
 
-/* Override general toggle-button:hover rule for Dark NFTs when disabled/greyed out */
+/* Override general toggle-button:hover rule for Dark NFTs when disabled/greyed out - COMPLETELY REMOVE ALL HOVER EFFECTS */
 .toggle-button:hover#generate-dark-nfts[disabled],
 #generate-dark-nfts.toggle-button:hover[disabled],
 .toggle-button:hover#generate-dark-nfts:disabled,
@@ -712,27 +731,41 @@ button#single-seed-toggle.tooltip:disabled:hover {
   color: #a0a0b0 !important;
   opacity: 0.6 !important;
   cursor: default !important; /* Default cursor, not forbidden sign */
-}
-
-/* Dark NFTs button hover state - match Seed NFT hover style (only color change, no text size/format changes) */
-#generate-dark-nfts.tooltip:hover:not(.active):not([disabled]):not(:disabled),
-#generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled),
-.toggle-button#generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled) {
-  /* Match Seed NFT hover - only change background and border colors, preserve all text properties */
-  background-color: #3a3a3a !important; /* Match Seed NFT hover background */
-  background: #3a3a3a !important;
-  border-color: #5a5a5a !important; /* Match Seed NFT hover border */
-  border: 2px solid #5a5a5a !important;
-  color: #ffffff !important; /* Preserve text color */
-  /* Preserve all text properties - no changes to font-size, font-weight, line-height, etc. */
-  height: 32px !important; /* Maintain 32px height on hover */
+  font-size: 14px !important; /* No font size change on hover */
+  font-weight: 500 !important; /* No font weight change on hover */
+  height: 32px !important; /* No height change on hover */
   min-height: 32px !important;
   max-height: 32px !important;
-  transform: none !important; /* Prevent any transform effects */
-  cursor: pointer !important;
+  line-height: 1 !important; /* Prevent text stretching */
+  transform: none !important; /* No transform on hover */
+  box-shadow: none !important; /* No shadow change on hover */
+  transition: none !important; /* Disable all transitions on hover */
 }
 
-/* Dark NFTs button when disabled/greyed out - completely remove hover effects */
+/* CRITICAL: Dark NFTs button hover state - COMPLETELY REMOVE ALL HOVER EFFECTS */
+/* Inactive state hover - NO HOVER EFFECT (maintain same appearance) */
+#generate-dark-nfts.tooltip:hover:not(.active):not([disabled]):not(:disabled),
+#generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled),
+.toggle-button#generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled),
+html body #generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled),
+html body #app #generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled),
+html body #app #generate-nfts #generate-dark-nfts:hover:not(.active):not([disabled]):not(:disabled) {
+  /* No hover effect - maintain same appearance as non-hover state */
+  background-color: #2a2a2a !important; /* Maintain same appearance - no hover effect */
+  border-color: #4a4a4a !important; /* Maintain same appearance - no hover effect */
+  transform: none !important; /* No transform on hover */
+  box-shadow: none !important; /* No shadow change on hover */
+  font-size: 14px !important; /* No font size change */
+  font-weight: 500 !important; /* No font weight change */
+  height: 32px !important; /* No height change */
+  min-height: 32px !important;
+  max-height: 32px !important;
+  transition: none !important; /* Disable all transitions on hover */
+  color: #ffffff !important; /* Maintain text color */
+  cursor: pointer !important; /* Maintain cursor */
+}
+
+/* Dark NFTs button when disabled/greyed out - COMPLETELY REMOVE ALL HOVER EFFECTS */
 #generate-dark-nfts.tooltip:hover[disabled],
 #generate-dark-nfts:hover[disabled],
 #generate-dark-nfts.tooltip:hover:disabled,
@@ -755,9 +788,10 @@ button#single-seed-toggle.tooltip:disabled:hover {
   line-height: 1 !important;
   transform: none !important;
   box-shadow: none !important;
+  transition: none !important; /* Disable all transitions on hover */
 }
 
-/* Dark NFTs button when greyed out (disabled state) - no hover effect */
+/* Dark NFTs button when greyed out (disabled state) - COMPLETELY REMOVE ALL HOVER EFFECTS */
 #generate-dark-nfts[disabled]:hover,
 #generate-dark-nfts:disabled:hover,
 #generate-dark-nfts.tooltip[disabled]:hover,
@@ -780,6 +814,7 @@ button#single-seed-toggle.tooltip:disabled:hover {
   line-height: 1 !important;
   transform: none !important;
   box-shadow: none !important; /* Remove any shadow effects */
+  transition: none !important; /* Disable all transitions on hover */
 }
 
 /* Dark NFTs button active state */
@@ -788,11 +823,43 @@ button#single-seed-toggle.tooltip:disabled:hover {
   background-color: #00ff88 !important;
   border-color: #00ff88 !important;
   color: #000000 !important;
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important; /* Green halo effect */
   height: 32px !important; /* Maintain 32px height in active state */
   min-height: 32px !important;
   max-height: 32px !important;
   line-height: 1 !important; /* Prevent text stretching */
   white-space: nowrap !important; /* Prevent text from wrapping */
+  font-size: 14px !important; /* Explicit font size - no changes on hover */
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* CRITICAL: Dark NFTs button active state hover - COMPLETELY REMOVE ALL HOVER EFFECTS */
+#generate-dark-nfts.tooltip.active:hover,
+#generate-dark-nfts.active:hover,
+html body #generate-dark-nfts.active:hover,
+html body #app #generate-dark-nfts.active:hover,
+html body #app #generate-nfts #generate-dark-nfts.active:hover {
+  /* No hover effect - maintain same appearance as non-hover active state */
+  background-color: #00ff88 !important; /* Maintain active state background - no change on hover */
+  border-color: #00ff88 !important; /* Maintain active state border - no change on hover */
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important; /* Maintain active state shadow - no change on hover */
+  transform: none !important; /* No transform on hover */
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  color: #000000 !important;
+  transition: none !important; /* Disable all transitions on hover */
+  cursor: pointer !important; /* Maintain cursor */
 }
 
 /* Batch Generation Modal Header Buttons Tooltips - ensure they use default style */
@@ -990,11 +1057,11 @@ button#single-seed-toggle.tooltip:disabled:hover {
   border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button */
 }
 
-/* CRITICAL: Preserve Dark Traits Edit Button styles when tooltip is applied */
-.dark-traits-edit-btn.tooltip,
-#dark-traits-edit-btn.tooltip {
+/* CRITICAL: Preserve Dark Traits Edit Button styles - NO TOOLTIP */
+.dark-traits-edit-btn,
+#dark-traits-edit-btn {
   position: absolute !important;
-  top: -43px !important; /* Overlap top-left corner of Dark NFTs button (which is at top: -35px, height: 32px, so top edge is at -35px) */
+  top: -11px !important; /* Positioned above Dark NFTs button */
   left: -10px !important; /* Overlap left edge of Dark NFTs button (which starts at left: 0, so -10px overlaps the left corner) */
   background: #ff6b35 !important;
   color: #fff !important;
@@ -1010,10 +1077,23 @@ button#single-seed-toggle.tooltip:disabled:hover {
   transition: all 0.3s ease !important;
   align-items: center !important;
   justify-content: center !important;
-  display: flex !important;
+  display: flex !important; /* Changed from 'none' - button visibility controlled by JavaScript via inline styles */
+  opacity: 0 !important; /* Hidden by default - JavaScript will set to 1 when visible */
+  visibility: hidden !important; /* Hidden by default - JavaScript will set to visible when shown */
+  pointer-events: none !important; /* Not clickable when hidden - JavaScript will set to auto when shown */
   overflow: visible !important; /* Ensure button is not clipped */
-  pointer-events: auto !important; /* Ensure button is clickable */
 }
+
+/* CRITICAL: Hide any tooltip on Dark Traits Edit Button - tooltip removed */
+.dark-traits-edit-btn .tooltiptext,
+#dark-traits-edit-btn .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Edit button visibility is controlled by JavaScript - CSS just ensures it's hidden by default */
+/* The button will be shown via inline styles when Dark NFTs button is active */
 
 /* Ensure seed-controls-container allows overflow for edit button */
 .seed-controls-container,

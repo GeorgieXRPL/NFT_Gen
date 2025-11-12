@@ -992,11 +992,13 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
 .nft-trait-info-panel {
   display: flex;
   flex-direction: column;
-  height: 732px !important; /* Fixed height to prevent layout shifts */
-  min-height: 732px !important;
-  max-height: 732px !important;
+  height: 697px !important; /* Fixed height to prevent layout shifts */
+  min-height: 697px !important;
+  max-height: 697px !important;
   flex: none !important; /* Prevent flex sizing */
   overflow: hidden;
+  margin-left: 0 !important; /* Remove margin-left */
+  margin-top: 4px !important; /* Move panel 4px down */
 }
 
 /* Fix content flow */
@@ -1442,17 +1444,21 @@ body .trait-layer-header {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
+  width: 141px !important;
+  min-width: 141px !important;
+  max-width: 141px !important;
   position: relative;
   background: rgba(20, 20, 20, 0.25);
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+  margin: 0 auto !important; /* Center horizontally within trait-items-container */
   margin-bottom: 0px;
   padding: 10px 0 12px 0;
   min-height: 165px;
   height: 165px;
   max-height: 165px;
   overflow: visible;
+  align-self: center !important; /* Center in flex container */
 }
 
 .trait-item {
@@ -2175,17 +2181,21 @@ body .content-area, .content-area {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
+  width: 141px !important;
+  min-width: 141px !important;
+  max-width: 141px !important;
   position: relative;
   background: rgba(20, 20, 20, 0.25);
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+  margin: 0 auto !important; /* Center horizontally within trait-items-container */
   margin-bottom: 0px;
   padding: 10px 0 12px 0;
   min-height: 165px;
   height: 165px;
   max-height: 165px;
   overflow: visible;
+  align-self: center !important; /* Center in flex container */
 }
 
 .trait-item {

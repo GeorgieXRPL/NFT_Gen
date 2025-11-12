@@ -461,7 +461,7 @@ body #app #generate-nfts.tab-content.active,
   min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
-  padding-top: 192px !important; /* CRITICAL: Set padding-top here to ensure it's applied */
+  padding-top: 177px !important; /* Reduced from 192px to 177px to move content 15px up */
   padding-bottom: 0 !important; /* Remove bottom padding */
   margin-top: 0 !important;
   margin-bottom: 0 !important; /* Remove bottom margin */
@@ -2500,6 +2500,7 @@ html body #generate-dark-nfts:disabled:hover,
   font-weight: 500 !important;
   line-height: 1 !important;
   pointer-events: none !important;
+  transition: none !important; /* Disable all transitions on hover */
 }
 
 /* CRITICAL: Prevent ALL hover effects (not just tooltips) for Seed NFT when disabled/greyed out - ABSOLUTE MAXIMUM SPECIFICITY */
@@ -2601,8 +2602,21 @@ html body #app #generate-nfts #nft-preview-container {
 html body #app #generate-nfts .no-project-card {
   order: 2 !important; /* no-project-card comes second (but absolutely positioned) */
   position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: 542px !important;
+  height: 542px !important;
+  min-width: 542px !important;
+  max-width: 542px !important;
+  min-height: 542px !important;
+  max-height: 542px !important;
+  margin: 0 !important;
+  padding: 40px !important;
   z-index: 1 !important;
-  margin-top: 7px !important;
+  box-sizing: border-box !important;
 }
 
 /* Show tooltips on hover - use maximum specificity */
@@ -3244,7 +3258,7 @@ html body #app #generate-nfts .generate-nfts-container .traits-title {
   position: absolute !important;
   top: -36px !important; /* Moved 20px up from -16px */
   left: 554px !important; /* Horizontally aligned to traits-list-card (traits-section starts at 542px + 12px gap = 554px) */
-  width: 220px !important; /* Match traits-section/traits-list-card width */
+  width: 200px !important; /* Match traits-section/traits-list-card width */
   margin-top: 24px !important; /* Add 24px margin-top */
   z-index: 10 !important;
   visibility: visible !important; /* Ensure titles are visible */
@@ -3445,9 +3459,12 @@ html body #app #generate-nfts .traits-section {
 /* TRAITS SECTION WIDTH - FIXED, NOT FLEX */
 html body #app #generate-nfts .traits-section {
   flex: none !important; /* Fixed width, not flex */
-  min-width: 220px !important;
-  max-width: 220px !important;
-  width: 220px !important;
+  min-width: 200px !important; /* Match traits-list-card width */
+  max-width: 200px !important; /* Match traits-list-card width */
+  width: 200px !important; /* Match traits-list-card width */
+  height: 732px !important; /* Match traits-list-card height */
+  min-height: 732px !important; /* Match traits-list-card height */
+  max-height: 732px !important; /* Match traits-list-card height */
   margin-bottom: 0 !important;
   margin-left: 0 !important; /* Remove any left margin that might create extra space */
   margin-right: 0 !important; /* Remove any right margin */
@@ -3639,9 +3656,9 @@ html body #app #generate-nfts .traits-list-card {
   max-height: 732px !important;
   flex: none !important; /* Prevent flex sizing */
   margin-top: 0 !important;
-  margin-bottom: 16px !important; /* 16px bottom margin boundary */
+  margin-bottom: 0 !important; /* Removed margin-bottom */
   padding-top: 12px !important;
-  padding-bottom: 12px !important;
+  padding-bottom: 10px !important; /* 10px bottom frame for visual consistency */
   padding-left: 12px !important;
   padding-right: 17px !important; /* Increased from 12px to 17px to move scrollbar 5px to the right */
   overflow-y: auto !important; /* Enable scrolling for NFT traits list */
@@ -3649,6 +3666,8 @@ html body #app #generate-nfts .traits-list-card {
   position: relative !important;
   scrollbar-width: none !important; /* Hide scrollbar for Firefox */
   -ms-overflow-style: none !important; /* Hide scrollbar for IE and Edge */
+  border: 1.5px solid #232323 !important; /* Ensure border is visible on all sides including bottom */
+  box-sizing: border-box !important; /* Ensure padding and border are included in height calculation */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -3665,11 +3684,16 @@ html body #app #generate-nfts .traits-list-card::-webkit-scrollbar,
 
 /* TRAITS LIST CONTAINER SCROLLING */
 html body #app #generate-nfts .nft-trait-info-list {
-  height: 100% !important;
-  max-height: 100% !important;
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  height: 697px !important;
+  min-height: 697px !important;
+  max-height: 697px !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   padding: 8px !important;
+  margin: 0 auto !important; /* No margin-top, auto left/right for horizontal centering */
   scrollbar-width: none !important; /* Hide scrollbar for Firefox */
   -ms-overflow-style: none !important; /* Hide scrollbar for IE and Edge */
 }
@@ -3721,12 +3745,15 @@ html body #app #generate-nfts .nft-preview-image-area {
   background-color: transparent !important;
   width: 542px !important;
   height: 542px !important; /* Fixed height to match width */
+  min-width: 542px !important;
+  max-width: 542px !important;
   min-height: 542px !important;
   max-height: 542px !important;
   flex-shrink: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   position: relative !important;
+  box-sizing: border-box !important;
 }
 
 /* Allow nft-preview-panel to size naturally */
@@ -4159,11 +4186,16 @@ html body #app .project-interface:has(#export-nfts.tab-content.active) .content-
   display: flex !important;
   flex-direction: column !important;
   gap: 10px !important;
-  height: 100% !important;
-  max-height: 100% !important;
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  height: 697px !important;
+  min-height: 697px !important;
+  max-height: 697px !important;
   overflow-y: auto !important;
   padding: 8px !important;
-  margin: 0 !important;
+  margin: 0 auto !important; /* No margin-top, auto left/right for horizontal centering */
+  margin-top: 0 !important; /* Explicitly set margin-top to 0 */
   position: relative !important;
   z-index: 1 !important;
   visibility: visible !important;
@@ -4288,6 +4320,7 @@ html body #app #generate-nfts .traits-list-card .nft-trait-info-panel:has(.nft-t
 .nft-trait-info-list .trait-items-container {
   display: flex !important;
   flex-direction: column !important;
+  align-items: center !important; /* Center nft-trait-card horizontally */
   gap: 10px !important;
   overflow-y: visible !important;
   flex: 1 1 auto !important;
@@ -4573,15 +4606,26 @@ html body #app #trait-selection-modal .modal-body .trait-selection-list {
   border: none !important;
 }
 
-/* Move nft-trait-info-panel 9px to the right and set size to 170x702px */
+/* Move nft-trait-info-panel and set size to 170x697px */
 .nft-trait-info-panel {
-  margin-left: 9px !important;
+  margin: 4px auto 0 auto !important; /* 4px margin-top, auto left/right for horizontal centering */
+  margin-top: 4px !important; /* Explicitly set margin-top to 4px */
   width: 170px !important;
   min-width: 170px !important;
   max-width: 170px !important;
-  height: 702px !important;
-  min-height: 702px !important;
-  max-height: 702px !important;
+  height: 697px !important;
+  min-height: 697px !important;
+  max-height: 697px !important;
+}
+
+/* CRITICAL: Ensure nft-trait-info-panel in generate-nfts context respects bottom frame */
+html body #app #generate-nfts .traits-list-card .nft-trait-info-panel,
+html body #app #generate-nfts .generate-nfts-container .nft-trait-info-panel {
+  margin: 4px auto 0 auto !important; /* 4px margin-top, auto left/right for horizontal centering */
+  margin-top: 4px !important; /* Explicitly set margin-top to 4px */
+  height: 697px !important;
+  min-height: 697px !important;
+  max-height: 697px !important;
 }
 
 /* Full-size trait popup styles */
@@ -6579,6 +6623,8 @@ html body #app .trait-layer-content.expanded #trait-layer-trait-image img {
   width: 141px !important;
   min-width: 141px !important;
   max-width: 141px !important;
+  margin: 0 auto !important; /* Center horizontally within trait-items-container */
+  align-self: center !important; /* Center in flex container */
 }
 
 /* Ensure trait items have correct dimensions in edit modal */
@@ -6753,21 +6799,26 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
   white-space: nowrap !important; /* Prevent text from wrapping */
 }
 
+/* Dark NFTs button active state hover - NO HOVER EFFECT (maintain same appearance) */
 #generate-dark-nfts.active:hover,
 #generate-dark-nfts.tooltip.active:hover {
-  background-color: #00e677 !important;
-  border-color: #00e677 !important;
+  /* No hover effect - maintain same appearance as non-hover active state */
+  background-color: #00ff88 !important; /* Maintain active state background - no change on hover */
+  border-color: #00ff88 !important; /* Maintain active state border - no change on hover */
   box-shadow: 
     inset 0 3px 5px rgba(0, 0, 0, 0.5),
-    0 0 15px rgba(0, 255, 136, 0.7),
-    0 0 25px rgba(0, 255, 136, 0.4) !important;
-  transform: translateY(2px) !important;
-  height: 32px !important; /* Maintain 32px height on hover */
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important; /* Maintain active state shadow - no change on hover */
+  transform: none !important; /* No transform on hover */
+  height: 32px !important;
   min-height: 32px !important;
   max-height: 32px !important;
-  font-size: 14px !important; /* Prevent font-size change on hover */
-  font-weight: 600 !important; /* Maintain active state font-weight */
-  line-height: 1 !important; /* Prevent text stretching */
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  transition: none !important; /* Disable all transitions on hover */
+  color: #000000 !important; /* Maintain active state text color */
+  cursor: pointer !important; /* Maintain cursor */
 }
 
 @keyframes darkToggleActivate {
@@ -6791,18 +6842,17 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
   }
 }
 
-/* Create NFT button styling when Dark NFTs toggle is active - match Dark NFTs toggle exactly */
+/* Create NFT button styling when Dark NFTs toggle is active - apply background color and halo effect only */
 #nft-action-create-btn.dark-mode-active {
   background-color: #00ff88 !important;
   border-color: #00ff88 !important;
-  color: #000000 !important;
+  /* Preserve original text color (#ffffff) - do not override */
+  /* Preserve original font-weight (bold) - do not override */
+  /* Preserve original text-shadow (2px 2px 0 #000000) - do not override */
   box-shadow: 
     inset 0 3px 5px rgba(0, 0, 0, 0.5),
     0 0 10px rgba(0, 255, 136, 0.5),
     0 0 20px rgba(0, 255, 136, 0.3) !important;
-  font-weight: 900 !important; /* Use extra bold for better visualization */
-  font-family: 'Archivo', sans-serif !important; /* Ensure consistent font */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
   animation: darkToggleActivate 0.3s ease-out !important;
   /* Ensure dimensions remain exactly the same */
   width: 102px !important;
@@ -6811,21 +6861,27 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
   border: 2px solid #00ff88 !important;
 }
 
-/* Ensure Create NFT button text is bold black when dark mode is active */
+/* Preserve Create NFT button original text color and font properties when dark mode is active */
 #nft-action-create-btn.dark-mode-active,
 #nft-action-create-btn.dark-mode-active * {
-  color: #000000 !important;
-  font-weight: 900 !important; /* Extra bold for maximum visibility */
-  font-family: 'Archivo', sans-serif !important;
+  color: #ffffff !important; /* Preserve original white text color */
+  font-weight: bold !important; /* Preserve original font weight */
+  text-shadow: 2px 2px 0 #000000 !important; /* Preserve original text shadow */
+  font-size: 18px !important; /* Preserve original font size */
 }
 
+/* CRITICAL: Remove hover effect from Create NFT button when Dark NFTs is active - match Dark NFTs button (no hover effect) */
 #nft-action-create-btn.dark-mode-active:hover {
-  background-color: #00e677 !important;
-  border-color: #00e677 !important;
+  background-color: #00ff88 !important; /* Maintain same appearance - no hover effect */
+  border-color: #00ff88 !important; /* Maintain same appearance - no hover effect */
   box-shadow: 
     inset 0 3px 5px rgba(0, 0, 0, 0.5),
-    0 0 15px rgba(0, 255, 136, 0.7),
-    0 0 25px rgba(0, 255, 136, 0.4) !important;
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important; /* Maintain same shadow - no hover effect */
+  color: #ffffff !important; /* Preserve original white text color on hover */
+  font-weight: bold !important; /* Preserve original font weight on hover */
+  text-shadow: 2px 2px 0 #000000 !important; /* Preserve original text shadow on hover */
+  transition: none !important; /* Disable all transitions on hover */
 }
 
 /* Ensure Create NFT button maintains exact dimensions in all states */

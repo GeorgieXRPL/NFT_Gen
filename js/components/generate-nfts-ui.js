@@ -1565,31 +1565,60 @@ window.NFTApp.registerModule("generateNftsUI", {
     // Also ensure the control elements exist (for test compatibility)
     const controlsPanel = document.querySelector('.nft-controls-panel');
     if (controlsPanel) {
-      // Check if rarity seed row exists
-      let raritySeedRow = controlsPanel.querySelector('.nft-rarity-seed-row');
+      // Get or create the content container
+      let contentContainer = controlsPanel.querySelector('.nft-controls-panel-content');
+      if (!contentContainer) {
+        console.log('[DEBUG] Creating missing content container...');
+        contentContainer = document.createElement('div');
+        contentContainer.className = 'nft-controls-panel-content';
+        contentContainer.id = 'nft-controls-panel-content';
+        contentContainer.style.display = 'flex';
+        contentContainer.style.flexDirection = 'column';
+        contentContainer.style.gap = '0';
+        contentContainer.style.width = '100%';
+        controlsPanel.appendChild(contentContainer);
+      }
+      
+      // Create parent container (Container 1) that wraps container 2 and container 3
+      let parentContainer = contentContainer.querySelector('.nft-seed-controls-parent');
+      if (!parentContainer) {
+        console.log('[DEBUG] Creating parent container for seed controls...');
+        parentContainer = document.createElement('div');
+        parentContainer.className = 'nft-seed-controls-parent';
+        parentContainer.id = 'nft-seed-controls-parent';
+        parentContainer.style.width = '496px';
+        parentContainer.style.height = '80px';
+        parentContainer.style.display = 'flex';
+        parentContainer.style.flexDirection = 'column';
+        parentContainer.style.gap = '16px';
+        contentContainer.appendChild(parentContainer);
+      }
+      
+      // Check if rarity seed row exists (Container 2)
+      let raritySeedRow = parentContainer.querySelector('.nft-rarity-seed-row');
       if (!raritySeedRow) {
         console.log('[DEBUG] Creating missing rarity seed row...');
         raritySeedRow = document.createElement('div');
         raritySeedRow.className = 'nft-rarity-seed-row';
-        controlsPanel.appendChild(raritySeedRow);
+        parentContainer.appendChild(raritySeedRow);
       }
       
       // Check if seedlist random row exists
-      let seedlistRandomRow = controlsPanel.querySelector('.nft-seedlist-random-row');
+      let seedlistRandomRow = contentContainer.querySelector('.nft-seedlist-random-row');
       if (!seedlistRandomRow) {
         console.log('[DEBUG] Creating missing seedlist random row...');
         seedlistRandomRow = document.createElement('div');
         seedlistRandomRow.className = 'nft-seedlist-random-row';
-        controlsPanel.appendChild(seedlistRandomRow);
+        contentContainer.appendChild(seedlistRandomRow);
       }
       
-      // Check if seed input row exists
-      let seedInputRow = controlsPanel.querySelector('.nft-seedinput-row');
+      // Check if seed input row exists (Container 3)
+      let seedInputRow = parentContainer.querySelector('.nft-seedinput-row');
       if (!seedInputRow) {
         console.log('[DEBUG] Creating missing seed input row...');
         seedInputRow = document.createElement('div');
         seedInputRow.className = 'nft-seedinput-row';
-        controlsPanel.appendChild(seedInputRow);
+        parentContainer.appendChild(seedInputRow);
       }
     }
     
@@ -1677,6 +1706,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       .trait-items-container {
         display: flex !important;
         flex-direction: column !important;
+        align-items: center !important;
         gap: 10px;
         width: 100%;
         overflow-y: auto;
@@ -1699,18 +1729,24 @@ window.NFTApp.registerModule("generateNftsUI", {
         width: 170px !important;
         min-width: 170px !important;
         max-width: 170px !important;
-        height: 702px !important; /* Fixed height to prevent layout shifts */
-        min-height: 702px !important;
-        max-height: 702px !important;
+        height: 697px !important; /* Fixed height to prevent layout shifts */
+        min-height: 697px !important;
+        max-height: 697px !important;
         flex: none !important; /* Prevent flex sizing */
         overflow: auto;
+        margin-top: 4px !important; /* Move panel 4px down */
       }
       /* Ensure proper padding around the trait list */
       .nft-trait-info-list {
         padding: 0 !important;
         display: block !important;
-        height: 100% !important;
-        width: 100% !important;
+        width: 170px !important;
+        min-width: 170px !important;
+        max-width: 170px !important;
+        height: 697px !important;
+        min-height: 697px !important;
+        max-height: 697px !important;
+        margin: 0 auto !important; /* Center horizontally within traits-list-card */
         overflow-y: auto !important;
       }
       /* Style for traits list card edit button - Independent styling with maximum specificity */
@@ -2195,7 +2231,10 @@ window.NFTApp.registerModule("generateNftsUI", {
         traitCard.style.flexDirection = 'column';
         traitCard.style.alignItems = 'center';
         traitCard.style.justifyContent = 'flex-start';
-        traitCard.style.width = '100%';
+        traitCard.style.width = '141px';
+        traitCard.style.minWidth = '141px';
+        traitCard.style.maxWidth = '141px';
+        traitCard.style.margin = '0 auto';
         traitCard.style.position = 'relative';
         // Add only the required children in order
         traitCard.appendChild(thumbContainer);
@@ -2246,6 +2285,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       traitItemsContainer.style.flex = '1 1 auto';
       traitItemsContainer.style.height = '100%';
       traitItemsContainer.style.maxHeight = 'none';
+      traitItemsContainer.style.alignItems = 'center';
     }
   },
   
@@ -3258,6 +3298,12 @@ window.NFTApp.registerModule("generateNftsUI", {
       progressBarElement.classList.remove('green', 'red', 'orange', 'yellow');
     }
 
+    // CRITICAL: Also grey out "Seed:" label during popup
+    const seedLabel = document.querySelector('.seed-label');
+    if (seedLabel) {
+      seedLabel.style.color = '#a0a0b0'; // Match Dark NFTs button text color when greyed out
+    }
+
     // Remove existing popup if it exists
     let popup = generateNftsTab.querySelector('.nft-rendering-popup');
     if (popup) {
@@ -3589,6 +3635,16 @@ window.NFTApp.registerModule("generateNftsUI", {
     setTimeout(() => {
       if (this._updateAllButtonStates) {
         this._updateAllButtonStates();
+      }
+      // Update seed label color after popup closes
+      const seedLabel = document.querySelector('.seed-label');
+      if (seedLabel) {
+        const hasNFT = window.lastGeneratedNFT && window.lastGeneratedNFT.seed;
+        if (hasNFT) {
+          seedLabel.style.color = '#fff'; // White when enabled
+        } else {
+          seedLabel.style.color = '#a0a0b0'; // Grey when no NFT
+        }
       }
       // Then animate the count
       this.animateNftCountAfterLoad();
@@ -5343,9 +5399,11 @@ window.NFTApp.registerModule("generateNftsUI", {
           <div class="nft-preview-section" style="flex: 0 0 542px; max-width: 542px; min-width: 542px; display: flex; flex-direction: column; gap: 0;">
             <div class="nft-preview-panel" style="display: flex; flex-direction: column; gap: 0;">
             <div class="nft-controls-panel" style="display: flex; flex-direction: column; gap: 0; width: 542px; height: 116px; background: #23232b; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); padding: 18px 18px 10px 18px; margin-bottom: 18px; border: 1.5px solid #29293a;">
-              <div class="nft-rarity-seed-row"></div>
-              <div class="nft-seedlist-random-row"></div>
-              <div class="nft-seedinput-row"></div>
+              <div class="nft-controls-panel-content" id="nft-controls-panel-content" style="display: flex; flex-direction: column; gap: 0; width: 100%;">
+                <div class="nft-rarity-seed-row"></div>
+                <div class="nft-seedlist-random-row"></div>
+                <div class="nft-seedinput-row"></div>
+              </div>
             </div>
             <div class="nft-preview-image-area" style="width: 542px; height: 542px;"><div id="nft-preview-container"></div></div>
             </div>
@@ -6642,16 +6700,18 @@ window.NFTApp.registerModule("generateNftsUI", {
             <div class="nft-preview-section" style="flex: 0 0 542px; max-width: 542px; min-width: 542px; display: flex; flex-direction: column; gap: 0;">
               <div class="nft-preview-panel" style="display: flex; flex-direction: column; gap: 0;">
                 <div class="nft-controls-panel" style="display: flex; flex-direction: column; gap: 0; width: 542px; height: 116px; background: #23232b; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.10); padding: 18px 18px 10px 18px; margin-bottom: 18px; border: 1.5px solid #29293a;">
-                  <div class="nft-rarity-seed-row"></div>
-                  <div class="nft-seedlist-random-row"></div>
-                  <div class="nft-seedinput-row"></div>
+                  <div class="nft-controls-panel-content" id="nft-controls-panel-content" style="display: flex; flex-direction: column; gap: 0; width: 100%;">
+                    <div class="nft-rarity-seed-row"></div>
+                    <div class="nft-seedlist-random-row"></div>
+                    <div class="nft-seedinput-row"></div>
+                  </div>
                 </div>
                 <div class="nft-preview-image-area" style="width: 542px; height: 542px;"><div id="nft-preview-container"></div></div>
               </div>
             </div>
             <div class="traits-section" style="width: 220px; min-width: 220px; max-width: 220px; display: flex; flex-direction: column; flex: none;">
               <div class="traits-list-card" style="height: 676px; min-height: 676px; max-height: 676px; display: flex; flex-direction: column;">
-              <div class="nft-trait-info-panel" style="width: 170px; min-width: 170px; max-width: 170px; height: 702px; min-height: 702px; max-height: 702px; flex: none;">
+              <div class="nft-trait-info-panel" style="width: 170px; min-width: 170px; max-width: 170px; height: 697px; min-height: 697px; max-height: 697px; flex: none; margin-left: 0; margin-top: 4px;">
                 <ul class="nft-trait-info-list"></ul>
                 </div>
               </div>
@@ -6804,9 +6864,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       color: var(--text-secondary);
       box-sizing: border-box;
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      left: 0;
+      transform: none;
       z-index: 1;
     `;
 
@@ -7023,7 +7083,10 @@ window.NFTApp.registerModule("generateNftsUI", {
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        width: 100%;
+        width: 141px;
+        min-width: 141px;
+        max-width: 141px;
+        margin: 0 auto;
         position: relative;
       `;
       
@@ -7174,6 +7237,102 @@ window.NFTApp.registerModule("generateNftsUI", {
     element.style.cursor = 'pointer';
   },
 
+  // Helper function to ensure all buttons stay greyed out (used when popup is showing)
+  _ensureButtonsGreyedOut: function() {
+    // Grey out ALL buttons in nft-action-buttons-container
+    const buttonsContainer = document.querySelector('.nft-action-buttons-container');
+    if (buttonsContainer) {
+      const allButtons = buttonsContainer.querySelectorAll('.nft-action-btn, button');
+      allButtons.forEach(btn => {
+        btn.style.setProperty('background-color', '#23232b', 'important');
+        btn.style.setProperty('border-color', 'transparent', 'important');
+        btn.style.setProperty('color', '#a0a0b0', 'important');
+        btn.style.setProperty('opacity', '0.6', 'important');
+        btn.style.setProperty('cursor', 'not-allowed', 'important');
+        btn.style.setProperty('box-shadow', 'none', 'important');
+        btn.style.setProperty('border', 'none', 'important');
+        btn.disabled = true;
+        btn.setAttribute('disabled', 'disabled');
+      });
+    }
+    
+    // Grey out specific buttons by ID
+    const createNftBtn = document.getElementById('nft-action-create-btn');
+    if (createNftBtn) {
+      createNftBtn.style.setProperty('background-color', '#23232b', 'important');
+      createNftBtn.style.setProperty('border-color', 'transparent', 'important');
+      createNftBtn.style.setProperty('color', '#a0a0b0', 'important');
+      createNftBtn.style.setProperty('opacity', '0.6', 'important');
+      createNftBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      createNftBtn.style.setProperty('box-shadow', 'none', 'important');
+      createNftBtn.style.setProperty('border', 'none', 'important');
+      createNftBtn.disabled = true;
+      createNftBtn.setAttribute('disabled', 'disabled');
+    }
+    
+    const bulkGenerationBtn = document.getElementById('nft-action-bulk-btn');
+    if (bulkGenerationBtn) {
+      bulkGenerationBtn.style.setProperty('background-color', '#23232b', 'important');
+      bulkGenerationBtn.style.setProperty('border-color', 'transparent', 'important');
+      bulkGenerationBtn.style.setProperty('color', '#a0a0b0', 'important');
+      bulkGenerationBtn.style.setProperty('opacity', '0.6', 'important');
+      bulkGenerationBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      bulkGenerationBtn.style.setProperty('box-shadow', 'none', 'important');
+      bulkGenerationBtn.style.setProperty('border', 'none', 'important');
+      bulkGenerationBtn.disabled = true;
+      bulkGenerationBtn.setAttribute('disabled', 'disabled');
+    }
+    
+    const generateSeedBtn = document.getElementById('generate-seed-nft-btn');
+    if (generateSeedBtn) {
+      generateSeedBtn.style.setProperty('background-color', '#23232b', 'important');
+      generateSeedBtn.style.setProperty('border-color', 'transparent', 'important');
+      generateSeedBtn.style.setProperty('color', '#a0a0b0', 'important');
+      generateSeedBtn.style.setProperty('opacity', '0.6', 'important');
+      generateSeedBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      generateSeedBtn.style.setProperty('box-shadow', 'none', 'important');
+      generateSeedBtn.style.setProperty('border', 'none', 'important');
+      generateSeedBtn.disabled = true;
+      generateSeedBtn.setAttribute('disabled', 'disabled');
+    }
+    
+    // Grey out Dark NFTs button
+    const darkNftsBtn = document.getElementById('generate-dark-nfts');
+    if (darkNftsBtn) {
+      darkNftsBtn.style.setProperty('background-color', '#23232b', 'important');
+      darkNftsBtn.style.setProperty('border-color', '#4a4a4a', 'important');
+      darkNftsBtn.style.setProperty('color', '#a0a0b0', 'important');
+      darkNftsBtn.style.setProperty('opacity', '0.6', 'important');
+      darkNftsBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      darkNftsBtn.disabled = true;
+      darkNftsBtn.setAttribute('disabled', 'disabled');
+    }
+    
+    // Grey out Seed NFT button
+    const seedToggleBtn = document.getElementById('single-seed-toggle');
+    if (seedToggleBtn) {
+      seedToggleBtn.style.setProperty('background-color', '#23232b', 'important');
+      seedToggleBtn.style.setProperty('border-color', '#84a0b0', 'important');
+      seedToggleBtn.style.setProperty('color', '#a0a0b0', 'important');
+      seedToggleBtn.style.setProperty('opacity', '0.6', 'important');
+      seedToggleBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      seedToggleBtn.disabled = true;
+      seedToggleBtn.setAttribute('disabled', 'disabled');
+    }
+    
+    // Grey out "Seed:" label
+    const seedLabel = document.querySelector('.seed-label');
+    if (seedLabel) {
+      seedLabel.style.color = '#a0a0b0';
+    }
+    
+    // Grey out seed box
+    const seedBox = document.querySelector('.nft-seed-box');
+    if (seedBox) {
+      seedBox.style.color = '#84a0b0';
+    }
+  },
+
   // Update all button states based on requirements and NFT status
   _updateAllButtonStates: function() {
     // CRITICAL: Don't update if popup is still showing - wait until it closes
@@ -7183,10 +7342,14 @@ window.NFTApp.registerModule("generateNftsUI", {
     if (!popup) {
       popup = document.querySelector('.nft-rendering-popup');
     }
-    const isPopupShowing = !!popup;
+    // Also check for "Please Wait" popup
+    const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+    const isPopupShowing = popup || pleaseWaitPopup;
     
     if (isPopupShowing) {
       console.log('[DEBUG] _updateAllButtonStates: Popup is still showing, skipping update');
+      // CRITICAL: Ensure all buttons stay greyed out while popup is showing
+      this._ensureButtonsGreyedOut();
       return; // Don't update while popup is visible - buttons should stay greyed out
     }
     
@@ -7333,6 +7496,14 @@ window.NFTApp.registerModule("generateNftsUI", {
           darkNftsBtn.style.cursor = 'default';
           darkNftsBtn.style.opacity = '0.6';
           darkNftsBtn.disabled = true;
+          // CRITICAL: Hide edit button when Dark NFTs button is disabled/greyed out
+          const editBtn = document.getElementById('dark-traits-edit-btn');
+          if (editBtn) {
+            editBtn.style.opacity = '0';
+            editBtn.style.visibility = 'hidden';
+            editBtn.style.pointerEvents = 'none';
+            editBtn.style.display = 'none';
+          }
         } else {
           darkNftsBtn.style.backgroundColor = '#2a2a2a';
           darkNftsBtn.style.color = '#ffffff';
@@ -7341,6 +7512,24 @@ window.NFTApp.registerModule("generateNftsUI", {
           darkNftsBtn.style.opacity = '1';
           darkNftsBtn.disabled = false;
           darkNftsBtn.removeAttribute('disabled');
+          // Edit button visibility will be controlled by active state (only show if Dark NFTs is active)
+          const editBtn = document.getElementById('dark-traits-edit-btn');
+          if (editBtn) {
+            const isDarkActive = darkNftsBtn.classList.contains('active');
+            if (isDarkActive) {
+              // Show if Dark NFTs is active
+              editBtn.style.setProperty('visibility', 'visible', 'important');
+              editBtn.style.setProperty('pointer-events', 'auto', 'important');
+              editBtn.style.setProperty('display', 'flex', 'important');
+              setTimeout(() => editBtn.style.setProperty('opacity', '1', 'important'), 10);
+            } else {
+              // Hide if Dark NFTs is not active
+              editBtn.style.setProperty('opacity', '0', 'important');
+              editBtn.style.setProperty('visibility', 'hidden', 'important');
+              editBtn.style.setProperty('pointer-events', 'none', 'important');
+              editBtn.style.setProperty('display', 'none', 'important');
+            }
+          }
         }
       }
       
@@ -7358,10 +7547,30 @@ window.NFTApp.registerModule("generateNftsUI", {
           createNftBtn.setAttribute('disabled', 'disabled');
         } else {
           console.log('[DEBUG] Enabling Create NFT button');
-          createNftBtn.style.setProperty('background-color', '#047857', 'important');
-          createNftBtn.style.setProperty('border', '2px solid #047857', 'important'); // Restore border when active
-          createNftBtn.style.setProperty('border-color', '#047857', 'important');
-          createNftBtn.style.setProperty('color', '#ffffff', 'important');
+          // Check if Dark NFTs is active - if so, apply dark mode styling
+          const darkNftsBtn = document.getElementById('generate-dark-nfts');
+          const isDarkActive = darkNftsBtn && darkNftsBtn.classList.contains('active');
+          
+          if (isDarkActive) {
+            // Apply Dark NFTs background color and halo effect, but preserve original text color and size
+            createNftBtn.style.setProperty('background-color', '#00ff88', 'important');
+            createNftBtn.style.setProperty('border', '2px solid #00ff88', 'important');
+            createNftBtn.style.setProperty('border-color', '#00ff88', 'important');
+            createNftBtn.style.setProperty('box-shadow', 'inset 0 3px 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 255, 136, 0.5), 0 0 20px rgba(0, 255, 136, 0.3)', 'important');
+            // Preserve original text color and properties
+            createNftBtn.style.setProperty('color', '#ffffff', 'important');
+            createNftBtn.style.setProperty('font-weight', 'bold', 'important');
+            createNftBtn.style.setProperty('text-shadow', '2px 2px 0 #000000', 'important');
+            createNftBtn.classList.add('dark-mode-active');
+          } else {
+            // Apply default styling
+            createNftBtn.style.setProperty('background-color', '#047857', 'important');
+            createNftBtn.style.setProperty('border', '2px solid #047857', 'important'); // Restore border when active
+            createNftBtn.style.setProperty('border-color', '#047857', 'important');
+            createNftBtn.style.setProperty('color', '#ffffff', 'important');
+            createNftBtn.style.setProperty('box-shadow', '', 'important');
+            createNftBtn.classList.remove('dark-mode-active');
+          }
           createNftBtn.style.setProperty('cursor', 'pointer', 'important');
           createNftBtn.style.setProperty('opacity', '1', 'important');
           createNftBtn.style.pointerEvents = 'auto';
@@ -7493,22 +7702,47 @@ window.NFTApp.registerModule("generateNftsUI", {
     const hasMinimumRequirements = this._hasMinimumRequirements(projectData);
     const hasNFT = window.lastGeneratedNFT && window.lastGeneratedNFT.seed;
     
-    // 1. Seed label, number, copy button
-    const raritySeedRow = document.querySelector('.nft-rarity-seed-row');
+    // 1. Container 2: Dark NFTs button, Seed label, number, copy button (all in one row)
+    const parentContainer = document.querySelector('.nft-seed-controls-parent');
+    const raritySeedRow = parentContainer ? parentContainer.querySelector('.nft-rarity-seed-row') : document.querySelector('.nft-rarity-seed-row');
     if (raritySeedRow) {
-      raritySeedRow.innerHTML = '';
+      // Set up rarity seed row as Container 2: flex row with 496px width and 32px height
+      raritySeedRow.style.display = 'flex';
+      raritySeedRow.style.flexDirection = 'row';
+      raritySeedRow.style.alignItems = 'center';
+      raritySeedRow.style.gap = '8px';
+      raritySeedRow.style.width = '496px';
+      raritySeedRow.style.height = '32px';
+      raritySeedRow.style.margin = '0';
+      raritySeedRow.style.padding = '0';
+      
+      // Clear existing content but preserve Dark NFTs button if it exists
+      const existingDarkNftsBtn = raritySeedRow.querySelector('#generate-dark-nfts');
+      const existingSeedDisplay = raritySeedRow.querySelector('.seed-display-container');
+      
+      // Clear all children except Dark NFTs button
+      const childrenToRemove = [];
+      for (let child of raritySeedRow.children) {
+        if (child.id !== 'generate-dark-nfts' && !child.querySelector('#generate-dark-nfts')) {
+          childrenToRemove.push(child);
+        }
+      }
+      childrenToRemove.forEach(child => child.remove());
+      
+      // Create seed display container (will contain Seed:, seed number, copy button)
       const rowFlex = document.createElement('div');
       rowFlex.className = 'seed-display-container';
       rowFlex.id = 'seed-display-container';
       rowFlex.style.display = 'flex';
       rowFlex.style.alignItems = 'center';
-      rowFlex.style.justifyContent = 'center';
+      rowFlex.style.justifyContent = 'flex-end';
       rowFlex.style.gap = '0px';
-      rowFlex.style.width = '542px';
+      rowFlex.style.flex = '1'; // Take remaining space after Dark NFTs button
       rowFlex.style.height = '32px';
       rowFlex.style.background = 'none';
-      rowFlex.style.padding = '0'; // Remove side padding for perfect stacking
-      rowFlex.style.marginBottom = '2px';
+      rowFlex.style.padding = '0';
+      rowFlex.style.margin = '0';
+      rowFlex.style.minWidth = '0'; // Allow flex shrinking
       const seedLabel = document.createElement('span');
       seedLabel.textContent = 'Seed:';
       seedLabel.className = 'seed-label';
@@ -7527,11 +7761,23 @@ window.NFTApp.registerModule("generateNftsUI", {
       }
       seedBox.textContent = deterministicSeed;
       
-      // Apply greyed out style to seed box when no NFT
-      if (!hasNFT) {
+      // CRITICAL: Check if "Please Wait" popup is showing - keep grey during popup
+      const generateNftsTab = document.getElementById('generate-nfts');
+      let popup = generateNftsTab ? generateNftsTab.querySelector('.nft-rendering-popup') : null;
+      if (!popup) {
+        popup = document.querySelector('.nft-rendering-popup');
+      }
+      // Also check for "Please Wait" popup
+      const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+      const isPopupShowing = popup || pleaseWaitPopup;
+      
+      // Apply greyed out style to seed box and seed label when no NFT OR when popup is showing
+      if (!hasNFT || isPopupShowing) {
         seedBox.style.color = '#84a0b0';
+        seedLabel.style.color = '#a0a0b0'; // Match Dark NFTs button text color when greyed out
       } else {
         seedBox.style.color = '#fff';
+        seedLabel.style.color = '#fff'; // White when enabled
       }
       
       const copyBtn = document.createElement('button');
@@ -7633,6 +7879,10 @@ window.NFTApp.registerModule("generateNftsUI", {
               clearTimeout(parseInt(copyBtn.dataset.copyTimeoutId));
             }
             
+            // CRITICAL: Store and maintain seed box color to prevent it from changing
+            const seedBoxCurrentColor = seedBox.style.color || window.getComputedStyle(seedBox).color;
+            const seedBoxOriginalColor = seedBoxCurrentColor;
+            
             // Store original values
             const originalText = copyBtn.textContent;
             
@@ -7640,6 +7890,11 @@ window.NFTApp.registerModule("generateNftsUI", {
             copyBtn.textContent = '✔';
           copyBtn.style.setProperty('color', '#00ff3c', 'important'); // Verified green color as requested
             copyBtn.style.transition = 'color 0.3s ease';
+            
+            // CRITICAL: Explicitly maintain seed box color - prevent it from changing
+            if (seedBoxOriginalColor) {
+              seedBox.style.setProperty('color', seedBoxOriginalColor, 'important');
+            }
             
             // Revert after 2 seconds - check current button state to use correct color
             const timeoutId = setTimeout(() => {
@@ -7661,6 +7916,12 @@ window.NFTApp.registerModule("generateNftsUI", {
                 // Button should be disabled - use grey color
                 copyBtn.style.setProperty('color', '#a0a0b0', 'important');
             }
+              
+              // CRITICAL: Ensure seed box color is maintained after timeout
+              if (seedBoxCheck && seedBoxOriginalColor) {
+                seedBoxCheck.style.setProperty('color', seedBoxOriginalColor, 'important');
+              }
+              
               delete copyBtn.dataset.copyTimeoutId;
             }, 2000);
             copyBtn.dataset.copyTimeoutId = timeoutId.toString();
@@ -7684,6 +7945,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       rowFlex.appendChild(seedLabel);
       rowFlex.appendChild(seedBox);
       rowFlex.appendChild(copyBtn);
+      
+      // Append seed display container to rarity seed row (Container 2)
+      // Dark NFTs button will be added first (leftmost) when it's created
       raritySeedRow.appendChild(rowFlex);
     }
     // 2. Plus, minus, counter, randomize
@@ -7729,6 +7993,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       const seedListKey = getSeedListKey(pdForCounter);
       let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
       seedListCounter.textContent = `${self.formatNumberWithCommas(seedList.length || 0)} / ${self.formatNumberWithCommas(totalSupply)}`;
+      // CRITICAL: Don't set color on initial render - wait until after "Please Wait" popup is shown
+      // This prevents green background from flashing before the popup appears
+      seedListCounter.style.color = '#fff'; // Set default white color initially
       leftGroup.appendChild(seedListCounter);
       outerFlex.appendChild(leftGroup);
       // Right group: randomize button
@@ -7740,33 +8007,24 @@ window.NFTApp.registerModule("generateNftsUI", {
       outerFlex.appendChild(rightGroup);
       seedListRandomRow.appendChild(outerFlex);
     }
-    // 3. Seed toggle, label, input, Generate Seed
-    const seedInputRow = document.querySelector('.nft-seedinput-row');
+    // 3. Container 3: Seed toggle, input field, Generate Seed button (all in one row)
+    const parentContainerForSeedInput = document.querySelector('.nft-seed-controls-parent');
+    const seedInputRow = parentContainerForSeedInput ? parentContainerForSeedInput.querySelector('.nft-seedinput-row') : document.querySelector('.nft-seedinput-row');
     if (seedInputRow) {
       seedInputRow.innerHTML = '';
-      // Create a column container
-      const columnContainer = document.createElement('div');
-      columnContainer.style.display = 'flex';
-      columnContainer.style.flexDirection = 'column';
-      columnContainer.style.gap = '8px';
-      columnContainer.style.width = '100%';
+      // Set up seed input row as Container 3: flex row with 496px width and 32px height
+      seedInputRow.style.display = 'flex';
+      seedInputRow.style.flexDirection = 'row';
+      seedInputRow.style.alignItems = 'center';
+      seedInputRow.style.justifyContent = 'flex-end'; // Align to right to match Container 2
+      seedInputRow.style.gap = '8px';
+      seedInputRow.style.width = '496px';
+      seedInputRow.style.height = '32px';
+      seedInputRow.style.margin = '0';
+      seedInputRow.style.padding = '0';
 
-      // Single row: toggle, input and button all in same container
-      const inputRow = document.createElement('div');
-      inputRow.style.display = 'flex';
-      inputRow.style.alignItems = 'center';
-      inputRow.style.width = '100%';
-      inputRow.style.gap = '8px'; // Add gap between all elements
-
-      // Single container for toggle, input and button
-      const inputButtonContainer = document.createElement('div');
-      inputButtonContainer.className = 'seed-controls-container';
-      inputButtonContainer.id = 'seed-controls-container';
-      inputButtonContainer.style.display = 'flex';
-      inputButtonContainer.style.alignItems = 'center';
-      inputButtonContainer.style.gap = '8px';
-      inputButtonContainer.style.width = '100%';
-      inputButtonContainer.style.justifyContent = 'flex-end';
+      // Elements will be appended directly to seedInputRow (Container 3)
+      // No need for extra wrapper containers
 
       // Create the toggle button
       const toggleButton = document.createElement('button');
@@ -7786,7 +8044,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         transition: all 0.2s ease;
         outline: none;
         user-select: none;
-        height: 40px;
+        height: 32px;
         width: 99px;
         min-width: 99px;
         display: flex;
@@ -7804,18 +8062,38 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Position Seed NFT tooltip using fixed positioning to avoid being cut off
       toggleButton.addEventListener('mouseenter', function() {
         const rect = toggleButton.getBoundingClientRect();
-        // Temporarily show tooltip to get dimensions
+        
+        // Temporarily show tooltip off-screen to get accurate dimensions
+        seedTooltipText.style.position = 'fixed';
         seedTooltipText.style.visibility = 'hidden';
         seedTooltipText.style.opacity = '0';
         seedTooltipText.style.display = 'block';
+        seedTooltipText.style.top = '-9999px';
+        seedTooltipText.style.left = '-9999px';
+        seedTooltipText.style.transform = 'none';
+        
+        // Force reflow to get accurate measurements
+        void seedTooltipText.offsetHeight;
+        
         const tooltipRect = seedTooltipText.getBoundingClientRect();
-        // Position tooltip ABOVE the button
-        const top = rect.top - tooltipRect.height - 8; // 8px gap above button
-        const left = rect.left + (rect.width / 2); // Center horizontally
+        const tooltipHeight = tooltipRect.height || 60; // Fallback height
+        const tooltipWidth = tooltipRect.width || 200; // Fallback width
+        
+        // Calculate button center position
+        const buttonCenterX = rect.left + (rect.width / 2);
+        const buttonTop = rect.top;
+        
+        // Position tooltip ABOVE the button, horizontally centered
+        const top = buttonTop - tooltipHeight - 8; // 8px gap above button
+        const left = buttonCenterX; // Center point of button
+        
+        // Apply positioning
         seedTooltipText.style.position = 'fixed';
         seedTooltipText.style.top = `${top}px`;
         seedTooltipText.style.left = `${left}px`;
-        seedTooltipText.style.transform = 'translateX(-50%)';
+        seedTooltipText.style.transform = 'translateX(-50%)'; // Center horizontally
+        seedTooltipText.style.zIndex = '2147483647';
+        
         // Show the tooltip
         seedTooltipText.style.visibility = 'visible';
         seedTooltipText.style.opacity = '1';
@@ -7827,14 +8105,26 @@ window.NFTApp.registerModule("generateNftsUI", {
         seedTooltipText.style.opacity = '0';
       });
       
+      // CRITICAL: Check if "Please Wait" popup is showing - keep grey during popup
+      const generateNftsTabCheck = document.getElementById('generate-nfts');
+      let popupCheck = generateNftsTabCheck ? generateNftsTabCheck.querySelector('.nft-rendering-popup') : null;
+      if (!popupCheck) {
+        popupCheck = document.querySelector('.nft-rendering-popup');
+      }
+      // Also check for "Please Wait" popup
+      const pleaseWaitPopupCheck = document.getElementById('nft-edit-please-wait-popup');
+      const isPopupShowingForButton = popupCheck || pleaseWaitPopupCheck;
+      
       // CRITICAL: Seed NFT toggle only needs minimum requirements (2 layers with 1 trait each)
       // It doesn't need an existing NFT because it's meant to GENERATE one with a seed
-      if (!hasMinimumRequirements) {
+      // BUT: Keep grey during popup even if requirements are met
+      if (!hasMinimumRequirements || isPopupShowingForButton) {
         toggleButton.style.backgroundColor = '#23232b';
         toggleButton.style.color = '#a0a0b0'; // Match placeholder color (var(--text-secondary))
         toggleButton.style.borderColor = '#84a0b0';
         toggleButton.style.cursor = 'not-allowed';
         toggleButton.style.opacity = '0.6';
+        toggleButton.style.pointerEvents = 'none'; // Completely prevent hover interactions
         toggleButton.disabled = true;
       } else {
         // Enable if minimum requirements are met (regardless of existing NFT)
@@ -7843,6 +8133,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         toggleButton.style.borderColor = '#4a4a4a';
         toggleButton.style.cursor = 'pointer';
         toggleButton.style.opacity = '1';
+        toggleButton.style.pointerEvents = 'auto'; // Re-enable hover interactions when enabled
         toggleButton.disabled = false;
         toggleButton.removeAttribute('disabled');
       }
@@ -7882,7 +8173,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       seedInput.id = 'single-seed-input';
       seedInput.placeholder = 'Paste Seed';
       seedInput.style.width = '166px';
-      seedInput.style.height = '40px';
+      seedInput.style.height = '32px';
       seedInput.style.fontSize = '13px';
       seedInput.style.margin = '0';
       seedInput.style.padding = '0 8px';
@@ -7899,7 +8190,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       generateSeedBtn.className = 'btn btn-primary';
       generateSeedBtn.textContent = 'Generate Seed';
       generateSeedBtn.style.width = '115px';
-      generateSeedBtn.style.height = '40px';
+      generateSeedBtn.style.height = '32px';
       generateSeedBtn.style.fontSize = '13px';
       generateSeedBtn.style.margin = '0';
       generateSeedBtn.style.borderRadius = '4px';
@@ -7907,12 +8198,14 @@ window.NFTApp.registerModule("generateNftsUI", {
       // CRITICAL: Generate Seed button only needs minimum requirements (2 layers with 1 trait each)
       // It doesn't need an existing NFT because it's meant to GENERATE one with a seed
       // CRITICAL: Check if popup is showing - if so, keep button greyed out
-      const generateNftsTabCheck = document.getElementById('generate-nfts');
-      let popupCheck = generateNftsTabCheck ? generateNftsTabCheck.querySelector('.nft-rendering-popup') : null;
-      if (!popupCheck) {
-        popupCheck = document.querySelector('.nft-rendering-popup');
+      const generateNftsTabCheckForSeed = document.getElementById('generate-nfts');
+      let popupCheckForSeed = generateNftsTabCheckForSeed ? generateNftsTabCheckForSeed.querySelector('.nft-rendering-popup') : null;
+      if (!popupCheckForSeed) {
+        popupCheckForSeed = document.querySelector('.nft-rendering-popup');
       }
-      const isPopupShowingCheck = !!popupCheck;
+      // Also check for "Please Wait" popup
+      const pleaseWaitPopupCheckForSeed = document.getElementById('nft-edit-please-wait-popup');
+      const isPopupShowingCheck = popupCheckForSeed || pleaseWaitPopupCheckForSeed;
       
       if (!hasMinimumRequirements || isPopupShowingCheck) {
         // Disable if minimum requirements not met OR popup is showing
@@ -7944,17 +8237,11 @@ window.NFTApp.registerModule("generateNftsUI", {
         existingDarkNftsBtn.remove();
       }
       
-      // Create Dark NFTs button row - placed above Seed NFT toggle
-      const darkNftsRow = document.createElement('div');
-      darkNftsRow.style.display = 'flex';
-      darkNftsRow.style.alignItems = 'center';
-      darkNftsRow.style.width = '100%';
-      darkNftsRow.style.justifyContent = 'flex-end';
-      darkNftsRow.style.position = 'relative';
-      darkNftsRow.style.overflow = 'visible';
-      // Removed translateY transform to restore button to its correct position above Seed NFT toggle
+      // Get Container 2 (rarity seed row) to add Dark NFTs button directly to it
+      const parentContainerForDarkNfts = document.querySelector('.nft-seed-controls-parent');
+      const raritySeedRowForDarkNfts = parentContainerForDarkNfts ? parentContainerForDarkNfts.querySelector('.nft-rarity-seed-row') : document.querySelector('.nft-rarity-seed-row');
       
-      // Create Dark NFTs toggle button
+      // Create Dark NFTs toggle button - will be added directly to Container 2 (first, leftmost)
       const duplicateGenerateSeedBtn = document.createElement('button');
       duplicateGenerateSeedBtn.id = 'generate-dark-nfts';
       duplicateGenerateSeedBtn.className = 'toggle-button';
@@ -7991,6 +8278,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         duplicateGenerateSeedBtn.style.cursor = 'not-allowed';
         duplicateGenerateSeedBtn.style.opacity = '0.6';
         duplicateGenerateSeedBtn.disabled = true;
+        // Note: Edit button will be hidden after it's created (see below)
       } else {
         duplicateGenerateSeedBtn.style.backgroundColor = '#2a2a2a';
         duplicateGenerateSeedBtn.style.color = '#ffffff';
@@ -7998,33 +8286,42 @@ window.NFTApp.registerModule("generateNftsUI", {
         duplicateGenerateSeedBtn.style.cursor = 'pointer';
         duplicateGenerateSeedBtn.style.opacity = '1';
         duplicateGenerateSeedBtn.disabled = false;
+        // Edit button visibility will be controlled by active state
       }
       
       // Ensure button is always visible (not hidden)
       duplicateGenerateSeedBtn.style.display = 'flex';
       duplicateGenerateSeedBtn.style.visibility = 'visible';
       
-      // Add Dark NFTs button to its row
-      darkNftsRow.appendChild(duplicateGenerateSeedBtn);
-
-      // Add toggle, input and button to the same container
-      inputButtonContainer.appendChild(toggleButton);
-      inputButtonContainer.appendChild(seedInput);
-      inputButtonContainer.appendChild(generateSeedBtn);
+      // Create a wrapper div for the Dark NFTs button to hold the edit button
+      const darkNftsWrapper = document.createElement('div');
+      darkNftsWrapper.style.position = 'relative';
+      darkNftsWrapper.style.display = 'flex';
+      darkNftsWrapper.style.alignItems = 'center';
+      darkNftsWrapper.style.overflow = 'visible';
       
-      // Set container position for edit button
-      inputButtonContainer.style.position = 'relative';
-      inputButtonContainer.style.overflow = 'visible'; // Allow edit button to display outside bounds
+      // Add Dark NFTs button to wrapper
+      darkNftsWrapper.appendChild(duplicateGenerateSeedBtn);
+
+      // Append toggle, input and button directly to Container 3 (seedInputRow)
+      seedInputRow.appendChild(toggleButton);
+      seedInputRow.appendChild(seedInput);
+      seedInputRow.appendChild(generateSeedBtn);
+      
+      // Set seedInputRow position for any absolute positioned elements
+      seedInputRow.style.position = 'relative';
+      seedInputRow.style.overflow = 'visible'; // Allow edit button to display outside bounds
       
       // Create edit button for Dark NFTs configuration (initially hidden)
-      // Position it relative to Dark NFTs button at upper-left
+      // Position it relative to Dark NFTs button - only show when Dark NFTs is active
+      // NO TOOLTIP - tooltip removed as requested
       const darkTraitsEditBtn = document.createElement('button');
       darkTraitsEditBtn.id = 'dark-traits-edit-btn';
-      darkTraitsEditBtn.className = 'dark-traits-edit-btn tooltip';
+      darkTraitsEditBtn.className = 'dark-traits-edit-btn'; // Removed 'tooltip' class - no tooltip
       darkTraitsEditBtn.innerHTML = 'EDIT';
       darkTraitsEditBtn.style.cssText = `
         position: absolute;
-        top: 25px;
+        top: -11px;
         left: -10px;
         width: 40px;
         height: 20px;
@@ -8035,8 +8332,10 @@ window.NFTApp.registerModule("generateNftsUI", {
         font-size: 10px;
         font-weight: bold;
         cursor: pointer;
-        display: none;
+        display: flex;
         opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
         transition: all 0.3s ease;
         z-index: 10000;
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -8044,56 +8343,19 @@ window.NFTApp.registerModule("generateNftsUI", {
         justify-content: center;
       `;
       
-      // Create tooltip text
-      const darkEditTooltipText = document.createElement('span');
-      darkEditTooltipText.className = 'tooltiptext';
-      darkEditTooltipText.textContent = 'Configure Dark NFT traits - Select which traits to use for Dark NFT generation';
-      darkTraitsEditBtn.appendChild(darkEditTooltipText);
+      // NO TOOLTIP - tooltip removed as requested
+      // No tooltip element created, no tooltip event listeners added
       
-      // Position edit button tooltip using fixed positioning to avoid being overlapped
-      darkTraitsEditBtn.addEventListener('mouseenter', function() {
-        if (!darkEditTooltipText) return;
-        
-        // Use requestAnimationFrame to ensure button is fully positioned before calculating
-        requestAnimationFrame(() => {
-          const rect = darkTraitsEditBtn.getBoundingClientRect();
-          
-          // Temporarily show tooltip to get its dimensions (but keep it invisible)
-          darkEditTooltipText.style.position = 'fixed';
-          darkEditTooltipText.style.visibility = 'hidden';
-          darkEditTooltipText.style.opacity = '0';
-          darkEditTooltipText.style.display = 'block';
-          darkEditTooltipText.style.top = '0';
-          darkEditTooltipText.style.left = '0';
-          darkEditTooltipText.style.transform = 'none';
-          
-          // Force reflow to get accurate measurements
-          void darkEditTooltipText.offsetHeight;
-          
-          const tooltipRect = darkEditTooltipText.getBoundingClientRect();
-          const tooltipHeight = tooltipRect.height || 60; // Fallback height if not measured
-          
-          // Position tooltip directly below the EDIT button, centered horizontally
-          // The tooltip arrow points down (top: 100% in CSS), so tooltip should be above button
-          // Ensure button position is accurate by recalculating if needed
-          const buttonRect = darkTraitsEditBtn.getBoundingClientRect();
-          // Position tooltip directly above the button since arrow points down
-          // Recalculate button position to ensure accuracy
-          const currentButtonRect = darkTraitsEditBtn.getBoundingClientRect();
-          const top = currentButtonRect.top - tooltipHeight - 8; // 8px gap above button (arrow will point down to button)
-          const left = currentButtonRect.left + (currentButtonRect.width / 2); // Center point of button
-          
-          // Apply final positioning
-          darkEditTooltipText.style.position = 'fixed';
-          darkEditTooltipText.style.top = `${top}px`;
-          darkEditTooltipText.style.left = `${left}px`;
-          darkEditTooltipText.style.transform = 'translateX(-50%)';
-          darkEditTooltipText.style.zIndex = '2147483647';
-        });
-      });
+      // CRITICAL: Hide edit button when Dark NFTs button is disabled/greyed out (if it was disabled above)
+      if (!hasNFT || !hasMinimumRequirements) {
+        darkTraitsEditBtn.style.setProperty('opacity', '0', 'important');
+        darkTraitsEditBtn.style.setProperty('visibility', 'hidden', 'important');
+        darkTraitsEditBtn.style.setProperty('pointer-events', 'none', 'important');
+        darkTraitsEditBtn.style.setProperty('display', 'none', 'important');
+      }
       
-      // Add edit button to darkNftsRow (positioned relative to Dark NFTs button)
-      darkNftsRow.appendChild(darkTraitsEditBtn);
+      // Add edit button to darkNftsWrapper (positioned relative to Dark NFTs button)
+      darkNftsWrapper.appendChild(darkTraitsEditBtn);
       
       // Add click event listener for edit button
       darkTraitsEditBtn.addEventListener('click', (e) => {
@@ -8122,13 +8384,24 @@ window.NFTApp.registerModule("generateNftsUI", {
         darkTraitsEditBtn.style.transform = 'scale(1)';
       });
       
-      // Add Dark NFTs row to column container first (above Seed NFT row)
-      columnContainer.appendChild(darkNftsRow);
+      // Add Dark NFTs button wrapper directly to Container 2 (rarity seed row) as first element (leftmost)
+      if (raritySeedRowForDarkNfts) {
+        // Remove existing Dark NFTs button if it exists to avoid duplicates
+        const existingBtn = raritySeedRowForDarkNfts.querySelector('#generate-dark-nfts');
+        if (existingBtn) {
+          existingBtn.parentElement.remove();
+        }
+        
+        // Insert Dark NFTs wrapper at the beginning (first, leftmost position)
+        const firstChild = raritySeedRowForDarkNfts.firstChild;
+        if (firstChild) {
+          raritySeedRowForDarkNfts.insertBefore(darkNftsWrapper, firstChild);
+        } else {
+          raritySeedRowForDarkNfts.appendChild(darkNftsWrapper);
+        }
+      }
       
-      inputRow.appendChild(inputButtonContainer);
-      columnContainer.appendChild(inputRow);
-
-      seedInputRow.appendChild(columnContainer);
+      // Elements are already appended directly to seedInputRow (Container 3)
       
       // Update event listener to work as radio toggle - mutually exclusive with Dark NFTs
       toggleButton.addEventListener('change', function() {
@@ -8150,6 +8423,8 @@ window.NFTApp.registerModule("generateNftsUI", {
           const editBtn = document.getElementById('dark-traits-edit-btn');
           if (editBtn) {
             editBtn.style.opacity = '0';
+            editBtn.style.visibility = 'hidden';
+            editBtn.style.pointerEvents = 'none';
             editBtn.style.display = 'none';
           }
           
@@ -8189,8 +8464,10 @@ window.NFTApp.registerModule("generateNftsUI", {
         const self = window.NFTApp.getModule('generateNftsUI');
         if (self) self.darkModeEnabled = false;
         
-        darkTraitsEditBtn.style.opacity = '0';
-        darkTraitsEditBtn.style.display = 'none';
+        darkTraitsEditBtn.style.setProperty('opacity', '0', 'important');
+        darkTraitsEditBtn.style.setProperty('visibility', 'hidden', 'important');
+        darkTraitsEditBtn.style.setProperty('pointer-events', 'none', 'important');
+        darkTraitsEditBtn.style.setProperty('display', 'none', 'important');
         
         // Restore Create NFT button to default styling
         const createNftBtn = document.getElementById('nft-action-create-btn');
@@ -8277,15 +8554,26 @@ window.NFTApp.registerModule("generateNftsUI", {
         const self = window.NFTApp.getModule('generateNftsUI');
         self.darkModeEnabled = isActive;
         
-        // Show/hide edit button with animation
+        // Show/hide edit button with animation - only show when Dark NFTs is active AND button is not disabled
         const editBtn = document.getElementById('dark-traits-edit-btn');
         if (editBtn) {
-          if (isActive) {
-            editBtn.style.display = 'flex';
-            setTimeout(() => editBtn.style.opacity = '1', 10);
+          // Get current state dynamically
+          const darkNftsBtn = document.getElementById('generate-dark-nfts');
+          const isButtonDisabled = this.disabled || this.classList.contains('disabled') || 
+                                   (darkNftsBtn && (darkNftsBtn.disabled || darkNftsBtn.classList.contains('disabled')));
+          
+          if (isActive && !isButtonDisabled) {
+            // Show edit button only when Dark NFTs is active and button is enabled
+            editBtn.style.setProperty('visibility', 'visible', 'important');
+            editBtn.style.setProperty('pointer-events', 'auto', 'important');
+            editBtn.style.setProperty('display', 'flex', 'important');
+            setTimeout(() => editBtn.style.setProperty('opacity', '1', 'important'), 10);
           } else {
-            editBtn.style.opacity = '0';
-            setTimeout(() => editBtn.style.display = 'none', 300);
+            // Hide edit button when Dark NFTs is inactive or button is disabled
+            editBtn.style.setProperty('opacity', '0', 'important');
+            editBtn.style.setProperty('visibility', 'hidden', 'important');
+            editBtn.style.setProperty('pointer-events', 'none', 'important');
+            setTimeout(() => editBtn.style.setProperty('display', 'none', 'important'), 300);
           }
         }
         
@@ -8293,20 +8581,13 @@ window.NFTApp.registerModule("generateNftsUI", {
         const createNftBtn = document.getElementById('nft-action-create-btn');
         if (createNftBtn) {
           if (isActive) {
-            // Match Dark NFTs toggle styling exactly
+            // Apply Dark NFTs background color and halo effect, but preserve original text color and size
             createNftBtn.style.backgroundColor = '#00ff88';
             createNftBtn.style.borderColor = '#00ff88';
-            createNftBtn.style.color = '#000000';
+            // Preserve original text color (#ffffff) - do not change
+            // Preserve original font-weight (bold) - do not change
+            // Preserve original text-shadow (2px 2px 0 #000000) - do not change
             createNftBtn.style.boxShadow = 'inset 0 3px 5px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 255, 136, 0.5), 0 0 20px rgba(0, 255, 136, 0.3)';
-            createNftBtn.style.fontWeight = '900'; /* Extra bold for better visualization */
-            createNftBtn.style.fontFamily = "'Archivo', sans-serif"; /* Ensure consistent font */
-            createNftBtn.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.3)';
-            // Ensure all text inside uses bold black font
-            const createNftBtnText = createNftBtn.querySelector('*');
-            if (createNftBtnText) {
-              createNftBtnText.style.color = '#000000';
-              createNftBtnText.style.fontWeight = '900';
-            }
             createNftBtn.style.animation = 'darkToggleActivate 0.3s ease-out';
             // Ensure dimensions remain exactly the same
             createNftBtn.style.width = '102px';
@@ -8339,6 +8620,24 @@ window.NFTApp.registerModule("generateNftsUI", {
         }
       });
     }
+    
+    // CRITICAL: After rendering all controls, ensure buttons are greyed out if popup is not showing yet
+    // This prevents buttons from appearing enabled before the "Please Wait" popup is displayed
+    const generateNftsTabFinal = document.getElementById('generate-nfts');
+    let popupFinal = generateNftsTabFinal ? generateNftsTabFinal.querySelector('.nft-rendering-popup') : null;
+    if (!popupFinal) {
+      popupFinal = document.querySelector('.nft-rendering-popup');
+    }
+    const pleaseWaitPopupFinal = document.getElementById('nft-edit-please-wait-popup');
+    const isPopupShowingFinal = popupFinal || pleaseWaitPopupFinal;
+    
+    if (!isPopupShowingFinal) {
+      // Popup not showing yet - ensure buttons are greyed out
+      if (this._ensureButtonsGreyedOut) {
+        this._ensureButtonsGreyedOut();
+      }
+    }
+    
     // Ensure seed counter always displays correct value by default
     const seedListCounter = document.getElementById('seed-list-counter');
     if (seedListCounter) {
@@ -8362,7 +8661,23 @@ window.NFTApp.registerModule("generateNftsUI", {
       if (!totalSupply || isNaN(totalSupply) || totalSupply < 1) totalSupply = 1;
       const seedListKey = getSeedListKey(pd);
       let seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
+      // CRITICAL: Check if "Please Wait" popup is showing - don't update counter until it's hidden
+      const generateNftsTabCounter = document.getElementById('generate-nfts');
+      let popupCounter = generateNftsTabCounter ? generateNftsTabCounter.querySelector('.nft-rendering-popup') : null;
+      if (!popupCounter) {
+        popupCounter = document.querySelector('.nft-rendering-popup');
+      }
+      // Also check for "Please Wait" popup
+      const pleaseWaitPopupCounter = document.getElementById('nft-edit-please-wait-popup');
+      if (popupCounter || pleaseWaitPopupCounter) {
+        console.log('[DEBUG] ensureNftPreviewContainerExists: Popup is still showing, skipping counter update');
+        // Don't update counter text or color while popup is visible
+        seedListCounter.style.color = '#fff'; // Keep white during popup
+        return;
+      }
+      
       seedListCounter.textContent = `${self.formatNumberWithCommas(seedList.length || 0)} / ${self.formatNumberWithCommas(totalSupply)}`;
+      // Popup is hidden, safe to update
       setSeedListCounterColor(seedListCounter, seedList.length || 0, totalSupply);
     }
   },
@@ -8940,6 +9255,20 @@ if (!window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter) {
 
   // Separate function for the actual refresh logic
   window.NFTApp.getModule('generateNftsUI')._performRefresh = function() {
+    // CRITICAL: Check if "Please Wait" popup is showing - don't update counter until it's hidden
+    const generateNftsTab = document.getElementById('generate-nfts');
+    let popup = generateNftsTab ? generateNftsTab.querySelector('.nft-rendering-popup') : null;
+    if (!popup) {
+      popup = document.querySelector('.nft-rendering-popup');
+    }
+    // Also check for "Please Wait" popup
+    const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+    if (popup || pleaseWaitPopup) {
+      console.log('[DEBUG] _performRefresh: Popup is still showing, skipping counter update');
+      // Don't update counter text or color while popup is visible
+      return;
+    }
+    
     // Store reference to the module for use in formatting
     const self = window.NFTApp.getModule('generateNftsUI');
     
@@ -8989,7 +9318,7 @@ if (!window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter) {
     }
     const text = `${self.formatNumberWithCommas(seedCount)} / ${self.formatNumberWithCommas(totalSupply)}`;
     
-    // Update display
+    // Update display - popup is hidden, safe to update
     seedListCounter.textContent = text;
     setSeedListCounterColor(seedListCounter, seedCount, totalSupply);
     
@@ -9096,6 +9425,7 @@ styleElement.textContent = `
   .trait-items-container {
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     overflow-y: auto !important;
     flex: 1 1 auto !important;
     height: 100% !important;
@@ -9114,6 +9444,7 @@ document.head.appendChild(styleElement);
     document.querySelectorAll('.trait-items-container').forEach(container => {
       container.style.display = 'flex';
       container.style.flexDirection = 'column';
+      container.style.alignItems = 'center';
       container.style.overflowY = 'auto';
       container.style.flex = '1 1 auto';
       container.style.height = '100%';
@@ -9145,6 +9476,7 @@ document.head.appendChild(styleElement);
         container.classList.remove('traits-grid');
         container.style.display = 'flex';
         container.style.flexDirection = 'column';
+        container.style.alignItems = 'center';
         container.style.overflowY = 'auto';
         container.style.flex = '1 1 auto';
         container.style.height = '100%';

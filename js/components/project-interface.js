@@ -538,6 +538,19 @@ window.NFTApp.registerModule("projectInterface", {
     
     // Update counters immediately and multiple times to ensure accuracy
     const updateCountersOnLoad = () => {
+      // CRITICAL: Check if "Please Wait" popup is showing - don't update counters until it's hidden
+      const generateNftsTab = document.getElementById('generate-nfts');
+      let popup = generateNftsTab ? generateNftsTab.querySelector('.nft-rendering-popup') : null;
+      if (!popup) {
+        popup = document.querySelector('.nft-rendering-popup');
+      }
+      // Also check for "Please Wait" popup
+      const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+      if (popup || pleaseWaitPopup) {
+        console.log('[DEBUG] updateCountersOnLoad: Popup is still showing, skipping counter updates');
+        return; // Don't update counters while popup is visible
+      }
+      
       // Ensure generateNftsUI module has projectData
       if (window.NFTApp.getModule('generateNftsUI')) {
         window.NFTApp.getModule('generateNftsUI').projectData = projectData;
@@ -547,7 +560,25 @@ window.NFTApp.registerModule("projectInterface", {
           window.NFTApp.getModule('navigation').enableGenerateNftsTab();
         }
         
-        // Update button states after setting project data
+        // CRITICAL: Ensure buttons start greyed out before popup appears
+        // Check if popup is showing - if not, grey out buttons immediately
+        const generateNftsTabCheck = document.getElementById('generate-nfts');
+        let popupCheck = generateNftsTabCheck ? generateNftsTabCheck.querySelector('.nft-rendering-popup') : null;
+        if (!popupCheck) {
+          popupCheck = document.querySelector('.nft-rendering-popup');
+        }
+        const pleaseWaitPopupCheck = document.getElementById('nft-edit-please-wait-popup');
+        const isPopupShowingCheck = popupCheck || pleaseWaitPopupCheck;
+        
+        if (!isPopupShowingCheck) {
+          // Popup not showing yet - ensure buttons are greyed out
+          const generateNftsUI = window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI._ensureButtonsGreyedOut) {
+            generateNftsUI._ensureButtonsGreyedOut();
+          }
+        }
+        
+        // Update button states after setting project data (will check for popup internally)
         setTimeout(() => {
           const generateNftsUI = window.NFTApp.getModule('generateNftsUI');
           if (generateNftsUI && generateNftsUI._updateAllButtonStates) {
@@ -969,7 +1000,7 @@ window.NFTApp.registerModule("projectInterface", {
             }
             if (batchButtonElems[lastIdx]) {
               var b = project.batches[lastIdx] || {};
-              var mintedSuffix = b.minted ? ' (Already Minted)' : '';
+              var mintedSuffix = b.minted ? ' (Already Exported)' : '';
               batchButtonElems[lastIdx].textContent = `Batch ${String(lastIdx + 1).padStart(2, '0')} (${formatNumberWithCommas(Number(b.size) || 0)} NFTs)` + mintedSuffix;
             }
           }
@@ -995,7 +1026,7 @@ window.NFTApp.registerModule("projectInterface", {
               rowTooltip.className = 'tooltiptext';
               row.appendChild(rowTooltip);
             }
-            rowTooltip.textContent = 'this batch will not be exported since it was already minted';
+            rowTooltip.textContent = 'this batch will not be exported since it was already exported';
           } else {
             row.style.background = '';
             row.style.color = '';
@@ -1036,10 +1067,10 @@ window.NFTApp.registerModule("projectInterface", {
           if (!mintedTooltip) {
             mintedTooltip = document.createElement('span');
             mintedTooltip.className = 'tooltiptext';
-            mintedTooltip.textContent = 'Mark this batch as already minted';
+            mintedTooltip.textContent = 'Mark this batch as already exported';
             mintedCheckbox.appendChild(mintedTooltip);
           } else {
-            mintedTooltip.textContent = 'Mark this batch as already minted';
+            mintedTooltip.textContent = 'Mark this batch as already exported';
           }
           mintedCheckbox.addEventListener('change', function(idx) {
             return function(e) {
@@ -1055,7 +1086,7 @@ window.NFTApp.registerModule("projectInterface", {
             };
           }(i));
           var mintedLabel = document.createElement('label');
-          mintedLabel.textContent = 'Already Minted';
+          mintedLabel.textContent = 'Already Exported';
           mintedLabel.style.fontSize = '13px';
           mintedLabel.style.marginLeft = '4px';
           batchInputs.push(input);
@@ -1084,7 +1115,7 @@ window.NFTApp.registerModule("projectInterface", {
               // Update the corresponding selection button label if present
               if (batchButtonElems[idx]) {
                 var b = project.batches[idx] || {};
-                var mintedSuffix = b.minted ? ' (Already Minted)' : '';
+                var mintedSuffix = b.minted ? ' (Already Exported)' : '';
                 batchButtonElems[idx].textContent = `Batch ${String(idx + 1).padStart(2, '0')} (${formatNumberWithCommas(v)} NFTs)` + mintedSuffix;
               }
               // Auto-fill last batch with the remaining supply and update title

@@ -1396,8 +1396,8 @@
       const currentTab = document.querySelector('.nav-tab.active')?.dataset.tab;
 
       // Show loading animation immediately
-      // Use transparent=false for Save Project As to ensure visibility
-      this.showLoadingAnimation("Preparing to save project...", forceNewFile ? false : true);
+      // Always show loading animation (not transparent) so user can see the saving window
+      this.showLoadingAnimation("Preparing to save project...", false);
 
       // Set the saving flag to prevent duplicate save operations
       this.isSaving = true;
@@ -2662,10 +2662,10 @@
       document.addEventListener('visibilitychange', this._visibilityChangeHandler)
     },
     
-    // Restart loading animation (useful when tab becomes visible again)
+    // Restart loading animation (useful when tab becomes visible again or window is restored)
     restartLoadingAnimation: function() {
       const loadingOverlay = document.getElementById("loading-overlay")
-      if (!loadingOverlay || loadingOverlay.style.display === "none") {
+      if (!loadingOverlay || loadingOverlay.style.display === "none" || loadingOverlay.style.visibility === "hidden") {
         return
       }
       
@@ -2673,21 +2673,84 @@
       const path = loadingOverlay.querySelector('.path')
       
       if (spinner && path) {
-        // Force reflow to restart animation
+        // More aggressive restart: completely remove and re-add animations
+        // Step 1: Remove all animation properties
+        spinner.style.removeProperty('animation')
+        spinner.style.removeProperty('animation-name')
+        spinner.style.removeProperty('animation-duration')
+        spinner.style.removeProperty('animation-timing-function')
+        spinner.style.removeProperty('animation-iteration-count')
+        spinner.style.removeProperty('animation-play-state')
+        spinner.style.removeProperty('will-change')
+        
+        path.style.removeProperty('animation')
+        path.style.removeProperty('animation-name')
+        path.style.removeProperty('animation-duration')
+        path.style.removeProperty('animation-timing-function')
+        path.style.removeProperty('animation-iteration-count')
+        path.style.removeProperty('animation-play-state')
+        path.style.removeProperty('will-change')
+        
+        // Force multiple reflows to ensure removal
         void spinner.offsetWidth
         void path.offsetWidth
+        void spinner.offsetHeight
+        void path.offsetHeight
         
-        // Remove and re-add animation to force restart
-        spinner.style.animation = 'none'
-        path.style.animation = 'none'
-        
-        // Use double requestAnimationFrame to ensure the animation restarts properly
-        // This is especially important when the tab becomes visible again
+        // Step 2: Use requestAnimationFrame to ensure browser has processed the removal
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            // Double requestAnimationFrame ensures the animation restarts properly
-            spinner.style.animation = 'spinner-rotate 2s linear infinite'
-            path.style.animation = 'spinner-dash 1.5s ease-in-out infinite'
+            // Step 3: Re-apply animations with will-change hint for better performance
+            spinner.style.willChange = 'transform'
+            path.style.willChange = 'stroke-dasharray, stroke-dashoffset'
+            
+            // Step 4: Force another reflow
+            void spinner.offsetWidth
+            void path.offsetWidth
+            
+            // Step 5: Apply animations
+            requestAnimationFrame(() => {
+              spinner.style.animation = 'spinner-rotate 2s linear infinite'
+              spinner.style.animationPlayState = 'running'
+              path.style.animation = 'spinner-dash 1.5s ease-in-out infinite'
+              path.style.animationPlayState = 'running'
+              
+              // Force repaint
+              void spinner.offsetWidth
+              void path.offsetWidth
+              
+              // Step 6: Verify animations are running and restart if needed
+              setTimeout(() => {
+                const checkSpinnerStyle = window.getComputedStyle(spinner)
+                const checkPathStyle = window.getComputedStyle(path)
+                const spinnerAnimName = checkSpinnerStyle.animationName
+                const pathAnimName = checkPathStyle.animationName
+                const spinnerPlayState = checkSpinnerStyle.animationPlayState
+                const pathPlayState = checkPathStyle.animationPlayState
+                
+                // If animations aren't running, force restart one more time
+                if (spinnerPlayState === 'paused' || pathPlayState === 'paused' ||
+                    spinnerAnimName === 'none' || pathAnimName === 'none' ||
+                    !spinnerAnimName || !pathAnimName) {
+                  // Last resort: completely reset
+                  spinner.style.animation = 'none'
+                  path.style.animation = 'none'
+                  void spinner.offsetWidth
+                  void path.offsetWidth
+                  
+                  requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                      spinner.style.animation = 'spinner-rotate 2s linear infinite'
+                      spinner.style.animationPlayState = 'running'
+                      path.style.animation = 'spinner-dash 1.5s ease-in-out infinite'
+                      path.style.animationPlayState = 'running'
+                      void spinner.offsetWidth
+                      void path.offsetWidth
+                    })
+                  })
+                }
+              }, 100)
+            })
           })
         })
       }
@@ -3192,52 +3255,208 @@
   }
 
   // Register the project service module
-  // Set up visibility change listener to restart animations when tab becomes visible
+  // Set up visibility change and window focus listeners to restart animations when tab/window becomes visible
   // This fixes the issue where animations pause when browser is minimized
   if (typeof document !== 'undefined') {
-    document.addEventListener('visibilitychange', function() {
-      // When tab becomes visible again
-      if (!document.hidden) {
-        // Check if loading overlay is visible
-        const loadingOverlay = document.getElementById("loading-overlay")
-        if (loadingOverlay && loadingOverlay.style.display !== "none" && loadingOverlay.style.display !== "") {
-          // Restart the loading animation
-          if (projectService.restartLoadingAnimation) {
-            projectService.restartLoadingAnimation()
-          }
+    // Function to restart all loading animations with aggressive restart logic
+    const restartAllAnimations = function() {
+      // Check if loading overlay is visible
+      const loadingOverlay = document.getElementById("loading-overlay")
+      if (loadingOverlay && loadingOverlay.style.display !== "none" && loadingOverlay.style.display !== "" && loadingOverlay.style.visibility !== "hidden") {
+        // Restart the loading animation
+        if (projectService.restartLoadingAnimation) {
+          projectService.restartLoadingAnimation()
         }
-        
-        // Also check NFT loading overlay
-        const nftLoadingOverlay = document.getElementById("nft-loading-overlay")
-        if (nftLoadingOverlay && nftLoadingOverlay.style.display !== "none" && nftLoadingOverlay.style.display !== "") {
-          // Restart NFT loading animation
-          const spinner = nftLoadingOverlay.querySelector('.loading-spinner')
-          if (spinner) {
-            // Force reflow to restart animation
-            void spinner.offsetWidth
-            // Remove and re-add animation to force restart
-            spinner.style.animation = 'none'
+      }
+      
+      // Also check NFT loading overlay
+      const nftLoadingOverlay = document.getElementById("nft-loading-overlay")
+      if (nftLoadingOverlay && nftLoadingOverlay.style.display !== "none" && nftLoadingOverlay.style.display !== "") {
+        // Restart NFT loading animation
+        const spinner = nftLoadingOverlay.querySelector('.loading-spinner')
+        if (spinner) {
+          // Force reflow to restart animation
+          void spinner.offsetWidth
+          // Remove and re-add animation to force restart
+          spinner.style.animation = 'none'
+          spinner.style.animationPlayState = 'paused'
+          requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              spinner.style.animation = ''
-            })
-          }
-        }
-        
-        // Also check for NFT rendering popup animation
-        const nftRenderingPopup = document.querySelector('.nft-rendering-popup')
-        if (nftRenderingPopup && nftRenderingPopup.style.display !== "none") {
-          // Restart any animated dots in the popup
-          const animatedDots = nftRenderingPopup.querySelectorAll('.task-dots span')
-          animatedDots.forEach(dot => {
-            void dot.offsetWidth // Force reflow
-            dot.style.animation = 'none'
-            requestAnimationFrame(() => {
-              dot.style.animation = ''
+              requestAnimationFrame(() => {
+                spinner.style.animation = ''
+                spinner.style.animationPlayState = 'running'
+                void spinner.offsetWidth
+                // Check if animation is running, if not, try again
+                setTimeout(() => {
+                  const checkStyle = window.getComputedStyle(spinner)
+                  if (checkStyle.animationPlayState === 'paused' || checkStyle.animation === 'none') {
+                    spinner.style.animation = 'none'
+                    void spinner.offsetWidth
+                    requestAnimationFrame(() => {
+                      spinner.style.animation = ''
+                      spinner.style.animationPlayState = 'running'
+                      void spinner.offsetWidth
+                    })
+                  }
+                }, 50)
+              })
             })
           })
         }
       }
+      
+      // Also check for NFT rendering popup animation
+      const nftRenderingPopup = document.querySelector('.nft-rendering-popup')
+      if (nftRenderingPopup && nftRenderingPopup.style.display !== "none") {
+        // Restart any animated dots in the popup
+        const animatedDots = nftRenderingPopup.querySelectorAll('.task-dots span')
+        animatedDots.forEach(dot => {
+          void dot.offsetWidth // Force reflow
+          dot.style.animation = 'none'
+          dot.style.animationPlayState = 'paused'
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                dot.style.animation = ''
+                dot.style.animationPlayState = 'running'
+                void dot.offsetWidth
+              })
+            })
+          })
+        })
+      }
+    }
+    
+    // Set up a monitoring system to continuously check if animations are running
+    let animationMonitorInterval = null
+    const startAnimationMonitor = function() {
+      // Clear any existing monitor
+      if (animationMonitorInterval) {
+        clearInterval(animationMonitorInterval)
+      }
+      
+      // Check every 500ms if animations are running and restart if needed
+      animationMonitorInterval = setInterval(() => {
+        const loadingOverlay = document.getElementById("loading-overlay")
+        if (loadingOverlay && loadingOverlay.style.display !== "none" && loadingOverlay.style.visibility !== "hidden") {
+          const spinner = loadingOverlay.querySelector('.spinner')
+          const path = loadingOverlay.querySelector('.path')
+          
+          if (spinner && path) {
+            const spinnerStyle = window.getComputedStyle(spinner)
+            const pathStyle = window.getComputedStyle(path)
+            
+            // Check if animations are actually running
+            if (spinnerStyle.animationPlayState === 'paused' || 
+                pathStyle.animationPlayState === 'paused' ||
+                spinnerStyle.animationName === 'none' ||
+                pathStyle.animationName === 'none' ||
+                !spinnerStyle.animationName ||
+                !pathStyle.animationName) {
+              // Animations are not running - restart them
+              if (projectService.restartLoadingAnimation) {
+                projectService.restartLoadingAnimation()
+              }
+            }
+          }
+        }
+      }, 500)
+    }
+    
+    // Start monitoring when page loads
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startAnimationMonitor)
+      } else {
+        startAnimationMonitor()
+      }
+    }
+    
+    // Listen for visibility change (tab switching)
+    document.addEventListener('visibilitychange', function() {
+      // When tab becomes visible again
+      if (!document.hidden) {
+        // Immediate restart
+        restartAllAnimations()
+        // Multiple attempts with delays to ensure animations restart
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 10)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 50)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 150)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 300)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 500)
+      }
     })
+    
+    // Also listen for window focus (window minimize/restore)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', function() {
+        // Immediate restart
+        restartAllAnimations()
+        // Multiple attempts with delays to ensure animations restart
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 10)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 50)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 150)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 300)
+        setTimeout(() => {
+          restartAllAnimations()
+        }, 500)
+      })
+      
+      // Also listen for pageshow event (fires when page is loaded from cache, including when window is restored)
+      window.addEventListener('pageshow', function(event) {
+        // If page was loaded from cache (back/forward navigation or window restore)
+        if (event.persisted) {
+          restartAllAnimations()
+          setTimeout(() => {
+            restartAllAnimations()
+          }, 10)
+          setTimeout(() => {
+            restartAllAnimations()
+          }, 50)
+          setTimeout(() => {
+            restartAllAnimations()
+          }, 150)
+          setTimeout(() => {
+            restartAllAnimations()
+          }, 300)
+          setTimeout(() => {
+            restartAllAnimations()
+          }, 500)
+        }
+      })
+      
+      // Also listen for window resize (sometimes fires when window is restored)
+      let resizeTimeout
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout)
+        resizeTimeout = setTimeout(() => {
+          restartAllAnimations()
+        }, 100)
+      })
+      
+      // Listen for window blur (when minimized) - prepare for restart
+      window.addEventListener('blur', function() {
+        // When window loses focus, we'll restart on focus
+      })
+    }
   }
 
   if (window.NFTApp && window.NFTApp.registerModule) {
