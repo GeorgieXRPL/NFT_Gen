@@ -340,10 +340,77 @@ window.NFTApp = window.NFTApp || {};
   setupRuleActionTooltip: function(btn, tooltip) {
     if (!btn || !tooltip) return;
     
+    // CRITICAL: Add cursor help to element
+    btn.style.cursor = "help";
+    
+    // CRITICAL: Ensure tooltip has 1 second transition
+    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+    
+    // Use global tooltip manager if available
     const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
     if (tooltipManager && tooltipManager.setupTooltip) {
       tooltipManager.setupTooltip(btn, tooltip);
+      return;
     }
+
+    // Fallback to local implementation if manager not available
+    let tooltipTimeout = null;
+    
+    btn.addEventListener("mouseenter", () => {
+      // Clear any existing timeout
+      if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+      }
+      // Show tooltip after 1 second delay
+      tooltipTimeout = setTimeout(() => {
+        const rect = btn.getBoundingClientRect();
+        // Make tooltip temporarily visible to measure height, but keep it off-screen
+        tooltip.style.visibility = "visible";
+        tooltip.style.opacity = "0";
+        tooltip.style.top = "-9999px";
+        tooltip.style.left = "-9999px";
+        tooltip.style.transform = "none";
+        void tooltip.offsetHeight; // Force reflow
+        const tooltipWidth = tooltip.offsetWidth || 200;
+        const tooltipHeight = tooltip.offsetHeight;
+        // CRITICAL: Set position fixed and use setProperty with important to override CSS
+        tooltip.style.setProperty("position", "fixed", "important");
+        tooltip.style.setProperty("z-index", "2147483647", "important");
+        tooltip.style.setProperty("bottom", "auto", "important");
+        tooltip.style.setProperty("right", "auto", "important");
+        tooltip.style.setProperty("margin", "0", "important");
+        tooltip.style.setProperty("transform", "none", "important");
+        // CRITICAL: Ensure orange text and black background
+        tooltip.style.setProperty("background-color", "#000000", "important");
+        tooltip.style.setProperty("background", "#000000", "important");
+        tooltip.style.setProperty("color", "#f39c12", "important");
+        // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
+        const elementRect = btn.getBoundingClientRect();
+        const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
+        const topPosition = elementRect.top - tooltipHeight - 5;
+        tooltip.style.setProperty("top", `${topPosition}px`, "important");
+        tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
+        // Fade in with transition
+        requestAnimationFrame(() => {
+          tooltip.style.opacity = "1";
+        });
+        tooltipTimeout = null;
+      }, 1000);
+    });
+    
+    btn.addEventListener("mouseleave", () => {
+      // Clear the show timeout if mouse leaves before delay completes
+      if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+      }
+      tooltip.style.opacity = "0";
+      // Wait for fade out transition to complete before hiding (1 second to match Export NFTs tab)
+      setTimeout(() => {
+        tooltip.style.visibility = "hidden";
+      }, 1000);
+    });
   },
 
   // Add a combination rule
@@ -3487,7 +3554,14 @@ window.NFTApp = window.NFTApp || {};
     rulesList.querySelectorAll('.move-up-rule, .move-down-rule').forEach(btn => {
       const tooltips = btn.querySelectorAll('.tooltip-text')
       if (tooltips.length > 0) {
-        // Use the first tooltip-text (the short one)
+        // Use the first tooltip-text (the short one) for standard tooltip
+        // Hide the second tooltip-text (the long one) to avoid conflicts
+        if (tooltips.length > 1) {
+          tooltips[1].style.display = 'none';
+          tooltips[1].style.visibility = 'hidden';
+          tooltips[1].style.opacity = '0';
+          tooltips[1].style.pointerEvents = 'none';
+        }
         this.setupRuleActionTooltip(btn, tooltips[0])
       }
     });

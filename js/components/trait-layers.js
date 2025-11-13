@@ -320,6 +320,33 @@ window.NFTApp.registerModule("traitLayers", {
         this.setupTooltipPositioning(stackingOrderInfo, tooltip)
       }
     }
+
+    // Setup tooltip for Add Layer button
+    const addLayerBtn = document.getElementById("add-layer-btn")
+    if (addLayerBtn) {
+      const tooltip = addLayerBtn.querySelector(".tooltiptext")
+      if (tooltip) {
+        this.setupTooltipPositioning(addLayerBtn, tooltip)
+      }
+    }
+
+    // Setup tooltip for Add Folders button
+    const addFoldersBtn = document.getElementById("add-folders-btn")
+    if (addFoldersBtn) {
+      const tooltip = addFoldersBtn.querySelector(".tooltiptext")
+      if (tooltip) {
+        this.setupTooltipPositioning(addFoldersBtn, tooltip)
+      }
+    }
+
+    // Setup tooltip for Delete All Layers button
+    const deleteAllLayersBtn = document.getElementById("delete-all-layers")
+    if (deleteAllLayersBtn) {
+      const tooltip = deleteAllLayersBtn.querySelector(".tooltiptext")
+      if (tooltip) {
+        this.setupTooltipPositioning(deleteAllLayersBtn, tooltip)
+      }
+    }
   },
 
   // Set up trait layers drag and drop
@@ -1034,6 +1061,12 @@ window.NFTApp.registerModule("traitLayers", {
   setupTooltipPositioning: function(element, tooltip) {
     if (!element || !tooltip) return;
     
+    // CRITICAL: Add cursor help to element
+    element.style.cursor = "help";
+    
+    // CRITICAL: Ensure tooltip has 1 second transition
+    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+    
     // Use global tooltip manager if available
     const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
     if (tooltipManager && tooltipManager.setupTooltip) {
@@ -1094,7 +1127,7 @@ window.NFTApp.registerModule("traitLayers", {
         tooltipTimeout = null;
       }
       tooltip.style.opacity = "0";
-      // Wait for fade out transition to complete before hiding
+      // Wait for fade out transition to complete before hiding (1 second to match Export NFTs tab)
       setTimeout(() => {
         tooltip.style.visibility = "hidden";
       }, 1000);

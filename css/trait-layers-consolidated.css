@@ -1108,12 +1108,17 @@
 }
 
 /* ===== TRAIT LAYER DRAG HANDLE ===== */
-.trait-layer-drag-handle,
-.trait-layer-drag-handle .tooltip,
-.trait-layer-drag-handle .tooltiptext,
-.trait-layer-drag-handle .custom-tooltip {
+/* Only make the drag handle itself transparent, not the tooltip */
+.trait-layer-drag-handle {
   background: transparent !important;
   background-color: transparent !important;
+}
+
+/* CRITICAL: Ensure tooltip has proper styling (not transparent) */
+.trait-layer-drag-handle .tooltiptext {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
 }
 
 .trait-layer-drag-handle:active {

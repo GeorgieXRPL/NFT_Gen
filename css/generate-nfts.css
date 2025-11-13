@@ -366,35 +366,45 @@
 /* Tooltip for progress bar - High specificity to override other tooltip rules */
 #nft-count-panel .tooltiptext {
   position: fixed !important; /* Use fixed positioning to avoid clipping */
-  background-color: #333 !important;
-  color: #fff !important;
-  padding: 6px 14px !important; /* Increased horizontal padding from 10px to 14px to ensure background is wider than text */
-  border-radius: 4px !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
+  padding: 8px 12px !important; /* Match Export NFTs tab padding */
+  border-radius: 6px !important;
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
   text-align: center !important; /* Center tooltip text within its background */
-  white-space: nowrap !important;
+  white-space: normal !important;
   opacity: 0 !important;
   visibility: hidden !important;
-  transition: all 0.2s ease !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   z-index: 2147483647 !important; /* Highest z-index across entire app */
   pointer-events: none !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-  border: 1px solid #555 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  border: none !important;
   /* Allow JavaScript to control positioning */
   top: auto !important;
   left: auto !important;
   bottom: auto !important;
   transform: none !important;
   margin: 0 !important;
+  word-wrap: break-word;
+  max-width: 300px;
+  width: max-content;
 }
 
-/* Only show tooltip when panel is active (not greyed out) */
+/* CRITICAL: Add cursor help to nft-count-panel */
+#nft-count-panel.tooltip {
+  cursor: help !important;
+}
+
+/* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
+/* Only show tooltip when panel is active (not greyed out) - JavaScript will handle this */
 #nft-count-panel:hover:not([style*="background-color: #23232b"]) .tooltiptext,
 #nft-count-panel:hover:not([style*="opacity: 0.6"]) .tooltiptext {
-  opacity: 1 !important;
-  visibility: visible !important;
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
 }
 
 /* Hide tooltip when panel is greyed out */
@@ -603,6 +613,16 @@
   min-height: 32px !important;
   max-height: 32px !important;
   transform: none !important; /* No transform on hover */
+  translate: none !important; /* No translate on hover */
+  position: relative !important; /* Maintain relative positioning - no movement */
+  top: 0 !important; /* No vertical movement */
+  left: 0 !important; /* No horizontal movement */
+  bottom: auto !important; /* No bottom positioning */
+  right: auto !important; /* No right positioning */
+  margin-top: 0 !important; /* No margin changes */
+  margin-left: 0 !important; /* No margin changes */
+  margin-bottom: 0 !important; /* No margin changes */
+  margin-right: 0 !important; /* No margin changes */
   box-shadow: none !important; /* No shadow change on hover */
   transition: none !important; /* Disable all transitions on hover */
   color: #ffffff !important; /* Maintain text color */
@@ -784,6 +804,16 @@ button#single-seed-toggle.tooltip:disabled:hover {
     0 0 10px rgba(0, 255, 136, 0.5),
     0 0 20px rgba(0, 255, 136, 0.3) !important; /* Maintain active state shadow - no change on hover */
   transform: none !important; /* No transform on hover */
+  translate: none !important; /* No translate on hover */
+  position: relative !important; /* Maintain relative positioning - no movement */
+  top: 0 !important; /* No vertical movement */
+  left: 0 !important; /* No horizontal movement */
+  bottom: auto !important; /* No bottom positioning */
+  right: auto !important; /* No right positioning */
+  margin-top: 0 !important; /* No margin changes */
+  margin-left: 0 !important; /* No margin changes */
+  margin-bottom: 0 !important; /* No margin changes */
+  margin-right: 0 !important; /* No margin changes */
   font-size: 14px !important; /* No font size change on hover */
   font-weight: 600 !important; /* Maintain active state font weight */
   height: 32px !important; /* No height change on hover */

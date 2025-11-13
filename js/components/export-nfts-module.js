@@ -4249,7 +4249,7 @@ const exportNftsModuleDefinition = {
     toggle.style.setProperty("font-size", "12px", "important");
     toggle.style.setProperty("font-weight", "600", "important");
     toggle.style.setProperty("box-shadow", "none", "important");
-    toggle.style.cursor = "help"; // Show help cursor for objects with tooltips
+    toggle.style.setProperty("cursor", "help", "important"); // Show help cursor for objects with tooltips - use setProperty with important
     
     return toggle;
   },
@@ -7772,9 +7772,17 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     card.style.display = "flex";
     card.style.flexDirection = "column";
     card.style.gap = "8px";
-    card.style.minWidth = "120px";
-    card.style.width = "100%";
+    // CRITICAL: Fixed size to prevent stretching when NFT count changes
+    card.style.width = "160px";
+    card.style.minWidth = "160px";
+    card.style.maxWidth = "160px";
+    card.style.height = "140px";
+    card.style.minHeight = "140px";
+    card.style.maxHeight = "140px";
     card.style.position = "relative";
+    card.style.boxSizing = "border-box";
+    card.style.flexShrink = "0";
+    card.style.flexGrow = "0";
 
     // Top section: Batch name on left, NFT count input on right
     const topSection = document.createElement("div");
@@ -7783,13 +7791,20 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     topSection.style.alignItems = "center";
     topSection.style.gap = "8px";
     topSection.style.marginBottom = "4px";
+    topSection.style.minWidth = "0"; // Prevent flex items from causing overflow
+    topSection.style.width = "100%";
+    topSection.style.flexShrink = "1"; // Allow shrinking if needed
 
     const batchName = document.createElement("span");
     batchName.textContent = `BATCH #${String(batchNumber).padStart(2, "0")}`;
     batchName.style.fontSize = "11px";
     batchName.style.fontWeight = "600";
     batchName.style.color = isActive ? "var(--text-primary)" : "#666666";
-    batchName.style.flexShrink = "0";
+    batchName.style.flexShrink = "1"; // Allow shrinking if needed
+    batchName.style.minWidth = "0"; // Prevent text from causing overflow
+    batchName.style.overflow = "hidden";
+    batchName.style.textOverflow = "ellipsis";
+    batchName.style.whiteSpace = "nowrap";
 
     const input = document.createElement("input");
     input.type = "number";
@@ -7798,6 +7813,8 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     input.min = "0";
     input.value = batchNumber === 1 && isActive ? "10000" : "0";
     input.style.width = "50px";
+    input.style.minWidth = "50px";
+    input.style.maxWidth = "50px";
     input.style.padding = "4px 6px";
     input.style.border = "1px solid var(--border-color)";
     input.style.borderRadius = "4px";
@@ -7807,6 +7824,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     input.style.color = isActive ? "#f39c12" : "#666666";
     input.style.fontSize = "11px";
     input.style.textAlign = "center";
+    input.style.flexShrink = "0"; // Prevent input from shrinking
     input.disabled = !isActive;
 
     // Debounce timer for redistribution
@@ -7906,13 +7924,19 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     const selectToExportToggle = this.createSelectToExportToggle(batchNumber, shouldSelectToExport, card);
     selectToExportToggle.disabled = !isActive;
     selectToExportToggle.style.width = "100%";
+    selectToExportToggle.style.minWidth = "0"; // Prevent toggle from causing overflow
+    selectToExportToggle.style.maxWidth = "100%";
     selectToExportToggle.style.margin = "0 auto";
+    selectToExportToggle.style.flexShrink = "1"; // Allow shrinking if needed
 
     // Bottom section: "ALREADY MINTED" toggle (centered)
     const alreadyMintedToggle = this.createAlreadyMintedToggle(batchNumber);
     alreadyMintedToggle.disabled = !isActive;
     alreadyMintedToggle.style.width = "100%";
+    alreadyMintedToggle.style.minWidth = "0"; // Prevent toggle from causing overflow
+    alreadyMintedToggle.style.maxWidth = "100%";
     alreadyMintedToggle.style.margin = "0 auto";
+    alreadyMintedToggle.style.flexShrink = "1"; // Allow shrinking if needed
     
     // Ensure both toggles have the same width and height
     // Both toggles should match the card width (100%) and have the same height (28px)

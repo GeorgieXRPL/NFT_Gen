@@ -354,7 +354,7 @@ html body #export-nfts .blockchain-toggles-container button.tooltip:hover,
   border-style: revert !important;
   color: revert !important;
   /* Let inline styles (set by JavaScript) control background, border, color, opacity */
-  cursor: pointer !important;
+  cursor: help !important; /* Help cursor for tooltips */
   pointer-events: auto !important;
   /* CRITICAL: Don't override font-size, font-weight, padding, height - let JavaScript inline styles control them */
   font-size: revert !important;
@@ -411,6 +411,7 @@ html body #export-nfts .blockchain-toggles-container button.tooltip:hover,
 .blockchain-toggles-container button.tooltip {
   /* Don't override flex or dimension properties - let existing CSS rules handle them */
   /* The export-nfts-module.css already has rules for .blockchain-toggles-container .toggle-button */
+  cursor: help !important; /* Ensure help cursor for blockchain buttons with tooltips */
 }
 
 /* ============================================

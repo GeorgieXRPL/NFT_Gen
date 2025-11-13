@@ -9,8 +9,9 @@
   visibility: hidden;
   position: absolute;
   z-index: 2147483647 !important; /* Highest z-index across entire app */
-  background-color: rgba(0, 0, 0, 0.9);
-  color: #f39c12;
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
   text-align: center;
   border-radius: 6px;
   padding: 8px 12px;
@@ -23,8 +24,40 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   word-wrap: break-word;
+}
+
+/* CRITICAL: Add cursor help to all tooltip parent elements */
+.tooltip {
+  cursor: help !important;
+}
+
+/* CRITICAL: Dark NFTs button - remove tooltip functionality completely */
+#generate-dark-nfts.tooltip,
+#generate-dark-nfts {
+  cursor: pointer !important; /* Normal pointer cursor, not help cursor */
+}
+
+/* CRITICAL: Hide Dark NFTs tooltip completely */
+#generate-dark-nfts.tooltip .tooltiptext,
+#generate-dark-nfts .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* CRITICAL: Hide Dark NFTs tooltip arrow completely */
+#generate-dark-nfts.tooltip .tooltiptext::after,
+#generate-dark-nfts .tooltiptext::after {
+  display: none !important;
+  content: none !important;
 }
 
 /* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
@@ -33,6 +66,7 @@
 .tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
   /* JavaScript will control visibility and opacity with 1-second delay */
   /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Prevent CSS from showing tooltip immediately */
 }
 
 /* CRITICAL: Explicitly hide tooltips for disabled elements */
@@ -46,11 +80,12 @@
   pointer-events: none !important;
 }
 
-/* Tooltip positioning */
+/* Tooltip positioning - above and centered */
 .tooltip .tooltiptext {
   bottom: 125%;
   left: 50%;
   transform: translateX(-50%);
+  position: fixed !important; /* Use fixed positioning for better control */
 }
 
 /* Export tab tooltips use fixed positioning controlled by JavaScript - override default positioning */
@@ -183,41 +218,57 @@ body {
 }
 
 .rule-actions .action-btn .tooltip-text {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: fixed !important; /* Use fixed positioning to escape container constraints */
   z-index: 2147483647 !important; /* Highest z-index across entire app */
-  bottom: auto;
-  top: 130%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto;
-  white-space: nowrap;
-  background-color: rgba(0, 0, 0, 0.9);
-  color: #f39c12;
-  text-align: center;
+  bottom: auto !important;
+  top: auto !important; /* JavaScript will set exact position */
+  left: auto !important; /* JavaScript will set exact position */
+  right: auto !important;
+  transform: none !important; /* JavaScript will handle centering */
+  width: max-content !important;
+  max-width: 300px !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
+  text-align: center !important;
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
-  padding: 6px 10px;
-  border-radius: 6px;
-  transition: opacity 0.3s;
-  pointer-events: none;
+  padding: 8px 12px !important; /* Match standard tooltip padding */
+  border-radius: 6px !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  line-height: 1.4 !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  pointer-events: none !important;
+  margin: 0 !important;
+}
+
+/* CRITICAL: Add cursor help to rule action buttons */
+.rule-actions .action-btn {
+  cursor: help !important;
 }
 
 .rule-actions .action-btn .tooltip-text::after {
   content: "";
   position: absolute;
-  bottom: 100%;
+  top: 100%; /* Position arrow at bottom of tooltip (tooltip is above button) */
+  bottom: auto !important;
   left: 50%;
   margin-left: -5px;
+  margin-top: -1px; /* Small overlap to connect with tooltip */
   border-width: 5px;
   border-style: solid;
-  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button */
 }
 
+/* CRITICAL: Don't use CSS hover to show tooltip - JavaScript will control visibility with delay */
 .rule-actions .action-btn:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Ensure tooltip is hidden by default - JavaScript controls display */
 }
 
 /* Ensure tooltips are always on top */
@@ -245,8 +296,11 @@ body {
   margin-bottom: 5px !important;
   visibility: hidden !important;
   opacity: 0 !important;
-  transition: opacity 0.2s ease !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   z-index: 2147483647 !important; /* Highest z-index across entire app */
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
 }
 
 .trait-layer-header .position-btn.tooltip:hover .tooltiptext,
@@ -280,12 +334,137 @@ body {
   bottom: auto !important; /* avoid conflicting bottom from default */
 }
 
+/* CRITICAL: Ensure drag handle tooltip uses standard orange text on black background */
+.trait-layer-drag-handle.tooltip .tooltiptext,
+.trait-layer-drag-handle .tooltiptext {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  text-align: center !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+}
+
+/* CRITICAL: Add cursor help to drag handle when not actively dragging */
+.trait-layer-drag-handle.tooltip {
+  cursor: help !important;
+}
+
+.trait-layer-drag-handle.tooltip:active {
+  cursor: grabbing !important;
+}
+
+/* CRITICAL: Disable CSS hover rules for drag handle tooltip - JavaScript controls with 1-second delay */
+.trait-layer-drag-handle.tooltip:hover .tooltiptext,
+.trait-layer-drag-handle:hover .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Prevent CSS from showing tooltip immediately */
+}
+
+/* CRITICAL: Ensure all action buttons tooltips use standard styling and don't interfere */
+.app-action-btn.tooltip .tooltiptext,
+#add-layer-btn.tooltip .tooltiptext,
+#add-layer-btn .tooltiptext,
+#delete-all-layers.tooltip .tooltiptext,
+#delete-all-layers .tooltiptext,
+.add-folders-btn.tooltip .tooltiptext,
+#add-folders-btn.tooltip .tooltiptext,
+#add-folders-btn .tooltiptext,
+.jump-to-rules-btn.tooltip .tooltiptext,
+#jump-to-rules-btn.tooltip .tooltiptext,
+#jump-to-rules-btn .tooltiptext,
+.jump-to-rules-bottom-btn.tooltip .tooltiptext,
+#jump-to-rules-bottom-btn.tooltip .tooltiptext,
+#jump-to-rules-bottom-btn .tooltiptext,
+.jump-to-layers-btn.tooltip .tooltiptext,
+#jump-to-layers-btn.tooltip .tooltiptext,
+#jump-to-layers-btn .tooltiptext,
+.jump-to-layers-bottom-btn.tooltip .tooltiptext,
+#jump-to-layers-bottom-btn.tooltip .tooltiptext,
+#jump-to-layers-bottom-btn .tooltiptext {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  text-align: center !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  z-index: 2147483647 !important;
+  position: fixed !important; /* Fixed positioning to escape container constraints */
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* CRITICAL: Ensure buttons maintain their functionality and don't interfere with tooltips */
+.app-action-btn.tooltip,
+#add-layer-btn.tooltip,
+#delete-all-layers.tooltip,
+.add-folders-btn.tooltip,
+#add-folders-btn.tooltip,
+.jump-to-rules-btn.tooltip,
+#jump-to-rules-btn.tooltip,
+.jump-to-rules-bottom-btn.tooltip,
+#jump-to-rules-bottom-btn.tooltip,
+.jump-to-layers-btn.tooltip,
+#jump-to-layers-btn.tooltip,
+.jump-to-layers-bottom-btn.tooltip,
+#jump-to-layers-bottom-btn.tooltip {
+  cursor: help !important;
+  position: relative !important; /* Required for tooltip positioning */
+  overflow: visible !important; /* Allow tooltips to overflow button boundaries */
+  pointer-events: auto !important; /* Ensure button clicks work */
+}
+
+/* CRITICAL: Add cursor help to SELECT FOR EXPORT and ALREADY EXPORTED buttons */
+.select-to-export-toggle.tooltip,
+.select-to-export-toggle,
+.already-minted-toggle.tooltip,
+.already-minted-toggle,
+#export-nfts .select-to-export-toggle.tooltip,
+#export-nfts .select-to-export-toggle,
+#export-nfts .already-minted-toggle.tooltip,
+#export-nfts .already-minted-toggle {
+  cursor: help !important;
+}
+
+/* CRITICAL: Add cursor help to blockchain selection buttons */
+.blockchain-toggles-container .toggle-button.tooltip,
+.blockchain-toggles-container button.tooltip,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip,
+#export-nfts .blockchain-toggles-container button.tooltip,
+html body #export-nfts .blockchain-toggles-container .toggle-button.tooltip,
+html body #export-nfts .blockchain-toggles-container button.tooltip {
+  cursor: help !important;
+}
+
 /* Global app-wide tooltip visual style normalization */
 html body .tooltip .tooltiptext,
 html body .tooltiptext,
 html body .custom-tooltip,
 html body .rule-actions .action-btn .tooltip-text {
-  background-color: rgba(0, 0, 0, 0.9) !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
   color: #f39c12 !important;
   border-radius: 6px !important;
   padding: 8px 12px !important;
@@ -293,6 +472,12 @@ html body .rule-actions .action-btn .tooltip-text {
   line-height: 1.4 !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
   text-align: center !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+}
+
+/* CRITICAL: Add cursor help to all tooltip elements */
+html body .tooltip {
+  cursor: help !important;
 }
 
 /* Absolute top priority z-index for all tooltips */

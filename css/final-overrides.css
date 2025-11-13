@@ -605,11 +605,13 @@ html body #app #generate-nfts.tab-content.active .traits-section {
   color: #fff !important;
   border: none !important;
   box-shadow: none !important;
+  cursor: help !important; /* Help cursor for tooltips */
 }
 .rule-header .action-btn:hover,
 .combination-rules-header .action-btn:hover {
   background: rgba(255,255,255,0.08) !important;
   color: #ffe066 !important;
+  cursor: help !important; /* Maintain help cursor on hover */
 }
 
 /* === EXCLUDE NAVIGATION & PROJECT ACTION BUTTONS FROM GLOBAL OVERRIDE === */
@@ -1938,7 +1940,7 @@ html body #app #generate-nfts.tab-content.active .traits-section {
   /* Only set non-conflicting properties */
   position: relative !important;
   display: inline-block !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Help cursor for tooltips */
   pointer-events: auto !important;
 }
 
@@ -2221,38 +2223,43 @@ html body .toggle-label .tooltiptext,
   backface-visibility: hidden !important; /* Improve rendering performance */
 }
 
-/* Exception: Keep white text for generate-nfts tab tooltips */
+/* CRITICAL: Normalize Generate NFTs tab tooltips to match Export NFTs tab style */
 #generate-nfts .tooltiptext,
 #generate-nfts .nft-trait-edit-btn.tooltip .tooltiptext,
 #generate-nfts .nft-trait-edit-btn .tooltiptext {
-  background-color: rgba(0, 0, 0, 0.9) !important; /* FORCE standard black background */
-  background: rgba(0, 0, 0, 0.9) !important; /* FORCE standard black background */
-  color: #ffffff !important; /* Keep white text for generate-nfts tab */
+  background-color: #000000 !important; /* FORCE standard black background */
+  background: #000000 !important; /* FORCE standard black background */
+  color: #f39c12 !important; /* Orange text to match Export NFTs tab */
   border-radius: 6px !important;
-  padding: 8px 10px !important;
+  padding: 8px 12px !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.4 !important;
+  text-align: center !important;
 }
 
-/* FORCE Dark NFTs and Seed NFT tooltips to use black background and position above */
-html body #generate-dark-nfts.tooltip .tooltiptext,
-html body #generate-dark-nfts .tooltiptext,
-#generate-dark-nfts.tooltip .tooltiptext,
-#generate-dark-nfts .tooltiptext,
+/* CRITICAL: Add cursor help to Generate NFTs tab tooltip elements */
+#generate-nfts .tooltip {
+  cursor: help !important;
+}
+
+/* FORCE Seed NFT tooltips to use black background and position above */
 html body #single-seed-toggle.tooltip:not([disabled]):not(:disabled) .tooltiptext,
 html body #single-seed-toggle:not([disabled]):not(:disabled) .tooltiptext,
 #single-seed-toggle.tooltip:not([disabled]):not(:disabled) .tooltiptext,
 #single-seed-toggle:not([disabled]):not(:disabled) .tooltiptext {
-  background-color: rgba(0, 0, 0, 0.9) !important; /* FORCE black background - override #333 from styles.css */
-  background: rgba(0, 0, 0, 0.9) !important; /* FORCE black background */
+  background-color: #000000 !important; /* FORCE black background - override #333 from styles.css */
+  background: #000000 !important; /* FORCE black background */
   color: #f39c12 !important; /* FORCE orange text for better visibility */
   border-radius: 6px !important;
-  padding: 8px 10px !important;
+  padding: 8px 12px !important;
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  text-align: justify !important;
-  text-justify: inter-word !important;
+  text-align: center !important;
   white-space: normal !important;
   max-width: 320px !important;
   width: max-content !important;
@@ -2260,22 +2267,40 @@ html body #single-seed-toggle:not([disabled]):not(:disabled) .tooltiptext,
   position: fixed !important; /* JavaScript will set exact position above buttons */
   visibility: hidden !important;
   opacity: 0 !important;
-  transition: opacity 0.3s !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   pointer-events: none !important;
   display: block !important;
 }
 
-/* Show tooltips on hover for Dark NFTs and Seed NFT buttons (but NOT when disabled) */
-html body #generate-dark-nfts.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
-html body #generate-dark-nfts:hover:not([disabled]):not(:disabled) .tooltiptext,
-#generate-dark-nfts.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
-#generate-dark-nfts:hover:not([disabled]):not(:disabled) .tooltiptext,
+/* CRITICAL: Don't use CSS hover to show tooltip - JavaScript will control visibility with delay */
+/* JavaScript setupTooltipPositioning will handle the 1-second delay and fade effects */
+/* Remove CSS hover rules to allow JavaScript to control tooltip display */
 html body #single-seed-toggle.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
 html body #single-seed-toggle:hover:not([disabled]):not(:disabled) .tooltiptext,
 #single-seed-toggle.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
 #single-seed-toggle:hover:not([disabled]):not(:disabled) .tooltiptext {
-  visibility: visible !important;
-  opacity: 1 !important;
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+}
+
+/* CRITICAL: Hide Dark NFTs tooltip completely - remove all tooltip functionality */
+html body #generate-dark-nfts.tooltip .tooltiptext,
+html body #generate-dark-nfts .tooltiptext,
+#generate-dark-nfts.tooltip .tooltiptext,
+#generate-dark-nfts .tooltiptext,
+html body #generate-dark-nfts.tooltip:hover .tooltiptext,
+html body #generate-dark-nfts:hover .tooltiptext,
+#generate-dark-nfts.tooltip:hover .tooltiptext,
+#generate-dark-nfts:hover .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
 }
 
 /* CRITICAL: Hide Seed NFT tooltip when disabled/greyed out - MAXIMUM SPECIFICITY to override ALL general tooltip rules */
@@ -2338,71 +2363,9 @@ html body #single-seed-toggle:disabled:hover .tooltiptext,
   overflow: hidden !important;
 }
 
-/* CRITICAL: Hide Dark NFTs tooltip when disabled/greyed out - MAXIMUM SPECIFICITY to override ALL general tooltip rules */
-html body #app #generate-nfts #generate-dark-nfts.tooltip[disabled] .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts.tooltip:disabled .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts[disabled] .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts:disabled .tooltiptext,
-html body #app #generate-dark-nfts.tooltip[disabled] .tooltiptext,
-html body #app #generate-dark-nfts.tooltip:disabled .tooltiptext,
-html body #app #generate-dark-nfts[disabled] .tooltiptext,
-html body #app #generate-dark-nfts:disabled .tooltiptext,
-html body #generate-dark-nfts.tooltip[disabled] .tooltiptext,
-html body #generate-dark-nfts.tooltip:disabled .tooltiptext,
-html body #generate-dark-nfts[disabled] .tooltiptext,
-html body #generate-dark-nfts:disabled .tooltiptext,
-#app #generate-dark-nfts.tooltip[disabled] .tooltiptext,
-#app #generate-dark-nfts.tooltip:disabled .tooltiptext,
-#app #generate-dark-nfts[disabled] .tooltiptext,
-#app #generate-dark-nfts:disabled .tooltiptext,
-#generate-dark-nfts.tooltip[disabled] .tooltiptext,
-#generate-dark-nfts.tooltip:disabled .tooltiptext,
-#generate-dark-nfts[disabled] .tooltiptext,
-#generate-dark-nfts:disabled .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts.tooltip[disabled]:hover .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts.tooltip:disabled:hover .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts[disabled]:hover .tooltiptext,
-html body #app #generate-nfts #generate-dark-nfts:disabled:hover .tooltiptext,
-html body #app #generate-dark-nfts.tooltip[disabled]:hover .tooltiptext,
-html body #app #generate-dark-nfts.tooltip:disabled:hover .tooltiptext,
-html body #app #generate-dark-nfts[disabled]:hover .tooltiptext,
-html body #app #generate-dark-nfts:disabled:hover .tooltiptext,
-html body #generate-dark-nfts.tooltip[disabled]:hover .tooltiptext,
-html body #generate-dark-nfts.tooltip:disabled:hover .tooltiptext,
-html body #generate-dark-nfts[disabled]:hover .tooltiptext,
-html body #generate-dark-nfts:disabled:hover .tooltiptext,
-#app #generate-dark-nfts.tooltip[disabled]:hover .tooltiptext,
-#app #generate-dark-nfts.tooltip:disabled:hover .tooltiptext,
-#app #generate-dark-nfts[disabled]:hover .tooltiptext,
-#app #generate-dark-nfts:disabled:hover .tooltiptext,
-#generate-dark-nfts.tooltip[disabled]:hover .tooltiptext,
-#generate-dark-nfts.tooltip:disabled:hover .tooltiptext,
-#generate-dark-nfts[disabled]:hover .tooltiptext,
-#generate-dark-nfts:disabled:hover .tooltiptext,
-.tooltip#generate-dark-nfts[disabled] .tooltiptext,
-.tooltip#generate-dark-nfts:disabled .tooltiptext,
-.tooltip#generate-dark-nfts[disabled]:hover .tooltiptext,
-.tooltip#generate-dark-nfts:disabled:hover .tooltiptext,
-.toggle-button.tooltip#generate-dark-nfts[disabled] .tooltiptext,
-.toggle-button.tooltip#generate-dark-nfts:disabled .tooltiptext,
-.toggle-button.tooltip#generate-dark-nfts[disabled]:hover .tooltiptext,
-.toggle-button.tooltip#generate-dark-nfts:disabled:hover .tooltiptext {
-  visibility: hidden !important;
-  opacity: 0 !important;
-  display: none !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
+/* CRITICAL: Hide Dark NFTs tooltip completely - removed all tooltip functionality */
 
-/* Dark NFTs and Seed NFT tooltip arrows - pointing downward (tooltips are above buttons) */
-html body #generate-dark-nfts.tooltip .tooltiptext::after,
-html body #generate-dark-nfts .tooltiptext::after,
-#generate-dark-nfts.tooltip .tooltiptext::after,
-#generate-dark-nfts .tooltiptext::after,
+/* Seed NFT tooltip arrows - pointing downward (tooltips are above buttons) */
 html body #single-seed-toggle.tooltip .tooltiptext::after,
 html body #single-seed-toggle .tooltiptext::after,
 #single-seed-toggle.tooltip .tooltiptext::after,
@@ -2417,6 +2380,15 @@ html body #single-seed-toggle .tooltiptext::after,
   border-width: 5px !important;
   border-style: solid !important;
   border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button - black background */
+}
+
+/* CRITICAL: Hide Dark NFTs tooltip arrow completely */
+html body #generate-dark-nfts.tooltip .tooltiptext::after,
+html body #generate-dark-nfts .tooltiptext::after,
+#generate-dark-nfts.tooltip .tooltiptext::after,
+#generate-dark-nfts .tooltiptext::after {
+  display: none !important;
+  content: none !important;
 }
 
 /* Force all tooltip arrows to use black background color */
@@ -2453,11 +2425,7 @@ html body .toggle-label .tooltiptext::after,
   border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* FORCE black arrow color */
 }
 
-/* Override any conflicting arrow rules for Dark NFTs and Seed NFT tooltips */
-html body #generate-dark-nfts.tooltip .tooltiptext::after,
-html body #generate-dark-nfts .tooltiptext::after,
-#generate-dark-nfts.tooltip .tooltiptext::after,
-#generate-dark-nfts .tooltiptext::after,
+/* Override any conflicting arrow rules for Seed NFT tooltips */
 html body #single-seed-toggle.tooltip .tooltiptext::after,
 html body #single-seed-toggle .tooltiptext::after,
 #single-seed-toggle.tooltip .tooltiptext::after,
@@ -2466,30 +2434,18 @@ html body #single-seed-toggle .tooltiptext::after,
 }
 
 /* CRITICAL: Prevent ALL hover effects (not just tooltips) for Dark NFTs when disabled/greyed out */
-html body #app #generate-nfts #generate-dark-nfts.tooltip[disabled]:hover,
-html body #app #generate-nfts #generate-dark-nfts.tooltip:disabled:hover,
 html body #app #generate-nfts #generate-dark-nfts[disabled]:hover,
 html body #app #generate-nfts #generate-dark-nfts:disabled:hover,
-html body #app #generate-dark-nfts.tooltip[disabled]:hover,
-html body #app #generate-dark-nfts.tooltip:disabled:hover,
 html body #app #generate-dark-nfts[disabled]:hover,
 html body #app #generate-dark-nfts:disabled:hover,
-html body #generate-dark-nfts.tooltip[disabled]:hover,
-html body #generate-dark-nfts.tooltip:disabled:hover,
 html body #generate-dark-nfts[disabled]:hover,
 html body #generate-dark-nfts:disabled:hover,
-#app #generate-dark-nfts.tooltip[disabled]:hover,
-#app #generate-dark-nfts.tooltip:disabled:hover,
 #app #generate-dark-nfts[disabled]:hover,
 #app #generate-dark-nfts:disabled:hover,
-#generate-dark-nfts.tooltip[disabled]:hover,
-#generate-dark-nfts.tooltip:disabled:hover,
 #generate-dark-nfts[disabled]:hover,
 #generate-dark-nfts:disabled:hover,
 .toggle-button#generate-dark-nfts[disabled]:hover,
-.toggle-button#generate-dark-nfts:disabled:hover,
-.toggle-button.tooltip#generate-dark-nfts[disabled]:hover,
-.toggle-button.tooltip#generate-dark-nfts:disabled:hover {
+.toggle-button#generate-dark-nfts:disabled:hover {
   background-color: #23232b !important;
   background: #23232b !important;
   border-color: #4a4a4a !important; /* Match Seed NFT border color when disabled */
@@ -3511,22 +3467,24 @@ html body #app #generate-nfts .traits-title,
   will-change: auto !important; /* Prevent GPU acceleration that might cause shifts */
 }
 
-/* ENSURE NO PURPLE BACKGROUND ON ANY TOOLTIP */
+/* ENSURE NO PURPLE BACKGROUND ON ANY TOOLTIP - Normalize to Export NFTs tab style */
 html body #app #generate-nfts .tooltiptext {
-  background-color: #333 !important;
-  background: #333 !important;
-  color: #fff !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
   border: none !important;
   background-image: none !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
 }
 
 /* SPECIFIC OVERRIDE FOR NFT PREVIEW TITLE TOOLTIP */
 html body #app #generate-nfts .nft-preview-title .tooltiptext {
   background-color: #000000 !important;
   background: #000000 !important;
-  color: #fff !important;
+  color: #f39c12 !important;
   border: none !important;
   background-image: none !important;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
 }
 
 /* NEW CUSTOM TOOLTIP CLASS FOR NFT PREVIEW TITLE */
@@ -6838,6 +6796,16 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
     0 0 10px rgba(0, 255, 136, 0.5),
     0 0 20px rgba(0, 255, 136, 0.3) !important; /* Maintain active state shadow - no change on hover */
   transform: none !important; /* No transform on hover */
+  translate: none !important; /* No translate on hover */
+  position: relative !important; /* Maintain relative positioning - no movement */
+  top: 0 !important; /* No vertical movement */
+  left: 0 !important; /* No horizontal movement */
+  bottom: auto !important; /* No bottom positioning */
+  right: auto !important; /* No right positioning */
+  margin-top: 0 !important; /* No margin changes */
+  margin-left: 0 !important; /* No margin changes */
+  margin-bottom: 0 !important; /* No margin changes */
+  margin-right: 0 !important; /* No margin changes */
   height: 32px !important;
   min-height: 32px !important;
   max-height: 32px !important;
@@ -8516,7 +8484,7 @@ html body #export-nfts .blockchain-toggles-container button.tooltip {
   /* Only set properties that don't conflict with JavaScript-controlled styles */
   position: relative !important;
   display: inline-block !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Help cursor for tooltips */
   pointer-events: auto !important;
   /* Explicitly do NOT set: background-color, background, border, border-color, color, font-size, font-weight, padding, height, box-shadow */
   /* These are all controlled by JavaScript inline styles and must not be overridden */

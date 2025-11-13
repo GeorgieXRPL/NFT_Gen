@@ -1310,6 +1310,33 @@ html:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
 .batch-card {
   transition: opacity 0.2s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
   position: relative !important;
+  /* CRITICAL: Fixed size to prevent stretching when NFT count changes */
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  height: 140px !important;
+  min-height: 140px !important;
+  max-height: 140px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  overflow: hidden !important; /* Prevent content from causing stretching */
+}
+
+/* CRITICAL: Ensure batch card internal elements don't cause stretching */
+.batch-card > * {
+  min-width: 0 !important; /* Prevent flex children from causing overflow */
+  max-width: 100% !important; /* Constrain children to card width */
+}
+
+.batch-card .batch-input {
+  flex-shrink: 0 !important; /* Input should maintain its size */
+}
+
+.batch-card .select-to-export-toggle,
+.batch-card .already-minted-toggle {
+  flex-shrink: 1 !important; /* Allow toggles to shrink if needed */
+  min-width: 0 !important; /* Prevent toggles from causing overflow */
 }
 
 .batch-card:not([style*="opacity: 0.5"]) {
@@ -1382,6 +1409,35 @@ html:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
   min-width: 120px !important;
   max-width: 200px !important;
   transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease, opacity 0.5s ease !important;
+  cursor: help !important; /* Always show help cursor for blockchain buttons with tooltips */
+}
+
+/* CRITICAL: Ensure blockchain toggle buttons always show help cursor on hover and all states */
+.blockchain-toggles-container .toggle-button,
+.blockchain-toggles-container .toggle-button:hover,
+.blockchain-toggles-container .toggle-button:active,
+.blockchain-toggles-container .toggle-button:focus,
+.blockchain-toggles-container .toggle-button.tooltip,
+.blockchain-toggles-container .toggle-button.tooltip:hover,
+.blockchain-toggles-container .toggle-button.tooltip:active,
+.blockchain-toggles-container .toggle-button.tooltip:focus,
+.blockchain-toggles-container button.tooltip,
+.blockchain-toggles-container button.tooltip:hover,
+.blockchain-toggles-container button.tooltip:active,
+.blockchain-toggles-container button.tooltip:focus,
+#export-nfts .blockchain-toggles-container .toggle-button,
+#export-nfts .blockchain-toggles-container .toggle-button:hover,
+#export-nfts .blockchain-toggles-container .toggle-button:active,
+#export-nfts .blockchain-toggles-container .toggle-button:focus,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:hover,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:active,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:focus,
+#export-nfts .blockchain-toggles-container button.tooltip,
+#export-nfts .blockchain-toggles-container button.tooltip:hover,
+#export-nfts .blockchain-toggles-container button.tooltip:active,
+#export-nfts .blockchain-toggles-container button.tooltip:focus {
+  cursor: help !important; /* Always show help cursor in all states */
 }
 
 /* Center align blockchain management section title and toggles */

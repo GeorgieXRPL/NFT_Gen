@@ -119,39 +119,49 @@
 .rule-actions .action-btn .tooltip-text {
   visibility: hidden !important;
   opacity: 0 !important;
-  position: absolute !important;
-  z-index: 9999 !important;
+  position: fixed !important; /* Use fixed positioning to escape container constraints */
+  z-index: 2147483647 !important; /* Highest z-index to match standard tooltips */
   bottom: auto !important;
-  top: 130% !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: auto !important;
-  white-space: nowrap !important;
-  background-color: rgba(0, 0, 0, 0.9) !important;
-  color: #fff !important;
+  top: auto !important; /* JavaScript will set exact position */
+  left: auto !important; /* JavaScript will set exact position */
+  right: auto !important;
+  transform: none !important; /* JavaScript will handle centering */
+  width: max-content !important;
+  max-width: 300px !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  background-color: #000000 !important; /* Match standard tooltip black background */
+  background: #000000 !important;
+  color: #f39c12 !important; /* Match standard tooltip orange text */
   text-align: center !important;
-  font-size: 0.8rem !important;
-  padding: 6px 10px !important;
+  font-size: 11px !important; /* Match standard tooltip font size */
+  font-family: 'Archivo', sans-serif !important; /* Match standard tooltip font */
+  padding: 8px 12px !important; /* Match standard tooltip padding */
   border-radius: 6px !important;
-  transition: opacity 0.3s !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important; /* Match standard tooltip shadow */
+  line-height: 1.4 !important;
+  transition: opacity 1s ease !important; /* 1 second to match standard tooltips */
   pointer-events: none !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  margin: 0 !important;
 }
 
 .rule-actions .action-btn .tooltip-text::after {
   content: "" !important;
   position: absolute !important;
-  bottom: 100% !important;
+  top: 100% !important; /* Position arrow at bottom of tooltip (tooltip is above button) */
+  bottom: auto !important;
   left: 50% !important;
   margin-left: -5px !important;
+  margin-top: -1px !important; /* Small overlap to connect with tooltip */
   border-width: 5px !important;
   border-style: solid !important;
-  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button */
 }
 
+/* CRITICAL: Don't use CSS hover to show tooltip - JavaScript will control visibility with delay */
 .rule-actions .action-btn:hover .tooltip-text {
-  visibility: visible !important;
-  opacity: 1 !important;
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
 }
 
 .trait-layer-header {

@@ -1074,22 +1074,31 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
 }
 .custom-tooltip {
   display: none;
-  position: absolute;
+  position: fixed !important;
   left: 50%;
   bottom: 120%;
   transform: translateX(-50%);
-  background: #181818;
-  color: #fff;
-  font-family: 'Archivo', sans-serif;
-  font-size: 12px;
-  padding: 4px 10px;
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f39c12 !important;
+  font-family: 'Archivo', sans-serif !important;
+  font-size: 11px !important;
+  padding: 8px 12px !important;
   border-radius: 6px;
-  white-space: pre;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  white-space: normal !important;
+  z-index: 2147483647 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  word-wrap: break-word;
+  max-width: 300px;
+  width: max-content;
+  line-height: 1.4;
+  text-align: center;
+}
+.custom-tooltip-anchor {
+  cursor: help !important;
 }
 .custom-tooltip-anchor:hover .custom-tooltip {
   display: block;
@@ -1664,22 +1673,31 @@ h3.subsection-title {
 }
 .custom-tooltip {
   display: none;
-  position: absolute;
+  position: fixed !important;
   left: 50%;
   bottom: 120%;
   transform: translateX(-50%);
-  background: #181818;
-  color: #fff;
-  font-family: 'Archivo', sans-serif;
-  font-size: 12px;
-  padding: 4px 10px;
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f39c12 !important;
+  font-family: 'Archivo', sans-serif !important;
+  font-size: 11px !important;
+  padding: 8px 12px !important;
   border-radius: 6px;
-  white-space: pre;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  white-space: normal !important;
+  z-index: 2147483647 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  word-wrap: break-word;
+  max-width: 300px;
+  width: max-content;
+  line-height: 1.4;
+  text-align: center;
+}
+.custom-tooltip-anchor {
+  cursor: help !important;
 }
 .custom-tooltip-anchor:hover .custom-tooltip {
   display: block;
@@ -1715,7 +1733,13 @@ h3.subsection-title {
   display: none;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f39c12 !important;
+}
+.custom-tooltip-anchor {
+  cursor: help !important;
 }
 .custom-tooltip-anchor:hover .custom-tooltip {
   display: block;
@@ -2401,22 +2425,31 @@ h3.subsection-title {
 }
 .custom-tooltip {
   display: none;
-  position: absolute;
+  position: fixed !important;
   left: 50%;
   bottom: 120%;
   transform: translateX(-50%);
-  background: #181818;
-  color: #fff;
-  font-family: 'Archivo', sans-serif;
-  font-size: 12px;
-  padding: 4px 10px;
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f39c12 !important;
+  font-family: 'Archivo', sans-serif !important;
+  font-size: 11px !important;
+  padding: 8px 12px !important;
   border-radius: 6px;
-  white-space: pre;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  white-space: normal !important;
+  z-index: 2147483647 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  word-wrap: break-word;
+  max-width: 300px;
+  width: max-content;
+  line-height: 1.4;
+  text-align: center;
+}
+.custom-tooltip-anchor {
+  cursor: help !important;
 }
 .custom-tooltip-anchor:hover .custom-tooltip {
   display: block;
@@ -2452,7 +2485,13 @@ h3.subsection-title {
   display: none;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s;
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f39c12 !important;
+}
+.custom-tooltip-anchor {
+  cursor: help !important;
 }
 .custom-tooltip-anchor:hover .custom-tooltip {
   display: block;

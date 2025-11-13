@@ -90,8 +90,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Store timeout reference
       let tooltipTimeout = null
 
-      // CRITICAL: Ensure tooltip has transition for fade in/out
-      tooltipText.style.transition = "opacity 0.3s ease"
+      // CRITICAL: Ensure tooltip has transition for fade in/out (1 second to match Export NFTs tab)
+      tooltipText.style.transition = "opacity 1s ease"
+      
+      // CRITICAL: Ensure orange text on black background
+      tooltipText.style.setProperty("background-color", "#000000", "important")
+      tooltipText.style.setProperty("background", "#000000", "important")
+      tooltipText.style.setProperty("color", "#f39c12", "important")
+      
+      // CRITICAL: Add cursor help to parent element
+      tooltip.style.cursor = "help"
 
       // Add mouseenter event to position the tooltip with 1-second delay (applies to ALL tooltips)
       tooltip.addEventListener("mouseenter", () => {
@@ -122,10 +130,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // Fade out with transition
         if (tooltipText) {
           tooltipText.style.opacity = "0"
-          // Hide after fade completes
+          // Hide after fade completes (1 second to match Export NFTs tab)
           setTimeout(() => {
             tooltipText.style.visibility = "hidden"
-          }, 300) // Match transition duration
+          }, 1000) // Match transition duration
         }
       })
 
@@ -162,11 +170,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const exportTab = document.getElementById("export-nfts")
         const isInExportTab = exportTab && exportTab.contains(button)
 
-        // CRITICAL: Ensure tooltip has transition for fade in/out
-        tooltip.style.transition = "opacity 0.3s ease"
+        // CRITICAL: Ensure tooltip has transition for fade in/out (1 second to match Export NFTs tab)
+        tooltip.style.transition = "opacity 1s ease"
+        
+        // CRITICAL: Ensure orange text on black background
+        tooltip.style.setProperty("background-color", "#000000", "important")
+        tooltip.style.setProperty("background", "#000000", "important")
+        tooltip.style.setProperty("color", "#f39c12", "important")
+        
+        // CRITICAL: Add cursor help to button
+        button.style.cursor = "help"
 
         const showTooltip = () => {
-        // Position the tooltip below the button
+        // Position the tooltip above the button (centered)
         const buttonRect = button.getBoundingClientRect()
 
         // Make tooltip visible to get its dimensions
@@ -174,13 +190,14 @@ document.addEventListener("DOMContentLoaded", () => {
         tooltip.style.opacity = "0"
         const tooltipRect = tooltip.getBoundingClientRect()
 
-        // Position the tooltip
-        tooltip.style.top = `${buttonRect.bottom + 10}px`
-        tooltip.style.left = `${buttonRect.left + (buttonRect.width / 2) - tooltipRect.width / 2}px`
-          tooltip.style.zIndex = "2147483647"
-
-        // Add bottom class to ensure arrow points up
-        tooltip.classList.add("tooltip-bottom")
+        // Position the tooltip above and centered
+        const tooltipWidth = tooltipRect.width || 200
+        const tooltipHeight = tooltipRect.height
+        tooltip.style.position = "fixed"
+        tooltip.style.top = `${buttonRect.top - tooltipHeight - 5}px`
+        tooltip.style.left = `${buttonRect.left + (buttonRect.width / 2) - (tooltipWidth / 2)}px`
+        tooltip.style.zIndex = "2147483647"
+        tooltip.style.transform = "none"
 
           // Fade in with transition
           requestAnimationFrame(() => {
@@ -204,10 +221,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         // Fade out with transition
         tooltip.style.opacity = "0"
-        // Hide after fade completes
+        // Hide after fade completes (1 second to match Export NFTs tab)
         setTimeout(() => {
           tooltip.style.visibility = "hidden"
-        }, 300) // Match transition duration
+        }, 1000) // Match transition duration
       })
     })
   }

@@ -5483,58 +5483,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         createTooltip.textContent = 'Create a random NFT, considering all rules and rarities';
         createNftBtn.appendChild(createTooltip);
         
-        // Position tooltip above button on hover (matching export-nfts-module.js pattern)
-        let createTooltipTimeout = null;
-        createNftBtn.addEventListener('mouseenter', function() {
-          // Clear any existing timeout
-          if (createTooltipTimeout) {
-            clearTimeout(createTooltipTimeout);
-            createTooltipTimeout = null;
-          }
-          // Show tooltip after 1 second delay
-          createTooltipTimeout = setTimeout(() => {
-            const rect = createNftBtn.getBoundingClientRect();
-            // Make tooltip temporarily visible to measure height, but keep it off-screen
-            createTooltip.style.visibility = 'visible';
-            createTooltip.style.opacity = '0';
-            createTooltip.style.top = '-9999px';
-            createTooltip.style.left = '-9999px';
-            createTooltip.style.transform = 'none';
-            void createTooltip.offsetHeight; // Force reflow
-            const tooltipWidth = createTooltip.offsetWidth || 200;
-            const tooltipHeight = createTooltip.offsetHeight;
-            // CRITICAL: Set position fixed and use setProperty with important to override CSS
-            createTooltip.style.setProperty("position", "fixed", "important");
-            createTooltip.style.setProperty("z-index", "2147483647", "important");
-            createTooltip.style.setProperty("bottom", "auto", "important");
-            createTooltip.style.setProperty("right", "auto", "important");
-            createTooltip.style.setProperty("margin", "0", "important");
-            createTooltip.style.setProperty("transform", "none", "important");
-            // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
-            const buttonRect = createNftBtn.getBoundingClientRect();
-            const centeredLeft = buttonRect.left + (buttonRect.width / 2) - (tooltipWidth / 2);
-            const topPosition = buttonRect.top - tooltipHeight - 5;
-            createTooltip.style.setProperty("top", `${topPosition}px`, "important");
-            createTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
-            // Fade in with transition
-            requestAnimationFrame(() => {
-              createTooltip.style.opacity = '1';
-            });
-            createTooltipTimeout = null;
-          }, 1000);
-        });
-        createNftBtn.addEventListener('mouseleave', function() {
-          // Clear the show timeout if mouse leaves before delay completes
-          if (createTooltipTimeout) {
-            clearTimeout(createTooltipTimeout);
-            createTooltipTimeout = null;
-          }
-          createTooltip.style.opacity = '0';
-          // Wait for fade out transition to complete before hiding
-          setTimeout(() => {
-            createTooltip.style.visibility = 'hidden';
-          }, 1000);
-        });
+        // Use standard tooltip positioning with 1 second delay
+        this.setupTooltipPositioning(createNftBtn, createTooltip);
         // Store original styles for Create NFT button
         const createNftBtnOriginalStyles = {
           backgroundColor: '#047857',
@@ -5670,26 +5620,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         addTooltip.textContent = 'Add current NFT to your collection';
         addToCollectionBtn.appendChild(addTooltip);
         
-        // Position tooltip above button on hover
-        addToCollectionBtn.addEventListener('mouseenter', function() {
-          requestAnimationFrame(() => {
-            const rect = addToCollectionBtn.getBoundingClientRect();
-            addTooltip.style.position = 'fixed';
-            addTooltip.style.visibility = 'hidden';
-            addTooltip.style.opacity = '0';
-            addTooltip.style.display = 'block';
-            addTooltip.style.top = '0';
-            addTooltip.style.left = '0';
-            addTooltip.style.transform = 'none';
-            void addTooltip.offsetHeight;
-            const tooltipRect = addTooltip.getBoundingClientRect();
-            const tooltipHeight = tooltipRect.height || 60;
-            addTooltip.style.top = `${rect.top - tooltipHeight - 8}px`;
-            addTooltip.style.left = `${rect.left + (rect.width / 2)}px`;
-            addTooltip.style.transform = 'translateX(-50%)';
-            addTooltip.style.zIndex = '2147483647';
-          });
-        });
+        // Use standard tooltip positioning with 1 second delay
+        this.setupTooltipPositioning(addToCollectionBtn, addTooltip);
         // Store original styles for Add to Collection button
         const addToCollectionBtnOriginalStyles = {
           backgroundColor: '#1e40af',
@@ -5932,26 +5864,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         bulkTooltip.textContent = 'Generate multiple NFTs at once or in batches. Pick the ones you like, select them in the order you want them added, then click Add Selected. They will be appended after the last NFT in your collection.';
         bulkGenerationBtn.appendChild(bulkTooltip);
         
-        // Position tooltip above button on hover
-        bulkGenerationBtn.addEventListener('mouseenter', function() {
-          requestAnimationFrame(() => {
-            const rect = bulkGenerationBtn.getBoundingClientRect();
-            bulkTooltip.style.position = 'fixed';
-            bulkTooltip.style.visibility = 'hidden';
-            bulkTooltip.style.opacity = '0';
-            bulkTooltip.style.display = 'block';
-            bulkTooltip.style.top = '0';
-            bulkTooltip.style.left = '0';
-            bulkTooltip.style.transform = 'none';
-            void bulkTooltip.offsetHeight;
-            const tooltipRect = bulkTooltip.getBoundingClientRect();
-            const tooltipHeight = tooltipRect.height || 60;
-            bulkTooltip.style.top = `${rect.top - tooltipHeight - 8}px`;
-            bulkTooltip.style.left = `${rect.left + (rect.width / 2)}px`;
-            bulkTooltip.style.transform = 'translateX(-50%)';
-            bulkTooltip.style.zIndex = '2147483647';
-          });
-        });
+        // Use standard tooltip positioning with 1 second delay
+        this.setupTooltipPositioning(bulkGenerationBtn, bulkTooltip);
         // Store original styles for Bulk Generation button
         const bulkGenerationBtnOriginalStyles = {
           backgroundColor: '#ea580c',
@@ -6033,7 +5947,14 @@ window.NFTApp.registerModule("generateNftsUI", {
           position: relative;
         `;
         editCollectionBtn.innerHTML = 'edit NFT<br>Collection';
-        editCollectionBtn.className = 'nft-action-btn';
+        editCollectionBtn.className = 'nft-action-btn tooltip';
+        const editTooltip = document.createElement('span');
+        editTooltip.className = 'tooltiptext';
+        editTooltip.textContent = 'View and manage your NFT collection';
+        editCollectionBtn.appendChild(editTooltip);
+        
+        // Use standard tooltip positioning with 1 second delay
+        this.setupTooltipPositioning(editCollectionBtn, editTooltip);
         // Store original styles for Edit Collection button
         const editCollectionBtnOriginalStyles = {
           backgroundColor: '#dc2626',
@@ -6187,47 +6108,14 @@ window.NFTApp.registerModule("generateNftsUI", {
         nftCountPanel.appendChild(nftCountContainer);
         
         // Add tooltip for progress bar
-        const tooltipContainer = document.createElement('div');
-        tooltipContainer.className = 'tooltip';
-        
-        const tooltip = document.createElement('div');
+        const tooltip = document.createElement('span');
         tooltip.className = 'tooltiptext';
         tooltip.textContent = '0% Complete';
+        nftCountPanel.appendChild(tooltip);
         
-        tooltipContainer.appendChild(tooltip);
-        nftCountPanel.appendChild(tooltipContainer);
-        
-        // Add event listener to position tooltip correctly - only show when active (not greyed out)
-        nftCountPanel.addEventListener('mouseenter', function() {
-          // Check if content should be enabled (not greyed out)
-          const hasNFT = !!(window.lastGeneratedNFT || document.querySelector('.nft-preview-item img, .nft-preview-image-area img'));
-          const previewImage = document.querySelector('.nft-preview-image-area img, .nft-preview-item img');
-          const isNFTImageLoaded = previewImage && previewImage.complete && previewImage.naturalWidth > 0;
-          const hasMinimumRequirements = document.querySelector('.trait-layer') !== null; // Check if traits are loaded
-          const shouldEnableContent = hasMinimumRequirements && hasNFT && isNFTImageLoaded;
-          
-          // Only show tooltip if content is enabled (not greyed out)
-          if (!shouldEnableContent) {
-            tooltip.style.opacity = '0';
-            tooltip.style.visibility = 'hidden';
-            return;
-          }
-          
-          const rect = nftCountPanel.getBoundingClientRect();
-          tooltip.style.position = 'fixed';
-          tooltip.style.zIndex = '2147483647';
-          tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
-          tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-          tooltip.style.transform = 'translateX(-50%)';
-          tooltip.style.opacity = '1';
-          tooltip.style.visibility = 'visible';
-        });
-        
-        // Hide tooltip when mouse leaves
-        nftCountPanel.addEventListener('mouseleave', function() {
-          tooltip.style.opacity = '0';
-          tooltip.style.visibility = 'hidden';
-        });
+        // Use standard tooltip positioning with 1 second delay
+        // Note: The tooltip text is updated dynamically in updateNftCountPanel
+        this.setupTooltipPositioning(nftCountPanel, tooltip);
         
         // Function to update NFT count panel
         function updateNftCountPanel() {
@@ -8059,51 +7947,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       seedTooltipText.innerHTML = 'activate it if you want to generate a particular NFT<br>based on a specific Seed Number.';
       toggleButton.appendChild(seedTooltipText);
       
-      // Position Seed NFT tooltip using fixed positioning to avoid being cut off
-      toggleButton.addEventListener('mouseenter', function() {
-        const rect = toggleButton.getBoundingClientRect();
-        
-        // Temporarily show tooltip off-screen to get accurate dimensions
-        seedTooltipText.style.position = 'fixed';
-        seedTooltipText.style.visibility = 'hidden';
-        seedTooltipText.style.opacity = '0';
-        seedTooltipText.style.display = 'block';
-        seedTooltipText.style.top = '-9999px';
-        seedTooltipText.style.left = '-9999px';
-        seedTooltipText.style.transform = 'none';
-        
-        // Force reflow to get accurate measurements
-        void seedTooltipText.offsetHeight;
-        
-        const tooltipRect = seedTooltipText.getBoundingClientRect();
-        const tooltipHeight = tooltipRect.height || 60; // Fallback height
-        const tooltipWidth = tooltipRect.width || 200; // Fallback width
-        
-        // Calculate button center position
-        const buttonCenterX = rect.left + (rect.width / 2);
-        const buttonTop = rect.top;
-        
-        // Position tooltip ABOVE the button, horizontally centered
-        const top = buttonTop - tooltipHeight - 8; // 8px gap above button
-        const left = buttonCenterX; // Center point of button
-        
-        // Apply positioning
-        seedTooltipText.style.position = 'fixed';
-        seedTooltipText.style.top = `${top}px`;
-        seedTooltipText.style.left = `${left}px`;
-        seedTooltipText.style.transform = 'translateX(-50%)'; // Center horizontally
-        seedTooltipText.style.zIndex = '2147483647';
-        
-        // Show the tooltip
-        seedTooltipText.style.visibility = 'visible';
-        seedTooltipText.style.opacity = '1';
-        seedTooltipText.style.display = 'block';
-      });
-      
-      toggleButton.addEventListener('mouseleave', function() {
-        seedTooltipText.style.visibility = 'hidden';
-        seedTooltipText.style.opacity = '0';
-      });
+      // Use standard tooltip positioning function to ensure consistent behavior
+      // This will position tooltip above and centered to the button with 1-second delay and fade
+      this.setupTooltipPositioning(toggleButton, seedTooltipText);
       
       // CRITICAL: Check if "Please Wait" popup is showing - keep grey during popup
       const generateNftsTabCheck = document.getElementById('generate-nfts');
@@ -8246,6 +8092,13 @@ window.NFTApp.registerModule("generateNftsUI", {
       duplicateGenerateSeedBtn.id = 'generate-dark-nfts';
       duplicateGenerateSeedBtn.className = 'toggle-button';
       duplicateGenerateSeedBtn.textContent = 'Dark NFTs';
+      // CRITICAL: Remove any tooltip-related attributes to prevent tooltip from showing
+      duplicateGenerateSeedBtn.removeAttribute('title');
+      duplicateGenerateSeedBtn.removeAttribute('data-tooltip');
+      // Ensure no tooltip class is ever added
+      if (duplicateGenerateSeedBtn.classList.contains('tooltip')) {
+        duplicateGenerateSeedBtn.classList.remove('tooltip');
+      }
       duplicateGenerateSeedBtn.style.cssText = `
         padding: 8px 14px;
         border: 2px solid #4a4a4a;
@@ -8302,6 +8155,38 @@ window.NFTApp.registerModule("generateNftsUI", {
       
       // Add Dark NFTs button to wrapper
       darkNftsWrapper.appendChild(duplicateGenerateSeedBtn);
+      
+      // CRITICAL: Ensure no tooltip is ever added to Dark NFTs button
+      // Remove any existing tooltip elements
+      const existingTooltip = duplicateGenerateSeedBtn.querySelector('.tooltiptext');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+      // Remove tooltip class if it exists
+      if (duplicateGenerateSeedBtn.classList.contains('tooltip')) {
+        duplicateGenerateSeedBtn.classList.remove('tooltip');
+      }
+      // Use MutationObserver to prevent tooltip from being added
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (duplicateGenerateSeedBtn.classList.contains('tooltip')) {
+              duplicateGenerateSeedBtn.classList.remove('tooltip');
+            }
+          }
+          if (mutation.type === 'childList') {
+            const tooltip = duplicateGenerateSeedBtn.querySelector('.tooltiptext');
+            if (tooltip) {
+              tooltip.remove();
+            }
+          }
+        });
+      });
+      observer.observe(duplicateGenerateSeedBtn, {
+        attributes: true,
+        childList: true,
+        subtree: true
+      });
 
       // Append toggle, input and button directly to Container 3 (seedInputRow)
       seedInputRow.appendChild(toggleButton);

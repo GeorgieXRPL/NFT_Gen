@@ -151,7 +151,7 @@
   background: none;
   border: none;
   color: #a9a9b2;
-  cursor: pointer;
+  cursor: help !important; /* Help cursor for tooltips */
   padding: 4px;
   border-radius: 4px;
   display: flex;
@@ -163,6 +163,7 @@
 .rule-actions .action-btn:hover {
   color: #fff;
   background-color: rgba(255, 255, 255, 0.1);
+  cursor: help !important; /* Maintain help cursor on hover */
 }
 
 .rule-actions .action-btn svg {
@@ -597,15 +598,26 @@ html body #app #combination-rule-modal .combination-rule-body {
 .combination-rule-modal .trait-selection-name.custom-tooltip-anchor:hover > .custom-tooltip,
 .combination-rule-modal .trait-selection-name.custom-tooltip-anchor > .custom-tooltip,
 .combination-rule-modal .tooltiptext {
-  background: #181818 !important;
-  color: #fff !important;
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #f39c12 !important;
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
   outline: none !important;
   z-index: 2147483647 !important; /* Highest z-index across entire app */
+  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  text-align: center !important;
+}
+
+/* CRITICAL: Add cursor help to combination rule tooltip anchors */
+.combination-rule-modal .custom-tooltip-anchor,
+.combination-rule-modal .trait-selection-name.custom-tooltip-anchor {
+  cursor: help !important;
 }
 
 /* Remove tooltips from first-layer and second-layer dropdown menus */
