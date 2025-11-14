@@ -66,32 +66,64 @@
     document.addEventListener("traits-updated", setupTraitLayersEnhancements);
     
     // Add a MutationObserver to detect changes to the DOM
+    // CRITICAL: Only observe the trait-layers-container, not the entire document.body
+    // This prevents the observer from firing on every tab switch and causing flickering
     try {
+      let enhancementTimeout = null;
+      const debouncedEnhancement = () => {
+        // Clear any pending timeout
+        if (enhancementTimeout) {
+          clearTimeout(enhancementTimeout);
+        }
+        // Debounce the enhancement to prevent excessive calls
+        enhancementTimeout = setTimeout(() => {
+          setupTraitLayersEnhancements();
+          enhancementTimeout = null;
+        }, 100); // 100ms debounce
+      };
+      
       const observer = new MutationObserver(mutations => {
         // Check if any of the mutations affected the trait layers
         const shouldEnhance = mutations.some(mutation => {
-          // Check if the mutation target is or contains trait layers
-          return mutation.target && 
-                (mutation.target.classList?.contains("trait-layers-container") || 
-                 mutation.target.querySelector?.(".trait-layers-container"));
+          const target = mutation.target;
+          // Only enhance if the mutation is directly in the trait-layers-container
+          // or if it's a class change on a trait-layer-bar
+          return target && (
+            target.classList?.contains("trait-layers-container") ||
+            target.classList?.contains("trait-layer-bar") ||
+            target.closest?.(".trait-layers-container")
+          );
         });
         
         if (shouldEnhance) {
-          setupTraitLayersEnhancements();
+          debouncedEnhancement();
         }
       });
       
-      // Start observing the document with the configured parameters
-      observer.observe(document.body, { 
-        childList: true, 
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class']
-      });
+      // CRITICAL: Only observe the trait-layers-container when it exists
+      // Don't observe the entire document.body to prevent firing on tab switches
+      const setupObserver = () => {
+        const container = document.querySelector(".trait-layers-container");
+        if (container) {
+          // Only observe the container, not the entire document
+          observer.observe(container, { 
+            childList: true, 
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'draggable']
+          });
+        } else {
+          // If container doesn't exist yet, try again after a delay
+          setTimeout(setupObserver, 500);
+        }
+      };
+      
+      // Setup observer after initial delay
+      setTimeout(setupObserver, 500);
     } catch (error) {
       console.error("Error setting up mutation observer:", error);
-      // Fallback: periodically check for changes
-      setInterval(setupTraitLayersEnhancements, 2000);
+      // Fallback: periodically check for changes (but less frequently)
+      setInterval(setupTraitLayersEnhancements, 5000); // Increased from 2000 to 5000
     }
   });
 })(); 

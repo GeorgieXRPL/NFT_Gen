@@ -440,11 +440,11 @@ window.isNFTAppReady = () =>
               </div>
               <div class="nav-tab tooltip" data-tab="traits-rules">
                 Traits & Rules
-                <span class="tooltiptext">Manage traits and combination rules</span>
+                <span class="tooltiptext">Manage Traits and<br>Combination Rules</span>
               </div>
               <div class="nav-tab tooltip" data-tab="generate-nfts">
                 Generate NFTs
-                <span class="tooltiptext">Create NFT images</span>
+                <span class="tooltiptext">Create NFT images and<br>manage your collection</span>
               </div>
               <div class="nav-tab tooltip" data-tab="export-nfts">
                 <span class="tab-label">Export NFTs / Metadata</span>
@@ -520,7 +520,7 @@ window.isNFTAppReady = () =>
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                       </svg>
-                      Add Layer
+                      Add Trait Layer
                       <span class="tooltiptext">Create a new empty layer</span>
                     </button>
                   </div>
@@ -1061,7 +1061,7 @@ window.isNFTAppReady = () =>
               <line x1="9" y1="21" x2="9" y2="9"></line>
             </svg>
             <p>No trait layers added yet</p>
-            <p class="empty-state-help">Add trait layers by clicking the "Add Layer" button or by dragging and dropping folders.</p>
+            <p class="empty-state-help">Add trait layers by clicking the "Add Layer" button, by clicking the "Add Folders" button or by dragging and dropping folders.</p>
           </div>
         `
         return
@@ -1686,6 +1686,19 @@ window.isNFTAppReady = () =>
 // Main application logic
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM content loaded, initializing app...")
+
+  // CRITICAL: Hide Jump to Rules buttons immediately on startup (before any other initialization)
+  const hideJumpToRulesButtons = () => {
+    const jumpToRulesBtn = document.getElementById('jump-to-rules-btn');
+    const jumpToRulesBottomBtn = document.getElementById('jump-to-rules-bottom-btn');
+    if (jumpToRulesBtn) {
+      jumpToRulesBtn.style.setProperty('display', 'none', 'important');
+    }
+    if (jumpToRulesBottomBtn) {
+      jumpToRulesBottomBtn.style.setProperty('display', 'none', 'important');
+    }
+  };
+  hideJumpToRulesButtons();
 
   // Check if NFTApp is properly initialized
   if (!window.isNFTAppReady()) {

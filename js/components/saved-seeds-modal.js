@@ -1769,19 +1769,30 @@ class SavedSeedsModal {
     // Initialize flag to indicate process is still running
     popup.dataset.processFinished = 'false';
     popup.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      font-family: 'Archivo', sans-serif;
-      pointer-events: auto;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(0, 0, 0, 0.85) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 99999 !important;
+      font-family: 'Archivo', sans-serif !important;
+      pointer-events: all !important;
     `;
+    
+    // CRITICAL: Prevent tab navigation while popup is showing (same as project loading)
+    const navTabs = document.querySelectorAll('.nav-tab');
+    navTabs.forEach(tab => {
+      tab.style.setProperty('pointer-events', 'none', 'important');
+      tab.style.setProperty('opacity', '0.5', 'important');
+      tab.style.setProperty('cursor', 'not-allowed', 'important');
+    });
+    
+    // Store reference to popup for cleanup
+    popup._blockedTabs = navTabs;
     
     popup.innerHTML = `
       <div style="
@@ -1848,6 +1859,16 @@ class SavedSeedsModal {
     const popup = document.getElementById('nft-edit-please-wait-popup');
     if (!popup) {
       return;
+    }
+    
+    // CRITICAL: Restore tab navigation (same as project loading)
+    if (popup._blockedTabs) {
+      popup._blockedTabs.forEach(tab => {
+        tab.style.removeProperty('pointer-events');
+        tab.style.removeProperty('opacity');
+        tab.style.removeProperty('cursor');
+      });
+      popup._blockedTabs = null;
     }
     
     // Mark that the process has finished
@@ -3192,6 +3213,9 @@ class SavedSeedsModal {
       this.renderPage(1);
       this.setupEventListeners();
       
+      // CRITICAL: Set up all tooltips in the modal with standard format
+      this.setupAllTooltips();
+      
       // Initialize tooltip content based on current mode
       this.updateRaritySearchTooltip();
       
@@ -3937,31 +3961,11 @@ class SavedSeedsModal {
     if (autoFixToggle) {
       const tooltip = autoFixToggle.querySelector('.tooltiptext');
       if (tooltip) {
-        autoFixToggle.addEventListener('mouseenter', () => {
-          // Get button position relative to viewport
-          const rect = autoFixToggle.getBoundingClientRect();
-          
-          // Temporarily show tooltip to get its dimensions
-          const originalVisibility = tooltip.style.visibility;
-          const originalOpacity = tooltip.style.opacity;
-          tooltip.style.visibility = 'hidden';
-          tooltip.style.opacity = '0';
-          tooltip.style.display = 'block';
-          
-          const tooltipRect = tooltip.getBoundingClientRect();
-          
-          // Position tooltip below the button, centered
-          const top = rect.bottom + 10; // 10px gap below button
-          const left = rect.left + (rect.width / 2); // Center point
-          
-          // Set position with fixed positioning
-          tooltip.style.top = `${top}px`;
-          tooltip.style.left = `${left}px`;
-          tooltip.style.transform = 'translateX(-50%)';
-          
-          // Restore visibility (CSS will handle showing it)
-          tooltip.style.display = '';
-        });
+        // CRITICAL: Use global tooltip manager for standard format
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(autoFixToggle, tooltip);
+        }
       }
     }
     
@@ -4039,6 +4043,84 @@ class SavedSeedsModal {
       }
     };
     document.addEventListener('keydown', escHandler);
+  }
+
+  // CRITICAL: Set up all tooltips in the saved seeds modal with standard format
+  setupAllTooltips() {
+    if (!this.modal) return;
+    
+    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+    const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+    
+    // List of all tooltip elements in the modal
+    const tooltipSelectors = [
+      '#close-saved-seeds-modal',
+      '#calculate-rarity-ranks',
+      '#rerender-thumbnails',
+      '#search-rarity-btn',
+      '#clear-search-btn',
+      '#search-trait-btn',
+      '#clear-trait-search-btn',
+      '#copy-all-seeds',
+      '#import-seeds',
+      '#clear-storage',
+      '#filter-violations',
+      '.auto-fix-toggle',
+      '.rarity-search-label',
+      '.rarity-search-input-wrapper',
+      '.trait-search-input-wrapper',
+      '.seed-card-btn',
+      '.seed-desc-btn'
+    ];
+    
+    tooltipSelectors.forEach(selector => {
+      const elements = this.modal.querySelectorAll(selector);
+      elements.forEach(element => {
+        if (element.classList.contains('tooltip')) {
+          const tooltipText = element.querySelector('.tooltiptext');
+          if (tooltipText) {
+            // Apply standard tooltip styling
+            tooltipText.style.setProperty('background-color', '#000000', 'important');
+            tooltipText.style.setProperty('background', '#000000', 'important');
+            tooltipText.style.setProperty('color', '#f39c12', 'important');
+            tooltipText.style.setProperty('z-index', '2147483647', 'important');
+            tooltipText.style.setProperty('position', 'fixed', 'important');
+            tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
+            
+            // Use global tooltip manager if available
+            if (tooltipManager && tooltipManager.setupTooltip) {
+              tooltipManager.setupTooltip(element, tooltipText);
+            } else if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+              // Fallback to generateNftsUI setupTooltipPositioning
+              generateNftsUI.setupTooltipPositioning(element, tooltipText);
+            }
+          }
+        }
+      });
+    });
+    
+    // Also set up tooltips for seed card buttons (they're created dynamically)
+    // This will be called when cards are created, but we also set it up here for existing cards
+    const seedCardButtons = this.modal.querySelectorAll('.seed-card-btn.tooltip');
+    seedCardButtons.forEach(btn => {
+      const tooltipText = btn.querySelector('.tooltiptext');
+      if (tooltipText) {
+        // Apply standard tooltip styling
+        tooltipText.style.setProperty('background-color', '#000000', 'important');
+        tooltipText.style.setProperty('background', '#000000', 'important');
+        tooltipText.style.setProperty('color', '#f39c12', 'important');
+        tooltipText.style.setProperty('z-index', '2147483647', 'important');
+        tooltipText.style.setProperty('position', 'fixed', 'important');
+        tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
+        
+        // Use global tooltip manager if available
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(btn, tooltipText);
+        } else if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+          generateNftsUI.setupTooltipPositioning(btn, tooltipText);
+        }
+      }
+    });
   }
 
   renderPage(page) {
@@ -4772,6 +4854,31 @@ class SavedSeedsModal {
 
     // Add button event listeners
     this.setupCardButtons(card, seedObj, index);
+    
+    // CRITICAL: Set up tooltips for seed card buttons with standard format
+    const seedCardButtons = card.querySelectorAll('.seed-card-btn.tooltip');
+    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+    const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+    
+    seedCardButtons.forEach(btn => {
+      const tooltipText = btn.querySelector('.tooltiptext');
+      if (tooltipText) {
+        // Apply standard tooltip styling
+        tooltipText.style.setProperty('background-color', '#000000', 'important');
+        tooltipText.style.setProperty('background', '#000000', 'important');
+        tooltipText.style.setProperty('color', '#f39c12', 'important');
+        tooltipText.style.setProperty('z-index', '2147483647', 'important');
+        tooltipText.style.setProperty('position', 'fixed', 'important');
+        tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
+        
+        // Use global tooltip manager if available
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(btn, tooltipText);
+        } else if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+          generateNftsUI.setupTooltipPositioning(btn, tooltipText);
+        }
+      }
+    });
 
     // CRITICAL: Don't initialize description button here - it will be initialized after all thumbnails are loaded
     // This prevents the button from being covered by thumbnail images during rendering
@@ -6283,43 +6390,26 @@ class SavedSeedsModal {
         this.openDescriptionModal(seed);
       });
       
-      // Position tooltip dynamically using fixed positioning to prevent clipping
+      // CRITICAL: Use global tooltip manager for description button tooltip with standard format
       const tooltipText = descBtn.querySelector('.tooltiptext');
       if (tooltipText) {
-        descBtn.addEventListener('mouseenter', function() {
-          if (!tooltipText) return;
-          
-          // Use requestAnimationFrame to ensure button is fully positioned before calculating
-          requestAnimationFrame(() => {
-            const rect = descBtn.getBoundingClientRect();
-            
-            // Temporarily show tooltip to get its dimensions (but keep it invisible)
-            tooltipText.style.position = 'fixed';
-            tooltipText.style.visibility = 'hidden';
-            tooltipText.style.opacity = '0';
-            tooltipText.style.display = 'block';
-            tooltipText.style.top = '0';
-            tooltipText.style.left = '0';
-            tooltipText.style.transform = 'none';
-            
-            // Force reflow to get accurate measurements
-            void tooltipText.offsetHeight;
-            
-            const tooltipRect = tooltipText.getBoundingClientRect();
-            const tooltipHeight = tooltipRect.height || 60; // Fallback height if not measured
-            
-            // Position tooltip above the button, centered horizontally
-            const top = rect.top - tooltipHeight - 5; // 5px gap above button
-            const left = rect.left + (rect.width / 2); // Center point of button
-            
-            // Apply final positioning
-            tooltipText.style.position = 'fixed';
-            tooltipText.style.top = `${top}px`;
-            tooltipText.style.left = `${left}px`;
-            tooltipText.style.transform = 'translateX(-50%)';
-            tooltipText.style.zIndex = '2147483647';
-          });
-        });
+        // Apply standard tooltip styling
+        tooltipText.style.setProperty('background-color', '#000000', 'important');
+        tooltipText.style.setProperty('background', '#000000', 'important');
+        tooltipText.style.setProperty('color', '#f39c12', 'important');
+        tooltipText.style.setProperty('z-index', '2147483647', 'important');
+        
+        // Use global tooltip manager if available
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(descBtn, tooltipText);
+        } else {
+          // Fallback: Use setupTooltipPositioning from generateNftsUI if available
+          const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+            generateNftsUI.setupTooltipPositioning(descBtn, tooltipText);
+          }
+        }
       }
     }
   }

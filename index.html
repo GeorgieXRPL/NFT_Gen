@@ -201,12 +201,26 @@
           const currentText = exportTab.textContent.trim();
           if (currentText.includes('Export Metadata / NFTs') || currentText !== 'Export NFTs / Metadata') {
             console.log("[Inline Fix] Fixing export-nfts tab label from:", currentText);
+            // CRITICAL: Preserve existing tooltip if it exists
+            const existingTooltip = exportTab.querySelector('.tooltiptext');
             exportTab.innerHTML = '';
-            exportTab.appendChild(document.createTextNode('Export NFTs / Metadata'));
-            const tooltip = document.createElement('span');
-            tooltip.className = 'tooltiptext';
-            tooltip.textContent = 'Export your collection';
-            exportTab.appendChild(tooltip);
+            const tabLabel = document.createElement('span');
+            tabLabel.className = 'tab-label';
+            tabLabel.textContent = 'Export NFTs / Metadata';
+            exportTab.appendChild(tabLabel);
+            // Re-add tooltip if it existed, or create new one
+            if (existingTooltip) {
+              exportTab.appendChild(existingTooltip);
+            } else {
+              const tooltip = document.createElement('span');
+              tooltip.className = 'tooltiptext';
+              tooltip.textContent = 'Export your collection';
+              exportTab.appendChild(tooltip);
+            }
+            // Ensure tooltip class is present
+            if (!exportTab.classList.contains('tooltip')) {
+              exportTab.classList.add('tooltip');
+            }
             console.log("[Inline Fix] Tab label fixed to: Export NFTs / Metadata");
           }
         }

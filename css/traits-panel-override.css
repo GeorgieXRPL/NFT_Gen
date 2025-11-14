@@ -597,21 +597,22 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
 }
 
 #trait-selection-modal .trait-search-clear {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 0;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: static !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  background: #6c757d !important;
+  border: none !important;
+  color: #fff !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  padding: 4px 12px !important;
+  width: fit-content !important;
+  height: auto !important;
+  display: inline-block !important;
+  align-items: unset !important;
+  justify-content: unset !important;
 }
 
 #trait-selection-modal .trait-search-clear:hover {
@@ -621,8 +622,8 @@ body #app .project-interface .content-area #generate-nfts .generate-nfts-contain
 #trait-selection-modal .trait-count-indicator {
   color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
-  margin-top: 5px;
-  text-align: right;
+  margin: 0;
+  text-align: left;
 }
 
 /* Style for image preview modal */
@@ -1372,7 +1373,7 @@ body .trait-layer-header {
   justify-content: flex-end;
   align-items: stretch;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden !important;
 }
 .nft-trait-info-trait-name {
   color: #fff;
@@ -1385,6 +1386,9 @@ body .trait-layer-header {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-left: 8px;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 .nft-trait-info-bottom-line {
   display: flex;
@@ -2124,7 +2128,7 @@ body .content-area, .content-area {
   justify-content: flex-end;
   align-items: stretch;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden !important;
 }
 .nft-trait-info-trait-name {
   color: #fff;
@@ -2137,6 +2141,9 @@ body .content-area, .content-area {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-left: 8px;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 .nft-trait-info-bottom-line {
   display: flex;

@@ -7,9 +7,46 @@ function generateUniqueId() {
 // Trait Layers Module
 window.NFTApp = window.NFTApp || {};
 window.NFTApp.registerModule("traitLayers", {
+  // Animation state tracking to prevent overlapping animations
+  _reorderingState: {
+    isAnimating: false,
+    pendingTimeouts: [],
+    transitionEndHandlers: []
+  },
+
+  // Helper to cancel all pending animations
+  _cancelPendingAnimations: function() {
+    // Cancel all pending timeouts
+    this._reorderingState.pendingTimeouts.forEach(timeout => clearTimeout(timeout));
+    this._reorderingState.pendingTimeouts = [];
+    
+    // Remove all transitionend handlers
+    this._reorderingState.transitionEndHandlers.forEach(({ element, handler }) => {
+      element.removeEventListener('transitionend', handler);
+    });
+    this._reorderingState.transitionEndHandlers = [];
+    
+    // Clean up any elements still in reordering state
+    const container = document.getElementById("trait-layers-container");
+    if (container) {
+      const reorderingElements = container.querySelectorAll(".trait-layer-bar.reordering");
+      reorderingElements.forEach(element => {
+        element.style.transition = "";
+        element.style.transform = "";
+        element.style.zIndex = "";
+        element.classList.remove("reordering");
+      });
+    }
+    
+    this._reorderingState.isAnimating = false;
+  },
+
   // Set up the trait layers functionality
   setup: function (projectData) {
     console.log("Setting up trait layers module")
+
+    // CRITICAL: Ensure buttons are visible before any other setup
+    this.ensureButtonsVisible()
 
     // Set up the trait layers UI
     this.setupUI(projectData)
@@ -24,14 +61,113 @@ window.NFTApp.registerModule("traitLayers", {
     this.initRenameModal()
   },
 
+  // CRITICAL: Ensure Add Layer, Add Folders, and Delete All Layers buttons are visible
+  ensureButtonsVisible: function() {
+    // Add Layer button
+    const addLayerBtn = document.getElementById("add-layer-btn")
+    if (addLayerBtn) {
+      addLayerBtn.style.setProperty("display", "flex", "important")
+      addLayerBtn.style.setProperty("visibility", "visible", "important")
+      addLayerBtn.style.setProperty("opacity", "1", "important")
+    } else {
+      console.warn("[Trait Layers] Add Layer button not found in DOM")
+    }
+
+    // Add Folders button
+    const addFoldersBtn = document.getElementById("add-folders-btn")
+    if (addFoldersBtn) {
+      addFoldersBtn.style.setProperty("display", "flex", "important")
+      addFoldersBtn.style.setProperty("visibility", "visible", "important")
+      addFoldersBtn.style.setProperty("opacity", "1", "important")
+    } else {
+      console.warn("[Trait Layers] Add Folders button not found in DOM")
+    }
+
+    // Delete All Layers button (will be shown/hidden based on layer count)
+    const deleteAllLayersBtn = document.getElementById("delete-all-layers")
+    if (deleteAllLayersBtn) {
+      // Only set visibility/opacity, not display (display is controlled by layer count)
+      deleteAllLayersBtn.style.setProperty("visibility", "visible", "important")
+      deleteAllLayersBtn.style.setProperty("opacity", "1", "important")
+    } else {
+      console.warn("[Trait Layers] Delete All Layers button not found in DOM")
+    }
+
+    // Ensure trait-layers-actions container is visible
+    const actionsContainer = document.querySelector(".trait-layers-actions")
+    if (actionsContainer) {
+      actionsContainer.style.setProperty("display", "flex", "important")
+      actionsContainer.style.setProperty("visibility", "visible", "important")
+      actionsContainer.style.setProperty("opacity", "1", "important")
+    }
+
+    // Ensure trait-layers-actions-left is visible
+    const actionsLeft = document.querySelector(".trait-layers-actions-left")
+    if (actionsLeft) {
+      actionsLeft.style.setProperty("display", "flex", "important")
+      actionsLeft.style.setProperty("visibility", "visible", "important")
+      actionsLeft.style.setProperty("opacity", "1", "important")
+    }
+
+    // Ensure trait-layers-actions-right is visible
+    const actionsRight = document.querySelector(".trait-layers-actions-right")
+    if (actionsRight) {
+      actionsRight.style.setProperty("display", "flex", "important")
+      actionsRight.style.setProperty("visibility", "visible", "important")
+      actionsRight.style.setProperty("opacity", "1", "important")
+    }
+  },
+
   // Set up the trait layers UI
   setupUI: function (projectData) {
     // Update the trait layers container
     this.updateTraitLayerUI(projectData)
   },
 
+  // Create the rename modal if it doesn't exist
+  createRenameModal: function () {
+    // Check if modal already exists
+    if (document.getElementById("rename-modal")) {
+      return
+    }
+
+    // Create modal HTML
+    const modal = document.createElement("div")
+    modal.id = "rename-modal"
+    modal.style.cssText = `
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999999;
+      background: rgba(0, 0, 0, 0.85);
+      align-items: center;
+      justify-content: center;
+      font-family: 'Archivo', sans-serif;
+    `
+
+    modal.innerHTML = `
+      <div style="background: #2a2a2a; padding: 30px; border-radius: 12px; min-width: 400px; max-width: 600px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; align-items: stretch; border: 1px solid #444; position: relative;">
+        <button id="close-rename-modal" style="position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border: none; background: #444; color: #fff; font-size: 18px; font-weight: bold; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 100;" onmouseover="this.style.background='#ff4444';this.style.transform='scale(1.1)'" onmouseout="this.style.background='#444';this.style.transform='scale(1)'">&times;</button>
+        <div id="rename-modal-title" style="font-size: 20px; font-weight: 700; color: #ecf0f1; margin-bottom: 16px; padding-right: 40px; line-height: 1.4; text-align: center;"></div>
+        <input type="text" id="rename-modal-input" style="background: #1a1a1a; border: 1px solid #444; border-radius: 6px; padding: 12px; color: #fff; font-size: 16px; font-family: 'Archivo', sans-serif; margin-bottom: 24px; outline: none; transition: border-color 0.2s ease;" onfocus="this.style.borderColor='#8b5cf6'" onblur="this.style.borderColor='#444'">
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button id="cancel-rename" style="background: #555; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Archivo', sans-serif; transition: all 0.2s ease;" onmouseover="this.style.background='#666'" onmouseout="this.style.background='#555'">Cancel</button>
+          <button id="confirm-rename" style="background: #3498db; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Archivo', sans-serif; transition: all 0.2s ease;" onmouseover="this.style.background='#2980b9'" onmouseout="this.style.background='#3498db'">Confirm</button>
+        </div>
+      </div>
+    `
+
+    document.body.appendChild(modal)
+  },
+
   // Initialize the rename modal
   initRenameModal: function () {
+    // Create modal if it doesn't exist
+    this.createRenameModal()
+
     // Add event listeners for the modal buttons
     const modal = document.getElementById("rename-modal")
     const cancelBtn = document.getElementById("cancel-rename")
@@ -87,9 +223,26 @@ window.NFTApp.registerModule("traitLayers", {
 
   // Show the rename modal
   showRenameModal: function (title, currentName, callback) {
+    // Create modal if it doesn't exist
+    this.createRenameModal()
+
     const modal = document.getElementById("rename-modal")
     const modalTitle = document.getElementById("rename-modal-title")
     const input = document.getElementById("rename-modal-input")
+
+    // CRITICAL: Add null checks to prevent errors if modal elements don't exist
+    if (!modal) {
+      console.error("[Trait Layers] Rename modal not found in DOM")
+      return
+    }
+    if (!modalTitle) {
+      console.error("[Trait Layers] Rename modal title element not found in DOM")
+      return
+    }
+    if (!input) {
+      console.error("[Trait Layers] Rename modal input element not found in DOM")
+      return
+    }
 
     modalTitle.textContent = title
     input.value = currentName
@@ -249,31 +402,50 @@ window.NFTApp.registerModule("traitLayers", {
 
   // Setup all tooltips in Traits & Rules tab
   setupTraitsRulesTooltips: function() {
+    console.log("[Tooltips] Setting up all tooltips in Traits & Rules tab");
+    
     // Setup tooltip for Jump to Rules button
     const jumpToRulesBtn = document.getElementById("jump-to-rules-btn")
     if (jumpToRulesBtn) {
       const jumpToRulesTooltip = jumpToRulesBtn.querySelector(".tooltiptext")
       if (jumpToRulesTooltip) {
+        console.log("[Tooltips] Setting up tooltip for jump-to-rules-btn");
         this.setupTooltipPositioning(jumpToRulesBtn, jumpToRulesTooltip)
+      } else {
+        console.warn("[Tooltips] Tooltip element not found for jump-to-rules-btn");
       }
+    } else {
+      console.warn("[Tooltips] Button jump-to-rules-btn not found");
     }
 
     // Setup tooltip for Jump to Layers buttons (multiple instances)
     const jumpToLayersBtns = document.querySelectorAll("#jump-to-layers-btn, #jump-to-layers-bottom-btn")
-    jumpToLayersBtns.forEach(btn => {
-      const tooltip = btn.querySelector(".tooltiptext")
-      if (tooltip) {
-        this.setupTooltipPositioning(btn, tooltip)
-      }
-    })
+    if (jumpToLayersBtns.length > 0) {
+      jumpToLayersBtns.forEach(btn => {
+        const tooltip = btn.querySelector(".tooltiptext")
+        if (tooltip) {
+          console.log(`[Tooltips] Setting up tooltip for ${btn.id}`);
+          this.setupTooltipPositioning(btn, tooltip)
+        } else {
+          console.warn(`[Tooltips] Tooltip element not found for ${btn.id}`);
+        }
+      })
+    } else {
+      console.warn("[Tooltips] Jump to Layers buttons not found");
+    }
 
     // Setup tooltip for Jump to Rules bottom button
     const jumpToRulesBottomBtn = document.getElementById("jump-to-rules-bottom-btn")
     if (jumpToRulesBottomBtn) {
       const tooltip = jumpToRulesBottomBtn.querySelector(".tooltiptext")
       if (tooltip) {
+        console.log("[Tooltips] Setting up tooltip for jump-to-rules-bottom-btn");
         this.setupTooltipPositioning(jumpToRulesBottomBtn, tooltip)
+      } else {
+        console.warn("[Tooltips] Tooltip element not found for jump-to-rules-bottom-btn");
       }
+    } else {
+      console.warn("[Tooltips] Button jump-to-rules-bottom-btn not found");
     }
 
     // Setup tooltip for Add Combination Rule button
@@ -306,8 +478,20 @@ window.NFTApp.registerModule("traitLayers", {
     // Setup tooltip for rules filter dropdown wrapper
     const rulesFilterDropdownWrapper = document.querySelector(".rules-filter-dropdown-wrapper.tooltip")
     if (rulesFilterDropdownWrapper) {
+      // CRITICAL: Ensure the select element inside doesn't have a title attribute or tooltip class
+      const dropdown = rulesFilterDropdownWrapper.querySelector("#rules-filter-dropdown, .rules-filter-dropdown")
+      if (dropdown) {
+        dropdown.removeAttribute('title');
+        dropdown.setAttribute('title', ''); // Set empty title to prevent native browser tooltip
+        dropdown.classList.remove('tooltip'); // Remove tooltip class if present
+      }
+      
       const tooltip = rulesFilterDropdownWrapper.querySelector(".tooltiptext")
       if (tooltip) {
+        // CRITICAL: Update tooltip text to two lines if not already updated
+        if (tooltip.textContent && !tooltip.innerHTML.includes('<br>')) {
+          tooltip.innerHTML = 'Filter Rules by type.<br>Only available when you have 5+ rules.';
+        }
         this.setupTooltipPositioning(rulesFilterDropdownWrapper, tooltip)
       }
     }
@@ -321,32 +505,49 @@ window.NFTApp.registerModule("traitLayers", {
       }
     }
 
-    // Setup tooltip for Add Layer button
+    // Setup tooltip for Add Layer button (CRITICAL: Ensure this is set up even if already set up in setupEventListeners)
     const addLayerBtn = document.getElementById("add-layer-btn")
     if (addLayerBtn) {
       const tooltip = addLayerBtn.querySelector(".tooltiptext")
       if (tooltip) {
+        console.log("[Tooltips] Setting up tooltip for add-layer-btn");
         this.setupTooltipPositioning(addLayerBtn, tooltip)
+      } else {
+        console.warn("[Tooltips] Tooltip element not found for add-layer-btn");
       }
+    } else {
+      console.warn("[Tooltips] Button add-layer-btn not found");
     }
 
-    // Setup tooltip for Add Folders button
+    // Setup tooltip for Add Folders button (CRITICAL: Ensure this is set up even if already set up in setupEventListeners)
     const addFoldersBtn = document.getElementById("add-folders-btn")
     if (addFoldersBtn) {
       const tooltip = addFoldersBtn.querySelector(".tooltiptext")
       if (tooltip) {
+        console.log("[Tooltips] Setting up tooltip for add-folders-btn");
         this.setupTooltipPositioning(addFoldersBtn, tooltip)
+      } else {
+        console.warn("[Tooltips] Tooltip element not found for add-folders-btn");
       }
+    } else {
+      console.warn("[Tooltips] Button add-folders-btn not found");
     }
 
-    // Setup tooltip for Delete All Layers button
+    // Setup tooltip for Delete All Layers button (CRITICAL: Ensure this is set up even if already set up in setupEventListeners)
     const deleteAllLayersBtn = document.getElementById("delete-all-layers")
     if (deleteAllLayersBtn) {
       const tooltip = deleteAllLayersBtn.querySelector(".tooltiptext")
       if (tooltip) {
+        console.log("[Tooltips] Setting up tooltip for delete-all-layers");
         this.setupTooltipPositioning(deleteAllLayersBtn, tooltip)
+      } else {
+        console.warn("[Tooltips] Tooltip element not found for delete-all-layers");
       }
+    } else {
+      console.warn("[Tooltips] Button delete-all-layers not found");
     }
+    
+    console.log("[Tooltips] Finished setting up all tooltips in Traits & Rules tab");
   },
 
   // Set up trait layers drag and drop
@@ -707,6 +908,9 @@ window.NFTApp.registerModule("traitLayers", {
     const container = document.getElementById("trait-layers-container")
     if (!container) return
 
+    // CRITICAL: Ensure buttons are visible before updating UI
+    this.ensureButtonsVisible()
+
     // Store expanded states before updating UI
     const expandedStates = {}
     const existingLayers = container.querySelectorAll(".trait-layer-bar")
@@ -727,6 +931,8 @@ window.NFTApp.registerModule("traitLayers", {
       this.updateDeleteAllLayersButtonVisibility(projectData)
       // Use our safe helper method
       this.safelyUpdatePreviewPanel(projectData, null);
+      // CRITICAL: Ensure buttons are still visible after clearing
+      setTimeout(() => this.ensureButtonsVisible(), 100)
       return
     }
 
@@ -761,18 +967,26 @@ window.NFTApp.registerModule("traitLayers", {
           </svg>
           <span class="tooltiptext">Drag to reorder</span>
         </div>
-        <div class="trait-layer-arrow ${wasExpanded ? "expanded" : ""}">
+        <div class="trait-layer-arrow tooltip ${wasExpanded ? "expanded" : ""}">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
+          <span class="tooltiptext">Expand/Collapse layer</span>
         </div>
         <div class="trait-layer-info">
-          <div class="trait-layer-name">${layer.name}</div>
-          <div class="trait-layer-stats">${layer.traits.length} traits</div>
+          <div class="trait-layer-name tooltip">${layer.name}
+            <span class="tooltiptext">Trait layer name: ${layer.name}</span>
+          </div>
+          <div class="trait-layer-stats tooltip">${layer.traits.length} traits
+            <span class="tooltiptext">Total number of traits in this layer: ${layer.traits.length}</span>
+          </div>
         </div>
         <div class="trait-layer-header-rarity">
           <input type="range" class="trait-layer-header-rarity-slider" value="${layer.rarity || 0}" min="0" max="100" step="0.5">
-          <input type="text" class="trait-layer-header-rarity-value ${layerRarityColorClass}" value="${this.formatRarityValue(layer.rarity || 0)}">
+          <div class="trait-layer-header-rarity-value-wrapper tooltip">
+            <input type="text" class="trait-layer-header-rarity-value ${layerRarityColorClass}" value="${this.formatRarityValue(layer.rarity || 0)}">
+            <span class="tooltiptext">Layer Rarity percentage: controls how often<br>this layer traits appears in generated NFTs</span>
+          </div>
         </div>
         <div class="trait-layer-position">
           <div class="position-controls">
@@ -780,13 +994,13 @@ window.NFTApp.registerModule("traitLayers", {
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="18 15 12 9 6 15"></polyline>
               </svg>
-              <span class="tooltiptext">Move layer up</span>
+              <span class="tooltiptext">Move Trait Layer up</span>
             </button>
             <button class="position-btn move-down tooltip" ${index === sortedTraits.length - 1 ? "disabled" : ""}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
-              <span class="tooltiptext">Move layer down</span>
+              <span class="tooltiptext">Move Trait Layer down</span>
             </button>
           </div>
         </div>
@@ -796,14 +1010,14 @@ window.NFTApp.registerModule("traitLayers", {
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
-            <span class="tooltiptext">Rename layer</span>
+            <span class="tooltiptext">Rename Trait Layer</span>
           </button>
           <button class="action-btn delete-layer tooltip">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
-            <span class="tooltiptext">Delete layer</span>
+            <span class="tooltiptext">Delete Trait Layer</span>
           </button>
         </div>
       </div>
@@ -816,12 +1030,13 @@ window.NFTApp.registerModule("traitLayers", {
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
             <p>Drag & drop images here to add more traits</p>
-            <button class="app-action-btn add-traits-btn">
+            <button class="app-action-btn add-traits-btn tooltip">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
               Add Traits
+              <span class="tooltiptext">Click to add more Traits to this Trait Layer.</span>
             </button>
             <input type="file" class="file-input trait-file-input" accept="image/*" multiple>
           </div>
@@ -904,6 +1119,9 @@ window.NFTApp.registerModule("traitLayers", {
       this.setupTraitLayerBarEvents(traitLayerBar, layer, projectData)
     })
 
+    // CRITICAL: Ensure buttons are visible after rendering all layers
+    setTimeout(() => this.ensureButtonsVisible(), 100)
+
     // Set up drag and drop for trait layers
     this.setupTraitLayerDragAndDrop(container, projectData)
 
@@ -932,21 +1150,26 @@ window.NFTApp.registerModule("traitLayers", {
               <span class="expanded-trait-layer-card-thumb">
                 ${trait.imageData ? `<img id="${thumbId}" src="${trait.imageData}" alt="${trait.name}" class="expanded-trait-layer-card-thumb-img" data-original-image="${trait.imageData}">` : ''}
               </span>
-              <span class="expanded-trait-layer-card-rarity">${rarity}%</span>
+              <input type="text" class="expanded-trait-layer-card-rarity-input" value="${rarity}%" data-trait-id="${trait.id}" data-layer-id="${layer.id}" data-original-value="${trait.rarity}">
               <div class="expanded-trait-layer-card-buttons">
-                <button class="expanded-trait-layer-card-delete-btn" type="button" title="Delete trait">
+                <button class="expanded-trait-layer-card-delete-btn tooltip" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                   </svg>
+                  <span class="tooltiptext">Delete this trait from the layer</span>
                 </button>
-                <button class="expanded-trait-layer-card-replace-btn" type="button" title="Replace image" data-trait-id="${trait.id}" data-layer-id="${layer.id}">
+                <button class="expanded-trait-layer-card-replace-btn tooltip" type="button" data-trait-id="${trait.id}" data-layer-id="${layer.id}">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 20h9"></path>
                     <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
                   </svg>
+                  <span class="tooltiptext">Replace the image for this trait</span>
                 </button>
-                <button class="expanded-trait-layer-card-view-btn" type="button" title="View full-size preview of ${trait.name}">VIEW</button>
+                <button class="expanded-trait-layer-card-view-btn tooltip" type="button">
+                  <span class="tooltiptext">View full-size preview of ${trait.name}</span>
+                  VIEW
+                </button>
               </div>
               <span class="expanded-trait-layer-card-name">
                 <span class="expanded-trait-layer-card-name-ellipsis">${trait.name}</span>
@@ -1061,23 +1284,84 @@ window.NFTApp.registerModule("traitLayers", {
   setupTooltipPositioning: function(element, tooltip) {
     if (!element || !tooltip) return;
     
-    // CRITICAL: Add cursor help to element
-    element.style.cursor = "help";
+    // CRITICAL: Skip if already set up to prevent duplicate event listeners
+    if (element.dataset.tooltipSetup === "true") {
+      return;
+    }
+    element.dataset.tooltipSetup = "true";
+    
+    // CRITICAL: Add cursor help to element (use setProperty with important to override CSS)
+    element.style.setProperty("cursor", "help", "important");
+    
+    // CRITICAL: Ensure SVG icons inside the element also trigger the tooltip
+    // Find all SVG elements inside the button and ensure they're part of the tooltip trigger area
+    const svgElements = element.querySelectorAll("svg");
+    svgElements.forEach(svg => {
+      // Add cursor help to SVG as well
+      svg.style.setProperty("cursor", "help", "important");
+    });
     
     // CRITICAL: Ensure tooltip has 1 second transition
     tooltip.style.setProperty("transition", "opacity 1s ease", "important");
     
-    // Use global tooltip manager if available
-    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
-    if (tooltipManager && tooltipManager.setupTooltip) {
-      tooltipManager.setupTooltip(element, tooltip);
-      return;
+    // CRITICAL: Ensure tooltip starts hidden
+    tooltip.style.setProperty("visibility", "hidden", "important");
+    tooltip.style.setProperty("opacity", "0", "important");
+    
+    // CRITICAL: For trait layer header buttons (position-btn, rename-layer, delete-layer) and
+    // rarity action buttons (randomize-rarities-tiered-btn, randomize-unique-rarities-btn, normalize-unique-rarities-btn),
+    // use local implementation to ensure reliable tooltip display
+    // The global tooltip manager might interfere with these buttons due to event conflicts
+    const isTraitLayerHeaderButton = element.classList.contains('position-btn') || 
+                                      element.classList.contains('rename-layer') || 
+                                      element.classList.contains('delete-layer') ||
+                                      element.closest('.trait-layer-header');
+    
+    const isRarityActionButton = element.classList.contains('randomize-rarities-tiered-btn') ||
+                                  element.classList.contains('randomize-unique-rarities-btn') ||
+                                  element.classList.contains('normalize-unique-rarities-btn') ||
+                                  element.classList.contains('normalize-rarities-btn');
+    
+    // Use global tooltip manager if available, but NOT for trait layer header buttons or rarity action buttons
+    if (!isTraitLayerHeaderButton && !isRarityActionButton) {
+      const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+      if (tooltipManager && tooltipManager.setupTooltip) {
+        tooltipManager.setupTooltip(element, tooltip);
+        return;
+      }
     }
 
     // Fallback to local implementation if manager not available
     let tooltipTimeout = null;
+    let isDragging = false;
     
-    element.addEventListener("mouseenter", () => {
+    // CRITICAL: For draggable elements, we need to handle drag events to prevent tooltip interference
+    // Check if element or parent is draggable
+    const isDraggable = element.draggable === true || element.closest('[draggable="true"]');
+    
+    if (isDraggable) {
+      // Prevent drag from interfering with tooltip
+      element.addEventListener("dragstart", () => {
+        isDragging = true;
+        // Clear any pending tooltip timeout
+        if (tooltipTimeout) {
+          clearTimeout(tooltipTimeout);
+          tooltipTimeout = null;
+        }
+        // Hide tooltip immediately if showing
+        tooltip.style.opacity = "0";
+        tooltip.style.visibility = "hidden";
+      });
+      
+      element.addEventListener("dragend", () => {
+        isDragging = false;
+      });
+    }
+    
+    element.addEventListener("mouseenter", (e) => {
+      // Don't show tooltip if dragging
+      if (isDragging) return;
+      
       // Clear any existing timeout
       if (tooltipTimeout) {
         clearTimeout(tooltipTimeout);
@@ -1085,17 +1369,11 @@ window.NFTApp.registerModule("traitLayers", {
       }
       // Show tooltip after 1 second delay
       tooltipTimeout = setTimeout(() => {
-        const rect = element.getBoundingClientRect();
-        // Make tooltip temporarily visible to measure height, but keep it off-screen
-        tooltip.style.visibility = "visible";
-        tooltip.style.opacity = "0";
-        tooltip.style.top = "-9999px";
-        tooltip.style.left = "-9999px";
-        tooltip.style.transform = "none";
-        void tooltip.offsetHeight; // Force reflow
-        const tooltipWidth = tooltip.offsetWidth || 200;
-        const tooltipHeight = tooltip.offsetHeight;
-        // CRITICAL: Set position fixed and use setProperty with important to override CSS
+        // Double-check we're not dragging
+        if (isDragging) return;
+        
+        // CRITICAL: Set ALL positioning properties FIRST before making tooltip visible
+        // This prevents tooltip from appearing in wrong position or being hidden
         tooltip.style.setProperty("position", "fixed", "important");
         tooltip.style.setProperty("z-index", "2147483647", "important");
         tooltip.style.setProperty("bottom", "auto", "important");
@@ -1106,15 +1384,27 @@ window.NFTApp.registerModule("traitLayers", {
         tooltip.style.setProperty("background-color", "#000000", "important");
         tooltip.style.setProperty("background", "#000000", "important");
         tooltip.style.setProperty("color", "#f39c12", "important");
-        // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
+        // CRITICAL: Keep tooltip hidden while measuring, positioned off-screen
+        tooltip.style.setProperty("visibility", "hidden", "important");
+        tooltip.style.setProperty("opacity", "0", "important");
+        tooltip.style.setProperty("top", "-9999px", "important");
+        tooltip.style.setProperty("left", "-9999px", "important");
+        // Force reflow to ensure styles are applied
+        void tooltip.offsetHeight;
+        // Now measure tooltip dimensions
+        const tooltipWidth = tooltip.offsetWidth || 200;
+        const tooltipHeight = tooltip.offsetHeight;
+        // CRITICAL: Calculate position BEFORE making tooltip visible
         const elementRect = element.getBoundingClientRect();
         const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
         const topPosition = elementRect.top - tooltipHeight - 5;
+        // Set final position while still hidden (CRITICAL: Do this BEFORE making visible)
         tooltip.style.setProperty("top", `${topPosition}px`, "important");
         tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
-        // Fade in with transition
+        // Now make tooltip visible and fade in (position is already set correctly)
         requestAnimationFrame(() => {
-          tooltip.style.opacity = "1";
+          tooltip.style.setProperty("visibility", "visible", "important");
+          tooltip.style.setProperty("opacity", "1", "important");
         });
         tooltipTimeout = null;
       }, 1000);
@@ -1126,11 +1416,77 @@ window.NFTApp.registerModule("traitLayers", {
         clearTimeout(tooltipTimeout);
         tooltipTimeout = null;
       }
-      tooltip.style.opacity = "0";
+      tooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding (1 second to match Export NFTs tab)
       setTimeout(() => {
-        tooltip.style.visibility = "hidden";
+        tooltip.style.setProperty("visibility", "hidden", "important");
       }, 1000);
+    });
+    
+    // CRITICAL: Also set up tooltip on SVG elements inside the button
+    // This ensures hovering over the SVG icon also shows the tooltip
+    svgElements.forEach(svg => {
+      // Create a shared tooltip handler function
+      const showTooltip = () => {
+        // Don't show tooltip if dragging
+        if (isDragging) return;
+        
+        // Clear any existing timeout
+        if (tooltipTimeout) {
+          clearTimeout(tooltipTimeout);
+          tooltipTimeout = null;
+        }
+        // Show tooltip after 1 second delay
+        tooltipTimeout = setTimeout(() => {
+          // Double-check we're not dragging
+          if (isDragging) return;
+          
+          // Use the button element's position for tooltip (not SVG)
+          tooltip.style.setProperty("position", "fixed", "important");
+          tooltip.style.setProperty("z-index", "2147483647", "important");
+          tooltip.style.setProperty("bottom", "auto", "important");
+          tooltip.style.setProperty("right", "auto", "important");
+          tooltip.style.setProperty("margin", "0", "important");
+          tooltip.style.setProperty("transform", "none", "important");
+          tooltip.style.setProperty("background-color", "#000000", "important");
+          tooltip.style.setProperty("background", "#000000", "important");
+          tooltip.style.setProperty("color", "#f39c12", "important");
+          tooltip.style.setProperty("visibility", "hidden", "important");
+          tooltip.style.setProperty("opacity", "0", "important");
+          tooltip.style.setProperty("top", "-9999px", "important");
+          tooltip.style.setProperty("left", "-9999px", "important");
+          void tooltip.offsetHeight;
+          const tooltipWidth = tooltip.offsetWidth || 200;
+          const tooltipHeight = tooltip.offsetHeight;
+          // Use button element's position (not SVG)
+          const elementRect = element.getBoundingClientRect();
+          const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
+          const topPosition = elementRect.top - tooltipHeight - 5;
+          tooltip.style.setProperty("top", `${topPosition}px`, "important");
+          tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
+          requestAnimationFrame(() => {
+            tooltip.style.setProperty("visibility", "visible", "important");
+            tooltip.style.setProperty("opacity", "1", "important");
+          });
+          tooltipTimeout = null;
+        }, 1000);
+      };
+      
+      const hideTooltip = () => {
+        // Clear the show timeout if mouse leaves before delay completes
+        if (tooltipTimeout) {
+          clearTimeout(tooltipTimeout);
+          tooltipTimeout = null;
+        }
+        tooltip.style.setProperty("opacity", "0", "important");
+        setTimeout(() => {
+          tooltip.style.setProperty("visibility", "hidden", "important");
+        }, 1000);
+      };
+      
+      // Add event listeners to SVG
+      svg.addEventListener("mouseenter", showTooltip);
+      svg.addEventListener("mouseleave", hideTooltip);
     });
   },
 
@@ -1146,6 +1502,12 @@ window.NFTApp.registerModule("traitLayers", {
       e.stopPropagation()
       this.toggleTraitLayerExpansion(traitLayerBar)
     })
+    
+    // Setup tooltip for expand arrow
+    const arrowTooltip = arrow.querySelector(".tooltiptext")
+    if (arrowTooltip) {
+      this.setupTooltipPositioning(arrow, arrowTooltip)
+    }
 
     // Header click handler (excluding buttons and controls)
     header.addEventListener("click", (e) => {
@@ -1196,7 +1558,7 @@ window.NFTApp.registerModule("traitLayers", {
     if (renameLayerBtn) {
       renameLayerBtn.addEventListener("click", (e) => {
         e.stopPropagation()
-        this.showRenameModal("Rename Layer", layer.name, (newName) => {
+        this.showRenameModal("Rename Trait Layer", layer.name, (newName) => {
           if (!newName || newName.trim() === "") {
             this.showFeedback("Layer name cannot be empty", "error")
             return
@@ -1264,6 +1626,33 @@ window.NFTApp.registerModule("traitLayers", {
       const deleteTooltip = deleteLayerBtn.querySelector(".tooltiptext")
       if (deleteTooltip) {
         this.setupTooltipPositioning(deleteLayerBtn, deleteTooltip)
+      }
+    }
+
+    // Setup tooltip for trait layer name
+    const traitLayerName = traitLayerBar.querySelector(".trait-layer-name")
+    if (traitLayerName) {
+      const nameTooltip = traitLayerName.querySelector(".tooltiptext")
+      if (nameTooltip) {
+        this.setupTooltipPositioning(traitLayerName, nameTooltip)
+      }
+    }
+
+    // Setup tooltip for trait count
+    const traitLayerStats = traitLayerBar.querySelector(".trait-layer-stats")
+    if (traitLayerStats) {
+      const statsTooltip = traitLayerStats.querySelector(".tooltiptext")
+      if (statsTooltip) {
+        this.setupTooltipPositioning(traitLayerStats, statsTooltip)
+      }
+    }
+
+    // Setup tooltip for rarity value
+    const rarityValueWrapper = traitLayerBar.querySelector(".trait-layer-header-rarity-value-wrapper")
+    if (rarityValueWrapper) {
+      const rarityTooltip = rarityValueWrapper.querySelector(".tooltiptext")
+      if (rarityTooltip) {
+        this.setupTooltipPositioning(rarityValueWrapper, rarityTooltip)
       }
     }
 
@@ -1365,10 +1754,23 @@ window.NFTApp.registerModule("traitLayers", {
     const traitFileInput = traitLayerBar.querySelector(".trait-file-input")
 
     if (addTraitsBtn && traitFileInput) {
-      // Remove tooltip class and any tooltiptext elements if they exist
-      addTraitsBtn.classList.remove("tooltip")
-      const existingTooltips = addTraitsBtn.querySelectorAll(".tooltiptext")
-      existingTooltips.forEach(tooltip => tooltip.remove())
+      // CRITICAL: Ensure tooltip class is present and tooltip element exists
+      addTraitsBtn.classList.add("tooltip")
+      let addTraitsTooltip = addTraitsBtn.querySelector(".tooltiptext")
+      if (!addTraitsTooltip) {
+        addTraitsTooltip = document.createElement("span")
+        addTraitsTooltip.className = "tooltiptext"
+        addTraitsTooltip.textContent = "Click to add more Traits to this Trait Layer."
+        addTraitsBtn.appendChild(addTraitsTooltip)
+      } else {
+        // Update tooltip text if it exists
+        addTraitsTooltip.textContent = "Click to add more Traits to this Trait Layer."
+      }
+      
+      // CRITICAL: Setup tooltip positioning with standard app behavior
+      if (addTraitsTooltip) {
+        this.setupTooltipPositioning(addTraitsBtn, addTraitsTooltip)
+      }
       
       addTraitsBtn.addEventListener("click", (e) => {
         e.stopPropagation()
@@ -1395,70 +1797,90 @@ window.NFTApp.registerModule("traitLayers", {
     const randomizeRaritiesTieredBtn = traitLayerBar.querySelector(".randomize-rarities-tiered-btn")
     if (randomizeRaritiesTieredBtn) {
       const randomizeTieredTooltip = randomizeRaritiesTieredBtn.querySelector('.tooltiptext');
-      // Dynamic tooltip note when traits are selected
+      // CRITICAL: Setup tooltip positioning FIRST before any other event listeners
+      if (randomizeTieredTooltip) {
+        // Store base HTML before setup
+        const baseHtml = randomizeTieredTooltip.innerHTML;
+        if (!randomizeTieredTooltip.getAttribute('data-base-html')) {
+          randomizeTieredTooltip.setAttribute('data-base-html', baseHtml);
+        }
+        this.setupTooltipPositioning(randomizeRaritiesTieredBtn, randomizeTieredTooltip)
+      }
+      // Dynamic tooltip note when traits are selected - update content but don't interfere with positioning
       randomizeRaritiesTieredBtn.addEventListener('mouseenter', () => {
         const tip = randomizeRaritiesTieredBtn.querySelector('.tooltiptext');
         if (!tip) return;
         const selectedCount = traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected').length;
         const baseHtml = tip.getAttribute('data-base-html') || tip.innerHTML;
         if (!tip.getAttribute('data-base-html')) tip.setAttribute('data-base-html', baseHtml);
-        tip.innerHTML = baseHtml + (selectedCount > 0 ? `<br><br><span style="color:#e17055;font-weight:600;">*this feature will only be used<br>on the selected traits.</span>` : '');
-      });
+        // Update content but preserve tooltip visibility/positioning set by setupTooltipPositioning
+        tip.innerHTML = baseHtml + (selectedCount > 0 ? `<br><br><span style="color:#6c5ce7;font-weight:600;">*this feature will only be used<br>on the selected traits.</span>` : '');
+      }, { passive: true });
       randomizeRaritiesTieredBtn.addEventListener("click", (e) => {
         e.stopPropagation()
         const selectedIds = Array.from(traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected')).map(card => card.dataset.traitId)
         this.randomizeTraitRarities(layer.id, projectData, selectedIds)
       })
-      // Setup tooltip positioning
-      if (randomizeTieredTooltip) {
-        this.setupTooltipPositioning(randomizeRaritiesTieredBtn, randomizeTieredTooltip)
-      }
     }
 
     // Randomize unique rarities button - respect selected traits
     const randomizeUniqueRaritiesBtn = traitLayerBar.querySelector(".randomize-unique-rarities-btn")
     if (randomizeUniqueRaritiesBtn) {
       const randomizeUniqueTooltip = randomizeUniqueRaritiesBtn.querySelector('.tooltiptext');
+      // CRITICAL: Setup tooltip positioning FIRST before any other event listeners
+      if (randomizeUniqueTooltip) {
+        // Store base HTML before setup
+        const baseHtml = randomizeUniqueTooltip.innerHTML;
+        if (!randomizeUniqueTooltip.getAttribute('data-base-html')) {
+          randomizeUniqueTooltip.setAttribute('data-base-html', baseHtml);
+        }
+        this.setupTooltipPositioning(randomizeUniqueRaritiesBtn, randomizeUniqueTooltip)
+      }
+      // Dynamic tooltip note when traits are selected - update content but don't interfere with positioning
       randomizeUniqueRaritiesBtn.addEventListener('mouseenter', () => {
         const tip = randomizeUniqueRaritiesBtn.querySelector('.tooltiptext');
         if (!tip) return;
         const selectedCount = traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected').length;
         const baseHtml = tip.getAttribute('data-base-html') || tip.innerHTML;
         if (!tip.getAttribute('data-base-html')) tip.setAttribute('data-base-html', baseHtml);
-        tip.innerHTML = baseHtml + (selectedCount > 0 ? `<br><br><span style="color:#e17055;font-weight:600;">*this feature will only be used<br>on the selected traits.</span>` : '');
-      });
+        // Update content but preserve tooltip visibility/positioning set by setupTooltipPositioning
+        tip.innerHTML = baseHtml + (selectedCount > 0 ? `<br><br><span style="color:#6c5ce7;font-weight:600;">*this feature will only be used<br>on the selected traits.</span>` : '');
+      }, { passive: true });
       randomizeUniqueRaritiesBtn.addEventListener("click", (e) => {
         e.stopPropagation()
         const selectedIds = Array.from(traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected')).map(card => card.dataset.traitId)
         this.randomizeUniqueTraitRarities(layer.id, projectData, selectedIds)
       })
-      // Setup tooltip positioning
-      if (randomizeUniqueTooltip) {
-        this.setupTooltipPositioning(randomizeUniqueRaritiesBtn, randomizeUniqueTooltip)
-      }
     }
 
     // Normalize unique rarities button - respect selected traits
     const normalizeUniqueRaritiesBtn = traitLayerBar.querySelector(".normalize-unique-rarities-btn")
     if (normalizeUniqueRaritiesBtn) {
       const normalizeTooltip = normalizeUniqueRaritiesBtn.querySelector('.tooltiptext');
+      // CRITICAL: Setup tooltip positioning FIRST before any other event listeners
+      if (normalizeTooltip) {
+        // Store base HTML before setup
+        const baseHtml = normalizeTooltip.innerHTML;
+        if (!normalizeTooltip.getAttribute('data-base-html')) {
+          normalizeTooltip.setAttribute('data-base-html', baseHtml);
+        }
+        this.setupTooltipPositioning(normalizeUniqueRaritiesBtn, normalizeTooltip)
+      }
+      // Dynamic tooltip note when traits are selected - update content but don't interfere with positioning
       normalizeUniqueRaritiesBtn.addEventListener('mouseenter', () => {
         const tip = normalizeUniqueRaritiesBtn.querySelector('.tooltiptext');
         if (!tip) return;
         const selectedCount = traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected').length;
         const baseHtml = tip.getAttribute('data-base-html') || tip.innerHTML;
         if (!tip.getAttribute('data-base-html')) tip.setAttribute('data-base-html', baseHtml);
-        tip.innerHTML = baseHtml + (selectedCount > 0 ? `<br><br><span style="color:#e17055;font-weight:600;">*this feature will only be used<br>on the selected traits.</span>` : '');
-      });
+        // Update content but preserve tooltip visibility/positioning set by setupTooltipPositioning
+        tip.innerHTML = baseHtml + (selectedCount > 0 ? `<br><br><span style="color:#6c5ce7;font-weight:600;">*this feature will only be used<br>on the selected traits.</span>` : '');
+      }, { passive: true });
       normalizeUniqueRaritiesBtn.addEventListener("click", (e) => {
         e.stopPropagation()
         const selectedIds = Array.from(traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected')).map(card => card.dataset.traitId)
         this.normalizeUniqueTraitRarities(layer.id, projectData, selectedIds)
       })
-      // Setup tooltip positioning
-      if (normalizeTooltip) {
-        this.setupTooltipPositioning(normalizeUniqueRaritiesBtn, normalizeTooltip)
-      }
     }
 
     // Toggle selection on trait items - NEW CARDS
@@ -1466,16 +1888,17 @@ window.NFTApp.registerModule("traitLayers", {
     const traitCards = traitLayerBar.querySelectorAll('.expanded-trait-layer-card')
     traitCards.forEach(card => {
       card.addEventListener('click', (e) => {
-        // Ignore clicks on any controls/buttons/sliders - prevent card selection
+        // Ignore clicks on any controls/buttons/sliders/percentage input - prevent card selection
         if (
           e.target.closest('.expanded-trait-layer-card-delete-btn') ||
           e.target.closest('.expanded-trait-layer-card-replace-btn') ||
           e.target.closest('.expanded-trait-layer-card-view-btn') ||
           e.target.closest('.expanded-trait-layer-card-rarity-slider') ||
           e.target.closest('.expanded-trait-layer-card-rarity-slider-container') ||
+          e.target.closest('.expanded-trait-layer-card-rarity-input') ||
           e.target.closest('.expanded-trait-layer-card-buttons') ||
           e.target.closest('button') ||
-          e.target.closest('input')
+          (e.target.closest('input') && !e.target.closest('.expanded-trait-layer-card').classList.contains('selected'))
         ) return
         card.classList.toggle('selected')
       })
@@ -1485,6 +1908,12 @@ window.NFTApp.registerModule("traitLayers", {
     // VIEW shows the trait in its actual position in the NFT (not centered)
     const viewBtns = traitLayerBar.querySelectorAll('.expanded-trait-layer-card-view-btn')
     viewBtns.forEach(btn => {
+      // Setup tooltip for VIEW button
+      const viewTooltip = btn.querySelector(".tooltiptext")
+      if (viewTooltip) {
+        this.setupTooltipPositioning(btn, viewTooltip)
+      }
+      
       btn.addEventListener('click', (e) => {
         e.stopPropagation()
         const traitCard = btn.closest('.expanded-trait-layer-card')
@@ -1508,6 +1937,12 @@ window.NFTApp.registerModule("traitLayers", {
     // Delete trait buttons - NEW CARDS
     const deleteTraitBtns = traitLayerBar.querySelectorAll(".expanded-trait-layer-card-delete-btn")
     deleteTraitBtns.forEach((btn) => {
+      // Setup tooltip for delete button
+      const deleteTooltip = btn.querySelector(".tooltiptext")
+      if (deleteTooltip) {
+        this.setupTooltipPositioning(btn, deleteTooltip)
+      }
+      
       btn.addEventListener("click", (e) => {
         e.stopPropagation()
         const traitCard = btn.closest(".expanded-trait-layer-card")
@@ -1535,7 +1970,7 @@ window.NFTApp.registerModule("traitLayers", {
     traitRaritySliders.forEach((slider) => {
       const traitCard = slider.closest(".expanded-trait-layer-card")
       const traitId = traitCard?.dataset?.traitId || slider.dataset.traitId
-      const rarityBadge = traitCard?.querySelector(".expanded-trait-layer-card-rarity")
+      const rarityInput = traitCard?.querySelector(".expanded-trait-layer-card-rarity-input")
 
       // Prevent drag and drop when interacting with the slider
       slider.addEventListener("mousedown", (e) => {
@@ -1555,10 +1990,11 @@ window.NFTApp.registerModule("traitLayers", {
       // Update the value display when slider changes - NEW CARDS
       slider.addEventListener("input", (e) => {
         e.stopPropagation()
-        const value = Number.parseFloat(e.target.value).toFixed(2)
-        // Update rarity badge
-        if (rarityBadge) {
-          rarityBadge.textContent = `${value}%`
+        const value = Number.parseFloat(e.target.value)
+        const valueFormatted = value.toFixed(2)
+        // Update rarity input field
+        if (rarityInput) {
+          rarityInput.value = `${valueFormatted}%`
         }
       })
 
@@ -1572,7 +2008,76 @@ window.NFTApp.registerModule("traitLayers", {
       })
     })
 
-    // Set up trait rarity input fields
+    // Set up trait rarity input fields for expanded trait layer cards
+    const expandedTraitRarityInputs = traitLayerBar.querySelectorAll(".expanded-trait-layer-card-rarity-input")
+    expandedTraitRarityInputs.forEach((input) => {
+      const traitCard = input.closest(".expanded-trait-layer-card")
+      const traitId = input.dataset.traitId || traitCard?.dataset?.traitId
+      const slider = traitCard?.querySelector(".expanded-trait-layer-card-rarity-slider")
+      const layerRarity = layer.rarity || 100
+
+      // Prevent drag and drop when interacting with the input
+      input.addEventListener("mousedown", (e) => {
+        e.stopPropagation()
+        traitLayerBar.setAttribute("draggable", "false")
+      })
+
+      input.addEventListener("mouseup", () => {
+        traitLayerBar.setAttribute("draggable", "true")
+      })
+
+      // Prevent propagation to avoid triggering parent events
+      input.addEventListener("click", (e) => e.stopPropagation())
+
+      // Select all text on focus for easy editing
+      input.addEventListener("focus", (e) => {
+        e.stopPropagation()
+        input.select()
+      })
+
+      // Update slider when input changes
+      input.addEventListener("input", (e) => {
+        e.stopPropagation()
+        // Remove % and parse value
+        let value = Number.parseFloat(e.target.value.replace(/[^0-9.]/g, ""))
+        if (isNaN(value)) value = 0
+        // Clamp to valid range
+        value = Math.min(Math.max(value, 0), Number.parseFloat(layerRarity))
+        // Update slider
+        if (slider) {
+          slider.value = value
+        }
+      })
+
+      // Update the trait rarity in the data when input loses focus
+      input.addEventListener("blur", (e) => {
+        e.stopPropagation()
+        // Remove % and parse value
+        let value = Number.parseFloat(e.target.value.replace(/[^0-9.]/g, ""))
+        if (isNaN(value)) value = 0
+        // Clamp to valid range
+        value = Math.min(Math.max(value, 0), Number.parseFloat(layerRarity))
+        // Format and update input display
+        e.target.value = `${value.toFixed(2)}%`
+        // Update slider
+        if (slider) {
+          slider.value = value
+        }
+        // Preserve expansion state
+        const isExpanded = content.classList.contains("expanded")
+        this.updateTraitRarity(layer.id, traitId, value, projectData, isExpanded)
+      })
+
+      // Handle enter key on input
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.stopPropagation()
+          e.target.blur()
+        }
+      })
+    })
+
+    // Set up trait rarity input fields (old style - keep for compatibility)
     const traitRarityInputFields = traitLayerBar.querySelectorAll(".trait-rarity-input")
 
     traitRarityInputFields.forEach((input) => {
@@ -1652,6 +2157,12 @@ window.NFTApp.registerModule("traitLayers", {
     // Add event listener for replace image button - NEW CARDS
     const replaceImageBtns = traitLayerBar.querySelectorAll(".expanded-trait-layer-card-replace-btn")
     replaceImageBtns.forEach((btn) => {
+      // Setup tooltip for replace button
+      const replaceTooltip = btn.querySelector(".tooltiptext")
+      if (replaceTooltip) {
+        this.setupTooltipPositioning(btn, replaceTooltip)
+      }
+      
       btn.addEventListener("click", (e) => {
         e.stopPropagation()
         const traitId = btn.getAttribute("data-trait-id")
@@ -1706,8 +2217,35 @@ window.NFTApp.registerModule("traitLayers", {
             }
           }
           
-          // Update the UI
-          this.updateTraitLayerUI(projectData)
+          // Store selected trait IDs before updating (to preserve selection state)
+          const selectedTraitIds = Array.from(traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected')).map(card => card.dataset.traitId)
+          
+          // Update only the image, not the entire UI
+          const traitCard = traitLayerBar.querySelector(`.expanded-trait-layer-card[data-trait-id="${traitId}"]`)
+          if (traitCard) {
+            const thumbImg = traitCard.querySelector('.expanded-trait-layer-card-thumb-img')
+            if (thumbImg) {
+              thumbImg.src = event.target.result
+              thumbImg.dataset.originalImage = event.target.result
+              // Reset centered extraction flag so it can be re-extracted
+              delete thumbImg.dataset.hasCentered
+              // Re-extract centered trait if needed
+              if (this.extractCenteredTraitForThumbnail) {
+                this.extractCenteredTraitForThumbnail(thumbImg, event.target.result)
+              }
+            }
+          }
+          
+          // Restore selection state for all previously selected traits
+          if (selectedTraitIds.length > 0) {
+            selectedTraitIds.forEach(selectedTraitId => {
+              const selectedCard = traitLayerBar.querySelector(`.expanded-trait-layer-card[data-trait-id="${selectedTraitId}"]`)
+              if (selectedCard) {
+                selectedCard.classList.add('selected')
+              }
+            })
+          }
+          
           this.showFeedback(`Image for trait "${trait.name}" updated successfully (path saved)`, "success")
           
           // Ensure all previews and thumbnails are refreshed and seed is recalculated
@@ -1723,6 +2261,49 @@ window.NFTApp.registerModule("traitLayers", {
         reader.readAsDataURL(file)
       })
     })
+  },
+
+  // Update only the rarity percentage displays for traits in a layer (without refreshing entire UI)
+  updateTraitRarityDisplays: function(layerId, projectData) {
+    const layer = projectData.traits.find((l) => l.id === layerId)
+    if (!layer) return
+
+    const traitLayerBar = document.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
+    if (!traitLayerBar) return
+
+    // Store selected trait IDs before updating (to preserve selection state)
+    const selectedTraitIds = Array.from(traitLayerBar.querySelectorAll('.expanded-trait-layer-card.selected')).map(card => card.dataset.traitId)
+
+    // Update rarity displays for all trait cards in this layer
+    layer.traits.forEach((trait) => {
+      const traitCard = traitLayerBar.querySelector(`.expanded-trait-layer-card[data-trait-id="${trait.id}"]`)
+      if (traitCard) {
+        const rarityInput = traitCard.querySelector(".expanded-trait-layer-card-rarity-input")
+        const raritySlider = traitCard.querySelector(".expanded-trait-layer-card-rarity-slider")
+        
+        if (rarityInput) {
+          rarityInput.value = `${(trait.rarity || 0).toFixed(2)}%`
+        }
+        
+        if (raritySlider) {
+          raritySlider.value = trait.rarity || 0
+          raritySlider.setAttribute("data-original-value", trait.rarity || 0)
+          // Update max value in case layer rarity changed
+          const layerRarity = layer.rarity || 100
+          raritySlider.max = layerRarity
+        }
+      }
+    })
+
+    // Restore selection state for previously selected traits
+    if (selectedTraitIds.length > 0) {
+      selectedTraitIds.forEach(traitId => {
+        const traitCard = traitLayerBar.querySelector(`.expanded-trait-layer-card[data-trait-id="${traitId}"]`)
+        if (traitCard) {
+          traitCard.classList.add('selected')
+        }
+      })
+    }
   },
 
   /**
@@ -2117,15 +2698,18 @@ window.NFTApp.registerModule("traitLayers", {
 
     // Update the UI if requested
     if (updateUI) {
-      // Preserve expansion state
+      // Preserve expansion state and selected traits
       const traitLayerBar = document.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
       const isExpanded = traitLayerBar
         ? traitLayerBar.querySelector(".trait-layer-content").classList.contains("expanded")
         : false
+      
+      // Store selected trait IDs before updating UI (to restore selection after)
+      const selectedTraitIds = Array.from(traitLayerBar?.querySelectorAll('.expanded-trait-layer-card.selected') || []).map(card => card.dataset.traitId)
 
       this.updateTraitLayerUI(projectData)
 
-      // Re-expand the layer if it was expanded before
+      // Re-expand the layer if it was expanded before and restore selection
       if (isExpanded) {
         const updatedTraitLayerBar = document.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
         if (updatedTraitLayerBar) {
@@ -2134,6 +2718,30 @@ window.NFTApp.registerModule("traitLayers", {
           if (content && arrow) {
             content.classList.add("expanded")
             arrow.classList.add("expanded")
+            updatedTraitLayerBar.classList.add("expanded")
+          }
+          
+          // Restore selection state after UI update
+          if (selectedTraitIds.length > 0) {
+            const restoreSelection = () => {
+              let allRestored = true
+              selectedTraitIds.forEach(traitId => {
+                const traitCard = updatedTraitLayerBar.querySelector(`.expanded-trait-layer-card[data-trait-id="${traitId}"]`)
+                if (traitCard) {
+                  traitCard.classList.add('selected')
+                } else {
+                  allRestored = false
+                }
+              })
+              // If not all cards were found, try again after a short delay
+              if (!allRestored) {
+                setTimeout(restoreSelection, 100)
+              }
+            }
+            // Use requestAnimationFrame to ensure DOM is ready, then setTimeout for event handlers
+            requestAnimationFrame(() => {
+              setTimeout(restoreSelection, 150)
+            })
           }
         }
       }
@@ -2401,7 +3009,7 @@ window.NFTApp.registerModule("traitLayers", {
     // Update the UI
     this.updateTraitLayerUI(projectData)
     
-    // Re-expand the layer if it was expanded before
+    // Re-expand the layer if it was expanded before and restore selection
     if (isExpanded) {
       const updatedTraitLayerBar = document.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
       if (updatedTraitLayerBar) {
@@ -2410,18 +3018,30 @@ window.NFTApp.registerModule("traitLayers", {
         if (content && arrow) {
           content.classList.add("expanded")
           arrow.classList.add("expanded")
+          updatedTraitLayerBar.classList.add("expanded")
         }
         
-        // Restore selection state after UI update
+        // Restore selection state after UI update - use multiple attempts to ensure it works
         if (selectedTraitIds.length > 0) {
-          setTimeout(() => {
+          const restoreSelection = () => {
+            let allRestored = true
             selectedTraitIds.forEach(traitId => {
               const traitCard = updatedTraitLayerBar.querySelector(`.expanded-trait-layer-card[data-trait-id="${traitId}"]`)
               if (traitCard) {
                 traitCard.classList.add('selected')
+              } else {
+                allRestored = false
               }
             })
-          }, 50)
+            // If not all cards were found, try again after a short delay
+            if (!allRestored) {
+              setTimeout(restoreSelection, 100)
+            }
+          }
+          // Use requestAnimationFrame to ensure DOM is ready, then setTimeout for event handlers
+          requestAnimationFrame(() => {
+            setTimeout(restoreSelection, 150)
+          })
         }
       }
     }
@@ -2663,8 +3283,8 @@ window.NFTApp.registerModule("traitLayers", {
       }
     }
 
-    // Update the UI
-    this.updateTraitLayerUI(projectData)
+    // Update only the rarity displays instead of refreshing the entire UI
+    this.updateTraitRarityDisplays(layerId, projectData)
 
     // Save the project data to persist the rarity changes
     if (window.NFTApp && window.NFTApp.getModule('projectService')) {
@@ -2678,18 +3298,7 @@ window.NFTApp.registerModule("traitLayers", {
       window.MemoryManager.updateProject({ traits: projectData.traits }, { syncToModules: false })
     }
 
-    // Re-expand the layer if it was expanded before
-    if (preserveExpanded) {
-      const traitLayerBar = document.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
-      if (traitLayerBar) {
-        const content = traitLayerBar.querySelector(".trait-layer-content")
-        const arrow = traitLayerBar.querySelector(".trait-layer-arrow")
-        if (content && arrow) {
-          content.classList.add("expanded")
-          arrow.classList.add("expanded")
-        }
-      }
-    }
+    // No need to re-expand since we're not refreshing the UI
   },
 
   // Delete trait
@@ -2739,42 +3348,412 @@ window.NFTApp.registerModule("traitLayers", {
 
   // Move trait layer up (decrease order)
   moveTraitLayerUp: function (layerId, projectData) {
+    // CRITICAL: Cancel any pending animations to prevent conflicts
+    if (this._reorderingState.isAnimating) {
+      this._cancelPendingAnimations();
+    }
+
     // Find the layer
     const layerIndex = projectData.traits.findIndex((l) => l.id === layerId)
     if (layerIndex <= 0) return // Already at the top
 
-    // Swap order with the layer above
+    // Get DOM elements before updating
+    const container = document.getElementById("trait-layers-container")
+    if (!container) {
+      // Fallback to instant update if container not found
+      const currentOrder = projectData.traits[layerIndex].order
+      const aboveOrder = projectData.traits[layerIndex - 1].order
+      projectData.traits[layerIndex].order = aboveOrder
+      projectData.traits[layerIndex - 1].order = currentOrder
+      projectData.traits.sort((a, b) => a.order - b.order)
+      this.updateTraitLayerUI(projectData)
+      return
+    }
+
+    const currentLayerBar = container.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
+    const aboveLayerBar = container.querySelector(`.trait-layer-bar[data-id="${projectData.traits[layerIndex - 1].id}"]`)
+    
+    if (!currentLayerBar || !aboveLayerBar) {
+      // Fallback to instant update if elements not found
+      const currentOrder = projectData.traits[layerIndex].order
+      const aboveOrder = projectData.traits[layerIndex - 1].order
+      projectData.traits[layerIndex].order = aboveOrder
+      projectData.traits[layerIndex - 1].order = currentOrder
+      projectData.traits.sort((a, b) => a.order - b.order)
+      this.updateTraitLayerUI(projectData)
+      return
+    }
+
+    // Mark animation as in progress
+    this._reorderingState.isAnimating = true;
+
+    // Calculate the distance to move (move current layer to where above layer is)
+    const currentRect = currentLayerBar.getBoundingClientRect()
+    const aboveRect = aboveLayerBar.getBoundingClientRect()
+    // Distance to move current layer up (negative value)
+    const moveDistance = aboveRect.top - currentRect.top
+    // Distance to move above layer down (positive value) - current layer's height + gap
+    const aboveMoveDistance = currentRect.bottom - aboveRect.top
+
+    // CRITICAL: Ensure both elements are visible and in document flow before animation
+    // This prevents disappearing during animation
+    currentLayerBar.style.visibility = "visible"
+    currentLayerBar.style.opacity = "1"
+    currentLayerBar.style.display = ""
+    aboveLayerBar.style.visibility = "visible"
+    aboveLayerBar.style.opacity = "1"
+    aboveLayerBar.style.display = ""
+    
+    // Clean up any existing transforms first
+    currentLayerBar.style.transition = ""
+    currentLayerBar.style.transform = ""
+    currentLayerBar.style.zIndex = ""
+    aboveLayerBar.style.transition = ""
+    aboveLayerBar.style.transform = ""
+    aboveLayerBar.style.zIndex = ""
+    
+    // Force reflow to ensure styles are reset
+    void currentLayerBar.offsetHeight;
+    void aboveLayerBar.offsetHeight;
+
+    // Add animation class to both elements simultaneously
+    currentLayerBar.classList.add("reordering")
+    aboveLayerBar.classList.add("reordering")
+    
+    // CRITICAL: Use faster, smoother animation with cubic-bezier timing for fluid motion
+    const animationDuration = 200; // 0.2 seconds total for fluid reordering animation
+    
+    // CRITICAL: Set transition on both elements simultaneously
+    currentLayerBar.style.transition = `transform ${animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`
+    aboveLayerBar.style.transition = `transform ${animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`
+    
+    // CRITICAL: Set z-index on both elements to ensure they're both visible during animation
+    currentLayerBar.style.zIndex = "1000"
+    aboveLayerBar.style.zIndex = "1000"
+    
+    // Force reflow to ensure transition and z-index are set before transform
+    void currentLayerBar.offsetHeight;
+    void aboveLayerBar.offsetHeight;
+    
+    // CRITICAL: Apply transforms to both elements in the same frame to ensure simultaneous animation
+    // Use requestAnimationFrame to ensure both transforms are applied together
+    requestAnimationFrame(() => {
+      currentLayerBar.style.transform = `translateY(${moveDistance}px)`
+      aboveLayerBar.style.transform = `translateY(${aboveMoveDistance}px)`
+    })
+
+    // Update the data order
     const currentOrder = projectData.traits[layerIndex].order
     const aboveOrder = projectData.traits[layerIndex - 1].order
-
     projectData.traits[layerIndex].order = aboveOrder
     projectData.traits[layerIndex - 1].order = currentOrder
 
     // Sort the traits array by order
     projectData.traits.sort((a, b) => a.order - b.order)
 
-    // Update the UI
-    this.updateTraitLayerUI(projectData)
+    // Use transitionend events for reliable cleanup (more reliable than setTimeout)
+    let completedCount = 0;
+    const requiredCompletions = 2; // Both elements need to complete
+    
+    const cleanup = () => {
+      completedCount++;
+      if (completedCount >= requiredCompletions) {
+        // CRITICAL: Move DOM elements FIRST while transforms are still visually applied
+        // This ensures the elements are in their new positions before removing transforms
+        const container = document.getElementById("trait-layers-container");
+        if (container) {
+          // Get all layer bars in current DOM order
+          const allBars = Array.from(container.querySelectorAll('.trait-layer-bar'));
+          
+          // Reorder DOM elements to match projectData.traits order (already sorted above)
+          // Do this while transforms are still applied so elements stay visually in place
+          projectData.traits.forEach((trait, index) => {
+            const bar = allBars.find(b => b.dataset.id === trait.id);
+            if (bar && bar.parentNode === container) {
+              // Move element to correct position if needed
+              const currentIndex = Array.from(container.children).indexOf(bar);
+              if (currentIndex !== index) {
+                const referenceNode = container.children[index];
+                if (referenceNode && referenceNode !== bar) {
+                  container.insertBefore(bar, referenceNode);
+                } else if (!referenceNode) {
+                  container.appendChild(bar);
+                }
+              }
+            }
+          });
+        }
+        
+        // CRITICAL: Now remove transforms - elements are already in new DOM positions
+        // They will stay in place because DOM position matches visual position
+        // Use requestAnimationFrame to ensure DOM move completes before removing transforms
+        requestAnimationFrame(() => {
+          // Remove transforms - elements are already in correct DOM positions
+          currentLayerBar.style.transition = ""
+          currentLayerBar.style.transform = ""
+          currentLayerBar.style.zIndex = ""
+          currentLayerBar.classList.remove("reordering")
+          
+          aboveLayerBar.style.transition = ""
+          aboveLayerBar.style.transform = ""
+          aboveLayerBar.style.zIndex = ""
+          aboveLayerBar.classList.remove("reordering")
+          
+          // CRITICAL: Only update UI after transforms are removed and DOM is in final position
+          setTimeout(() => {
+            // Only update UI state if needed, but don't re-render the list
+            // The DOM is already in the correct order
+            const traitLayersModule = window.NFTApp?.getModule('traitLayers');
+            if (traitLayersModule && traitLayersModule.updateDeleteAllLayersButtonVisibility) {
+              traitLayersModule.updateDeleteAllLayersButtonVisibility(projectData);
+            }
+          }, 50);
+        });
+        
+        // Reset animation state
+        this._reorderingState.isAnimating = false;
+        this._reorderingState.pendingTimeouts = [];
+        this._reorderingState.transitionEndHandlers = [];
+      }
+    };
+
+    // Add transitionend handlers
+    const currentHandler = (e) => {
+      if (e.target === currentLayerBar && e.propertyName === 'transform') {
+        cleanup();
+        currentLayerBar.removeEventListener('transitionend', currentHandler);
+      }
+    };
+    
+    const aboveHandler = (e) => {
+      if (e.target === aboveLayerBar && e.propertyName === 'transform') {
+        cleanup();
+        aboveLayerBar.removeEventListener('transitionend', aboveHandler);
+      }
+    };
+
+    currentLayerBar.addEventListener('transitionend', currentHandler);
+    aboveLayerBar.addEventListener('transitionend', aboveHandler);
+    
+    // Store handlers for potential cleanup
+    this._reorderingState.transitionEndHandlers.push(
+      { element: currentLayerBar, handler: currentHandler },
+      { element: aboveLayerBar, handler: aboveHandler }
+    );
+
+    // Fallback timeout in case transitionend doesn't fire (shouldn't happen, but safety net)
+    const fallbackTimeout = setTimeout(() => {
+      if (this._reorderingState.isAnimating) {
+        cleanup();
+      }
+    }, 500); // Slightly longer than animation duration
+    
+    this._reorderingState.pendingTimeouts.push(fallbackTimeout);
   },
 
   // Move trait layer down (increase order)
   moveTraitLayerDown: function (layerId, projectData) {
+    // CRITICAL: Cancel any pending animations to prevent conflicts
+    if (this._reorderingState.isAnimating) {
+      this._cancelPendingAnimations();
+    }
+
     // Find the layer
     const layerIndex = projectData.traits.findIndex((l) => l.id === layerId)
     if (layerIndex === -1 || layerIndex >= projectData.traits.length - 1) return // Already at the bottom
 
-    // Swap order with the layer below
+    // Get DOM elements before updating
+    const container = document.getElementById("trait-layers-container")
+    if (!container) {
+      // Fallback to instant update if container not found
+      const currentOrder = projectData.traits[layerIndex].order
+      const belowOrder = projectData.traits[layerIndex + 1].order
+      projectData.traits[layerIndex].order = belowOrder
+      projectData.traits[layerIndex + 1].order = currentOrder
+      projectData.traits.sort((a, b) => a.order - b.order)
+      this.updateTraitLayerUI(projectData)
+      return
+    }
+
+    const currentLayerBar = container.querySelector(`.trait-layer-bar[data-id="${layerId}"]`)
+    const belowLayerBar = container.querySelector(`.trait-layer-bar[data-id="${projectData.traits[layerIndex + 1].id}"]`)
+    
+    if (!currentLayerBar || !belowLayerBar) {
+      // Fallback to instant update if elements not found
+      const currentOrder = projectData.traits[layerIndex].order
+      const belowOrder = projectData.traits[layerIndex + 1].order
+      projectData.traits[layerIndex].order = belowOrder
+      projectData.traits[layerIndex + 1].order = currentOrder
+      projectData.traits.sort((a, b) => a.order - b.order)
+      this.updateTraitLayerUI(projectData)
+      return
+    }
+
+    // Mark animation as in progress
+    this._reorderingState.isAnimating = true;
+
+    // Calculate the distance to move (move current layer to where below layer is)
+    const currentRect = currentLayerBar.getBoundingClientRect()
+    const belowRect = belowLayerBar.getBoundingClientRect()
+    // Distance to move current layer down (positive value)
+    const moveDistance = belowRect.top - currentRect.top
+    // Distance to move below layer up (negative value) - current layer's height + gap
+    const belowMoveDistance = -(belowRect.top - currentRect.bottom)
+
+    // CRITICAL: Ensure both elements are visible and in document flow before animation
+    // This prevents disappearing during animation
+    currentLayerBar.style.visibility = "visible"
+    currentLayerBar.style.opacity = "1"
+    currentLayerBar.style.display = ""
+    belowLayerBar.style.visibility = "visible"
+    belowLayerBar.style.opacity = "1"
+    belowLayerBar.style.display = ""
+    
+    // Clean up any existing transforms first
+    currentLayerBar.style.transition = ""
+    currentLayerBar.style.transform = ""
+    currentLayerBar.style.zIndex = ""
+    belowLayerBar.style.transition = ""
+    belowLayerBar.style.transform = ""
+    belowLayerBar.style.zIndex = ""
+    
+    // Force reflow to ensure styles are reset
+    void currentLayerBar.offsetHeight;
+    void belowLayerBar.offsetHeight;
+
+    // Add animation class to both elements simultaneously
+    currentLayerBar.classList.add("reordering")
+    belowLayerBar.classList.add("reordering")
+    
+    // CRITICAL: Use faster, smoother animation with cubic-bezier timing for fluid motion
+    const animationDuration = 200; // 0.2 seconds total for fluid reordering animation
+    
+    // CRITICAL: Set transition on both elements simultaneously
+    currentLayerBar.style.transition = `transform ${animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`
+    belowLayerBar.style.transition = `transform ${animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`
+    
+    // CRITICAL: Set z-index on both elements to ensure they're both visible during animation
+    currentLayerBar.style.zIndex = "1000"
+    belowLayerBar.style.zIndex = "1000"
+    
+    // Force reflow to ensure transition and z-index are set before transform
+    void currentLayerBar.offsetHeight;
+    void belowLayerBar.offsetHeight;
+    
+    // CRITICAL: Apply transforms to both elements in the same frame to ensure simultaneous animation
+    // Use requestAnimationFrame to ensure both transforms are applied together
+    requestAnimationFrame(() => {
+      currentLayerBar.style.transform = `translateY(${moveDistance}px)`
+      belowLayerBar.style.transform = `translateY(${belowMoveDistance}px)`
+    })
+
+    // Update the data order
     const currentOrder = projectData.traits[layerIndex].order
     const belowOrder = projectData.traits[layerIndex + 1].order
-
     projectData.traits[layerIndex].order = belowOrder
     projectData.traits[layerIndex + 1].order = currentOrder
 
     // Sort the traits array by order
     projectData.traits.sort((a, b) => a.order - b.order)
 
-    // Update the UI
-    this.updateTraitLayerUI(projectData)
+    // Use transitionend events for reliable cleanup (more reliable than setTimeout)
+    let completedCount = 0;
+    const requiredCompletions = 2; // Both elements need to complete
+    
+    const cleanup = () => {
+      completedCount++;
+      if (completedCount >= requiredCompletions) {
+        // CRITICAL: Move DOM elements FIRST while transforms are still visually applied
+        // This ensures the elements are in their new positions before removing transforms
+        const container = document.getElementById("trait-layers-container");
+        if (container) {
+          // Get all layer bars in current DOM order
+          const allBars = Array.from(container.querySelectorAll('.trait-layer-bar'));
+          
+          // Reorder DOM elements to match projectData.traits order (already sorted above)
+          // Do this while transforms are still applied so elements stay visually in place
+          projectData.traits.forEach((trait, index) => {
+            const bar = allBars.find(b => b.dataset.id === trait.id);
+            if (bar && bar.parentNode === container) {
+              // Move element to correct position if needed
+              const currentIndex = Array.from(container.children).indexOf(bar);
+              if (currentIndex !== index) {
+                const referenceNode = container.children[index];
+                if (referenceNode && referenceNode !== bar) {
+                  container.insertBefore(bar, referenceNode);
+                } else if (!referenceNode) {
+                  container.appendChild(bar);
+                }
+              }
+            }
+          });
+        }
+        
+        // CRITICAL: Now remove transforms - elements are already in new DOM positions
+        // They will stay in place because DOM position matches visual position
+        // Use requestAnimationFrame to ensure DOM move completes before removing transforms
+        requestAnimationFrame(() => {
+          // Remove transforms - elements are already in correct DOM positions
+          currentLayerBar.style.transition = ""
+          currentLayerBar.style.transform = ""
+          currentLayerBar.style.zIndex = ""
+          currentLayerBar.classList.remove("reordering")
+          
+          belowLayerBar.style.transition = ""
+          belowLayerBar.style.transform = ""
+          belowLayerBar.style.zIndex = ""
+          belowLayerBar.classList.remove("reordering")
+          
+          // CRITICAL: Only update UI after transforms are removed and DOM is in final position
+          setTimeout(() => {
+            // Only update UI state if needed, but don't re-render the list
+            // The DOM is already in the correct order
+            const traitLayersModule = window.NFTApp?.getModule('traitLayers');
+            if (traitLayersModule && traitLayersModule.updateDeleteAllLayersButtonVisibility) {
+              traitLayersModule.updateDeleteAllLayersButtonVisibility(projectData);
+            }
+          }, 50);
+        });
+        
+        // Reset animation state
+        this._reorderingState.isAnimating = false;
+        this._reorderingState.pendingTimeouts = [];
+        this._reorderingState.transitionEndHandlers = [];
+      }
+    };
+
+    // Add transitionend handlers
+    const currentHandler = (e) => {
+      if (e.target === currentLayerBar && e.propertyName === 'transform') {
+        cleanup();
+        currentLayerBar.removeEventListener('transitionend', currentHandler);
+      }
+    };
+    
+    const belowHandler = (e) => {
+      if (e.target === belowLayerBar && e.propertyName === 'transform') {
+        cleanup();
+        belowLayerBar.removeEventListener('transitionend', belowHandler);
+      }
+    };
+
+    currentLayerBar.addEventListener('transitionend', currentHandler);
+    belowLayerBar.addEventListener('transitionend', belowHandler);
+    
+    // Store handlers for potential cleanup
+    this._reorderingState.transitionEndHandlers.push(
+      { element: currentLayerBar, handler: currentHandler },
+      { element: belowLayerBar, handler: belowHandler }
+    );
+
+    // Fallback timeout in case transitionend doesn't fire (shouldn't happen, but safety net)
+    const fallbackTimeout = setTimeout(() => {
+      if (this._reorderingState.isAnimating) {
+        cleanup();
+      }
+    }, animationDuration + 100); // Slightly longer than animation duration to ensure it completes
+    
+    this._reorderingState.pendingTimeouts.push(fallbackTimeout);
   },
 
   // Update the visibility of the Delete All Layers button

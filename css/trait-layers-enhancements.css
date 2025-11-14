@@ -133,16 +133,19 @@
   background-color: #000000 !important; /* Match standard tooltip black background */
   background: #000000 !important;
   color: #f39c12 !important; /* Match standard tooltip orange text */
-  text-align: center !important;
   font-size: 11px !important; /* Match standard tooltip font size */
   font-family: 'Archivo', sans-serif !important; /* Match standard tooltip font */
-  padding: 8px 12px !important; /* Match standard tooltip padding */
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
   border-radius: 6px !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important; /* Match standard tooltip shadow */
-  line-height: 1.4 !important;
   transition: opacity 1s ease !important; /* 1 second to match standard tooltips */
   pointer-events: none !important;
   margin: 0 !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
 .rule-actions .action-btn .tooltip-text::after {
@@ -191,12 +194,17 @@
   margin-top: -5px !important;
 }
 
-.trait-layer-drag-handle,
-.trait-layer-drag-handle .tooltip,
-.trait-layer-drag-handle .tooltiptext,
-.trait-layer-drag-handle .custom-tooltip {
+/* CRITICAL: Only make the drag handle itself transparent, NOT the tooltip */
+.trait-layer-drag-handle {
   background: transparent !important;
   background-color: transparent !important;
+}
+
+/* CRITICAL: Ensure tooltip has proper styling (not transparent) */
+.trait-layer-drag-handle .tooltiptext {
+  background-color: #000000 !important; /* Black background for standard tooltip */
+  background: #000000 !important;
+  color: #f39c12 !important; /* Orange text for standard tooltip */
 }
 
 .trait-layer-header-rarity,

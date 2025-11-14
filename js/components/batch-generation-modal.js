@@ -957,57 +957,131 @@ class BatchGenerationModal {
     // Add drag event listeners
     this.setupCardDragAndDrop(card, index);
     
+    // CRITICAL: Set up edited icon tooltip with standard format
+    const editedIcon = card.querySelector('.edited-icon.tooltip');
+    if (editedIcon) {
+      const tooltipText = editedIcon.querySelector('.tooltiptext');
+      if (tooltipText) {
+        // Apply standard tooltip styling
+        tooltipText.style.setProperty('background-color', '#000000', 'important');
+        tooltipText.style.setProperty('background', '#000000', 'important');
+        tooltipText.style.setProperty('color', '#f39c12', 'important');
+        tooltipText.style.setProperty('z-index', '2147483647', 'important');
+        tooltipText.style.setProperty('position', 'fixed', 'important');
+        tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
+        
+        // Use global tooltip manager if available
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(editedIcon, tooltipText);
+        } else {
+          // Fallback: Use setupTooltipPositioning from generateNftsUI if available
+          const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+            generateNftsUI.setupTooltipPositioning(editedIcon, tooltipText);
+          }
+        }
+      }
+    }
+    
     // Ensure buttons are clickable by adding direct event listeners as backup
     const buttons = card.querySelectorAll('.seed-card-btn');
     buttons.forEach(btn => {
-      // Position tooltip dynamically using fixed positioning
+      // Position tooltip dynamically using fixed positioning with standard format
       const tooltipText = btn.querySelector('.tooltiptext');
       if (tooltipText) {
+        // CRITICAL: Apply standard tooltip styling
+        tooltipText.style.setProperty('background-color', '#000000', 'important');
+        tooltipText.style.setProperty('background', '#000000', 'important');
+        tooltipText.style.setProperty('color', '#f39c12', 'important');
+        tooltipText.style.setProperty('border-radius', '6px', 'important');
+        tooltipText.style.setProperty('padding', '8px 12px', 'important');
+        tooltipText.style.setProperty('font-size', '11px', 'important');
+        tooltipText.style.setProperty('font-family', "'Archivo', sans-serif", 'important');
+        tooltipText.style.setProperty('line-height', '1.4', 'important');
+        tooltipText.style.setProperty('box-shadow', '0 3px 10px rgba(0, 0, 0, 0.5)', 'important');
+        tooltipText.style.setProperty('text-align', 'center', 'important');
+        tooltipText.style.setProperty('white-space', 'normal', 'important');
+        tooltipText.style.setProperty('max-width', '300px', 'important');
+        tooltipText.style.setProperty('width', 'max-content', 'important');
+        tooltipText.style.setProperty('z-index', '2147483647', 'important');
+        tooltipText.style.setProperty('position', 'fixed', 'important');
+        tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
+        tooltipText.style.setProperty('visibility', 'hidden', 'important');
+        tooltipText.style.setProperty('opacity', '0', 'important');
+        tooltipText.style.setProperty('pointer-events', 'none', 'important');
+        tooltipText.style.setProperty('display', 'block', 'important');
+        
+        let tooltipTimeout = null;
+        
         btn.addEventListener('mouseenter', function() {
           if (!tooltipText) return;
           
-          // Use double requestAnimationFrame to ensure button is fully positioned before calculating
-          requestAnimationFrame(() => {
+          // Clear any existing timeout
+          if (tooltipTimeout) {
+            clearTimeout(tooltipTimeout);
+            tooltipTimeout = null;
+          }
+          
+          // Show tooltip after 1 second delay (standard tooltip delay)
+          tooltipTimeout = setTimeout(() => {
+            // Use double requestAnimationFrame to ensure button is fully positioned before calculating
             requestAnimationFrame(() => {
-              const rect = btn.getBoundingClientRect();
-              
-              // Temporarily show tooltip to get its dimensions (but keep it invisible)
-              tooltipText.style.position = 'fixed';
-              tooltipText.style.visibility = 'hidden';
-              tooltipText.style.opacity = '0';
-              tooltipText.style.display = 'block';
-              tooltipText.style.top = '0';
-              tooltipText.style.left = '0';
-              tooltipText.style.transform = 'none';
-              
-              // Force reflow to get accurate measurements
-              void tooltipText.offsetHeight;
-              
-              const tooltipRect = tooltipText.getBoundingClientRect();
-              const tooltipHeight = tooltipRect.height || 60;
-              
-              // Position tooltip above the button (arrow points down)
-              const top = rect.top - tooltipHeight - 8; // 8px gap above button
-              const left = rect.left + (rect.width / 2); // Center horizontally
-              
-              // Apply final positioning with all necessary properties
-              tooltipText.style.position = 'fixed';
-              tooltipText.style.top = `${top}px`;
-              tooltipText.style.left = `${left}px`;
-              tooltipText.style.transform = 'translateX(-50%) translateZ(0)';
-              tooltipText.style.zIndex = '2147483647';
-              tooltipText.style.isolation = 'isolate';
-              tooltipText.style.contain = 'layout style paint';
-              tooltipText.style.visibility = 'visible';
-              tooltipText.style.opacity = '1';
+              requestAnimationFrame(() => {
+                const rect = btn.getBoundingClientRect();
+                
+                // Temporarily show tooltip to get its dimensions (but keep it invisible)
+                tooltipText.style.setProperty('position', 'fixed', 'important');
+                tooltipText.style.setProperty('visibility', 'hidden', 'important');
+                tooltipText.style.setProperty('opacity', '0', 'important');
+                tooltipText.style.setProperty('display', 'block', 'important');
+                tooltipText.style.setProperty('top', '-9999px', 'important');
+                tooltipText.style.setProperty('left', '-9999px', 'important');
+                tooltipText.style.setProperty('transform', 'none', 'important');
+                
+                // Force reflow to get accurate measurements
+                void tooltipText.offsetHeight;
+                
+                const tooltipRect = tooltipText.getBoundingClientRect();
+                const tooltipWidth = tooltipRect.width || 200;
+                const tooltipHeight = tooltipRect.height || 60;
+                
+                // Position tooltip above the button (arrow points down)
+                const top = rect.top - tooltipHeight - 5; // 5px gap above button
+                const left = rect.left + (rect.width / 2); // Center horizontally
+                
+                // Apply final positioning with all necessary properties
+                tooltipText.style.setProperty('position', 'fixed', 'important');
+                tooltipText.style.setProperty('top', `${top}px`, 'important');
+                tooltipText.style.setProperty('left', `${left}px`, 'important');
+                tooltipText.style.setProperty('transform', 'translateX(-50%)', 'important');
+                tooltipText.style.setProperty('z-index', '2147483647', 'important');
+                tooltipText.style.setProperty('isolation', 'isolate', 'important');
+                tooltipText.style.setProperty('contain', 'layout style paint', 'important');
+                
+                // Fade in with transition
+                requestAnimationFrame(() => {
+                  tooltipText.style.setProperty('visibility', 'visible', 'important');
+                  tooltipText.style.setProperty('opacity', '1', 'important');
+                });
+              });
             });
-          });
+            tooltipTimeout = null;
+          }, 1000); // 1 second delay
         });
         
         btn.addEventListener('mouseleave', function() {
           if (tooltipText) {
-            tooltipText.style.visibility = 'hidden';
-            tooltipText.style.opacity = '0';
+            // Clear timeout if mouse leaves before delay completes
+            if (tooltipTimeout) {
+              clearTimeout(tooltipTimeout);
+              tooltipTimeout = null;
+            }
+            // Fade out with transition
+            tooltipText.style.setProperty('opacity', '0', 'important');
+            setTimeout(() => {
+              tooltipText.style.setProperty('visibility', 'hidden', 'important');
+            }, 1000);
           }
         });
       }

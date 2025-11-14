@@ -162,47 +162,65 @@
   }
 
   // Hook into navigation module to update rules section visibility when switching tabs
+  // CRITICAL: Add debouncing to prevent multiple calls
+  let isProcessingTabSwitch = false;
+  let tabSwitchTimeout = null;
+  
   function hookIntoNavigation() {
     try {
       const navigationModule = window.NFTApp?.getModule('navigation');
       if (navigationModule && typeof navigationModule.showTab === 'function') {
+        // Check if already hooked to prevent duplicate hooks
+        if (navigationModule.showTab._traitsRulesHooked) {
+          return; // Already hooked
+        }
+        
         const originalShowTab = navigationModule.showTab;
         navigationModule.showTab = function(tabId, isUserInitiated) {
           const result = originalShowTab.call(this, tabId, isUserInitiated);
           
-          // If switching to traits-rules tab, update rules section visibility
-          if (tabId === 'traits-rules') {
-            setTimeout(() => {
-              updateRulesSectionVisibility();
-              forceNativeScrollbar();
-            }, 100);
+          // Debounce to prevent multiple rapid calls
+          if (tabSwitchTimeout) {
+            clearTimeout(tabSwitchTimeout);
           }
           
-          // If switching to generate-nfts tab, handle viewport changes
-          if (tabId === 'generate-nfts') {
-            setTimeout(() => {
-              handleViewportChange();
-              // Also check if scrolling is needed after a short delay
-              setTimeout(() => {
-                const generateNftsTab = document.getElementById('generate-nfts');
-                if (generateNftsTab) {
-                  const viewportHeight = window.innerHeight;
-                  const availableHeight = viewportHeight - 110;
-                  const contentHeight = generateNftsTab.scrollHeight;
-                  
-                  if (contentHeight > availableHeight) {
-                    generateNftsTab.style.overflowY = 'auto';
-                    generateNftsTab.style.scrollbarWidth = 'auto';
-                    generateNftsTab.style.msOverflowStyle = 'scrollbar';
-                    console.log('[DEBUG] Enabled scrolling for Generate NFTs tab on tab switch');
-                  }
-                }
-              }, 500);
-            }, 100);
+          if (isProcessingTabSwitch) {
+            return result; // Already processing
           }
+          
+          isProcessingTabSwitch = true;
+          tabSwitchTimeout = setTimeout(() => {
+            // If switching to traits-rules tab, update rules section visibility
+            if (tabId === 'traits-rules') {
+              updateRulesSectionVisibility();
+              forceNativeScrollbar();
+            }
+            
+            // If switching to generate-nfts tab, handle viewport changes
+            if (tabId === 'generate-nfts') {
+              // CRITICAL: Always ensure scrollbars are hidden - never enable scrolling
+              const generateNftsTab = document.getElementById('generate-nfts');
+              if (generateNftsTab) {
+                // Always hide scrollbars - no scrolling allowed
+                generateNftsTab.style.setProperty('overflow', 'hidden', 'important');
+                generateNftsTab.style.setProperty('overflow-y', 'hidden', 'important');
+                generateNftsTab.style.setProperty('overflow-x', 'hidden', 'important');
+                generateNftsTab.style.setProperty('scrollbar-width', 'none', 'important');
+                generateNftsTab.style.setProperty('-ms-overflow-style', 'none', 'important');
+              }
+              // Removed handleViewportChange call since it was enabling scrolling
+              // handleViewportChange();
+            }
+            
+            isProcessingTabSwitch = false;
+            tabSwitchTimeout = null;
+          }, 0); // Use 0ms timeout to defer to next tick but still be fast
           
           return result;
         };
+        
+        // Mark as hooked to prevent duplicate hooks
+        navigationModule.showTab._traitsRulesHooked = true;
         console.log('[DEBUG] Successfully hooked into navigation module');
       } else {
         console.log('[DEBUG] Navigation module not available, using fallback tab detection');
@@ -267,12 +285,19 @@
       if (typeof traitLayersModule.updateTraitLayerUI === 'function') {
         const originalUpdateTraitLayerUI = traitLayersModule.updateTraitLayerUI;
         traitLayersModule.updateTraitLayerUI = function(...args) {
+          // CRITICAL: Don't run calculations if reordering animation is in progress
+          if (traitLayersModule._reorderingState && traitLayersModule._reorderingState.isAnimating) {
+            // Skip calculations during animation - they'll be done after animation completes
+            return originalUpdateTraitLayerUI.apply(this, args);
+          }
+          
           const result = originalUpdateTraitLayerUI.apply(this, args);
-          setTimeout(() => {
+          // Defer non-critical operations to avoid blocking
+          requestAnimationFrame(() => {
             updateButtonVisibility();
             updateRulesSectionVisibility();
             forceNativeScrollbar();
-          }, 100);
+          });
           return result;
         };
       }
@@ -282,11 +307,12 @@
         const originalAddTrait = traitLayersModule.addTrait;
         traitLayersModule.addTrait = function(...args) {
           const result = originalAddTrait.apply(this, args);
-          setTimeout(() => {
+          // Defer non-critical operations to avoid blocking
+          requestAnimationFrame(() => {
             updateButtonVisibility();
             updateRulesSectionVisibility();
             forceNativeScrollbar();
-          }, 100);
+          });
           return result;
         };
       }
@@ -296,11 +322,12 @@
         const originalDeleteTrait = traitLayersModule.deleteTrait;
         traitLayersModule.deleteTrait = function(...args) {
           const result = originalDeleteTrait.apply(this, args);
-          setTimeout(() => {
+          // Defer non-critical operations to avoid blocking
+          requestAnimationFrame(() => {
             updateButtonVisibility();
             updateRulesSectionVisibility();
             forceNativeScrollbar();
-          }, 100);
+          });
           return result;
         };
       }
@@ -442,7 +469,8 @@
     jumpButton.style.left = 'auto';
     jumpButton.style.transform = 'none';
     
-    console.log('[DEBUG] Jump to layers button positioning reset - now using flex layout');
+    // Removed debug log to reduce console noise
+    // console.log('[DEBUG] Jump to layers button positioning reset - now using flex layout');
   }
 
   // Add functionality to the jump to layers button
@@ -537,7 +565,8 @@
       
       if (jumpButton) {
         jumpButton.style.display = isTraitsRulesActive ? 'flex' : 'none';
-        console.log(`[DEBUG] Jump to layers button visibility based on tab: ${isTraitsRulesActive ? 'visible' : 'hidden'}`);
+        // Removed debug log to reduce console noise
+        // console.log(`[DEBUG] Jump to layers button visibility based on tab: ${isTraitsRulesActive ? 'visible' : 'hidden'}`);
         
         if (isTraitsRulesActive) {
           setTimeout(positionJumpToLayersButton, 100);
@@ -772,60 +801,84 @@
       return;
     }
     
-    // Count trait layers
-    const traitLayersCount = projectData.traits ? projectData.traits.length : 0;
+    // Validate trait layers using the combination-rules module validation function
+    // Jump to Rules buttons should only be visible when at least 2 trait layers with 1 trait each exist
+    let shouldShowJumpToRulesButtons = false;
     
-    // Count combination rules
+    // Use the validateTraitLayers function from combination-rules module if available
+    const combinationRulesModule = window.NFTApp?.getModule('combinationRules');
+    if (combinationRulesModule && combinationRulesModule.validateTraitLayers) {
+      shouldShowJumpToRulesButtons = combinationRulesModule.validateTraitLayers(projectData);
+    } else {
+      // Fallback validation: Check if there are at least 2 trait layers with at least 1 trait each
+      if (projectData.traits && Array.isArray(projectData.traits) && projectData.traits.length >= 2) {
+        let layersWithTraits = 0;
+        for (const layer of projectData.traits) {
+          if (layer && layer.traits && Array.isArray(layer.traits) && layer.traits.length > 0) {
+            layersWithTraits++;
+          }
+        }
+        shouldShowJumpToRulesButtons = layersWithTraits >= 2;
+      }
+    }
+    
+    // Count trait layers and combination rules for Jump to Layers button visibility
+    const traitLayersCount = projectData.traits ? projectData.traits.length : 0;
     const combinationRulesCount = projectData.rules ? projectData.rules.length : 0;
     
-    // Show buttons if there are 5 or more trait layers OR 5 or more combination rules
-    const shouldShowButtons = traitLayersCount >= 5 || combinationRulesCount >= 5;
+    // Show Jump to Layers bottom button if there are 5 or more trait layers OR 5 or more combination rules
+    const shouldShowJumpToLayersBottom = traitLayersCount >= 5 || combinationRulesCount >= 5;
     
     // console.log('[DEBUG] Button visibility check:', {
+    //   shouldShowJumpToRulesButtons,
+    //   shouldShowJumpToLayersBottom,
     //   traitLayersCount,
     //   combinationRulesCount,
-    //   shouldShowButtons,
-    //   projectData: !!projectData,
-    //   projectDataKeys: projectData ? Object.keys(projectData) : [],
-    //   traits: projectData.traits ? projectData.traits.length : 'no traits',
-    //   rules: projectData.rules ? projectData.rules.length : 'no rules'
+    //   projectData: !!projectData
     // });
     
-    // Update visibility of all buttons - controlled by conditions
-    const buttons = [
+    // Update visibility of Jump to Rules buttons - only show when requirements are met
+    const jumpToRulesButtons = [
       'jump-to-rules-btn',
-      'jump-to-rules-bottom-btn',
-      'jump-to-layers-bottom-btn'
+      'jump-to-rules-bottom-btn'
     ];
     
-    buttons.forEach(buttonId => {
+    jumpToRulesButtons.forEach(buttonId => {
       const button = document.getElementById(buttonId);
       if (button) {
-        button.style.display = shouldShowButtons ? 'flex' : 'none';
-        // console.log(`[DEBUG] Button ${buttonId} visibility: ${shouldShowButtons ? 'visible' : 'hidden'}`);
+        button.style.display = shouldShowJumpToRulesButtons ? 'flex' : 'none';
+        // console.log(`[DEBUG] Button ${buttonId} visibility: ${shouldShowJumpToRulesButtons ? 'visible' : 'hidden'}`);
       } else {
         // console.log(`[DEBUG] Button ${buttonId} not found`);
       }
     });
     
+    // Update visibility of Jump to Layers bottom button - keep existing logic
+    const jumpToLayersBottomBtn = document.getElementById('jump-to-layers-bottom-btn');
+    if (jumpToLayersBottomBtn) {
+      jumpToLayersBottomBtn.style.display = shouldShowJumpToLayersBottom ? 'flex' : 'none';
+      // console.log(`[DEBUG] Button jump-to-layers-bottom-btn visibility: ${shouldShowJumpToLayersBottom ? 'visible' : 'hidden'}`);
+    }
+    
     // Note: jump-to-layers-btn is now inside the combination-rules-filter-container
     // and will be managed by the filter container visibility
     
-    // Update visibility of bottom buttons container - Always show when rules section is visible
+    // Update visibility of bottom buttons container - Show when rules section is visible
     const bottomContainer = document.querySelector('.bottom-shortcut-buttons');
     const rulesSection = document.querySelector('.rules-section');
     const isRulesSectionVisible = rulesSection && rulesSection.style.display !== 'none' && !rulesSection.classList.contains('hidden');
     
     if (bottomContainer) {
-      // Always show bottom buttons when rules section is visible, regardless of rule count
-      if (isRulesSectionVisible || shouldShowButtons) {
+      // Show bottom container if rules section is visible AND at least one button should be visible
+      const shouldShowContainer = isRulesSectionVisible && (shouldShowJumpToRulesButtons || shouldShowJumpToLayersBottom);
+      if (shouldShowContainer) {
         bottomContainer.style.display = 'flex';
         bottomContainer.style.visibility = 'visible';
         bottomContainer.style.opacity = '1';
       } else {
         bottomContainer.style.display = 'none';
       }
-      // console.log(`[DEBUG] Bottom container visibility: ${shouldShowButtons || isRulesSectionVisible ? 'visible' : 'hidden'}`);
+      // console.log(`[DEBUG] Bottom container visibility: ${shouldShowContainer ? 'visible' : 'hidden'}`);
     }
   }
 
@@ -891,14 +944,40 @@
     }
   }
 
-  // Setup the rules filter functionality
-  function setupRulesFilter() {
-    // console.log('[DEBUG] Setting up rules filter');
-    
-    const filterContainer = document.getElementById('combination-rules-filter-container');
-    const clearBtn = document.getElementById('clear-rules-filter-btn');
-    const dropdown = document.getElementById('rules-filter-dropdown');
-    const jumpBtn = document.getElementById('jump-to-layers-btn');
+    // Setup the rules filter functionality
+    function setupRulesFilter() {
+      // console.log('[DEBUG] Setting up rules filter');
+      
+      const filterContainer = document.getElementById('combination-rules-filter-container');
+      const clearBtn = document.getElementById('clear-rules-filter-btn');
+      const dropdown = document.getElementById('rules-filter-dropdown');
+      const jumpBtn = document.getElementById('jump-to-layers-btn');
+      
+      // CRITICAL: Remove any title attribute from dropdown to prevent native browser tooltip
+      if (dropdown) {
+        dropdown.removeAttribute('title');
+        dropdown.setAttribute('title', ''); // Set empty title to prevent native tooltip
+        // Ensure dropdown doesn't have tooltip class
+        dropdown.classList.remove('tooltip');
+        // CRITICAL: Ensure dropdown has proper appearance settings to remove native arrows
+        dropdown.style.setProperty('appearance', 'none', 'important');
+        dropdown.style.setProperty('-webkit-appearance', 'none', 'important');
+        dropdown.style.setProperty('-moz-appearance', 'none', 'important');
+        // CRITICAL: Remove any child elements that might be icons or checkmarks
+        const dropdownChildren = Array.from(dropdown.children);
+        dropdownChildren.forEach(child => {
+          // Remove any elements that aren't option elements (like icons or checkmarks)
+          if (child.tagName !== 'OPTION') {
+            child.remove();
+          }
+        });
+        // CRITICAL: Force remove any pseudo-elements or conflicting styles
+        dropdown.style.setProperty('background-image', 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3e%3cpath stroke=\'%236b7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'m6 8 4 4 4-4\'/%3e%3c/svg%3e")', 'important');
+        dropdown.style.setProperty('background-position', 'right 0.75rem center', 'important');
+        dropdown.style.setProperty('background-repeat', 'no-repeat', 'important');
+        dropdown.style.setProperty('background-size', '1rem', 'important');
+        dropdown.style.setProperty('padding-right', '2.5rem', 'important');
+      }
     
     if (!filterContainer || !clearBtn || !dropdown || !jumpBtn) {
       // console.log('[DEBUG] Rules filter elements not found, retrying...', {
@@ -1251,6 +1330,12 @@
       return;
     }
     
+    // CRITICAL: Ensure rules container doesn't affect Trait Layers section positioning
+    // Use position: relative and ensure it doesn't cause layout shifts
+    rulesContainer.style.setProperty('position', 'relative', 'important');
+    rulesContainer.style.setProperty('min-height', '0', 'important');
+    rulesContainer.style.setProperty('height', 'auto', 'important');
+    
     // Look for all possible rule element selectors
     const ruleElements = rulesContainer.querySelectorAll('.rule-item, .combination-rule-item, .combination-rule, [data-rule-id]');
     
@@ -1273,11 +1358,25 @@
           element.style.visibility = '';
           visibleCount++;
         } else {
+          // CRITICAL: Use display: none but ensure it doesn't affect layout
           element.style.display = 'none';
           element.style.visibility = 'hidden';
+          element.style.position = 'absolute';
+          element.style.height = '0';
+          element.style.overflow = 'hidden';
         }
       });
       console.log(`[DEBUG] Showing ${visibleCount} rules of type: ${ruleType}`);
+    }
+    
+    // CRITICAL: Ensure Trait Layers section remains fixed and unaffected
+    const traitsSection = document.querySelector('#traits-rules .traits-section');
+    if (traitsSection) {
+      // Force traits section to maintain its position
+      traitsSection.style.setProperty('position', 'relative', 'important');
+      traitsSection.style.setProperty('top', 'auto', 'important');
+      traitsSection.style.setProperty('left', 'auto', 'important');
+      traitsSection.style.setProperty('transform', 'none', 'important');
     }
   }
 
@@ -1365,11 +1464,42 @@
         };
       }
     }
+
+    // CRITICAL: Hook into projectService.load to ensure button visibility is updated when project is loaded
+    if (projectServiceModule && typeof projectServiceModule.load === 'function') {
+      const originalLoad = projectServiceModule.load;
+      projectServiceModule.load = function(event) {
+        const result = originalLoad.call(this, event);
+        // CRITICAL: Update button visibility after project is loaded (with multiple delays to catch all cases)
+        setTimeout(() => {
+          updateButtonVisibility();
+          updateRulesFilterVisibility();
+          updateRulesSectionVisibility();
+          forceNativeScrollbar();
+        }, 1500); // Wait for projectInterface.start to complete
+        setTimeout(() => {
+          updateButtonVisibility();
+          updateRulesFilterVisibility();
+          updateRulesSectionVisibility();
+          forceNativeScrollbar();
+        }, 2500); // Additional check after all modules are initialized
+        setTimeout(() => {
+          updateButtonVisibility();
+          updateRulesFilterVisibility();
+          updateRulesSectionVisibility();
+          forceNativeScrollbar();
+        }, 3500); // Final check to ensure buttons are visible if conditions are met
+        return result;
+      };
+    }
   }
 
   // Comprehensive setup function
   function performCompleteSetup() {
     // console.log('[DEBUG] Performing complete setup...');
+    
+    // CRITICAL: Hide all jump buttons by default before checking conditions
+    hideAllButtons();
     
     // Setup all buttons and filters
     setupJumpToRulesButton();
@@ -1377,7 +1507,7 @@
     setupBottomButtons();
     setupRulesFilter();
     
-    // Update visibility
+    // Update visibility (will show buttons if conditions are met)
     updateButtonVisibility();
     updateRulesFilterVisibility();
     updateRulesSectionVisibility();
@@ -1441,6 +1571,9 @@
       console.log('[DEBUG] Setup already completed, skipping...');
       return;
     }
+    
+    // CRITICAL: Hide all jump buttons by default on startup
+    hideAllButtons();
     
     // Multiple attempts to ensure setup works
     setTimeout(performCompleteSetup, 100);
@@ -1622,17 +1755,20 @@
         currentOverflow: generateNftsTab.style.overflowY || 'not set'
       });
       
-      // Always enable scrolling when viewport is reduced (console open)
-      // This is a more aggressive approach to ensure content is accessible
-      generateNftsTab.style.overflowY = 'auto';
-      generateNftsTab.style.scrollbarWidth = 'auto';
-      generateNftsTab.style.msOverflowStyle = 'scrollbar';
+      // CRITICAL: Never enable scrolling - always keep it disabled
+      // The tab-scroll-control.js module handles scroll control, and we never want scrolling
+      generateNftsTab.style.setProperty('overflow', 'hidden', 'important');
+      generateNftsTab.style.setProperty('overflow-y', 'hidden', 'important');
+      generateNftsTab.style.setProperty('overflow-x', 'hidden', 'important');
+      generateNftsTab.style.setProperty('scrollbar-width', 'none', 'important');
+      generateNftsTab.style.setProperty('-ms-overflow-style', 'none', 'important');
       
       // Set height constraints - REMOVED to allow CSS to control project-interface height
       // generateNftsTab.style.minHeight = 'calc(100vh - 110px)';
       // generateNftsTab.style.maxHeight = 'calc(100vh - 110px)';
       
-      console.log('[DEBUG] Enabled scrolling for Generate NFTs tab - viewport change detected');
+      // Removed debug log to reduce console noise
+      // console.log('[DEBUG] Enabled scrolling for Generate NFTs tab - viewport change detected');
     }
   }
 

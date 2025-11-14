@@ -98,76 +98,62 @@
       // CRITICAL: Remove margin-top AND height from content-area to eliminate 675px empty space
       // This must override ALL CSS rules: traits-panel-override.css, main.css, styles.css
       if (contentArea) {
-        // Force remove ALL height and margin styles first - IMMEDIATELY
+        // CRITICAL: If we're in the middle of a tab switch, preserve the current height
+        // to prevent flickering. Only set to auto after the tab is fully visible.
+        // Check data attribute FIRST (most reliable), then inline styles
+        const preservedHeightAttr = contentArea.getAttribute('data-preserved-height');
+        const currentHeight = contentArea.style.getPropertyValue('height');
+        const currentMinHeight = contentArea.style.getPropertyValue('min-height');
+        
+        // CRITICAL: Data attribute is the source of truth - if it exists, use it
+        // Otherwise, check inline styles for a pixel value
+        const heightToPreserve = preservedHeightAttr || 
+                                 (currentHeight && currentHeight !== 'auto' && currentHeight.includes('px') ? currentHeight : null) ||
+                                 (currentMinHeight && currentMinHeight !== '0' && currentMinHeight !== '0px' && currentMinHeight.includes('px') ? currentMinHeight : null);
+        
+        // Only preserve if we're switching tabs AND we have a height to preserve
+        const shouldPreserveHeight = isTabSwitching && heightToPreserve;
+        
+        if (shouldPreserveHeight) {
+          console.log(`[FLICKER DEBUG] removeInlineStyles: Preserving height during tab switch: attr=${preservedHeightAttr}, height=${currentHeight}, min-height=${currentMinHeight}, using=${heightToPreserve}`);
+        } else if (isTabSwitching) {
+          console.log(`[FLICKER DEBUG] removeInlineStyles: Tab switching but no preserved height found: attr=${preservedHeightAttr}, height=${currentHeight}, min-height=${currentMinHeight}`);
+        }
+        
+        // Force remove margin-top but preserve height if we're switching tabs
         contentArea.style.removeProperty('margin-top');
-        contentArea.style.removeProperty('height');
-        contentArea.style.removeProperty('min-height');
+        if (!shouldPreserveHeight) {
+          // Only remove height if we're not in the middle of a tab switch
+          contentArea.style.removeProperty('height');
+          contentArea.style.removeProperty('min-height');
+        }
         contentArea.style.removeProperty('max-height');
         // Add class to enable CSS targeting
         contentArea.classList.add('generate-nfts-content-active');
         // Force apply via JavaScript IMMEDIATELY - inline styles override CSS
         // This ensures the fix works even if CSS doesn't load or is overridden
         contentArea.style.setProperty('margin-top', '0', 'important');
-        contentArea.style.setProperty('height', 'auto', 'important'); // Use auto to fit content and eliminate empty space
-        contentArea.style.setProperty('min-height', '0', 'important');
+        if (!shouldPreserveHeight) {
+          // Only set to auto if we're not preserving height
+          contentArea.style.setProperty('height', 'auto', 'important'); // Use auto to fit content and eliminate empty space
+          contentArea.style.setProperty('min-height', '0', 'important');
+        } else {
+          // CRITICAL: Re-apply preserved height from data attribute or inline style
+          // This ensures the height stays preserved even if something cleared the inline styles
+          if (heightToPreserve) {
+            contentArea.style.setProperty('height', heightToPreserve, 'important');
+            contentArea.style.setProperty('min-height', heightToPreserve, 'important');
+            // Also ensure data attribute is set (in case it was missing)
+            if (!preservedHeightAttr) {
+              contentArea.setAttribute('data-preserved-height', heightToPreserve);
+            }
+            console.log(`[FLICKER DEBUG] removeInlineStyles: Re-applied preserved height: ${heightToPreserve}`);
+          }
+        }
         contentArea.style.setProperty('max-height', 'none', 'important');
-        // Also force multiple times to catch any late-applied styles
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 0);
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 10);
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 25);
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 50);
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 100);
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 200);
-        setTimeout(function() {
-          if (contentArea.classList.contains('generate-nfts-content-active')) {
-            contentArea.style.setProperty('margin-top', '0', 'important');
-            contentArea.style.setProperty('height', '853.55px', 'important');
-            contentArea.style.setProperty('min-height', '853.55px', 'important');
-            contentArea.style.setProperty('max-height', '853.55px', 'important');
-          }
-        }, 500);
+        // CRITICAL: Removed all aggressive setTimeout calls that were setting height to 853.55px
+        // These were overriding the preserved height during tab switches, causing flickering
+        // The preserved height mechanism and deferred operations now handle height management properly
       }
     } else {
       // Remove class when Generate NFTs is not active
@@ -230,35 +216,10 @@
     // Use requestAnimationFrame for immediate updates
     requestAnimationFrame(forceApplyFix);
     requestAnimationFrame(() => requestAnimationFrame(forceApplyFix));
-    // Also run periodically to catch any late-applied styles - VERY AGGRESSIVE
-    setTimeout(removeInlineStyles, 0);
-    setTimeout(forceApplyFix, 0);
-    setTimeout(removeInlineStyles, 10);
-    setTimeout(forceApplyFix, 10);
-    setTimeout(removeInlineStyles, 25);
-    setTimeout(forceApplyFix, 25);
-    setTimeout(removeInlineStyles, 50);
-    setTimeout(forceApplyFix, 50);
-    setTimeout(removeInlineStyles, 75);
-    setTimeout(forceApplyFix, 75);
-    setTimeout(removeInlineStyles, 100);
-    setTimeout(forceApplyFix, 100);
-    setTimeout(removeInlineStyles, 150);
-    setTimeout(forceApplyFix, 150);
-    setTimeout(removeInlineStyles, 200);
-    setTimeout(forceApplyFix, 200);
-    setTimeout(removeInlineStyles, 300);
-    setTimeout(forceApplyFix, 300);
-    setTimeout(removeInlineStyles, 500);
-    setTimeout(forceApplyFix, 500);
-    setTimeout(removeInlineStyles, 750);
-    setTimeout(forceApplyFix, 750);
-    setTimeout(removeInlineStyles, 1000);
-    setTimeout(forceApplyFix, 1000);
-    setTimeout(removeInlineStyles, 1500);
-    setTimeout(forceApplyFix, 1500);
-    setTimeout(removeInlineStyles, 2000);
-    setTimeout(forceApplyFix, 2000);
+    
+    // CRITICAL: Removed all aggressive setTimeout calls that were causing flickering
+    // These were constantly modifying styles during tab switches, causing visual glitches
+    // The MutationObserver and hookIntoNavigation will handle style fixes when needed
   }
   
   if (document.readyState === 'loading') {
@@ -267,50 +228,61 @@
     init();
   }
   
-  // Run when Generate NFTs tab becomes active
+  // Run when Generate NFTs tab becomes active - OPTIMIZED to prevent flickering
+  let isProcessing = false; // Prevent multiple simultaneous operations
+  let isTabSwitching = false; // Track if we're in the middle of a tab switch
   const observer = new MutationObserver(function(mutations) {
+    // DEBUG: Track MutationObserver activity
+    const mutationTime = performance.now();
+    console.log(`[FLICKER DEBUG] MutationObserver fired: isProcessing=${isProcessing}, isTabSwitching=${isTabSwitching}, mutations=${mutations.length}`);
+    
+    // Skip if already processing or if we're switching tabs to prevent flickering
+    if (isProcessing || isTabSwitching) {
+      console.log(`[FLICKER DEBUG] MutationObserver skipped: isProcessing=${isProcessing}, isTabSwitching=${isTabSwitching}`);
+      return;
+    }
+    
     mutations.forEach(function(mutation) {
       if (mutation.type === 'attributes') {
         const target = mutation.target;
+        console.log(`[FLICKER DEBUG] MutationObserver: attribute change on ${target.id || target.className}, attribute=${mutation.attributeName}`);
+        
         if (target.id === 'generate-nfts' && target.classList.contains('active')) {
+          console.log(`[FLICKER DEBUG] MutationObserver: generate-nfts became active, processing...`);
+          isProcessing = true;
           // Inject style tag to ensure CSS is available
           injectStyleTag();
-          // Very aggressive - remove styles immediately and multiple times
+          // Execute immediately - no delays to prevent flickering
           removeInlineStyles();
           forceApplyFix();
-          requestAnimationFrame(forceApplyFix);
-          setTimeout(removeInlineStyles, 0);
-          setTimeout(forceApplyFix, 0);
-          setTimeout(removeInlineStyles, 10);
-          setTimeout(forceApplyFix, 10);
-          setTimeout(removeInlineStyles, 25);
-          setTimeout(forceApplyFix, 25);
-          setTimeout(removeInlineStyles, 50);
-          setTimeout(forceApplyFix, 50);
-          setTimeout(removeInlineStyles, 100);
-          setTimeout(forceApplyFix, 100);
-          setTimeout(removeInlineStyles, 200);
-          setTimeout(forceApplyFix, 200);
+          // Use single requestAnimationFrame for layout-dependent operations only
+          requestAnimationFrame(() => {
+            forceApplyFix();
+            isProcessing = false;
+            console.log(`[FLICKER DEBUG] MutationObserver: finished processing generate-nfts active`);
+          });
         }
-        // Also watch for project-interface style changes
-        if (target.classList && target.classList.contains('project-interface')) {
-          setTimeout(removeInlineStyles, 0);
-          setTimeout(forceApplyFix, 0);
-          setTimeout(removeInlineStyles, 10);
-          setTimeout(forceApplyFix, 10);
+        // Also watch for project-interface style changes - OPTIMIZED
+        if (target.classList && target.classList.contains('project-interface') && !isProcessing) {
+          console.log(`[FLICKER DEBUG] MutationObserver: project-interface style change, processing...`);
+          isProcessing = true;
+          requestAnimationFrame(() => {
+            removeInlineStyles();
+            forceApplyFix();
+            isProcessing = false;
+            console.log(`[FLICKER DEBUG] MutationObserver: finished processing project-interface`);
+          });
         }
-        // Watch for content-area style changes - CRITICAL
-        if (target.classList && target.classList.contains('content-area')) {
-          setTimeout(removeInlineStyles, 0);
-          setTimeout(forceApplyFix, 0);
-          setTimeout(removeInlineStyles, 10);
-          setTimeout(forceApplyFix, 10);
-          // Also watch for style attribute changes
-          if (mutation.attributeName === 'style') {
-            setTimeout(forceApplyFix, 0);
-            setTimeout(forceApplyFix, 10);
-            setTimeout(forceApplyFix, 50);
-          }
+        // Watch for content-area style changes - OPTIMIZED
+        if (target.classList && target.classList.contains('content-area') && !isProcessing) {
+          console.log(`[FLICKER DEBUG] MutationObserver: content-area style change, processing...`);
+          isProcessing = true;
+          requestAnimationFrame(() => {
+            removeInlineStyles();
+            forceApplyFix();
+            isProcessing = false;
+            console.log(`[FLICKER DEBUG] MutationObserver: finished processing content-area`);
+          });
         }
       }
     });
@@ -329,78 +301,239 @@
   }
   if (contentArea) {
     observer.observe(contentArea, { attributes: true, attributeFilter: ['style', 'class'] });
-    // Also observe style changes directly
+    // Also observe style changes directly - OPTIMIZED to prevent flickering
+    let styleProcessing = false;
     const styleObserver = new MutationObserver(function(mutations) {
+      // Skip if already processing to prevent flickering
+      if (styleProcessing) return;
+      
       mutations.forEach(function(mutation) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-          forceApplyFix();
-          requestAnimationFrame(forceApplyFix);
+          // Only process if generate-nfts tab is active
+          const generateNftsTab = document.getElementById('generate-nfts');
+          if (generateNftsTab && generateNftsTab.classList.contains('active')) {
+            styleProcessing = true;
+            // Use single requestAnimationFrame to prevent flickering
+            requestAnimationFrame(() => {
+              forceApplyFix();
+              styleProcessing = false;
+            });
+          }
         }
       });
     });
     styleObserver.observe(contentArea, { attributes: true, attributeFilter: ['style'] });
   }
   
-  // Also observe tab switching via navigation
+  // Also observe tab switching via navigation - OPTIMIZED to prevent flickering
+  // Use a single requestAnimationFrame instead of multiple setTimeout calls
+  // Note: isTabSwitching is already declared above in the MutationObserver scope
   document.addEventListener('click', function(e) {
     if (e.target.closest('[data-tab="generate-nfts"]')) {
-      setTimeout(removeInlineStyles, 0);
-      setTimeout(forceApplyFix, 0);
-      setTimeout(removeInlineStyles, 50);
-      setTimeout(forceApplyFix, 50);
-      setTimeout(removeInlineStyles, 200);
-      setTimeout(forceApplyFix, 200);
-      setTimeout(removeInlineStyles, 500);
-      setTimeout(forceApplyFix, 500);
+      // Mark that we're switching tabs to prevent MutationObserver interference
+      isTabSwitching = true;
+      // Use single requestAnimationFrame to defer operations until after tab switch completes
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          removeInlineStyles();
+          forceApplyFix();
+          isTabSwitching = false;
+        });
+      });
     }
   });
   
   // Hook into navigation module's showTab function
+  // CRITICAL: Use a module-level flag to prevent duplicate hooks across all attempts
+  let _hookAttempted = false;
+  let _hookSuccess = false;
+  
   function hookIntoNavigation() {
+    // CRITICAL: Prevent duplicate hook attempts
+    if (_hookAttempted && _hookSuccess) {
+      console.log(`[FLICKER DEBUG] remove-inline-styles: Hook already successful, skipping`);
+      return;
+    }
+    
+    _hookAttempted = true;
+    
     const navigationModule = window.NFTApp?.getModule('navigation');
+    console.log(`[FLICKER DEBUG] remove-inline-styles: Attempting to hook into navigation module`, {
+      hasNFTApp: !!window.NFTApp,
+      hasNavigationModule: !!navigationModule,
+      hasShowTab: !!(navigationModule && typeof navigationModule.showTab === 'function'),
+      alreadyHooked: !!(navigationModule && navigationModule.showTab && navigationModule.showTab._removeInlineStylesHooked),
+      hookSuccess: _hookSuccess
+    });
+    
     if (navigationModule && typeof navigationModule.showTab === 'function') {
+      // Check if already hooked to prevent duplicate hooks
+      if (navigationModule.showTab._removeInlineStylesHooked) {
+        console.log(`[FLICKER DEBUG] remove-inline-styles: Already hooked, marking as success`);
+        _hookSuccess = true;
+        return; // Already hooked
+      }
+      
       const originalShowTab = navigationModule.showTab;
       navigationModule.showTab = function(tabId, isUserInitiated) {
-        const result = originalShowTab.call(this, tabId, isUserInitiated);
-        // Run after tab switch - VERY AGGRESSIVE
+        console.log(`[FLICKER DEBUG] remove-inline-styles hook: showTab(${tabId}) called`);
+        
+        // CRITICAL: Set isTabSwitching flag BEFORE calling originalShowTab to prevent MutationObserver from firing
         if (tabId === 'generate-nfts') {
-          setTimeout(removeInlineStyles, 0);
-          setTimeout(forceApplyFix, 0);
-          requestAnimationFrame(forceApplyFix);
-          setTimeout(removeInlineStyles, 10);
-          setTimeout(forceApplyFix, 10);
-          setTimeout(removeInlineStyles, 100);
-          setTimeout(forceApplyFix, 100);
-          setTimeout(removeInlineStyles, 500);
-          setTimeout(forceApplyFix, 500);
+          console.log(`[FLICKER DEBUG] remove-inline-styles: Setting isTabSwitching=true BEFORE showTab`);
+          isTabSwitching = true;
+        }
+        
+        const result = originalShowTab.call(this, tabId, isUserInitiated);
+        
+        // Defer operations to avoid blocking tab switch
+        if (tabId === 'generate-nfts') {
+          console.log(`[FLICKER DEBUG] remove-inline-styles: Deferring operations for generate-nfts`);
+          // Use triple requestAnimationFrame to ensure tab is fully visible and height is stable
+          // This prevents removeInlineStyles from clearing the preserved height too early
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                console.log(`[FLICKER DEBUG] remove-inline-styles: Executing deferred operations (tab should be fully visible now)`);
+                
+                // CRITICAL: Check if height was preserved and needs to be set to auto
+                // Check both the data attribute (most reliable) and inline styles
+                const contentArea = document.querySelector('.content-area');
+                const generateNftsTab = document.getElementById('generate-nfts');
+                
+                if (contentArea) {
+                  const preservedHeightAttr = contentArea.getAttribute('data-preserved-height');
+                  const currentHeight = contentArea.style.getPropertyValue('height');
+                  const currentMinHeight = contentArea.style.getPropertyValue('min-height');
+                  
+                  // Check if we have a preserved height (from data attribute or inline style)
+                  const hasPreservedHeight = preservedHeightAttr || 
+                                            (currentHeight && currentHeight !== 'auto' && currentHeight.includes('px')) ||
+                                            (currentMinHeight && currentMinHeight !== '0' && currentMinHeight !== '0px' && currentMinHeight.includes('px'));
+                  
+                  console.log(`[FLICKER DEBUG] remove-inline-styles: Checking preserved height: attr=${preservedHeightAttr}, height=${currentHeight}, minHeight=${currentMinHeight}, hasPreserved=${!!hasPreservedHeight}`);
+                  
+                  if (hasPreservedHeight) {
+                    // CRITICAL: Before setting to auto, ensure the generate-nfts tab content is fully rendered
+                    // Check if the tab has actual content height to prevent collapse
+                    const tabContentHeight = generateNftsTab ? generateNftsTab.offsetHeight : 0;
+                    const tabScrollHeight = generateNftsTab ? generateNftsTab.scrollHeight : 0;
+                    const actualContentHeight = Math.max(tabContentHeight, tabScrollHeight);
+                    
+                    console.log(`[FLICKER DEBUG] remove-inline-styles: Tab content height check: offsetHeight=${tabContentHeight}, scrollHeight=${tabScrollHeight}, actual=${actualContentHeight}`);
+                    
+                    // Use the data attribute value if available, otherwise use the inline style
+                    const heightToUse = preservedHeightAttr || currentHeight || currentMinHeight;
+                    
+                    // Only set to auto if the tab content has actual height (is rendered)
+                    // Otherwise, keep the preserved height to prevent collapse
+                    if (actualContentHeight > 100) {
+                      console.log(`[FLICKER DEBUG] remove-inline-styles: Preserved height detected (${heightToUse}), tab content is rendered (${actualContentHeight}px), setting to auto now`);
+                      // Set to auto now that tab is fully visible and stable
+                      contentArea.style.setProperty('height', 'auto', 'important');
+                      contentArea.style.setProperty('min-height', '0', 'important');
+                      // Clear the data attribute since we've now set it to auto
+                      contentArea.removeAttribute('data-preserved-height');
+                    } else {
+                      console.log(`[FLICKER DEBUG] remove-inline-styles: Preserved height detected (${heightToUse}), but tab content not fully rendered yet (${actualContentHeight}px), keeping preserved height`);
+                      // Re-apply preserved height to ensure it doesn't collapse
+                      if (heightToUse) {
+                        contentArea.style.setProperty('height', heightToUse, 'important');
+                        contentArea.style.setProperty('min-height', heightToUse, 'important');
+                      }
+                      // Retry after a short delay
+                      setTimeout(() => {
+                        const retryContentHeight = generateNftsTab ? generateNftsTab.offsetHeight : 0;
+                        if (retryContentHeight > 100) {
+                          console.log(`[FLICKER DEBUG] remove-inline-styles: Retry - tab content now rendered (${retryContentHeight}px), setting to auto`);
+                          contentArea.style.setProperty('height', 'auto', 'important');
+                          contentArea.style.setProperty('min-height', '0', 'important');
+                          contentArea.removeAttribute('data-preserved-height');
+                        }
+                      }, 50);
+                    }
+                  } else {
+                    console.log(`[FLICKER DEBUG] remove-inline-styles: No preserved height detected, skipping height=auto`);
+                  }
+                }
+                
+                // Now it's safe to remove inline styles
+                isTabSwitching = false; // Clear flag BEFORE calling removeInlineStyles
+                removeInlineStyles();
+                forceApplyFix();
+                console.log(`[FLICKER DEBUG] remove-inline-styles: Finished deferred operations, isTabSwitching=false`);
+              });
+            });
+          });
+        } else {
+          // If switching away from generate-nfts, reset the flag
+          console.log(`[FLICKER DEBUG] remove-inline-styles: Switching away from generate-nfts, resetting flag`);
+          isTabSwitching = false;
         }
         return result;
       };
+      
+      // Mark as hooked to prevent duplicate hooks
+      navigationModule.showTab._removeInlineStylesHooked = true;
+      _hookSuccess = true;
+      console.log(`[FLICKER DEBUG] remove-inline-styles: Successfully hooked into navigation.showTab`);
+    } else {
+      console.log(`[FLICKER DEBUG] remove-inline-styles: Navigation module not available yet, will retry`);
+      _hookAttempted = false; // Reset so we can retry
     }
   }
   
-  // Try to hook into navigation after a delay
-  setTimeout(hookIntoNavigation, 100);
-  setTimeout(hookIntoNavigation, 500);
-  setTimeout(hookIntoNavigation, 1000);
+  // CRITICAL: Only attempt to hook once, using a single retry mechanism
+  // This prevents duplicate hooks that cause flickering
+  let hookAttempts = 0;
+  const MAX_HOOK_ATTEMPTS = 3;
   
-  // Listen for custom events that might indicate tab switching
-  window.addEventListener('tab-switched', function(e) {
-    if (e.detail && e.detail.tab === 'generate-nfts') {
-      setTimeout(removeInlineStyles, 0);
-      setTimeout(forceApplyFix, 0);
-      requestAnimationFrame(forceApplyFix);
-      setTimeout(removeInlineStyles, 50);
-      setTimeout(forceApplyFix, 50);
-      setTimeout(removeInlineStyles, 200);
-      setTimeout(forceApplyFix, 200);
-      setTimeout(removeInlineStyles, 500);
-      setTimeout(forceApplyFix, 500);
+  const attemptHook = () => {
+    if (_hookSuccess) {
+      return; // Already successful, don't retry
     }
+    
+    hookAttempts++;
+    if (hookAttempts > MAX_HOOK_ATTEMPTS) {
+      console.log(`[FLICKER DEBUG] remove-inline-styles: Max hook attempts reached, giving up`);
+      return;
+    }
+    
+    hookIntoNavigation();
+    
+    // If not successful, retry after a delay
+    if (!_hookSuccess && hookAttempts < MAX_HOOK_ATTEMPTS) {
+      setTimeout(attemptHook, 100 * hookAttempts); // Exponential backoff
+    }
+  };
+  
+  // Try to hook into navigation - use requestAnimationFrame for immediate execution
+  requestAnimationFrame(() => {
+    attemptHook();
   });
+  
+  // Also try when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(attemptHook, 50);
+    });
+  } else {
+    // DOM already ready, try after a short delay
+    setTimeout(attemptHook, 100);
+  }
 
-  // CONSTANT MONITORING: Check every frame if Generate NFTs is active and apply fix
+  // CONSTANT MONITORING: Check periodically (not every frame) if Generate NFTs is active and apply fix
+  // Use throttling to avoid performance issues
+  let lastMonitorTime = 0;
+  const MONITOR_INTERVAL = 100; // Check every 100ms instead of every frame
+  
   function constantMonitor() {
+    const now = performance.now();
+    if (now - lastMonitorTime < MONITOR_INTERVAL) {
+      return; // Skip if called too frequently
+    }
+    lastMonitorTime = now;
+    
     const generateNftsTab = document.getElementById('generate-nfts');
     const contentArea = document.querySelector('.content-area');
     
@@ -421,15 +554,10 @@
     }
   }
   
-  // Run constant monitoring every frame - VERY AGGRESSIVE
+  // Run constant monitoring periodically (not every frame) - OPTIMIZED
   setInterval(function() {
     constantMonitor();
-    injectStyleTag(); // Re-inject style tag every frame to ensure it's always present
-  }, 16); // ~60fps
-  
-  requestAnimationFrame(function loop() {
-    constantMonitor();
-    requestAnimationFrame(loop);
-  });
+    injectStyleTag(); // Re-inject style tag periodically to ensure it's always present
+  }, MONITOR_INTERVAL); // Use same interval as throttling
 })();
 

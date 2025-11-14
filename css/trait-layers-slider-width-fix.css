@@ -112,14 +112,18 @@
 /* Ensure drag handle is visible and properly sized */
 .trait-layer-drag-handle {
   margin-right: 1rem !important;
-  cursor: grab;
+  cursor: help !important; /* Help cursor for tooltip */
   flex: 0 0 auto !important;
   background: transparent !important;
   background-color: transparent !important;
 }
 
+.trait-layer-drag-handle.tooltip {
+  cursor: help !important; /* Ensure tooltip class maintains help cursor */
+}
+
 .trait-layer-drag-handle:active {
-  cursor: grabbing;
+  cursor: grabbing !important;
 }
 
 .trait-layer-bar.expanded .trait-layer-header {
@@ -127,12 +131,18 @@
   max-width: 1557px !important;
 }
 
+/* CRITICAL: Only make the drag handle itself transparent, NOT the tooltip */
 .trait-layer-drag-handle,
-.trait-layer-drag-handle .tooltip,
-.trait-layer-drag-handle .tooltiptext,
-.trait-layer-drag-handle .custom-tooltip {
+.trait-layer-drag-handle .tooltip {
   background: transparent !important;
   background-color: transparent !important;
+}
+
+/* CRITICAL: Ensure tooltip has proper styling (not transparent) */
+.trait-layer-drag-handle .tooltiptext {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
 }
 
 .trait-layer-header-rarity,

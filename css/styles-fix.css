@@ -96,6 +96,11 @@
   border: 1px solid #444; /* Border for better visibility */
 }
 
+.trait-layer-header-rarity-value-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .trait-layer-header-rarity-value {
   font-size: 0.9rem;
   color: var(--accent-primary);

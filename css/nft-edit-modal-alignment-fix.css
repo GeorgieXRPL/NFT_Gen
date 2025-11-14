@@ -42,6 +42,19 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
+/* CRITICAL: Ensure first and last items don't get clipped - remove margins since container padding handles spacing */
+html body #app #generate-nfts .nft-trait-info-list .nft-trait-info-item:first-child,
+.nft-trait-info-list .nft-trait-info-item:first-child {
+  margin-top: 0 !important; /* Container padding handles top spacing */
+  padding-top: 0 !important; /* Ensure no top padding */
+}
+
+html body #app #generate-nfts .nft-trait-info-list .nft-trait-info-item:last-child,
+.nft-trait-info-list .nft-trait-info-item:last-child {
+  margin-bottom: 0 !important; /* Container padding-bottom (40px) handles bottom spacing */
+  padding-bottom: 0 !important; /* Ensure no bottom padding */
+}
+
 /* Force center alignment for trait info text containers */
 .nft-edit-modal-content .nft-edit-traits-section .nft-edit-traits-list-card .nft-edit-trait-info-panel .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text,
 .nft-edit-traits-list-card .nft-edit-trait-info-list .nft-trait-info-item .nft-trait-info-text,

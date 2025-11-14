@@ -778,8 +778,8 @@ class NFTEditModal {
         word-wrap: break-word;
         overflow-wrap: break-word;
       `;
-      traitNameDiv.textContent = traitName.length > 21 ? traitName.slice(0, 21) + '...' : traitName;
-      if (traitName.length > 21) {
+      traitNameDiv.textContent = traitName.length > 19 ? traitName.slice(0, 19) + '...' : traitName;
+      if (traitName.length > 19) {
         // Remove title and add custom tooltip
         traitNameDiv.removeAttribute('title');
         traitNameDiv.classList.add('tooltip');
@@ -790,6 +790,11 @@ class NFTEditModal {
           traitNameDiv.appendChild(nameTooltip);
         }
         nameTooltip.textContent = traitName;
+        // CRITICAL: Setup tooltip positioning
+        const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+        if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+          generateNftsUI.setupTooltipPositioning(traitNameDiv, nameTooltip);
+        }
       } else {
         traitNameDiv.removeAttribute('title');
       }

@@ -2658,8 +2658,25 @@
         }
       }
       
+      // Create window focus/blur handlers for browser minimize/maximize
+      this._windowFocusHandler = () => {
+        if (loadingOverlay && loadingOverlay.style.display !== "none") {
+          // Window regained focus and loading overlay is still showing - restart animation
+          this.restartLoadingAnimation()
+        }
+      }
+      
+      this._windowBlurHandler = () => {
+        // Window lost focus - animation will pause, but we'll restart it when focus returns
+        // No action needed here, focus handler will restart it
+      }
+      
       // Add the visibility change listener
       document.addEventListener('visibilitychange', this._visibilityChangeHandler)
+      
+      // Add window focus/blur listeners for browser minimize/maximize
+      window.addEventListener('focus', this._windowFocusHandler)
+      window.addEventListener('blur', this._windowBlurHandler)
     },
     
     // Restart loading animation (useful when tab becomes visible again or window is restored)
@@ -2775,6 +2792,16 @@
       if (this._visibilityChangeHandler) {
         document.removeEventListener('visibilitychange', this._visibilityChangeHandler)
         this._visibilityChangeHandler = null
+      }
+      
+      // Remove window focus/blur listeners when hiding loading animation
+      if (this._windowFocusHandler) {
+        window.removeEventListener('focus', this._windowFocusHandler)
+        this._windowFocusHandler = null
+      }
+      if (this._windowBlurHandler) {
+        window.removeEventListener('blur', this._windowBlurHandler)
+        this._windowBlurHandler = null
       }
     },
 

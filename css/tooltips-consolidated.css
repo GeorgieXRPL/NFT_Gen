@@ -12,12 +12,11 @@
   background-color: #000000 !important;
   background: #000000 !important;
   color: #f39c12 !important;
-  text-align: center;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
-  line-height: 1.4;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
   white-space: normal;
   max-width: 300px;
   width: max-content;
@@ -26,6 +25,10 @@
   opacity: 0;
   transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   word-wrap: break-word;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
 /* CRITICAL: Add cursor help to all tooltip parent elements */
@@ -33,31 +36,146 @@
   cursor: help !important;
 }
 
-/* CRITICAL: Dark NFTs button - remove tooltip functionality completely */
-#generate-dark-nfts.tooltip,
-#generate-dark-nfts {
-  cursor: pointer !important; /* Normal pointer cursor, not help cursor */
-}
-
-/* CRITICAL: Hide Dark NFTs tooltip completely */
-#generate-dark-nfts.tooltip .tooltiptext,
-#generate-dark-nfts .tooltiptext {
-  display: none !important;
+/* CRITICAL: Navigation tab tooltips - standard tooltip style */
+.nav-tab.tooltip .tooltiptext {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important; /* Orange text */
+  border-radius: 6px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  z-index: 2147483647 !important; /* Highest z-index */
+  position: fixed !important; /* JavaScript will control positioning */
   visibility: hidden !important;
   opacity: 0 !important;
+  transition: opacity 1s ease !important; /* 1 second fade */
   pointer-events: none !important;
-  height: 0 !important;
-  width: 0 !important;
-  padding: 0 !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
   margin: 0 !important;
-  overflow: hidden !important;
 }
 
-/* CRITICAL: Hide Dark NFTs tooltip arrow completely */
+/* CRITICAL: Disable CSS hover rules for navigation tab tooltips - JavaScript controls visibility */
+.nav-tab.tooltip:hover .tooltiptext {
+  visibility: hidden !important; /* JavaScript will control visibility with 1-second delay */
+  opacity: 0 !important;
+}
+
+/* CRITICAL: Remove help cursor from navigation tabs - user requested to remove "?" cursor */
+.nav-tab.tooltip {
+  cursor: pointer !important;
+}
+
+/* CRITICAL: Navigation tab tooltip arrow - pointing downward (tooltip is above tab) */
+.nav-tab.tooltip .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important; /* Position arrow at bottom of tooltip */
+  bottom: auto !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  margin-top: -1px !important; /* Small overlap to connect with tooltip */
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to tab */
+}
+
+/* CRITICAL: Dark NFTs button - add help cursor for tooltip (only when NOT active) */
+#generate-dark-nfts.tooltip:not(.active),
+#generate-dark-nfts:not(.active) {
+  cursor: help !important; /* Help cursor for tooltip */
+}
+
+/* CRITICAL: Dark NFTs button when active - use pointer cursor (no tooltip when active) */
+#generate-dark-nfts.tooltip.active,
+#generate-dark-nfts.active {
+  cursor: pointer !important; /* Pointer cursor when active (no tooltip) */
+}
+
+/* CRITICAL: Dark NFTs tooltip - use standard tooltip style (similar to Seed NFT) */
+#generate-dark-nfts.tooltip .tooltiptext,
+#generate-dark-nfts .tooltiptext {
+  background-color: #000000 !important; /* Black background to match standard tooltips */
+  background: #000000 !important;
+  color: #f39c12 !important; /* Orange text to match standard tooltips */
+  border-radius: 6px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 320px !important;
+  width: max-content !important;
+  z-index: 21474836470 !important; /* CRITICAL: Maximum z-index to ensure it's above nav-container (999999) */
+  position: fixed !important; /* JavaScript will set exact position above buttons */
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity 1s ease !important; /* 1 second to match standard tooltips */
+  pointer-events: none !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important; /* JavaScript will handle centering */
+  margin: 0 !important;
+  /* CRITICAL: Ensure tooltip is not clipped by any parent container */
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  /* CRITICAL: Create new stacking context to escape navigation container clipping */
+  isolation: isolate !important;
+  contain: none !important; /* Don't contain layout/paint to allow tooltip to escape */
+  /* CRITICAL: Ensure tooltip escapes all parent containers including navigation */
+  will-change: transform, opacity !important; /* Optimize for positioning changes */
+}
+
+/* CRITICAL: Ensure tooltips moved to body maintain proper styling */
+body > .tooltiptext {
+  z-index: 21474836470 !important;
+  position: fixed !important;
+}
+
+/* CRITICAL: Dark NFTs tooltip arrow - pointing downward (tooltip is above button) */
 #generate-dark-nfts.tooltip .tooltiptext::after,
 #generate-dark-nfts .tooltiptext::after {
-  display: none !important;
-  content: none !important;
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important; /* Position arrow at bottom of tooltip */
+  bottom: auto !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  margin-top: -1px !important; /* Small overlap to connect with tooltip */
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button */
+}
+
+/* CRITICAL: Don't use CSS hover to show tooltip - JavaScript will control visibility with delay */
+#generate-dark-nfts.tooltip:hover .tooltiptext,
+#generate-dark-nfts:hover .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Ensure tooltip is hidden by default - JavaScript controls display */
 }
 
 /* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
@@ -100,6 +218,17 @@
   margin: 0 !important;
   margin-bottom: 0 !important;
   margin-top: 0 !important;
+  z-index: 2147483647 !important; /* Highest z-index to ensure visibility */
+}
+
+/* CRITICAL: Ensure Export NFTs / Metadata navigation tab tooltip has highest z-index */
+.nav-tab[data-tab="export-nfts"].tooltip .tooltiptext,
+.nav-tab.tooltip[data-tab="export-nfts"] .tooltiptext {
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+  position: fixed !important;
+  display: block !important; /* Ensure tooltip can be displayed */
+  pointer-events: none !important;
+  /* JavaScript controls visibility and opacity - don't override here */
 }
 
 /* Tooltip arrow */
@@ -164,7 +293,7 @@
 .rule-actions .tooltip .tooltiptext {
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
-  padding: 6px 10px;
+  padding: 8px 12px !important; /* CRITICAL: Equal top and bottom padding (8px) */
   text-align: center;
 }
 
@@ -217,7 +346,10 @@ body {
   position: relative;
 }
 
-.rule-actions .action-btn .tooltip-text {
+.rule-actions .action-btn .tooltip-text,
+.rule-actions .action-btn.tooltip .tooltip-text,
+html body .rule-actions .action-btn .tooltip-text,
+html body .rule-actions .action-btn.tooltip .tooltip-text {
   visibility: hidden !important;
   opacity: 0 !important;
   position: fixed !important; /* Use fixed positioning to escape container constraints */
@@ -234,16 +366,22 @@ body {
   background-color: #000000 !important;
   background: #000000 !important;
   color: #f39c12 !important;
-  text-align: center !important;
-  font-size: 11px !important;
-  font-family: 'Archivo', sans-serif !important;
-  padding: 8px 12px !important; /* Match standard tooltip padding */
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
   border-radius: 6px !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  line-height: 1.4 !important;
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
   transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   pointer-events: none !important;
   margin: 0 !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
+  overflow: visible !important; /* Ensure tooltip is not clipped */
+  clip: auto !important;
+  clip-path: none !important;
 }
 
 /* CRITICAL: Add cursor help to rule action buttons */
@@ -289,11 +427,15 @@ body {
 .trait-layer-header .action-btn.tooltip .tooltiptext,
 .trait-layer-header .rename-layer.tooltip .tooltiptext,
 .trait-layer-header .delete-layer.tooltip .tooltiptext {
-  position: absolute !important;
-  bottom: 125% !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  margin-bottom: 5px !important;
+  /* CRITICAL: Use fixed positioning to match JavaScript positioning - allows tooltip to escape container constraints */
+  position: fixed !important;
+  bottom: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
   visibility: hidden !important;
   opacity: 0 !important;
   transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
@@ -301,14 +443,23 @@ body {
   background-color: #000000 !important;
   background: #000000 !important;
   color: #f39c12 !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
+  /* JavaScript will set exact position via inline styles */
 }
 
+/* CRITICAL: Disable CSS hover rules for trait layer buttons - JavaScript controls with 1-second delay */
 .trait-layer-header .position-btn.tooltip:hover .tooltiptext,
 .trait-layer-header .action-btn.tooltip:hover .tooltiptext,
 .trait-layer-header .rename-layer.tooltip:hover .tooltiptext,
 .trait-layer-header .delete-layer.tooltip:hover .tooltiptext {
-  visibility: visible !important;
-  opacity: 1 !important;
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Ensure tooltip is hidden by default - JavaScript controls display */
 }
 
 /* Add arrow to header button tooltips */
@@ -326,12 +477,100 @@ body {
   border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
 }
 
-/* For other tooltips in trait-layer-bar (like drag handle), keep fixed positioning */
+/* CRITICAL: Rarity value wrapper tooltip - standard tooltip style with black background */
+.trait-layer-header-rarity-value-wrapper.tooltip .tooltiptext,
+.trait-layer-header .trait-layer-header-rarity-value-wrapper.tooltip .tooltiptext,
+.trait-layer-header-rarity .trait-layer-header-rarity-value-wrapper.tooltip .tooltiptext {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity 1s ease !important;
+  pointer-events: none !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  /* CRITICAL: Force black background - override any purple or other colors */
+  border: none !important;
+}
+
+/* CRITICAL: Disable CSS hover rules for rarity value wrapper tooltip */
+.trait-layer-header-rarity-value-wrapper.tooltip:hover .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* CRITICAL: Disable CSS hover rules for trait layer tooltips - JavaScript controls with 1-second delay */
+.trait-layer-arrow.tooltip:hover .tooltiptext,
+.trait-layer-name.tooltip:hover .tooltiptext,
+.trait-layer-stats.tooltip:hover .tooltiptext,
+.expanded-trait-layer-card-delete-btn.tooltip:hover .tooltiptext,
+.expanded-trait-layer-card-replace-btn.tooltip:hover .tooltiptext,
+.expanded-trait-layer-card-view-btn.tooltip:hover .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Ensure tooltip is hidden by default - JavaScript controls display */
+}
+
+/* For other tooltips in trait-layer-bar (like drag handle, arrow, name, stats), keep fixed positioning */
 .trait-layer-bar .tooltip:not(.position-btn):not(.action-btn):not(.rename-layer):not(.delete-layer) .tooltiptext,
-.trait-layer-content .tooltip .tooltiptext {
+.trait-layer-drag-handle.tooltip .tooltiptext,
+.trait-layer-arrow.tooltip .tooltiptext,
+.trait-layer-name.tooltip .tooltiptext,
+.trait-layer-stats.tooltip .tooltiptext,
+.trait-layer-content .tooltip .tooltiptext,
+.expanded-trait-layer-card-delete-btn.tooltip .tooltiptext,
+.expanded-trait-layer-card-replace-btn.tooltip .tooltiptext,
+.expanded-trait-layer-card-view-btn.tooltip .tooltiptext {
   position: fixed !important;
   transform: none !important;
   bottom: auto !important; /* avoid conflicting bottom from default */
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #f39c12 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
+  font-size: 11px !important;
+  font-family: 'Archivo', sans-serif !important;
+  z-index: 2147483647 !important; /* Highest z-index to ensure visibility */
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity 1s ease !important;
+  pointer-events: none !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
 }
 
 /* CRITICAL: Ensure drag handle tooltip uses standard orange text on black background */
@@ -341,12 +580,11 @@ body {
   background: #000000 !important;
   color: #f39c12 !important;
   border-radius: 6px !important;
-  padding: 8px 12px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
-  line-height: 1.4 !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  text-align: center !important;
   transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   z-index: 2147483647 !important;
   position: fixed !important;
@@ -354,6 +592,10 @@ body {
   word-wrap: break-word !important;
   max-width: 300px !important;
   width: max-content !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
 /* CRITICAL: Add cursor help to drag handle when not actively dragging */
@@ -398,12 +640,11 @@ body {
   background: #000000 !important;
   color: #f39c12 !important;
   border-radius: 6px !important;
-  padding: 8px 12px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding for vertical centering */
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  text-align: center !important;
   transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
   z-index: 2147483647 !important;
   position: fixed !important; /* Fixed positioning to escape container constraints */
@@ -414,6 +655,11 @@ body {
   pointer-events: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
 /* CRITICAL: Ensure buttons maintain their functionality and don't interfere with tooltips */
@@ -434,6 +680,32 @@ body {
   position: relative !important; /* Required for tooltip positioning */
   overflow: visible !important; /* Allow tooltips to overflow button boundaries */
   pointer-events: auto !important; /* Ensure button clicks work */
+}
+
+/* CRITICAL: Disable CSS hover rules for these buttons - JavaScript controls with 1-second delay */
+.app-action-btn.tooltip:hover .tooltiptext,
+#add-layer-btn.tooltip:hover .tooltiptext,
+#add-layer-btn:hover .tooltiptext,
+#delete-all-layers.tooltip:hover .tooltiptext,
+#delete-all-layers:hover .tooltiptext,
+.add-folders-btn.tooltip:hover .tooltiptext,
+#add-folders-btn.tooltip:hover .tooltiptext,
+#add-folders-btn:hover .tooltiptext,
+.jump-to-rules-btn.tooltip:hover .tooltiptext,
+#jump-to-rules-btn.tooltip:hover .tooltiptext,
+#jump-to-rules-btn:hover .tooltiptext,
+.jump-to-rules-bottom-btn.tooltip:hover .tooltiptext,
+#jump-to-rules-bottom-btn.tooltip:hover .tooltiptext,
+#jump-to-rules-bottom-btn:hover .tooltiptext,
+.jump-to-layers-btn.tooltip:hover .tooltiptext,
+#jump-to-layers-btn.tooltip:hover .tooltiptext,
+#jump-to-layers-btn:hover .tooltiptext,
+.jump-to-layers-bottom-btn.tooltip:hover .tooltiptext,
+#jump-to-layers-bottom-btn.tooltip:hover .tooltiptext,
+#jump-to-layers-bottom-btn:hover .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Prevent CSS from showing tooltip immediately */
 }
 
 /* CRITICAL: Add cursor help to SELECT FOR EXPORT and ALREADY EXPORTED buttons */
@@ -467,12 +739,15 @@ html body .rule-actions .action-btn .tooltip-text {
   background: #000000 !important;
   color: #f39c12 !important;
   border-radius: 6px !important;
-  padding: 8px 12px !important;
+  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
   font-size: 11px !important;
-  line-height: 1.4 !important;
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  text-align: center !important;
   transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  text-align: center !important; /* Horizontal centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
 /* CRITICAL: Add cursor help to all tooltip elements */
@@ -508,20 +783,26 @@ html body .rule-actions .action-btn .tooltip-text {
 #saved-seeds-modal .tooltip .tooltiptext,
 #saved-seeds-modal .tooltiptext,
 #saved-seeds-modal .custom-tooltip {
-  background-color: rgba(0, 0, 0, 0.9) !important;
-  color: #f39c12 !important;
+  background-color: #000000 !important; /* Standard black background */
+  background: #000000 !important;
+  color: #f39c12 !important; /* Standard orange text */
   border-radius: 6px !important;
-  padding: 8px 10px !important;
+  padding: 8px 12px !important; /* CRITICAL: Equal top and bottom padding (8px) */
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  text-align: justify !important;
-  text-justify: inter-word !important;
+  text-align: center !important; /* Center text */
   white-space: normal !important;
-  max-width: 260px !important;
+  max-width: 300px !important;
   width: max-content !important;
-  z-index: 2147483647 !important;
+  z-index: 2147483647 !important; /* Maximum z-index to ensure tooltips never get clipped */
+  position: fixed !important; /* Use fixed positioning to escape container constraints */
+  transition: opacity 1s ease !important; /* Standard 1 second fade */
+  /* CRITICAL: Center text both horizontally and vertically */
+  display: block !important; /* Use block instead of flex for better text wrapping */
+  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
+  /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
 /* Default placement for saved-seeds tooltips: below and centered */

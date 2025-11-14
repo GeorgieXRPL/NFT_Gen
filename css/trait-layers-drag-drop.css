@@ -11,6 +11,11 @@
   position: static !important;
 }
 
+/* CRITICAL: Exception for reordering animation - temporary relative positioning during animation */
+.trait-layer-bar.reordering {
+  position: relative !important; /* Override static for animation */
+}
+
 /* Hover state to indicate elements are draggable */
 .trait-layer-bar:not(.expanded):hover {
   border-color: var(--accent-primary) !important;
@@ -24,6 +29,70 @@
   z-index: 100 !important;
   position: relative !important;
   background-color: rgba(108, 92, 231, 0.08) !important;
+}
+
+/* CRITICAL: Reordering animation state - smooth movement when using arrow up/down buttons */
+.trait-layer-bar.reordering {
+  position: relative !important;
+  z-index: 1000 !important; /* Higher z-index during animation to appear above other layers */
+  will-change: transform !important; /* Optimize for animation performance */
+  pointer-events: none !important; /* Prevent interaction during animation */
+  /* CRITICAL: Maintain header alignment and spacing during animation */
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* CRITICAL: Ensure trait layer headers maintain perfect alignment and spacing during reordering animation */
+.trait-layer-bar.reordering .trait-layer-header {
+  width: 1557px !important;
+  max-width: 1557px !important;
+  min-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 2rem !important;
+  flex-wrap: nowrap !important;
+  gap: 0 !important;
+  position: relative !important;
+  /* Prevent any layout shifts during animation */
+  transform: none !important; /* Header itself should not transform, only the bar */
+}
+
+/* CRITICAL: Ensure trait-layers-container maintains proper spacing during reordering animation */
+.trait-layers-container:has(.trait-layer-bar.reordering) {
+  gap: 0.75rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 1557px !important;
+  max-width: 1557px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Alternative selector for browsers that don't support :has() */
+.trait-layers-container .trait-layer-bar.reordering ~ .trait-layer-bar,
+.trait-layers-container .trait-layer-bar:has(~ .trait-layer-bar.reordering) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Ensure spacing is maintained between all layers during animation */
+.trait-layers-container .trait-layer-bar.reordering {
+  margin-bottom: 0.75rem !important;
+  margin-top: 0 !important;
+}
+
+/* Ensure smooth transition for reordering animation */
+.trait-layer-bar.reordering,
+.trait-layer-bar[style*="transform"] {
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Enhanced placeholder styling */

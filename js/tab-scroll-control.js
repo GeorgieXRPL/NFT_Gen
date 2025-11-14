@@ -56,7 +56,8 @@ window.NFTApp.registerModule("tabScrollControl", {
     tab.style.scrollbarWidth = 'none';
     tab.style.msOverflowStyle = 'none';
     
-    console.log(`[TabScrollControl] Scrolling DISABLED for tab: ${tab.id}`);
+    // Removed debug log to reduce console noise
+    // console.log(`[TabScrollControl] Scrolling DISABLED for tab: ${tab.id}`);
   },
 
   // Set up listener for tab changes
@@ -67,23 +68,31 @@ window.NFTApp.registerModule("tabScrollControl", {
       if (tabButton) {
         const tabId = tabButton.getAttribute('data-tab');
         if (tabId) {
-          setTimeout(() => {
-            this.handleTabChange(tabId);
-          }, 100);
+          // Execute immediately - no delay needed
+          this.handleTabChange(tabId);
         }
       }
     });
 
     // Also listen for programmatic tab changes
-    const originalShowTab = window.NFTApp?.getModule?.('navigation')?.showTab;
-    if (originalShowTab) {
-      window.NFTApp.getModule('navigation').showTab = (tabId, isUserInitiated) => {
+    // CRITICAL: Check if already hooked to prevent duplicate hooks
+    const navigationModule = window.NFTApp?.getModule?.('navigation');
+    if (navigationModule && typeof navigationModule.showTab === 'function') {
+      // Check if already hooked
+      if (navigationModule.showTab._tabScrollControlHooked) {
+        return; // Already hooked
+      }
+      
+      const originalShowTab = navigationModule.showTab;
+      navigationModule.showTab = (tabId, isUserInitiated) => {
         const result = originalShowTab.call(this, tabId, isUserInitiated);
-        setTimeout(() => {
-          this.handleTabChange(tabId);
-        }, 100);
+        // Execute immediately - no delay needed for tab switching
+        this.handleTabChange(tabId);
         return result;
       };
+      
+      // Mark as hooked to prevent duplicate hooks
+      navigationModule.showTab._tabScrollControlHooked = true;
     }
   },
 
@@ -92,11 +101,17 @@ window.NFTApp.registerModule("tabScrollControl", {
     const tab = document.getElementById(tabId);
     if (!tab) return;
 
-    // Check if this tab should be non-scrollable
-    if (this.nonScrollableTabs.includes(tabId)) {
-      this.disableScrolling(tab);
-    } else {
-      this.enableScrolling(tab);
+    // CRITICAL: Always disable scrolling for ALL tabs - no scrollbars anywhere in the app
+    this.disableScrolling(tab);
+    
+    // Also ensure content-area doesn't have scrollbar
+    const contentArea = tab.closest('.content-area') || document.querySelector('.content-area');
+    if (contentArea) {
+      contentArea.style.setProperty('overflow', 'hidden', 'important');
+      contentArea.style.setProperty('overflow-y', 'hidden', 'important');
+      contentArea.style.setProperty('overflow-x', 'hidden', 'important');
+      contentArea.style.setProperty('scrollbar-width', 'none', 'important');
+      contentArea.style.setProperty('-ms-overflow-style', 'none', 'important');
     }
   },
 

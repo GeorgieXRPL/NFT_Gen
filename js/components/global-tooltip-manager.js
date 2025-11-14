@@ -16,10 +16,20 @@ window.NFTApp.registerModule("globalTooltipManager", {
 
     // Ensure tooltip has correct styling
     this.ensureTooltipStyle(tooltip);
+    
+    // CRITICAL: Ensure tooltip has 1 second transition for fade in/out
+    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+
+    // CRITICAL: Also set up tooltip on SVG elements inside the button
+    // This ensures hovering over the SVG icon also shows the tooltip
+    const svgElements = element.querySelectorAll ? element.querySelectorAll("svg") : [];
+    const parentButton = element.tagName === "SVG" ? element.closest("button") : element;
+    const targetElement = parentButton || element; // Use parent button if element is SVG, otherwise use element itself
 
     let tooltipTimeout = null;
 
-    element.addEventListener("mouseenter", () => {
+    // Helper function to show tooltip
+    const showTooltip = (triggerElement) => {
       // Hide any currently displayed tooltip
       this.hideCurrentTooltip();
 
@@ -29,7 +39,11 @@ window.NFTApp.registerModule("globalTooltipManager", {
         tooltipTimeout = null;
       }
 
-      // Show tooltip after 1 second delay
+      // CRITICAL: Navigation tabs have 4 second delay, other tooltips have 1 second delay
+      const isNavTab = targetElement.classList.contains('nav-tab') || targetElement.closest('.nav-tab');
+      const delay = isNavTab ? 4000 : 1000; // 4 seconds for navigation tabs, 1 second for others
+      
+      // Show tooltip after delay
       tooltipTimeout = setTimeout(() => {
         // Double-check if another tooltip started showing
         if (this.currentTooltip && this.currentTooltip !== tooltip) {
@@ -39,9 +53,10 @@ window.NFTApp.registerModule("globalTooltipManager", {
 
         // Set this as the current tooltip
         this.currentTooltip = tooltip;
-        this.currentElement = element;
+        this.currentElement = targetElement;
 
-        const rect = element.getBoundingClientRect();
+        // Use the button element's position for tooltip (not SVG if triggerElement is SVG)
+        const rect = targetElement.getBoundingClientRect();
         // Make tooltip temporarily visible to measure height, but keep it off-screen
         tooltip.style.visibility = "visible";
         tooltip.style.opacity = "0";
@@ -54,7 +69,13 @@ window.NFTApp.registerModule("globalTooltipManager", {
 
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         tooltip.style.setProperty("position", "fixed", "important");
+        // CRITICAL: Ensure Export NFTs / Metadata navigation tab tooltip has highest z-index
+        const isExportNavTab = (targetElement.classList.contains('nav-tab') && targetElement.dataset.tab === 'export-nfts') || 
+                                (targetElement.closest('.nav-tab') && targetElement.closest('.nav-tab').dataset.tab === 'export-nfts');
         tooltip.style.setProperty("z-index", "2147483647", "important");
+        if (isExportNavTab) {
+          tooltip.style.setProperty("display", "block", "important");
+        }
         tooltip.style.setProperty("bottom", "auto", "important");
         tooltip.style.setProperty("right", "auto", "important");
         tooltip.style.setProperty("margin", "0", "important");
@@ -66,22 +87,33 @@ window.NFTApp.registerModule("globalTooltipManager", {
         tooltip.style.setProperty("color", "#f39c12", "important");
 
         // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
-        const elementRect = element.getBoundingClientRect();
+        const elementRect = targetElement.getBoundingClientRect();
         const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
-        const topPosition = elementRect.top - tooltipHeight - 5;
+        // CRITICAL: For navigation tabs, move tooltip 20px down from original position
+        const isNavTab = targetElement.classList.contains('nav-tab') || targetElement.closest('.nav-tab');
+        // CRITICAL: Check if element is inside nft-action-buttons-container and move tooltip 15px up
+        const isInNftActionButtonsContainer = targetElement.closest('.nft-action-buttons-container') !== null;
+        const baseOffset = 5;
+        const navTabOffset = isNavTab ? 20 : 0;
+        const nftActionButtonsOffset = isInNftActionButtonsContainer ? -15 : 0; // Move 15px up (negative offset)
+        const topPosition = elementRect.top - tooltipHeight - baseOffset + navTabOffset + nftActionButtonsOffset;
         tooltip.style.setProperty("top", `${topPosition}px`, "important");
         tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
 
+        // CRITICAL: Ensure transition is set before fade in
+        tooltip.style.setProperty("transition", "opacity 1s ease", "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-          tooltip.style.opacity = "1";
+          tooltip.style.setProperty("visibility", "visible", "important");
+          tooltip.style.setProperty("opacity", "1", "important");
         });
 
         tooltipTimeout = null;
-      }, 1000); // 1 second delay
-    });
+      }, delay); // 4 seconds for navigation tabs, 1 second for others
+    };
 
-    element.addEventListener("mouseleave", () => {
+    // Helper function to hide tooltip
+    const hideTooltip = () => {
       // Clear the show timeout if mouse leaves before delay completes
       if (tooltipTimeout) {
         clearTimeout(tooltipTimeout);
@@ -92,24 +124,50 @@ window.NFTApp.registerModule("globalTooltipManager", {
       if (this.currentTooltip === tooltip) {
         this.hideCurrentTooltip();
       } else {
+        // CRITICAL: Ensure transition is set before fade out
+        tooltip.style.setProperty("transition", "opacity 1s ease", "important");
         // Fade out this tooltip
-        tooltip.style.opacity = "0";
+        tooltip.style.setProperty("opacity", "0", "important");
         // Wait for fade out transition to complete before hiding
         setTimeout(() => {
-          tooltip.style.visibility = "hidden";
+          tooltip.style.setProperty("visibility", "hidden", "important");
         }, 1000);
       }
+    };
+
+    element.addEventListener("mouseenter", () => {
+      showTooltip(element);
+    });
+
+    element.addEventListener("mouseleave", () => {
+      hideTooltip();
+    });
+
+    // Also set up tooltip on SVG elements inside the button
+    svgElements.forEach(svg => {
+      // Add cursor help to SVG
+      svg.style.setProperty("cursor", "help", "important");
+      
+      svg.addEventListener("mouseenter", () => {
+        showTooltip(svg);
+      });
+
+      svg.addEventListener("mouseleave", () => {
+        hideTooltip();
+      });
     });
   },
 
   // Hide the currently displayed tooltip
   hideCurrentTooltip: function() {
     if (this.currentTooltip) {
-      this.currentTooltip.style.opacity = "0";
+      // CRITICAL: Ensure transition is set for fade out
+      this.currentTooltip.style.setProperty("transition", "opacity 1s ease", "important");
+      this.currentTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         if (this.currentTooltip) {
-          this.currentTooltip.style.visibility = "hidden";
+          this.currentTooltip.style.setProperty("visibility", "hidden", "important");
         }
       }, 1000);
       this.currentTooltip = null;

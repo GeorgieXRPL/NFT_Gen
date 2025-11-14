@@ -44,6 +44,7 @@
   flex-direction: column;
   overflow: visible !important;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  position: relative !important; /* Create stacking context for trait cards */
 }
 
 #combination-rule-modal .combination-rule-header {
@@ -103,6 +104,8 @@
   overflow-y: auto;
   padding: 20px 24px;
   background: #222;
+  position: relative !important; /* Create stacking context for trait cards */
+  z-index: 0 !important; /* Lower z-index than trait cards to allow halo effects */
 }
 
 #combination-rule-modal .combination-rule-footer {
@@ -146,6 +149,7 @@
   position: relative; /* Allows absolute positioning of warning */
   margin-top: 50px; /* Reserve space for warning message */
   overflow: visible !important;
+  z-index: 0 !important; /* Lower z-index than trait cards to allow halo effects */
 }
 
 /* Fixed space for warning message - prevents content shift */
@@ -180,6 +184,8 @@
   width: 623px !important;
   max-width: 623px !important;
   overflow: visible !important;
+  position: relative !important; /* Create stacking context for trait cards */
+  z-index: 0 !important; /* Lower z-index than trait cards to allow halo effects */
 }
 
 #combination-rule-modal .traits-selection-container {
@@ -209,7 +215,7 @@
   flex-shrink: 0 !important;
   position: sticky !important;
   top: 0 !important;
-  z-index: 10 !important;
+  z-index: 1 !important; /* Lower z-index than trait cards to allow halo effects to show above */
 }
 
 #combination-rule-modal .traits-selection-header span {
@@ -254,6 +260,8 @@
   padding: 20px !important; /* Increased padding to accommodate halo effects (was 12px) */
   contain: none !important;
   isolation: auto !important;
+  position: relative !important; /* Create stacking context for trait cards */
+  z-index: 0 !important; /* Lower z-index than trait cards to allow halo effects */
 }
 
 /* Trait Selection Cards - Match Select Trait modal (142x165px) */
@@ -279,6 +287,8 @@
   overflow: visible !important; /* Changed from hidden to visible to allow halo effects */
   transition: all 0.2s ease !important;
   will-change: transform, z-index !important;
+  contain: none !important; /* Disable containment to allow halo effects to extend beyond card */
+  isolation: auto !important; /* Allow halo effects to show above other elements */
 }
 
 #combination-rule-modal .trait-checkbox-label .trait-checkbox-thumb {
@@ -335,7 +345,7 @@
 #combination-rule-modal .trait-checkbox-label:hover {
   border-color: #a259e6 !important;
   overflow: visible !important;
-  z-index: 99990 !important;
+  z-index: 2147483646 !important; /* High z-index, but lower than selected state to ensure selected cards are always on top */
   position: relative !important;
   transform: translateZ(0) !important;
   box-shadow: 0 4px 12px rgba(162, 89, 230, 0.4) !important; /* Halo effect on hover */
@@ -348,7 +358,7 @@
   box-shadow: 0 0 20px rgba(225, 112, 85, 0.6) !important;
   transform: translateZ(0) scale(1.02) !important;
   transition: all 0.2s ease !important;
-  z-index: 99995 !important;
+  z-index: 2147483647 !important; /* Highest z-index on modal to ensure halo is not clipped by any container */
   overflow: visible !important;
   position: relative !important;
 }
@@ -360,7 +370,7 @@
 #combination-rule-modal .trait-checkbox-label.selected:hover {
   transform: translateZ(0) scale(1.05) !important;
   box-shadow: 0 0 25px rgba(225, 112, 85, 0.8) !important;
-  z-index: 99998 !important;
+  z-index: 2147483647 !important; /* Highest z-index on modal to ensure halo is not clipped by any container */
   overflow: visible !important;
   position: relative !important;
 }
@@ -723,13 +733,14 @@
   overflow: visible !important;
   display: flex !important;
   flex-direction: column !important;
+  position: relative !important; /* Create stacking context for trait cards */
 }
 
 #combination-rule-modal .traits-selection-header {
   flex-shrink: 0 !important;
   position: sticky !important;
   top: 0 !important;
-  z-index: 10 !important;
+  z-index: 1 !important; /* Lower z-index than trait cards to allow halo effects to show above */
 }
 
 #combination-rule-modal .traits-selection-list {
@@ -754,18 +765,20 @@
   max-height: 300px !important;
   contain: none !important;
   padding: 20px !important; /* Increased padding to accommodate halo effects */
+  position: relative !important; /* Create stacking context for trait cards */
+  z-index: 0 !important; /* Lower z-index than trait cards to allow halo effects */
 }
 
-/* Ensure dropdowns stack above layer selectors and lists */
+/* Ensure dropdowns stack above layer selectors and lists, but below selected trait cards */
 #combination-rule-modal .custom-dropdown,
 #combination-rule-modal .custom-dropdown-selected {
   position: relative !important;
-  z-index: 1000000 !important;
+  z-index: 1000000 !important; /* Lower than selected trait cards (2147483647) */
 }
 
 #combination-rule-modal .custom-dropdown-options {
   position: absolute !important;
-  z-index: 1000002 !important;
+  z-index: 1000002 !important; /* Lower than selected trait cards (2147483647) */
 }
 
 /* In case consolidated styles set modal body overflow, force visible here */

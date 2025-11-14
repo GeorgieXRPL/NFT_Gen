@@ -97,12 +97,21 @@
 #trait-selection-modal .select-trait-search-section {
   margin-bottom: 20px;
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Trait Search Controls Container (Clear button + Trait count) */
+#trait-selection-modal .trait-search-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 #trait-selection-modal .trait-search-input {
-  flex: 1;
+  width: 100%;
   padding: 8px 12px;
   background: #181818;
   color: #fff;
@@ -132,6 +141,8 @@
   font-weight: 500;
   font-family: 'Archivo', sans-serif;
   transition: background 0.2s ease;
+  width: fit-content;
+  flex-shrink: 0;
 }
 
 #trait-selection-modal .trait-search-clear:hover {
@@ -142,9 +153,9 @@
   font-size: 13px;
   color: #aaa;
   font-family: 'Archivo', sans-serif;
-  margin-bottom: 12px;
   font-weight: 500;
   flex-shrink: 0;
+  margin: 0;
 }
 
 /* Select Trait Cards - 141x165px similar to Dark Traits */
@@ -294,34 +305,34 @@
 
 /* Select Trait VIEW Button */
 #trait-selection-modal .select-trait-view-btn {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 34px;
-  min-width: 34px;
-  max-width: 34px;
-  height: 20px;
-  min-height: 20px;
-  max-height: 20px;
-  background: #f39c12;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 500;
-  cursor: pointer;
-  z-index: 100;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: background 0.2s ease;
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Archivo', sans-serif;
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  background: #f39c12 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 3px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  z-index: 100 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: background 0.2s ease !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Archivo', sans-serif !important;
 }
 
 #trait-selection-modal .select-trait-view-btn:hover {
-  background: #e67e22;
+  background: #e67e22 !important;
 }
 
 /* Select Trait Forbidden Overlay */

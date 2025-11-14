@@ -116,10 +116,10 @@
   pointer-events: none !important;
 }
 
-/* Rarity badge - matching combination-rule-modal .combination-rule-trait-rarity */
-.expanded-trait-layer-card-rarity {
+/* Rarity input - editable percentage - matching combination-rule-modal .combination-rule-trait-rarity */
+.expanded-trait-layer-card-rarity-input {
   position: absolute !important;
-  top: 4px !important;
+  top: 6px !important; /* CRITICAL: Moved 2px down from 4px */
   left: 4px !important;
   color: #8b5cf6 !important;
   background: rgba(0, 0, 0, 0.7) !important;
@@ -129,10 +129,22 @@
   font-weight: 600 !important;
   font-family: 'Archivo', sans-serif !important;
   z-index: 4 !important;
-  pointer-events: none !important;
+  pointer-events: auto !important; /* Allow editing */
   border: 1px solid rgba(139, 92, 246, 0.3) !important;
   white-space: nowrap !important;
   overflow: visible !important;
+  width: 38px !important; /* CRITICAL: Changed from auto to 38px */
+  min-width: 38px !important; /* CRITICAL: Changed from 40px to 38px */
+  max-width: 38px !important; /* CRITICAL: Changed from 60px to 38px */
+  text-align: center !important;
+  cursor: text !important;
+  outline: none !important;
+}
+
+.expanded-trait-layer-card-rarity-input:focus {
+  border-color: #8b5cf6 !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  box-shadow: 0 0 4px rgba(139, 92, 246, 0.5) !important;
 }
 
 /* Buttons container - positioned at top right */
@@ -162,7 +174,7 @@
   color: #fff !important;
   border: none !important;
   border-radius: 3px !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Help cursor for tooltip */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   transition: background 0.2s ease !important;
   display: flex !important;
@@ -202,7 +214,7 @@
   color: #fff !important;
   border: none !important;
   border-radius: 3px !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Help cursor for tooltip */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   transition: background 0.2s ease !important;
   display: flex !important;
@@ -242,7 +254,7 @@
   border-radius: 3px !important;
   font-size: 10px !important;
   font-weight: 500 !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Help cursor for tooltip */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   transition: background 0.2s ease !important;
   display: flex !important;
@@ -370,11 +382,12 @@
   gap: 10px !important; /* Equal spacing between columns and rows */
   justify-content: center !important; /* Center the grid horizontally */
   overflow-y: auto !important;
-  overflow-x: visible !important;
+  overflow-x: hidden !important; /* Prevent horizontal scrolling */
   padding: 20px !important;
   margin: 0 auto !important; /* Additional centering */
-  width: fit-content !important; /* Allow grid to shrink to content width */
+  width: 100% !important; /* Fit within container */
   max-width: 100% !important; /* Prevent overflow */
+  box-sizing: border-box !important; /* Include padding in width calculation */
 }
 
 .expanded-trait-layer-cards-grid-item {
@@ -390,11 +403,11 @@
   justify-content: center !important; /* Center the grid horizontally */
   align-content: start !important; /* Align content to top */
   overflow-y: auto !important;
-  overflow-x: visible !important;
+  overflow-x: hidden !important; /* Prevent horizontal scrolling */
   padding: 20px !important;
   margin: 0 auto !important; /* Additional centering */
-  width: fit-content !important; /* Allow grid to shrink to content width */
+  width: 100% !important; /* Fit within container */
   max-width: 100% !important; /* Prevent overflow */
-  box-sizing: border-box !important;
+  box-sizing: border-box !important; /* Include padding in width calculation */
 }
 

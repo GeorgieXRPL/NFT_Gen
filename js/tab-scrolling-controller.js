@@ -159,9 +159,8 @@ class TabScrollingController {
       const tab = e.target.closest('.nav-tab');
       if (tab && tab.dataset.tab) {
         const tabId = tab.dataset.tab;
-        setTimeout(() => {
-          this.applyScrollingToTab(tabId);
-        }, 100); // Small delay to ensure tab content is loaded
+        // Execute immediately - no delay needed
+        this.applyScrollingToTab(tabId);
       }
     });
 
@@ -170,26 +169,26 @@ class TabScrollingController {
     if (originalShowTab) {
       window.NFTApp.getModule('navigation').showTab = (tabId, isUserInitiated) => {
         const result = originalShowTab.call(this, tabId, isUserInitiated);
-        setTimeout(() => {
-          this.applyScrollingToTab(tabId);
-          // CRITICAL: When Generate NFTs tab becomes active, ensure scrollbar is hidden
-          // This fixes the issue where scrollbar reappears after visiting Export NFTs tab
-          if (tabId === 'generate-nfts') {
-            const generateNftsTab = document.getElementById('generate-nfts');
-            if (generateNftsTab && generateNftsTab.classList.contains('active')) {
-              this.disableScrolling('generate-nfts');
-              // Also ensure content-area doesn't have scrollbar
-              const contentArea = generateNftsTab.closest('.content-area');
-              if (contentArea) {
-                contentArea.style.setProperty('overflow-y', 'hidden', 'important');
-                contentArea.style.setProperty('overflow-x', 'hidden', 'important');
-                contentArea.style.setProperty('overflow', 'hidden', 'important');
-                contentArea.style.setProperty('scrollbar-width', 'none', 'important');
-                contentArea.style.setProperty('-ms-overflow-style', 'none', 'important');
-              }
-            }
-          }
-        }, 100);
+        // Execute immediately - no delay needed for tab switching
+        this.applyScrollingToTab(tabId);
+        // CRITICAL: Always hide scrollbars for ALL tabs - no scrollbars anywhere in the app
+        const activeTab = document.getElementById(tabId);
+        if (activeTab) {
+          activeTab.style.setProperty('overflow', 'hidden', 'important');
+          activeTab.style.setProperty('overflow-y', 'hidden', 'important');
+          activeTab.style.setProperty('overflow-x', 'hidden', 'important');
+          activeTab.style.setProperty('scrollbar-width', 'none', 'important');
+          activeTab.style.setProperty('-ms-overflow-style', 'none', 'important');
+        }
+        // Also ensure content-area doesn't have scrollbar
+        const contentArea = activeTab ? activeTab.closest('.content-area') : document.querySelector('.content-area');
+        if (contentArea) {
+          contentArea.style.setProperty('overflow-y', 'hidden', 'important');
+          contentArea.style.setProperty('overflow-x', 'hidden', 'important');
+          contentArea.style.setProperty('overflow', 'hidden', 'important');
+          contentArea.style.setProperty('scrollbar-width', 'none', 'important');
+          contentArea.style.setProperty('-ms-overflow-style', 'none', 'important');
+        }
         return result;
       };
     }

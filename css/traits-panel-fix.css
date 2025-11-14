@@ -27,7 +27,9 @@
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
   border: 1.5px solid #232323;
-  padding: 20px 16px;
+  padding: 12px 16px !important; /* Reduced top/bottom padding to allow more space for content */
+  padding-top: 12px !important;
+  padding-bottom: 12px !important; /* Ensure sufficient bottom padding */
   height: 732px !important; /* Fixed height to prevent layout shifts */
   min-height: 732px !important;
   max-height: 732px !important;
@@ -36,7 +38,8 @@
   flex-direction: column;
   visibility: visible !important;
   opacity: 1 !important;
-  overflow: visible !important; /* Changed from hidden to visible to prevent first card clipping */
+  overflow-y: auto !important; /* Enable vertical scrolling */
+  overflow-x: hidden !important; /* Prevent horizontal scrolling */
   width: 220px !important;
   min-width: 220px !important;
   max-width: 220px !important;

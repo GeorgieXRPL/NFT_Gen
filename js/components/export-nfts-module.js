@@ -100,6 +100,8 @@ const exportNftsModuleDefinition = {
       if (navTab) {
         const textContent = navTab.textContent.trim();
         let tabLabel = navTab.querySelector('.tab-label');
+        // CRITICAL: Preserve existing tooltip if it exists
+        let existingTooltip = navTab.querySelector('.tooltiptext');
         
         // Check if it needs fixing
         if (textContent.includes('Export Metadata / NFTs') || 
@@ -108,8 +110,13 @@ const exportNftsModuleDefinition = {
           
           // If .tab-label doesn't exist, create it
           if (!tabLabel) {
-            // Remove all content but preserve structure
-          navTab.innerHTML = '';
+            // Remove all content but preserve tooltip
+            if (existingTooltip) {
+              navTab.innerHTML = '';
+              navTab.appendChild(existingTooltip);
+            } else {
+              navTab.innerHTML = '';
+            }
             tabLabel = document.createElement('span');
             tabLabel.className = 'tab-label';
             navTab.appendChild(tabLabel);
@@ -121,8 +128,13 @@ const exportNftsModuleDefinition = {
         } else {
           // Ensure .tab-label exists even if text is correct
           if (!tabLabel) {
-            // Remove all content but preserve structure
-            navTab.innerHTML = '';
+            // Remove all content but preserve tooltip
+            if (existingTooltip) {
+              navTab.innerHTML = '';
+              navTab.appendChild(existingTooltip);
+            } else {
+              navTab.innerHTML = '';
+            }
             tabLabel = document.createElement('span');
             tabLabel.className = 'tab-label';
             tabLabel.textContent = 'Export NFTs / Metadata';
@@ -131,6 +143,28 @@ const exportNftsModuleDefinition = {
             // Just ensure text is correct
             tabLabel.textContent = 'Export NFTs / Metadata';
           }
+        }
+        
+        // CRITICAL: Ensure tooltip exists and is set up properly
+        let tooltip = navTab.querySelector('.tooltiptext');
+        if (!tooltip) {
+          tooltip = document.createElement('span');
+          tooltip.className = 'tooltiptext';
+          tooltip.textContent = 'Export your collection';
+          navTab.appendChild(tooltip);
+        }
+        
+        // CRITICAL: Ensure tab has tooltip class
+        if (!navTab.classList.contains('tooltip')) {
+          navTab.classList.add('tooltip');
+        }
+        
+        // CRITICAL: Set up tooltip using navigation module if available
+        const navigationModule = window.NFTApp?.getModule('navigation');
+        if (navigationModule && navigationModule.setupNavTabTooltip && tooltip) {
+          // Reset tooltip setup flag to allow re-setup if needed
+          navTab.dataset.tooltipSetup = 'false';
+          navigationModule.setupNavTabTooltip(navTab, tooltip);
         }
       }
       // If tab not found yet, silently return (it might not be created yet)
@@ -290,11 +324,10 @@ const exportNftsModuleDefinition = {
     document.addEventListener('click', (e) => {
       const tab = e.target.closest('.nav-tab[data-tab="export-nfts"]');
       if (tab) {
-        setTimeout(() => {
+        // Execute immediately - no delay needed
           this.initializeTab();
           // Disable scrolling when tab becomes active
           this.disableScrolling();
-        }, 50);
       }
       
       // Save state when user clicks on any other tab (leaving Export NFTs tab)

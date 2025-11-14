@@ -16,6 +16,13 @@
   background-color: #000000 !important;
 }
 
+/* Ensure navigation tab options have transparent background */
+.nav-tab,
+.nav-tabs .nav-tab {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
 /* Ensure no borders are visible in the navigation area */
 .nav-container,
 .nav-header,
@@ -84,19 +91,31 @@ body .project-actions *:hover {
   background-color: #000000 !important;
 }
 
-/* Only exception is for nav-tabs that should show hover effect - EXCEPT Generate NFTs tab */
+/* CRITICAL: Override the general nav-tabs *:hover rule for nav-tab elements - ensure transparent background */
+/* This rule applies to all nav-tab hovers, but more specific rules below will override for specific cases */
+body .nav-tabs .nav-tab:hover,
+body .nav-tab:hover {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ensure navigation tabs maintain transparent background on hover - EXCEPT Generate NFTs tab */
+/* This more specific rule overrides the general transparent rule above for non-active, non-generate-nfts tabs */
 body .nav-tab:hover:not(.active):not([data-tab="generate-nfts"]) {
   background-color: rgba(108, 92, 231, 0.1) !important;
 }
 
-/* Remove hover effect for Generate NFTs tab */
+/* Remove hover effect for Generate NFTs tab - keep transparent */
 body .nav-tab[data-tab="generate-nfts"]:hover:not(.active) {
-  background-color: #000000 !important;
-  background: #000000 !important;
+  background-color: transparent !important;
+  background: transparent !important;
   color: #fff !important;
   transition: none !important;
 }
 
-body .nav-tab.active {
-  background-color: #000000 !important;
+/* Active navigation tabs should have transparent background */
+body .nav-tab.active,
+body .nav-tab.active:hover {
+  background-color: transparent !important;
+  background: transparent !important;
 }

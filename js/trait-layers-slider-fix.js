@@ -59,7 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Apply styles when any tab is clicked
   document.addEventListener("click", (e) => {
     if (e.target.closest(".nav-tab")) {
-      setTimeout(applySliderStyles, 300)
+      // Execute immediately - no delay needed
+      applySliderStyles()
     }
   })
 })

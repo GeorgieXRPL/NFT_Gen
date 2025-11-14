@@ -20,16 +20,17 @@ window.NFTApp.registerModule("projectInterface", {
         </div>
         <div class="nav-tabs-container">
           <div class="nav-tabs">
-            <div class="nav-tab active" data-tab="general-info">
+            <div class="nav-tab tooltip active" data-tab="general-info">
               <span class="tab-label">Collection Info</span>
+              <span class="tooltiptext">Configure your collection<br>basic information</span>
             </div>
             <div class="nav-tab tooltip" data-tab="traits-rules">
               <span class="tab-label">Traits & Rules</span>
-              <span class="tooltiptext">Manage traits and combination rules</span>
+              <span class="tooltiptext">Manage Traits and<br>Combination Rules</span>
             </div>
             <div class="nav-tab tooltip" data-tab="generate-nfts">
               <span class="tab-label">Generate NFTs</span>
-              <span class="tooltiptext">Create NFT images</span>
+              <span class="tooltiptext">Create NFT images and<br>manage your collection</span>
             </div>
             <div class="nav-tab tooltip" data-tab="export-nfts">
               <span class="tab-label">Export NFTs / Metadata</span>
@@ -143,7 +144,7 @@ window.NFTApp.registerModule("projectInterface", {
                 Trait Layers
               </h3>
               <p id="trait-layers-subsection-description" class="subsection-description">Add and manage trait layers for your NFT collection.</p>
-              <button id="jump-to-rules-btn" class="jump-to-rules-btn tooltip">
+              <button id="jump-to-rules-btn" class="jump-to-rules-btn tooltip" style="display: none;">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
@@ -162,7 +163,7 @@ window.NFTApp.registerModule("projectInterface", {
                       <line x1="12" y1="5" x2="12" y2="19"></line>
                       <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
-                    Add Layer
+                    Add Trait Layer
                     <span class="tooltiptext">Create a new empty layer</span>
                   </button>
                 </div>
@@ -265,7 +266,7 @@ window.NFTApp.registerModule("projectInterface", {
               </button>
               
               <div class="rules-filter-dropdown-wrapper tooltip">
-                <select id="rules-filter-dropdown" class="rules-filter-dropdown">
+                <select id="rules-filter-dropdown" class="rules-filter-dropdown" title="">
                   <option value="">All Rule Types</option>
                   <option value="never-combine">Never Combine Rules</option>
                   <option value="always-combine">Always Combine Rules</option>
@@ -274,7 +275,7 @@ window.NFTApp.registerModule("projectInterface", {
                   <option value="immediately-above">Immediately Above Rules</option>
                   <option value="immediately-below">Immediately Below Rules</option>
                 </select>
-                <span class="tooltiptext">Filter rules by type. Only available when you have 5+ rules.</span>
+                <span class="tooltiptext">Filter Rules by type.<br>Only available when you have 5+ rules.</span>
               </div>
               
               <!-- Jump to Layers Button - Right aligned with filter container -->
@@ -1866,24 +1867,51 @@ window.NFTApp.registerModule("projectInterface", {
       generateTab.classList.remove('disabled');
       exportTab.classList.remove('disabled');
       
+      // Ensure both tabs have the tooltip class
+      if (!generateTab.classList.contains('tooltip')) {
+        generateTab.classList.add('tooltip');
+      }
+      if (!exportTab.classList.contains('tooltip')) {
+        exportTab.classList.add('tooltip');
+      }
+      
       // Update tooltips to normal state
-      const generateTooltip = generateTab.querySelector('.tooltiptext');
-      const exportTooltip = exportTab.querySelector('.tooltiptext');
+      let generateTooltip = generateTab.querySelector('.tooltiptext');
+      let exportTooltip = exportTab.querySelector('.tooltiptext');
+      
+      // Create tooltip if it doesn't exist
+      if (!generateTooltip) {
+        generateTooltip = document.createElement('span');
+        generateTooltip.className = 'tooltiptext';
+        generateTab.appendChild(generateTooltip);
+      }
+      if (!exportTooltip) {
+        exportTooltip = document.createElement('span');
+        exportTooltip.className = 'tooltiptext';
+        exportTab.appendChild(exportTooltip);
+      }
       
       if (generateTooltip) {
-        generateTooltip.textContent = 'Create NFT images';
+        generateTooltip.innerHTML = 'Create NFT images and<br>manage your collection';
       }
       if (exportTooltip) {
-      exportTooltip.textContent = 'Export your collection';
+        exportTooltip.textContent = 'Export your collection';
+      }
+      
+      // Setup tooltips using navigation module
+      const navigationModule = window.NFTApp?.getModule('navigation');
+      if (navigationModule && navigationModule.setupNavTabTooltip) {
+        navigationModule.setupNavTabTooltip(generateTab, generateTooltip);
+        navigationModule.setupNavTabTooltip(exportTab, exportTooltip);
       }
       
     // Force enable both tabs
       generateTab.style.pointerEvents = 'auto';
       generateTab.style.opacity = '1';
-      generateTab.style.cursor = 'pointer';
+      generateTab.style.setProperty('cursor', 'pointer', 'important'); // Pointer cursor for consistency
     exportTab.style.pointerEvents = 'auto';
     exportTab.style.opacity = '1';
-    exportTab.style.cursor = 'pointer';
+    exportTab.style.setProperty('cursor', 'pointer', 'important'); // Pointer cursor for consistency
   },
 
   // Check if project has at least 2 trait layers with at least one trait each

@@ -239,6 +239,12 @@
   border-radius: 12px !important;
   flex-wrap: nowrap !important; /* Prevent wrapping */
   box-shadow: none !important;
+  position: relative !important; /* Ensure proper stacking context */
+  pointer-events: auto !important; /* Ensure header receives pointer events */
+  min-height: 90px !important; /* Ensure full height for hover area */
+  box-sizing: border-box !important; /* Ensure padding is included in width */
+  gap: 0 !important; /* Remove any gap that might create dead zones */
+  justify-content: flex-start !important; /* Ensure proper alignment */
 }
 
 /* Fix trait layer header background for purple look */
@@ -249,7 +255,7 @@
   background-color: var(--trait-header-even) !important;
 }
 
-/* Hover effects */
+/* Hover effects - ensure hover works on entire header area */
 .trait-layer-bar:nth-child(odd) .trait-layer-header:hover {
   background-color: var(--trait-header-odd-hover) !important;
 }
@@ -258,18 +264,61 @@
   background-color: var(--trait-header-even-hover) !important;
 }
 
+/* CRITICAL: Ensure hover works on entire header area, not just tiny parts */
+/* Use a pseudo-element to create a full hover area that covers the entire header */
+.trait-layer-header::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important; /* Allow clicks to pass through to child elements */
+  z-index: 0 !important; /* Behind child elements */
+  border-radius: inherit !important; /* Match header border radius */
+}
+
+/* Ensure child elements can still receive their own pointer events and are above the pseudo-element */
+.trait-layer-header > * {
+  pointer-events: auto !important; /* Child elements receive their own events */
+  position: relative !important; /* Ensure proper stacking */
+  z-index: 1 !important; /* Ensure child elements are above header background and pseudo-element */
+}
+
+/* CRITICAL: Ensure buttons and interactive elements have full hover area */
+.trait-layer-header .position-btn,
+.trait-layer-header .action-btn,
+.trait-layer-header .rename-layer,
+.trait-layer-header .delete-layer {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 2 !important; /* Higher z-index to ensure they're above header pseudo-element */
+  min-width: 40px !important; /* Ensure minimum clickable area */
+  min-height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Ensure drag handle is visible and properly sized */
 .trait-layer-drag-handle {
   margin-left: 24px !important;
   margin-right: 1rem !important;
-  cursor: grab;
+  cursor: help !important; /* Hand with "?" for tooltip */
   flex: 0 0 auto !important;
   background: transparent !important;
   background-color: transparent !important;
 }
 
+/* CRITICAL: Ensure tooltip class on drag handle doesn't get overridden */
+.trait-layer-drag-handle.tooltip {
+  cursor: help !important;
+}
+
 .trait-layer-drag-handle:active {
-  cursor: grabbing;
+  cursor: grabbing !important;
 }
 
 /* Layer Arrow */
@@ -279,7 +328,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: help !important; /* Hand with "?" for tooltip */
   transition: transform 0.2s;
 }
 
@@ -310,11 +359,21 @@
   font-weight: var(--font-weight-semibold) !important;
   margin-bottom: 0.25rem !important;
   color: var(--text-primary) !important;
+  cursor: help !important; /* Hand with "?" for tooltip */
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 .trait-layer-stats {
   font-size: 0.85rem !important;
   color: var(--text-secondary) !important;
+  cursor: help !important; /* Hand with "?" for tooltip */
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 /* ===== TRAIT LAYER RARITY SLIDER ===== */
@@ -444,7 +503,7 @@
   background: none !important;
   border: none !important;
   color: var(--text-secondary) !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Hand with "?" for tooltip */
   padding: 0.25rem !important;
   border-radius: 4px !important;
   transition: all 0.3s ease !important;
@@ -479,7 +538,7 @@
   background: none !important;
   border: none !important;
   color: var(--text-secondary) !important;
-  cursor: pointer !important;
+  cursor: help !important; /* Hand with "?" for tooltip */
   padding: 0.5rem !important;
   border-radius: 4px !important;
   transition: all 0.3s ease !important;

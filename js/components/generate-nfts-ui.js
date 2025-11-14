@@ -17,15 +17,62 @@ window.NFTApp.registerModule("generateNftsUI", {
   setupTooltipPositioning: function(element, tooltip) {
     if (!element || !tooltip) return;
     
-    // Use global tooltip manager if available
-    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
-    if (tooltipManager) {
-      tooltipManager.setupTooltip(element, tooltip);
+    // CRITICAL: Skip if already set up to prevent duplicate event listeners
+    if (element.dataset.tooltipSetup === "true") {
       return;
+    }
+    element.dataset.tooltipSetup = "true";
+    
+    // CRITICAL: Add cursor help to element
+    element.style.cursor = "help";
+    
+    // CRITICAL: Ensure tooltip has 1 second transition
+    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+    
+    // CRITICAL: Ensure tooltip starts hidden
+    tooltip.style.setProperty("visibility", "hidden", "important");
+    tooltip.style.setProperty("opacity", "0", "important");
+    
+    // CRITICAL: Skip global tooltip manager for Seed NFT to ensure delay is always applied
+    // Check if this element should skip global tooltip manager
+    const skipGlobalTooltip = element.dataset.skipGlobalTooltip === "true";
+    
+    // Use global tooltip manager if available (but skip if element requests it)
+    if (!skipGlobalTooltip) {
+      const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+      if (tooltipManager && tooltipManager.setupTooltip) {
+        tooltipManager.setupTooltip(element, tooltip);
+        return;
+      }
     }
 
     // Fallback to local implementation if manager not available
     let tooltipTimeout = null;
+    
+    // CRITICAL: Only move tooltip to body if it's not already properly positioned
+    // For most tooltips, keeping them in their parent is better for performance
+    // Only Dark NFTs tooltip needs body move due to navigation clipping
+    const needsBodyMove = element.id === 'generate-dark-nfts' || element.classList.contains('generate-dark-nfts');
+    if (needsBodyMove && tooltip.parentNode !== document.body) {
+      document.body.appendChild(tooltip);
+    }
+    
+    // CRITICAL: Pre-calculate tooltip dimensions once to avoid multiple reflows
+    // Only do this if tooltip is already in DOM (not moved to body yet)
+    let cachedTooltipWidth = 200;
+    let cachedTooltipHeight = 40;
+    if (!needsBodyMove || tooltip.parentNode === document.body) {
+      tooltip.style.setProperty("position", "fixed", "important");
+      tooltip.style.setProperty("visibility", "hidden", "important");
+      tooltip.style.setProperty("opacity", "0", "important");
+      tooltip.style.setProperty("top", "-9999px", "important");
+      tooltip.style.setProperty("left", "-9999px", "important");
+      tooltip.style.setProperty("transform", "none", "important");
+      tooltip.style.setProperty("display", "block", "important");
+      void tooltip.offsetHeight; // Force one reflow to measure
+      cachedTooltipWidth = tooltip.offsetWidth || 200;
+      cachedTooltipHeight = tooltip.offsetHeight || 40;
+    }
     
     element.addEventListener("mouseenter", () => {
       // Clear any existing timeout
@@ -35,36 +82,49 @@ window.NFTApp.registerModule("generateNftsUI", {
       }
       // Show tooltip after 1 second delay
       tooltipTimeout = setTimeout(() => {
-        const rect = element.getBoundingClientRect();
-        // Make tooltip temporarily visible to measure height, but keep it off-screen
-        tooltip.style.visibility = "visible";
-        tooltip.style.opacity = "0";
-        tooltip.style.top = "-9999px";
-        tooltip.style.left = "-9999px";
-        tooltip.style.transform = "none";
-        void tooltip.offsetHeight; // Force reflow
-        const tooltipWidth = tooltip.offsetWidth || 200;
-        const tooltipHeight = tooltip.offsetHeight;
-        // CRITICAL: Set position fixed and use setProperty with important to override CSS
+        // CRITICAL: Get element position once
+        const elementRect = element.getBoundingClientRect();
+        
+        // CRITICAL: For tooltips not in body, measure dimensions on first show (lazy measurement)
+        let tooltipWidth = cachedTooltipWidth;
+        let tooltipHeight = cachedTooltipHeight;
+        if (!needsBodyMove && tooltip.parentNode !== document.body) {
+          // Measure tooltip dimensions only when needed (lazy measurement)
+          tooltip.style.setProperty("position", "fixed", "important");
+          tooltip.style.setProperty("visibility", "hidden", "important");
+          tooltip.style.setProperty("opacity", "0", "important");
+          tooltip.style.setProperty("top", "-9999px", "important");
+          tooltip.style.setProperty("left", "-9999px", "important");
+          tooltip.style.setProperty("display", "block", "important");
+          void tooltip.offsetHeight; // Force one reflow to measure
+          tooltipWidth = tooltip.offsetWidth || 200;
+          tooltipHeight = tooltip.offsetHeight || 40;
+        }
+        
+        const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
+        
+        // CRITICAL: Check if element is inside nft-action-buttons-container and move tooltip 15px up
+        const isInNftActionButtonsContainer = element.closest('.nft-action-buttons-container') !== null;
+        const topOffset = isInNftActionButtonsContainer ? 20 : 5; // 15px additional offset (5 + 15 = 20)
+        const topPosition = elementRect.top - tooltipHeight - topOffset;
+        
+        // CRITICAL: Set all properties at once to minimize reflows
         tooltip.style.setProperty("position", "fixed", "important");
         tooltip.style.setProperty("z-index", "2147483647", "important");
+        tooltip.style.setProperty("top", `${topPosition}px`, "important");
+        tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         tooltip.style.setProperty("bottom", "auto", "important");
         tooltip.style.setProperty("right", "auto", "important");
         tooltip.style.setProperty("margin", "0", "important");
         tooltip.style.setProperty("transform", "none", "important");
-        // CRITICAL: Ensure orange text and black background
         tooltip.style.setProperty("background-color", "#000000", "important");
         tooltip.style.setProperty("background", "#000000", "important");
         tooltip.style.setProperty("color", "#f39c12", "important");
-        // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
-        const elementRect = element.getBoundingClientRect();
-        const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
-        const topPosition = elementRect.top - tooltipHeight - 5;
-        tooltip.style.setProperty("top", `${topPosition}px`, "important");
-        tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
-        // Fade in with transition
+        
+        // Fade in - use single requestAnimationFrame
         requestAnimationFrame(() => {
-          tooltip.style.opacity = "1";
+          tooltip.style.setProperty("visibility", "visible", "important");
+          tooltip.style.setProperty("opacity", "1", "important");
         });
         tooltipTimeout = null;
       }, 1000);
@@ -82,6 +142,154 @@ window.NFTApp.registerModule("generateNftsUI", {
         tooltip.style.visibility = "hidden";
       }, 1000);
     });
+  },
+
+  // Setup tooltip for Dark NFTs button - only show when NOT active
+  setupDarkNftsTooltip: function(element, tooltip) {
+    if (!element || !tooltip) return;
+    
+    // CRITICAL: Skip if already set up to prevent duplicate event listeners
+    if (element.dataset.tooltipSetup === "true") {
+      return;
+    }
+    element.dataset.tooltipSetup = "true";
+    
+    // CRITICAL: Add cursor help to element when NOT active (including when disabled)
+    // Cursor will be updated by MutationObserver when active state changes
+    if (!element.classList.contains("active")) {
+      element.style.cursor = "help";
+    } else {
+      element.style.cursor = "pointer";
+    }
+    
+    // CRITICAL: Ensure help cursor is shown when disabled (but not active)
+    const updateCursor = () => {
+      if (element.classList.contains("active")) {
+        element.style.cursor = "pointer";
+      } else {
+        element.style.cursor = "help";
+      }
+    };
+    
+    // Update cursor on state changes
+    const observer = new MutationObserver(updateCursor);
+    observer.observe(element, { attributes: true, attributeFilter: ['class', 'disabled'] });
+    updateCursor();
+    
+    // CRITICAL: Ensure tooltip has 1 second transition
+    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+    
+    // CRITICAL: Ensure tooltip starts hidden
+    tooltip.style.setProperty("visibility", "hidden", "important");
+    tooltip.style.setProperty("opacity", "0", "important");
+    
+    // CRITICAL: Move tooltip to body to escape navigation container clipping
+    if (tooltip.parentNode !== document.body) {
+      document.body.appendChild(tooltip);
+    }
+    
+    // CRITICAL: Pre-calculate tooltip dimensions once to avoid multiple reflows
+    tooltip.style.setProperty("position", "fixed", "important");
+    tooltip.style.setProperty("visibility", "hidden", "important");
+    tooltip.style.setProperty("opacity", "0", "important");
+    tooltip.style.setProperty("top", "-9999px", "important");
+    tooltip.style.setProperty("left", "-9999px", "important");
+    tooltip.style.setProperty("transform", "none", "important");
+    tooltip.style.setProperty("display", "block", "important");
+    void tooltip.offsetHeight; // Force one reflow to measure
+    const cachedTooltipWidth = tooltip.offsetWidth || 200;
+    const cachedTooltipHeight = tooltip.offsetHeight || 40;
+    
+    let tooltipTimeout = null;
+    
+    element.addEventListener("mouseenter", () => {
+      // CRITICAL: Show tooltip when button is NOT active (including when disabled)
+      if (element.classList.contains("active")) {
+        return; // Don't show tooltip when active
+      }
+      
+      // Clear any existing timeout
+      if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+      }
+      // Show tooltip after 1 second delay
+      tooltipTimeout = setTimeout(() => {
+        // Double-check button is still not active
+        if (element.classList.contains("active")) {
+          return;
+        }
+        
+        // CRITICAL: Show tooltip even when disabled (as long as not active)
+        
+        // CRITICAL: Use cached dimensions to avoid reflows
+        // Get element position once
+        const elementRect = element.getBoundingClientRect();
+        const centeredLeft = elementRect.left + (elementRect.width / 2) - (cachedTooltipWidth / 2);
+        const topPosition = elementRect.top - cachedTooltipHeight - 5;
+        
+        // CRITICAL: Set all properties at once to minimize reflows
+        tooltip.style.setProperty("position", "fixed", "important");
+        tooltip.style.setProperty("z-index", "21474836470", "important");
+        tooltip.style.setProperty("top", `${topPosition}px`, "important");
+        tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
+        tooltip.style.setProperty("bottom", "auto", "important");
+        tooltip.style.setProperty("right", "auto", "important");
+        tooltip.style.setProperty("margin", "0", "important");
+        tooltip.style.setProperty("transform", "none", "important");
+        tooltip.style.setProperty("background-color", "#000000", "important");
+        tooltip.style.setProperty("background", "#000000", "important");
+        tooltip.style.setProperty("color", "#f39c12", "important");
+        
+        // Fade in - use single requestAnimationFrame
+        requestAnimationFrame(() => {
+          tooltip.style.setProperty("visibility", "visible", "important");
+          tooltip.style.setProperty("opacity", "1", "important");
+        });
+        tooltipTimeout = null;
+      }, 1000);
+    });
+    
+    element.addEventListener("mouseleave", () => {
+      // Clear the show timeout if mouse leaves before delay completes
+      if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+      }
+      tooltip.style.setProperty("opacity", "0", "important");
+      // Wait for fade out transition to complete before hiding
+      setTimeout(() => {
+        tooltip.style.setProperty("visibility", "hidden", "important");
+      }, 1000);
+    });
+    
+    // CRITICAL: Also hide tooltip immediately if button becomes active
+    // Use debounced observer to reduce performance impact
+    let observerTimeout = null;
+    const activeStateObserver = new MutationObserver(() => {
+      // Debounce observer callbacks
+      if (observerTimeout) {
+        clearTimeout(observerTimeout);
+      }
+      observerTimeout = setTimeout(() => {
+        if (element.classList.contains("active")) {
+          // Clear any pending timeout
+          if (tooltipTimeout) {
+            clearTimeout(tooltipTimeout);
+            tooltipTimeout = null;
+          }
+          // Hide tooltip immediately
+          tooltip.style.setProperty("opacity", "0", "important");
+          tooltip.style.setProperty("visibility", "hidden", "important");
+          // Change cursor to pointer (no tooltip when active)
+          element.style.cursor = "pointer";
+        } else {
+          // Change cursor back to help when not active
+          element.style.cursor = "help";
+        }
+      }, 10); // 10ms debounce
+    });
+    activeStateObserver.observe(element, { attributes: true, attributeFilter: ["class"] });
   },
 
   // Dark Traits Configuration Modal
@@ -524,9 +732,9 @@ window.NFTApp.registerModule("generateNftsUI", {
           margin: 0;
           padding: 0;
         `;
-        // Truncate trait name to 21 characters and add ellipsis
-        if (trait.name.length > 21) {
-          nameDiv.textContent = trait.name.substring(0, 21) + '...';
+        // Truncate trait name to 19 characters and add ellipsis
+        if (trait.name.length > 19) {
+          nameDiv.textContent = trait.name.substring(0, 19) + '...';
           // Remove title and add custom tooltip
           nameDiv.removeAttribute('title');
           nameDiv.classList.add('tooltip');
@@ -540,7 +748,7 @@ window.NFTApp.registerModule("generateNftsUI", {
             nameTooltip.textContent = trait.name;
           }
           // Setup tooltip positioning
-          if (nameTooltip) {
+          if (nameTooltip && this.setupTooltipPositioning) {
             this.setupTooltipPositioning(nameDiv, nameTooltip);
           }
         } else {
@@ -1858,10 +2066,24 @@ window.NFTApp.registerModule("generateNftsUI", {
         }
         // Add edit button for all traits (including 'none')
         const editBtn = document.createElement('button');
-        editBtn.className = 'nft-trait-edit-btn';
+        editBtn.className = 'nft-trait-edit-btn tooltip';
         editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i> EDIT';
         editBtn.setAttribute('data-layer', layer.name || '');
         editBtn.setAttribute('data-idx', idx);
+        
+        // Create tooltip text explaining the button's purpose
+        const editTooltipText = document.createElement('span');
+        editTooltipText.className = 'tooltiptext';
+        editTooltipText.innerHTML = 'Click to change this trait to another<br>one from the same trait layer';
+        editBtn.appendChild(editTooltipText);
+        
+        // CRITICAL: Skip global tooltip manager for edit buttons to ensure proper setup
+        editBtn.dataset.skipGlobalTooltip = "true";
+        
+        // Setup tooltip positioning with standard delay and fade effects
+        if (this.setupTooltipPositioning) {
+          this.setupTooltipPositioning(editBtn, editTooltipText);
+        }
         if (traitObj.trait.name === 'none' || traitObj.trait === 'none') {
           if (noneForced) {
             editBtn.onclick = (e) => {
@@ -2152,8 +2374,8 @@ window.NFTApp.registerModule("generateNftsUI", {
           traitNameElem.style.color = '#888';
           traitNameElem.style.fontWeight = 'normal';
         } else {
-          traitNameElem.textContent = traitName.length > 21 ? traitName.slice(0, 21) + '...' : traitName;
-          if (traitName.length > 21) {
+          traitNameElem.textContent = traitName.length > 19 ? traitName.slice(0, 19) + '...' : traitName;
+          if (traitName.length > 19) {
             // Remove title and add custom tooltip
             traitNameElem.removeAttribute('title');
             traitNameElem.classList.add('tooltip');
@@ -2161,9 +2383,15 @@ window.NFTApp.registerModule("generateNftsUI", {
             if (!nameTooltip) {
               nameTooltip = document.createElement('span');
               nameTooltip.className = 'tooltiptext';
+              nameTooltip.textContent = traitName;
               traitNameElem.appendChild(nameTooltip);
+            } else {
+              nameTooltip.textContent = traitName;
             }
-            nameTooltip.textContent = traitName;
+            // CRITICAL: Setup tooltip positioning
+            if (nameTooltip && this.setupTooltipPositioning) {
+              this.setupTooltipPositioning(traitNameElem, nameTooltip);
+            }
           } else {
             traitNameElem.removeAttribute('title');
           }
@@ -2178,8 +2406,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         // Layer name (grey, left)
         const layerNameElem = document.createElement('div');
         layerNameElem.className = 'nft-trait-info-layer-name';
-        layerNameElem.textContent = layerName.length > 21 ? layerName.slice(0, 21) + '...' : layerName;
-        if (layerName.length > 21) {
+        layerNameElem.textContent = layerName.length > 19 ? layerName.slice(0, 19) + '...' : layerName;
+        if (layerName.length > 19) {
           // Remove title and add custom tooltip
           layerNameElem.removeAttribute('title');
           layerNameElem.classList.add('tooltip');
@@ -2187,9 +2415,15 @@ window.NFTApp.registerModule("generateNftsUI", {
           if (!layerTooltip) {
             layerTooltip = document.createElement('span');
             layerTooltip.className = 'tooltiptext';
+            layerTooltip.textContent = layerName;
             layerNameElem.appendChild(layerTooltip);
+          } else {
+            layerTooltip.textContent = layerName;
           }
-          layerTooltip.textContent = layerName;
+          // CRITICAL: Setup tooltip positioning
+          if (layerTooltip && this.setupTooltipPositioning) {
+            this.setupTooltipPositioning(layerNameElem, layerTooltip);
+          }
         } else {
           layerNameElem.removeAttribute('title');
         }
@@ -4218,9 +4452,11 @@ window.NFTApp.registerModule("generateNftsUI", {
       modalBody.innerHTML = `
         <div class="select-trait-search-section">
           <input type="text" class="trait-search-input" placeholder="Search traits...">
-          <button class="trait-search-clear">Clear</button>
+          <div class="trait-search-controls">
+            <button class="trait-search-clear">Clear</button>
+            <div class="trait-count-indicator"></div>
+          </div>
         </div>
-        <div class="trait-count-indicator"></div>
         <div class="select-trait-list"></div>
       `;
       // Now run the rest of the trait list population logic as before
@@ -7038,8 +7274,8 @@ window.NFTApp.registerModule("generateNftsUI", {
       const layerNameElem = document.createElement('div');
       layerNameElem.className = 'nft-trait-info-layer-name';
       const layerName = layer.name || 'Unknown';
-      layerNameElem.textContent = layerName.length > 21 ? layerName.slice(0, 21) + '...' : layerName;
-      if (layerName.length > 21) {
+      layerNameElem.textContent = layerName.length > 19 ? layerName.slice(0, 19) + '...' : layerName;
+      if (layerName.length > 19) {
         // Remove title and add custom tooltip
         layerNameElem.removeAttribute('title');
         layerNameElem.classList.add('tooltip');
@@ -7047,9 +7283,15 @@ window.NFTApp.registerModule("generateNftsUI", {
         if (!layerTooltip) {
           layerTooltip = document.createElement('span');
           layerTooltip.className = 'tooltiptext';
+          layerTooltip.textContent = layerName;
           layerNameElem.appendChild(layerTooltip);
+        } else {
+          layerTooltip.textContent = layerName;
         }
-        layerTooltip.textContent = layerName;
+        // CRITICAL: Setup tooltip positioning
+        if (layerTooltip && this.setupTooltipPositioning) {
+          this.setupTooltipPositioning(layerNameElem, layerTooltip);
+        }
       } else {
         layerNameElem.removeAttribute('title');
       }
@@ -7259,14 +7501,15 @@ window.NFTApp.registerModule("generateNftsUI", {
     // Only enable content if BOTH: minimum requirements exist AND NFT image is displayed
     const shouldEnableContent = hasMinimumRequirements && hasNFT && isNFTImageLoaded;
     
-    console.log('[DEBUG] _updateAllButtonStates called', {
-      hasProjectData: !!projectData,
-      hasMinimumRequirements,
-      hasNFT,
-      isNFTImageLoaded,
-      shouldEnableContent,
-      projectDataTraits: projectData?.traits?.length || 0
-    });
+    // Removed debug log to reduce console noise and potential performance impact
+    // console.log('[DEBUG] _updateAllButtonStates called', {
+    //   hasProjectData: !!projectData,
+    //   hasMinimumRequirements,
+    //   hasNFT,
+    //   isNFTImageLoaded,
+    //   shouldEnableContent,
+    //   projectDataTraits: projectData?.traits?.length || 0
+    // });
     
       // Update seed display
       const seedBox = document.querySelector('.nft-seed-box');
@@ -7305,7 +7548,7 @@ window.NFTApp.registerModule("generateNftsUI", {
           copyBtn.style.cursor = 'pointer';
           copyBtn.removeAttribute('disabled');
           if (copyTooltipText) {
-            copyTooltipText.textContent = 'copy the NFT seed number';
+            copyTooltipText.textContent = 'Copy Seed number';
           }
         }
       }
@@ -7428,7 +7671,8 @@ window.NFTApp.registerModule("generateNftsUI", {
       const createNftBtn = document.getElementById('nft-action-create-btn');
       if (createNftBtn) {
         if (!hasMinimumRequirements || !hasNFT) {
-          console.log('[DEBUG] Disabling Create NFT button - requirements:', hasMinimumRequirements, 'hasNFT:', hasNFT);
+          // Removed debug log to reduce console noise and potential performance impact
+          // console.log('[DEBUG] Disabling Create NFT button - requirements:', hasMinimumRequirements, 'hasNFT:', hasNFT);
           this._applyDisabledStyles(createNftBtn);
           // Border is already removed by _applyDisabledStyles
           createNftBtn.disabled = true;
@@ -7681,40 +7925,13 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Create custom tooltip
       const copyTooltipText = document.createElement('span');
       copyTooltipText.className = 'tooltiptext';
-      copyTooltipText.textContent = 'copy the NFT seed number';
-      // Set tooltip styling: black background, white text, high z-index
-      copyTooltipText.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-      copyTooltipText.style.background = 'rgba(0, 0, 0, 0.9)';
-      copyTooltipText.style.color = '#ffffff';
-      copyTooltipText.style.zIndex = '2147483647';
-      copyTooltipText.style.borderRadius = '6px';
-      copyTooltipText.style.padding = '8px 10px';
-      copyTooltipText.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.5)';
-      copyTooltipText.style.position = 'fixed';
-      copyTooltipText.style.visibility = 'hidden';
-      copyTooltipText.style.opacity = '0';
-      copyTooltipText.style.pointerEvents = 'none';
-      copyTooltipText.style.transition = 'opacity 1s';
+      copyTooltipText.textContent = 'Copy Seed number';
       copyBtn.appendChild(copyTooltipText);
       
-      // Position tooltip on hover
-      copyBtn.addEventListener('mouseenter', function() {
-        const rect = copyBtn.getBoundingClientRect();
-        const tooltipRect = copyTooltipText.getBoundingClientRect();
-        // Position tooltip above the button
-        const top = rect.top - tooltipRect.height - 8; // 8px gap above button
-        const left = rect.left + (rect.width / 2); // Center horizontally
-        copyTooltipText.style.top = `${top}px`;
-        copyTooltipText.style.left = `${left}px`;
-        copyTooltipText.style.transform = 'translateX(-50%)';
-        copyTooltipText.style.visibility = 'visible';
-        copyTooltipText.style.opacity = '1';
-      });
-      
-      copyBtn.addEventListener('mouseleave', function() {
-        copyTooltipText.style.visibility = 'hidden';
-        copyTooltipText.style.opacity = '0';
-      });
+      // Use proper tooltip setup with delay
+      if (this.setupTooltipPositioning) {
+        this.setupTooltipPositioning(copyBtn, copyTooltipText);
+      }
       
       // Grey out copy button when no NFT or requirements not met (but don't disable it)
       if (!hasNFT || !hasMinimumRequirements) {
@@ -7737,7 +7954,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         copyBtn.style.setProperty('color', '#007bff', 'important'); // Same blue as Generate Seed button
         copyBtn.style.cursor = 'pointer';
         copyBtn.removeAttribute('disabled');
-        copyTooltipText.textContent = 'copy the NFT seed number';
+        copyTooltipText.textContent = 'Copy Seed number';
       }
       
       copyBtn.textContent = '⧉';
@@ -7949,7 +8166,12 @@ window.NFTApp.registerModule("generateNftsUI", {
       
       // Use standard tooltip positioning function to ensure consistent behavior
       // This will position tooltip above and centered to the button with 1-second delay and fade
-      this.setupTooltipPositioning(toggleButton, seedTooltipText);
+      // CRITICAL: Force local implementation for Seed NFT to ensure delay is always applied
+      if (this.setupTooltipPositioning) {
+        // Mark element to skip global tooltip manager
+        toggleButton.dataset.skipGlobalTooltip = "true";
+        this.setupTooltipPositioning(toggleButton, seedTooltipText);
+      }
       
       // CRITICAL: Check if "Please Wait" popup is showing - keep grey during popup
       const generateNftsTabCheck = document.getElementById('generate-nfts');
@@ -8090,15 +8312,17 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Create Dark NFTs toggle button - will be added directly to Container 2 (first, leftmost)
       const duplicateGenerateSeedBtn = document.createElement('button');
       duplicateGenerateSeedBtn.id = 'generate-dark-nfts';
-      duplicateGenerateSeedBtn.className = 'toggle-button';
+      duplicateGenerateSeedBtn.className = 'toggle-button tooltip'; // Add tooltip class for standard tooltip
       duplicateGenerateSeedBtn.textContent = 'Dark NFTs';
-      // CRITICAL: Remove any tooltip-related attributes to prevent tooltip from showing
+      // Remove title attribute to use custom tooltip instead
       duplicateGenerateSeedBtn.removeAttribute('title');
       duplicateGenerateSeedBtn.removeAttribute('data-tooltip');
-      // Ensure no tooltip class is ever added
-      if (duplicateGenerateSeedBtn.classList.contains('tooltip')) {
-        duplicateGenerateSeedBtn.classList.remove('tooltip');
-      }
+      
+      // Create tooltip text similar to Seed NFT
+      const darkNftsTooltipText = document.createElement('span');
+      darkNftsTooltipText.className = 'tooltiptext';
+      darkNftsTooltipText.innerHTML = 'activate it if you want to generate NFTs considering only<br>part of the traits in your collection. This is useful to create<br>NFTs with particular styles or using particular dominant colors<br>(like dark colors, for instance). By default, the app will consider<br>a major percentage of dark traits, but this can be personalized.';
+      duplicateGenerateSeedBtn.appendChild(darkNftsTooltipText);
       duplicateGenerateSeedBtn.style.cssText = `
         padding: 8px 14px;
         border: 2px solid #4a4a4a;
@@ -8156,37 +8380,12 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Add Dark NFTs button to wrapper
       darkNftsWrapper.appendChild(duplicateGenerateSeedBtn);
       
-      // CRITICAL: Ensure no tooltip is ever added to Dark NFTs button
-      // Remove any existing tooltip elements
-      const existingTooltip = duplicateGenerateSeedBtn.querySelector('.tooltiptext');
-      if (existingTooltip) {
-        existingTooltip.remove();
+      // Setup tooltip positioning for Dark NFTs button (similar to Seed NFT)
+      // CRITICAL: Only show tooltip when button is NOT active (like Seed NFT)
+      if (darkNftsTooltipText && this.setupTooltipPositioning) {
+        // Create custom tooltip handler that checks for active state
+        this.setupDarkNftsTooltip(duplicateGenerateSeedBtn, darkNftsTooltipText);
       }
-      // Remove tooltip class if it exists
-      if (duplicateGenerateSeedBtn.classList.contains('tooltip')) {
-        duplicateGenerateSeedBtn.classList.remove('tooltip');
-      }
-      // Use MutationObserver to prevent tooltip from being added
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-            if (duplicateGenerateSeedBtn.classList.contains('tooltip')) {
-              duplicateGenerateSeedBtn.classList.remove('tooltip');
-            }
-          }
-          if (mutation.type === 'childList') {
-            const tooltip = duplicateGenerateSeedBtn.querySelector('.tooltiptext');
-            if (tooltip) {
-              tooltip.remove();
-            }
-          }
-        });
-      });
-      observer.observe(duplicateGenerateSeedBtn, {
-        attributes: true,
-        childList: true,
-        subtree: true
-      });
 
       // Append toggle, input and button directly to Container 3 (seedInputRow)
       seedInputRow.appendChild(toggleButton);
@@ -8199,11 +8398,16 @@ window.NFTApp.registerModule("generateNftsUI", {
       
       // Create edit button for Dark NFTs configuration (initially hidden)
       // Position it relative to Dark NFTs button - only show when Dark NFTs is active
-      // NO TOOLTIP - tooltip removed as requested
       const darkTraitsEditBtn = document.createElement('button');
       darkTraitsEditBtn.id = 'dark-traits-edit-btn';
-      darkTraitsEditBtn.className = 'dark-traits-edit-btn'; // Removed 'tooltip' class - no tooltip
+      darkTraitsEditBtn.className = 'dark-traits-edit-btn tooltip'; // Add tooltip class for standard tooltip
       darkTraitsEditBtn.innerHTML = 'EDIT';
+      
+      // Create tooltip text explaining the feature and default configuration
+      const darkTraitsEditTooltipText = document.createElement('span');
+      darkTraitsEditTooltipText.className = 'tooltiptext';
+      darkTraitsEditTooltipText.innerHTML = 'Configure which traits are used for Dark NFT generation.<br>By default, the app considers a major percentage of dark traits,<br>but this can be personalized to match your collection style.';
+      darkTraitsEditBtn.appendChild(darkTraitsEditTooltipText);
       darkTraitsEditBtn.style.cssText = `
         position: absolute;
         top: -11px;
@@ -8228,8 +8432,10 @@ window.NFTApp.registerModule("generateNftsUI", {
         justify-content: center;
       `;
       
-      // NO TOOLTIP - tooltip removed as requested
-      // No tooltip element created, no tooltip event listeners added
+      // Setup tooltip positioning with standard delay and fade effects
+      if (this.setupTooltipPositioning && darkTraitsEditTooltipText) {
+        this.setupTooltipPositioning(darkTraitsEditBtn, darkTraitsEditTooltipText);
+      }
       
       // CRITICAL: Hide edit button when Dark NFTs button is disabled/greyed out (if it was disabled above)
       if (!hasNFT || !hasMinimumRequirements) {

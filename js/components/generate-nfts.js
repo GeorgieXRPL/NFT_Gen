@@ -62,57 +62,54 @@ window.NFTApp.registerModule("generateNfts", {
   },
   
   // Setup a listener for tab changes to ensure validation runs
+  // CRITICAL: Hook into navigation module instead of adding duplicate click listeners
+  // This prevents duplicate validation calls and flickering
   setupTabChangeListener: function() {
-    // Try multiple selector strategies to find navigation tabs
-    const navLinks = document.querySelectorAll('.nav-link, .nav-item a, .tab-link, [data-tab]');
+    // Check if already hooked to prevent duplicate hooks
+    if (this._tabChangeListenerHooked) {
+      return; // Already hooked
+    }
     
-    if (navLinks && navLinks.length > 0) {
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          // Check if this is the generate tab being selected using multiple possible attributes
-          const href = link.getAttribute('href');
-          const dataTab = link.getAttribute('data-tab');
-          const tabId = link.getAttribute('data-tab-id');
-          
-          if ((href && (href === '#generate-nfts' || href === '#generate')) || 
-              (dataTab && (dataTab === 'generate-nfts' || dataTab === 'generate')) ||
-              (tabId && (tabId === 'generate-nfts' || tabId === 'generate'))) {
-            console.log("Generate NFTs tab selected, running validation");
-            // If we have project data, run validation with force=true
-            if (this.projectData) {
-              setTimeout(() => {
-                this.validateProjectData(this.projectData, true);
-                // Removed auto-generation - user must manually click randomize button
-              }, 200);
-            }
-          }
-        });
-      });
-      console.log("Set up tab change listener for validation");
-    } else {
-      // Fallback to a global click listener for tab elements
-      document.addEventListener('click', (e) => {
-        // Look for any element that might be a tab navigator
-        const target = e.target.closest('.nav-link, .nav-item a, .tab-link, [data-tab]');
-        if (target) {
-          const href = target.getAttribute('href');
-          const dataTab = target.getAttribute('data-tab');
-          const tabId = target.getAttribute('data-tab-id');
-          
-          if ((href && (href === '#generate-nfts' || href === '#generate')) || 
-              (dataTab && (dataTab === 'generate-nfts' || dataTab === 'generate')) ||
-              (tabId && (tabId === 'generate-nfts' || tabId === 'generate'))) {
-            console.log("Generate NFTs tab selected via global listener, running validation");
-            if (this.projectData) {
-              setTimeout(() => {
-                this.validateProjectData(this.projectData, true);
-                // Removed auto-generation - user must manually click randomize button
-              }, 100);
-            }
-          }
+    // Hook into navigation module's showTab function
+    const navigationModule = window.NFTApp?.getModule('navigation');
+    if (navigationModule && typeof navigationModule.showTab === 'function') {
+      // Check if already hooked by this module
+      if (navigationModule.showTab._generateNftsHooked) {
+        this._tabChangeListenerHooked = true;
+        return; // Already hooked
+      }
+      
+      const originalShowTab = navigationModule.showTab;
+      const self = this;
+      
+      navigationModule.showTab = function(tabId, isUserInitiated) {
+        const result = originalShowTab.call(this, tabId, isUserInitiated);
+        
+        // Only run validation once when switching to generate-nfts tab
+        if (tabId === 'generate-nfts' && self.projectData) {
+          // Use double requestAnimationFrame to defer validation until after tab is fully visible
+          // This prevents validation from causing flickering during tab switch
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              // Check if validation was already run recently to prevent duplicate calls
+              const now = Date.now();
+              if (!self._lastValidationTime || (now - self._lastValidationTime) > 100) {
+                self._lastValidationTime = now;
+                self.validateProjectData(self.projectData, true);
+              }
+            });
+          });
         }
-      });
-      console.log("Set up global click listener for tab navigation");
+        
+        return result;
+      };
+      
+      // Mark as hooked to prevent duplicate hooks
+      navigationModule.showTab._generateNftsHooked = true;
+      this._tabChangeListenerHooked = true;
+      console.log("Set up tab change listener for validation via navigation module");
+    } else {
+      console.warn("Navigation module not available, validation will not run on tab switch");
     }
   },
   
@@ -2553,12 +2550,14 @@ window.NFTApp.registerModule("generateNfts", {
   },
 
   validateProjectData: function(projectData, force = false) {
-    console.log("Validating project data for NFT generation");
+    // Removed debug log to reduce console noise and potential performance impact
+    // console.log("Validating project data for NFT generation");
     const now = Date.now();
     if (!force && this.validationState && this.validationState.lastCheck > 0) {
       const timeSinceLastCheck = now - this.validationState.lastCheck;
       if (timeSinceLastCheck < 500 && this.validationState.isValid !== null) {
-        console.log(`Using cached validation result: ${this.validationState.isValid ? 'Valid' : 'Invalid'} (${timeSinceLastCheck}ms ago)`);
+        // Removed debug log
+        // console.log(`Using cached validation result: ${this.validationState.isValid ? 'Valid' : 'Invalid'} (${timeSinceLastCheck}ms ago)`);
         return this.validationState.isValid;
       }
     }
@@ -2566,8 +2565,18 @@ window.NFTApp.registerModule("generateNfts", {
       this.validationState.lastCheck = now;
     }
     if (!projectData.traits || projectData.traits.length === 0) {
-      console.log("Validation failed: No trait layers defined");
-      window.NFTApp.getModule('generateNftsUI').showError("You need to add at least one trait layer before generating NFTs.");
+      // Removed debug log
+      // console.log("Validation failed: No trait layers defined");
+      // CRITICAL: Defer error display to prevent flickering during tab switch
+      // Use double requestAnimationFrame to ensure tab is fully visible before showing error
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const generateNftsUI = window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI.showError) {
+            generateNftsUI.showError("You need to add at least one trait layer before generating NFTs.");
+          }
+        });
+      });
       if (this.validationState) this.validationState.isValid = false;
       return false;
     }
@@ -2580,14 +2589,32 @@ window.NFTApp.registerModule("generateNfts", {
       }
     });
     if (totalTraitCount < 2) {
-      console.log(`Validation failed: Only ${totalTraitCount} trait(s) found, need at least 2`);
-      window.NFTApp.getModule('generateNftsUI').showError(`You need to add at least 2 traits across all layers. Currently you have ${totalTraitCount}.`);
+      // Removed debug log
+      // console.log(`Validation failed: Only ${totalTraitCount} trait(s) found, need at least 2`);
+      // CRITICAL: Defer error display to prevent flickering during tab switch
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const generateNftsUI = window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI.showError) {
+            generateNftsUI.showError(`You need to add at least 2 traits across all layers. Currently you have ${totalTraitCount}.`);
+          }
+        });
+      });
       if (this.validationState) this.validationState.isValid = false;
       return false;
     }
     if (layersWithTraits < 1) {
-      console.log(`Validation failed: No layers with traits found`);
-      window.NFTApp.getModule('generateNftsUI').showError("You need at least one layer with traits.");
+      // Removed debug log
+      // console.log(`Validation failed: No layers with traits found`);
+      // CRITICAL: Defer error display to prevent flickering during tab switch
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const generateNftsUI = window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI.showError) {
+            generateNftsUI.showError("You need at least one layer with traits.");
+          }
+        });
+      });
       if (this.validationState) this.validationState.isValid = false;
       return false;
     }

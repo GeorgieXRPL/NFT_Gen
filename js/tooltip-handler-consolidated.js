@@ -75,6 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const tooltipText = tooltip.querySelector(".tooltiptext")
       if (!tooltipText) return
 
+      // CRITICAL: Skip navigation tabs - they are handled by navigation.js with proper 1-second delay
+      if (tooltip.classList.contains('nav-tab') || tooltip.closest('.nav-tabs')) {
+        // Navigation tabs are handled by navigation.js setupNavTabTooltip
+        // Ensure tooltip stays hidden - navigation.js will control it with 1-second delay
+        tooltipText.style.visibility = "hidden"
+        tooltipText.style.opacity = "0"
+        return // Skip - handled by navigation.js with 1-second delay
+      }
+      
       // Skip if this tooltip is inside the export tab (handled by export-nfts-module.js)
       const exportTab = document.getElementById("export-nfts")
       if (exportTab && exportTab.contains(tooltip)) {
@@ -85,6 +94,54 @@ document.addEventListener("DOMContentLoaded", () => {
         tooltipText.style.left = "-9999px"
         tooltipText.style.transform = "none"
         return // Skip - handled by export-nfts-module.js with 1-second delay
+      }
+
+      // CRITICAL: Skip buttons that are handled by trait-layers.js setupTooltipPositioning
+      // These buttons have their tooltips set up explicitly with proper positioning
+      const buttonIds = [
+        "add-layer-btn",
+        "add-folders-btn", 
+        "delete-all-layers",
+        "jump-to-rules-btn",
+        "jump-to-rules-bottom-btn",
+        "jump-to-layers-btn",
+        "jump-to-layers-bottom-btn"
+      ]
+      
+      // CRITICAL: Skip randomize and normalize rarities buttons - handled by trait-layers.js
+      const isRarityButton = tooltip.classList.contains('randomize-rarities-tiered-btn') ||
+                             tooltip.classList.contains('randomize-unique-rarities-btn') ||
+                             tooltip.classList.contains('normalize-unique-rarities-btn') ||
+                             tooltip.classList.contains('normalize-rarities-btn');
+      
+      // CRITICAL: Skip trait layer header buttons (position-btn, rename-layer, delete-layer)
+      // These are handled by trait-layers.js setupTooltipPositioning with local implementation
+      const isTraitLayerHeaderButton = tooltip.classList.contains('position-btn') || 
+                                        tooltip.classList.contains('rename-layer') || 
+                                        tooltip.classList.contains('delete-layer') ||
+                                        tooltip.classList.contains('action-btn') ||
+                                        tooltip.closest('.trait-layer-header');
+      
+      // Check if the tooltip element itself is one of these buttons (the tooltip element IS the button with class "tooltip")
+      if (buttonIds.some(id => tooltip.id === id || tooltip.classList.contains(id.replace("#", "").replace(".", "")))) {
+        // Skip - these are handled by trait-layers.js setupTooltipPositioning
+        return
+      }
+      
+      // CRITICAL: Skip trait layer header buttons - they are handled by trait-layers.js
+      if (isTraitLayerHeaderButton) {
+        // Ensure tooltip stays hidden - trait-layers.js will control it with 1-second delay
+        tooltipText.style.visibility = "hidden"
+        tooltipText.style.opacity = "0"
+        return // Skip - handled by trait-layers.js setupTooltipPositioning with local implementation
+      }
+      
+      // CRITICAL: Skip randomize and normalize rarities buttons - handled by trait-layers.js
+      if (isRarityButton) {
+        // Ensure tooltip stays hidden - trait-layers.js will control it with 1-second delay
+        tooltipText.style.visibility = "hidden"
+        tooltipText.style.opacity = "0"
+        return // Skip - handled by trait-layers.js setupTooltipPositioning
       }
 
       // Store timeout reference
@@ -150,8 +207,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize tooltips
   initTooltips()
 
-  // Add a special function to handle the randomize tooltip
+  // CRITICAL: Skip randomize tooltip handler - these buttons are now handled by trait-layers.js setupTooltipPositioning
+  // This function is kept for backward compatibility but should not interfere
   function handleRandomizeTooltip() {
+    // Skip - handled by trait-layers.js setupTooltipPositioning
+    return;
+    
+    /* DISABLED - Now handled by trait-layers.js
     const randomizeButtons = document.querySelectorAll(".randomize-rarities-tiered-btn")
 
     randomizeButtons.forEach((button) => {
@@ -227,6 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000) // Match transition duration
       })
     })
+    */
   }
 
   // Call the function after initializing tooltips

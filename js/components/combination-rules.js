@@ -340,11 +340,14 @@ window.NFTApp = window.NFTApp || {};
   setupRuleActionTooltip: function(btn, tooltip) {
     if (!btn || !tooltip) return;
     
-    // CRITICAL: Add cursor help to element
-    btn.style.cursor = "help";
+    // CRITICAL: Skip if already set up to prevent duplicate event listeners
+    if (btn.dataset.tooltipSetup === "true") {
+      return;
+    }
+    btn.dataset.tooltipSetup = "true";
     
-    // CRITICAL: Ensure tooltip has 1 second transition
-    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+    // CRITICAL: Add cursor help to element (use setProperty with important to override CSS)
+    btn.style.setProperty("cursor", "help", "important");
     
     // Use global tooltip manager if available
     const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
@@ -353,7 +356,43 @@ window.NFTApp = window.NFTApp || {};
       return;
     }
 
-    // Fallback to local implementation if manager not available
+    // CRITICAL: Ensure tooltip has 1 second transition (matching All Rule Types tooltip)
+    tooltip.style.setProperty("transition", "opacity 1s ease", "important");
+    
+    // CRITICAL: Ensure tooltip starts hidden
+    tooltip.style.setProperty("visibility", "hidden", "important");
+    tooltip.style.setProperty("opacity", "0", "important");
+    
+    // CRITICAL: Set initial tooltip styling to match All Rule Types tooltip
+    tooltip.style.setProperty("position", "fixed", "important");
+    tooltip.style.setProperty("z-index", "2147483647", "important");
+    tooltip.style.setProperty("background-color", "#000000", "important");
+    tooltip.style.setProperty("background", "#000000", "important");
+    tooltip.style.setProperty("color", "#f39c12", "important");
+    tooltip.style.setProperty("border-radius", "6px", "important");
+    tooltip.style.setProperty("padding", "8px 12px", "important");
+    tooltip.style.setProperty("font-size", "11px", "important");
+    tooltip.style.setProperty("font-family", "'Archivo', sans-serif", "important");
+    tooltip.style.setProperty("line-height", "1.4", "important");
+    tooltip.style.setProperty("box-shadow", "0 3px 10px rgba(0, 0, 0, 0.5)", "important");
+    tooltip.style.setProperty("text-align", "center", "important");
+    tooltip.style.setProperty("white-space", "normal", "important");
+    tooltip.style.setProperty("word-wrap", "break-word", "important");
+    tooltip.style.setProperty("max-width", "300px", "important");
+    tooltip.style.setProperty("width", "max-content", "important");
+    tooltip.style.setProperty("pointer-events", "none", "important");
+    tooltip.style.setProperty("display", "block", "important");
+    tooltip.style.setProperty("top", "auto", "important");
+    tooltip.style.setProperty("left", "auto", "important");
+    tooltip.style.setProperty("bottom", "auto", "important");
+    tooltip.style.setProperty("right", "auto", "important");
+    tooltip.style.setProperty("transform", "none", "important");
+    tooltip.style.setProperty("margin", "0", "important");
+    tooltip.style.setProperty("overflow", "visible", "important");
+    tooltip.style.setProperty("clip", "auto", "important");
+    tooltip.style.setProperty("clip-path", "none", "important");
+
+    // Fallback to local implementation (matching All Rule Types tooltip behavior)
     let tooltipTimeout = null;
     
     btn.addEventListener("mouseenter", () => {
@@ -362,19 +401,9 @@ window.NFTApp = window.NFTApp || {};
         clearTimeout(tooltipTimeout);
         tooltipTimeout = null;
       }
-      // Show tooltip after 1 second delay
+      // Show tooltip after 1 second delay (matching All Rule Types tooltip)
       tooltipTimeout = setTimeout(() => {
-        const rect = btn.getBoundingClientRect();
-        // Make tooltip temporarily visible to measure height, but keep it off-screen
-        tooltip.style.visibility = "visible";
-        tooltip.style.opacity = "0";
-        tooltip.style.top = "-9999px";
-        tooltip.style.left = "-9999px";
-        tooltip.style.transform = "none";
-        void tooltip.offsetHeight; // Force reflow
-        const tooltipWidth = tooltip.offsetWidth || 200;
-        const tooltipHeight = tooltip.offsetHeight;
-        // CRITICAL: Set position fixed and use setProperty with important to override CSS
+        // CRITICAL: Set position fixed and z-index FIRST, before making tooltip visible
         tooltip.style.setProperty("position", "fixed", "important");
         tooltip.style.setProperty("z-index", "2147483647", "important");
         tooltip.style.setProperty("bottom", "auto", "important");
@@ -385,15 +414,28 @@ window.NFTApp = window.NFTApp || {};
         tooltip.style.setProperty("background-color", "#000000", "important");
         tooltip.style.setProperty("background", "#000000", "important");
         tooltip.style.setProperty("color", "#f39c12", "important");
-        // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
+        // CRITICAL: Keep tooltip hidden while measuring, positioned off-screen
+        tooltip.style.setProperty("visibility", "hidden", "important");
+        tooltip.style.setProperty("opacity", "0", "important");
+        tooltip.style.setProperty("top", "-9999px", "important");
+        tooltip.style.setProperty("left", "-9999px", "important");
+        // Force reflow to ensure styles are applied
+        void tooltip.offsetHeight;
+        // Now measure tooltip dimensions
+        const tooltipWidth = tooltip.offsetWidth || 200;
+        const tooltipHeight = tooltip.offsetHeight;
+        // CRITICAL: Calculate position BEFORE making tooltip visible
         const elementRect = btn.getBoundingClientRect();
         const centeredLeft = elementRect.left + (elementRect.width / 2) - (tooltipWidth / 2);
+        // CRITICAL: Position tooltip above button (matching All Rule Types tooltip)
         const topPosition = elementRect.top - tooltipHeight - 5;
+        // CRITICAL: Set position BEFORE making visible
         tooltip.style.setProperty("top", `${topPosition}px`, "important");
         tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-          tooltip.style.opacity = "1";
+          tooltip.style.setProperty("visibility", "visible", "important");
+          tooltip.style.setProperty("opacity", "1", "important");
         });
         tooltipTimeout = null;
       }, 1000);
@@ -405,10 +447,10 @@ window.NFTApp = window.NFTApp || {};
         clearTimeout(tooltipTimeout);
         tooltipTimeout = null;
       }
-      tooltip.style.opacity = "0";
-      // Wait for fade out transition to complete before hiding (1 second to match Export NFTs tab)
+      tooltip.style.setProperty("opacity", "0", "important");
+      // Wait for fade out transition to complete before hiding (1 second to match All Rule Types tooltip)
       setTimeout(() => {
-        tooltip.style.visibility = "hidden";
+        tooltip.style.setProperty("visibility", "hidden", "important");
       }, 1000);
     });
   },
@@ -3135,14 +3177,14 @@ window.NFTApp = window.NFTApp || {};
       bottomButtonsElement = document.createElement('div')
       bottomButtonsElement.className = 'bottom-shortcut-buttons'
       bottomButtonsElement.innerHTML = `
-        <button id="jump-to-layers-bottom-btn" class="jump-to-layers-btn tooltip">
+        <button id="jump-to-layers-bottom-btn" class="jump-to-layers-btn tooltip" style="display: none;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
             <polyline points="18 15 12 9 6 15"></polyline>
           </svg>
           Jump to Layers
           <span class="tooltiptext">Quickly scroll up to the Trait Layers section</span>
         </button>
-        <button id="jump-to-rules-bottom-btn" class="jump-to-rules-btn tooltip">
+        <button id="jump-to-rules-bottom-btn" class="jump-to-rules-btn tooltip" style="display: none;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
             <polyline points="18 15 12 9 6 15"></polyline>
           </svg>
@@ -3558,11 +3600,22 @@ window.NFTApp = window.NFTApp || {};
         // Hide the second tooltip-text (the long one) to avoid conflicts
         if (tooltips.length > 1) {
           tooltips[1].style.display = 'none';
-          tooltips[1].style.visibility = 'hidden';
-          tooltips[1].style.opacity = '0';
-          tooltips[1].style.pointerEvents = 'none';
         }
-        this.setupRuleActionTooltip(btn, tooltips[0])
+        // Setup tooltip for the first (visible) tooltip
+        this.setupRuleActionTooltip(btn, tooltips[0]);
+      }
+    });
+    
+    // CRITICAL: Setup tooltips for all action buttons that weren't set up above
+    rulesList.querySelectorAll('.action-btn.tooltip').forEach(btn => {
+      // Skip if already set up
+      if (btn.dataset.tooltipSetup === "true") {
+        return;
+      }
+      const tooltip = btn.querySelector('.tooltip-text');
+      if (tooltip && !tooltip.style.display || tooltip.style.display !== 'none') {
+        this.setupRuleActionTooltip(btn, tooltip);
+        btn.dataset.tooltipSetup = "true";
       }
     });
 
@@ -3583,63 +3636,100 @@ window.NFTApp = window.NFTApp || {};
     
     // Function to perform the reorder based on placeholder position
     const performReorder = function() {
-      if (!dragSrcEl || !placeholder.parentNode) {
-        return;
-      }
-      
-      // Get all rule items (excluding placeholder)
-      const allItems = Array.from(rulesList.querySelectorAll('.rule-item:not(.rule-placeholder)'));
-      const dragIndex = allItems.indexOf(dragSrcEl);
-      
-      if (dragIndex === -1) {
-        return;
-      }
-      
-      // Find where the placeholder is positioned
-      const siblings = Array.from(rulesList.children);
-      const placeholderIndex = siblings.indexOf(placeholder);
-      
-      // Count how many actual rule items are before the placeholder
-      let dropIndex = 0;
-      for (let i = 0; i < placeholderIndex; i++) {
-        if (siblings[i].classList.contains('rule-item') && !siblings[i].classList.contains('rule-placeholder')) {
-          dropIndex++;
-        }
-      }
-      
-      console.log('[DEBUG] Drag and Drop:', {
-        visualDragIndex: dragIndex,
-        visualDropIndex: dropIndex,
-        placeholderIndex: placeholderIndex
-      });
-      
-      // Rules are displayed in reverse order (newest first)
-      // Convert visual indices to data indices
-      const dataLength = projectData.rules.length;
-      const fromDataIndex = dataLength - 1 - dragIndex;
-      const toDataIndex = dataLength - 1 - dropIndex;
-      
-      console.log('[DEBUG] Data indices:', {
-        fromDataIndex: fromDataIndex,
-        toDataIndex: toDataIndex
-      });
-      
-      if (fromDataIndex !== toDataIndex) {
-        // Perform the reorder
-        const [movedRule] = projectData.rules.splice(fromDataIndex, 1);
-        projectData.rules.splice(toDataIndex, 0, movedRule);
-        
-        // Notify that rules have changed
-        if (window.SavedSeedsModal && window.SavedSeedsModal.notifyRuleChange) {
-          window.SavedSeedsModal.notifyRuleChange();
+      try {
+        if (!dragSrcEl || !placeholder || !placeholder.parentNode) {
+          console.warn('[WARN] Cannot perform reorder: missing dragSrcEl or placeholder');
+          return;
         }
         
-        // Update UI
-        self.updateRulesUI(projectData);
-        self.updateCheckConflictsButtonState(projectData);
+        // Get all rule items (excluding placeholder)
+        const allItems = Array.from(rulesList.querySelectorAll('.rule-item:not(.rule-placeholder)'));
+        const dragIndex = allItems.indexOf(dragSrcEl);
         
-        // Show success notification
-        NFTApp.getModule("notificationService").show("Rule order updated", "success");
+        if (dragIndex === -1) {
+          console.warn('[WARN] Cannot find dragged item in list');
+          return;
+        }
+        
+        // Find where the placeholder is positioned
+        const siblings = Array.from(rulesList.children);
+        const placeholderIndex = siblings.indexOf(placeholder);
+        
+        if (placeholderIndex === -1) {
+          console.warn('[WARN] Cannot find placeholder in list');
+          return;
+        }
+        
+        // Count how many actual rule items are before the placeholder
+        let dropIndex = 0;
+        for (let i = 0; i < placeholderIndex; i++) {
+          if (siblings[i].classList.contains('rule-item') && !siblings[i].classList.contains('rule-placeholder')) {
+            dropIndex++;
+          }
+        }
+        
+        console.log('[DEBUG] Drag and Drop:', {
+          visualDragIndex: dragIndex,
+          visualDropIndex: dropIndex,
+          placeholderIndex: placeholderIndex
+        });
+        
+        // Rules are displayed in reverse order (newest first)
+        // Convert visual indices to data indices
+        const dataLength = projectData.rules.length;
+        
+        if (dataLength === 0) {
+          console.warn('[WARN] No rules to reorder');
+          return;
+        }
+        
+        const fromDataIndex = dataLength - 1 - dragIndex;
+        const toDataIndex = dataLength - 1 - dropIndex;
+        
+        // Validate indices
+        if (fromDataIndex < 0 || fromDataIndex >= dataLength || toDataIndex < 0 || toDataIndex >= dataLength) {
+          console.error('[ERROR] Invalid data indices:', { fromDataIndex, toDataIndex, dataLength });
+          return;
+        }
+        
+        console.log('[DEBUG] Data indices:', {
+          fromDataIndex: fromDataIndex,
+          toDataIndex: toDataIndex
+        });
+        
+        if (fromDataIndex !== toDataIndex) {
+          // Perform the reorder
+          const [movedRule] = projectData.rules.splice(fromDataIndex, 1);
+          projectData.rules.splice(toDataIndex, 0, movedRule);
+          
+          // Notify that rules have changed
+          if (window.SavedSeedsModal && window.SavedSeedsModal.notifyRuleChange) {
+            window.SavedSeedsModal.notifyRuleChange();
+          }
+          
+          // Update UI with error handling
+          try {
+            self.updateRulesUI(projectData);
+            self.updateCheckConflictsButtonState(projectData);
+            
+            // Show success notification
+            if (NFTApp.getModule && NFTApp.getModule("notificationService")) {
+              NFTApp.getModule("notificationService").show("Rule order updated", "success");
+            }
+          } catch (updateError) {
+            console.error('[ERROR] Failed to update UI after reorder:', updateError);
+            // Try to restore rules visibility
+            self.updateRulesUI(projectData);
+          }
+        }
+      } catch (error) {
+        console.error('[ERROR] performReorder error:', error);
+        // Ensure rules are still visible even if reorder fails
+        try {
+          self.updateRulesUI(projectData);
+        } catch (updateError) {
+          console.error('[ERROR] Failed to restore rules UI:', updateError);
+        }
       }
     };
 
@@ -3659,54 +3749,123 @@ window.NFTApp = window.NFTApp || {};
     rulesList.querySelectorAll('.rule-item').forEach((item, visualIdx) => {
       item.setAttribute('draggable', 'true');
       
+      // Prevent child elements from blocking drag
+      const childElements = item.querySelectorAll('.rule-header, .rule-description, button, .rule-actions');
+      childElements.forEach(child => {
+        child.setAttribute('draggable', 'false');
+        child.style.userSelect = 'none';
+        child.style.pointerEvents = 'auto'; // Allow clicks but not drag
+      });
+      
       item.addEventListener('dragstart', function(e) {
-        dragSrcEl = this;
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', this.innerHTML);
-        // Add slight delay to allow drag image to render before hiding
-        setTimeout(() => { 
-          this.style.opacity = '0.4';
-        }, 0);
+        try {
+          // If drag started on a child element, find the parent rule-item
+          let targetItem = e.target;
+          while (targetItem && !targetItem.classList.contains('rule-item')) {
+            targetItem = targetItem.parentElement;
+          }
+          
+          if (!targetItem || !targetItem.classList.contains('rule-item')) {
+            e.preventDefault();
+            return;
+          }
+          
+          dragSrcEl = targetItem;
+          targetItem.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/html', targetItem.innerHTML);
+          // Add slight delay to allow drag image to render before hiding
+          setTimeout(() => { 
+            if (targetItem) {
+              targetItem.style.opacity = '0.4';
+            }
+          }, 0);
+        } catch (error) {
+          console.error('[ERROR] Drag start error:', error);
+          e.preventDefault();
+          dragSrcEl = null;
+        }
       });
       
       item.addEventListener('dragend', function(e) {
-        this.classList.remove('dragging');
-        this.style.opacity = '';
-        // Clean up placeholder
-        if (placeholder.parentNode) {
-          placeholder.parentNode.removeChild(placeholder);
+        try {
+          // Find the dragged item
+          let targetItem = e.target;
+          while (targetItem && !targetItem.classList.contains('rule-item')) {
+            targetItem = targetItem.parentElement;
+          }
+          
+          if (targetItem) {
+            targetItem.classList.remove('dragging');
+            targetItem.style.opacity = '';
+          }
+          
+          // Clean up placeholder
+          if (placeholder && placeholder.parentNode) {
+            placeholder.parentNode.removeChild(placeholder);
+          }
+          if (placeholder) {
+            placeholder.style.display = 'none';
+          }
+          dragSrcEl = null;
+        } catch (error) {
+          console.error('[ERROR] Drag end error:', error);
+          dragSrcEl = null;
         }
-        placeholder.style.display = 'none';
-        dragSrcEl = null;
       });
       
       item.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.dataTransfer.dropEffect = 'move';
-        
-        if (this !== dragSrcEl && dragSrcEl && !this.classList.contains('rule-placeholder')) {
-          // Calculate position relative to this item
-          const rect = this.getBoundingClientRect();
-          const midpoint = rect.top + rect.height / 2;
-          const insertBefore = e.clientY < midpoint;
+        try {
+          e.preventDefault();
+          e.stopPropagation();
+          e.dataTransfer.dropEffect = 'move';
           
-          // Insert placeholder
-          const parent = this.parentNode;
-          if (insertBefore) {
-            parent.insertBefore(placeholder, this);
-          } else {
-            parent.insertBefore(placeholder, this.nextSibling);
+          // Find the target rule-item
+          let targetItem = e.target;
+          while (targetItem && !targetItem.classList.contains('rule-item')) {
+            targetItem = targetItem.parentElement;
           }
-          placeholder.style.display = '';
+          
+          if (!targetItem || !targetItem.classList.contains('rule-item')) {
+            return;
+          }
+          
+          if (targetItem !== dragSrcEl && dragSrcEl && !targetItem.classList.contains('rule-placeholder')) {
+            // Calculate position relative to this item
+            const rect = targetItem.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            const insertBefore = e.clientY < midpoint;
+            
+            // Insert placeholder
+            const parent = targetItem.parentNode;
+            if (parent) {
+              if (insertBefore) {
+                parent.insertBefore(placeholder, targetItem);
+              } else {
+                parent.insertBefore(placeholder, targetItem.nextSibling);
+              }
+              placeholder.style.display = '';
+            }
+          }
+        } catch (error) {
+          console.error('[ERROR] Drag over error:', error);
         }
       });
       
       item.addEventListener('drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        performReorder();
+        try {
+          e.preventDefault();
+          e.stopPropagation();
+          performReorder();
+        } catch (error) {
+          console.error('[ERROR] Drop error:', error);
+          // Ensure rules are still visible even if drop fails
+          if (dragSrcEl) {
+            dragSrcEl.classList.remove('dragging');
+            dragSrcEl.style.opacity = '';
+            dragSrcEl = null;
+          }
+        }
       });
     });
 
@@ -3868,6 +4027,10 @@ window.NFTApp = window.NFTApp || {};
           jumpToRulesBtn.dataset.listenerAdded = 'true'
         }
       }, 50)
+      
+      // Button visibility will be updated by traits-rules-layout-fix.js
+      // The buttons are hidden by default and will be shown by updateButtonVisibility() 
+      // when the requirements are met (at least 2 trait layers with 1 trait each)
     }
     
     // Update rules section visibility after updating UI
