@@ -52,7 +52,7 @@
   width: 100% !important;
   align-items: flex-start !important;
   justify-content: start !important;
-  min-height: 330px !important;
+  min-height: 0 !important; /* Remove fixed min-height to prevent empty space */
   max-height: none !important;
   overflow-y: auto !important;
   box-sizing: border-box !important;
@@ -283,6 +283,8 @@
   cursor: pointer !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .btn-primary.randomize-rarities-tiered-btn .tooltiptext,
 .randomize-rarities-tiered-btn .tooltiptext,
 .btn-primary.normalize-rarities-btn .tooltiptext,
@@ -294,6 +296,7 @@
 .normalize-rarities-btn:hover .tooltiptext {
   display: block !important;
 }
+*/
 
 .trait-item > .trait-image,
 .trait-item > .trait-image img {

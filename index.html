@@ -36,11 +36,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- ============================================
+       NEW CONSOLIDATED CSS STRUCTURE
+       ============================================ -->
+  
+  <!-- Base: Theme (MUST load first - provides all CSS variables) -->
+  <link rel="stylesheet" href="css/base/theme.css">
+  
+  <!-- ============================================
+       EXISTING CSS FILES (temporarily kept for comparison)
+       Will be gradually removed after testing
+       ============================================ -->
+  
   <!-- Core CSS files -->
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/button-enhancements.css">
-  <link rel="stylesheet" href="css/tooltip-fix.css">
+  <!-- OLD TOOLTIP FILES - Commented out, replaced by css/components/tooltip.css -->
+  <!-- <link rel="stylesheet" href="css/tooltip-fix.css"> -->
+  <!-- <link rel="stylesheet" href="css/tooltips-consolidated.css"> -->
+  <!-- <link rel="stylesheet" href="css/randomize-tooltip-fix.css"> -->
+  <!-- <link rel="stylesheet" href="css/enhanced-randomize-tooltip.css"> -->
+  <!-- <link rel="stylesheet" href="css/nft-action-buttons-tooltips.css"> -->
   <link rel="stylesheet" href="css/custom-dropdown.css">
   <link rel="stylesheet" href="css/styles-fix.css">
   <link rel="stylesheet" href="css/integer-input.css">
@@ -49,12 +66,10 @@
   <!-- <link rel="stylesheet" href="css/trait-layer-slider-fix.css"> - moved to trait-layers-consolidated.css -->
   <link rel="stylesheet" href="css/trait-layer-expanded-alignment.css">
   <link rel="stylesheet" href="css/expanded-trait-layer-cards.css">
-  <link rel="stylesheet" href="css/tooltips-consolidated.css">
   <link rel="stylesheet" href="css/rule-validation.css">
   <link rel="stylesheet" href="css/navigation-black-background-fix.css">
   <!-- <link rel="stylesheet" href="css/trait-layer-slider-max-width.css"> - moved to trait-layers-consolidated.css -->
   <link rel="stylesheet" href="css/rarity-status-indicator.css">
-  <link rel="stylesheet" href="css/randomize-tooltip-fix.css">
   <link rel="stylesheet" href="css/generate-nfts.css">
   <link rel="stylesheet" href="css/traits-panel-fix.css">
   <link rel="stylesheet" href="css/traits-panel-override.css">
@@ -69,8 +84,10 @@
   <!-- <link rel="stylesheet" href="css/trait-layers-header-fix.css"> - moved to trait-layers-consolidated.css -->
   <!-- <link rel="stylesheet" href="css/trait-layers-error-icon-fix.css"> - moved to trait-layers-consolidated.css -->
   <!-- <link rel="stylesheet" href="css/trait-buttons-fix.css"> - moved to trait-layers-consolidated.css -->
-  <link rel="stylesheet" href="css/enhanced-randomize-tooltip.css">
+  <!-- OLD TOOLTIP FILES - Commented out, replaced by css/components/tooltip.css -->
+  <!-- <link rel="stylesheet" href="css/enhanced-randomize-tooltip.css"> -->
   <link rel="stylesheet" href="css/combination-rules-warning.css">
+  <link rel="stylesheet" href="css/rule-drag-handle-tooltip-fix.css">
   <!-- The collection-info-override.css must be loaded last to ensure its styles take precedence -->
   <link rel="stylesheet" href="css/collection-info-override.css">
   <link rel="stylesheet" href="css/saved-seeds-modal.css">
@@ -82,7 +99,8 @@
   <link rel="stylesheet" href="css/hide-scrollbars-specific-tabs.css">
   <link rel="stylesheet" href="css/nfts-collection-modal-fix.css">
   <link rel="stylesheet" href="css/nft-edit-modal-alignment-fix.css">
-  <link rel="stylesheet" href="css/nft-action-buttons-tooltips.css">
+  <!-- OLD TOOLTIP FILES - Commented out, replaced by css/components/tooltip.css -->
+  <!-- <link rel="stylesheet" href="css/nft-action-buttons-tooltips.css"> -->
   <link rel="stylesheet" href="css/final-overrides.css">
   <link rel="stylesheet" href="css/export-nfts-module.css">
   <link rel="stylesheet" href="css/nft-rendering-popup.css">
@@ -90,6 +108,11 @@
   <link rel="stylesheet" href="css/generate-nfts-content-area-fix.css">
   <!-- Traits Rules Scrollbar Fix - MUST be loaded last to override all other scrollbar styles -->
   <link rel="stylesheet" href="css/traits-rules-scrollbar-fix.css">
+  
+  <!-- ============================================
+       CONSOLIDATED TOOLTIP STYLES (MUST load LAST to override all other CSS)
+       ============================================ -->
+  <link rel="stylesheet" href="css/components/tooltip.css">
 
   <script>
     // Cache-busting for all local CSS and JS files
@@ -129,6 +152,8 @@
   <script src="js/components/global-tooltip-manager.js"></script>
   <script src="js/components/trait-layers.js"></script>
   <script src="js/components/combination-rules.js"></script>
+  <script src="js/utils/rule-validation-utility.js"></script>
+  <script src="js/components/smooth-drag-drop.js"></script>
   <script src="js/traits-rules-layout-fix.js"></script>
   <script src="js/components/combination-rules-enhanced-validation.js"></script>
   <script src="js/components/project-interface.js"></script>
@@ -159,13 +184,15 @@
   <script>
     // DIFFERENT APPROACH: Use height constraint to freeze tabs
     function freezeTabs() {
-      // Freeze Collection Info tab
+      // CRITICAL: Do NOT freeze Collection Info tab - it needs overflow: visible to prevent clipping
+      // Collection Info tab overflow is handled by collection-info-override.css and navigation.js
+      // Only set scrollbar properties, NOT overflow
       const collectionInfo = document.getElementById('collection-info') || document.getElementById('general-info');
       if (collectionInfo) {
-        collectionInfo.style.height = 'calc(100vh - 120px)';
-        collectionInfo.style.maxHeight = 'calc(100vh - 120px)';
-        collectionInfo.style.overflow = 'hidden';
-        collectionInfo.style.position = 'relative';
+        // DO NOT set overflow here - let CSS handle it
+        // Only set scrollbar properties if needed
+        collectionInfo.style.setProperty('scrollbar-width', 'none', 'important');
+        collectionInfo.style.setProperty('-ms-overflow-style', 'none', 'important');
       }
       
       // Freeze Generate NFTs tab - REMOVED inline styles to allow CSS to control dimensions
@@ -248,9 +275,6 @@
   
   <!-- Load trait layers enhancement script last -->
   <script src="js/trait-layers-enhancement.js"></script>
-  
-  <!-- Load enhanced drag and drop functionality -->
-  <script src="js/trait-layers-drag-drop-enhanced.js"></script>
   
   <!-- Load the folder drag and drop functionality -->
   <script src="js/components/trait-folders-drag-drop.js"></script>

@@ -61,7 +61,7 @@ class BatchGenerationModal {
                 <div class="counter-line-2">generated</div>
               </div>
               <button id="generate-batch-btn" class="batch-generation-btn generate-btn tooltip">Generate Batch
-                <span class="tooltiptext">Input the number of random nfts you want to<br>generate and press the 'Generate Batch' button</span>
+                <span class="tooltiptext">Input the number of random nfts<br>you want to generate and press<br> the 'Generate Batch' button.</span>
               </button>
               <input type="number" id="batch-count-input" placeholder="100" min="1" max="10000" class="batch-count-input">
               <button id="dark-mode-toggle" class="batch-generation-btn dark-mode-toggle tooltip">
@@ -69,13 +69,13 @@ class BatchGenerationModal {
                 <span class="tooltiptext">use this filter in case you want to generate nfts considering only part of the traits on your collection. This is useful to create nfts with particular styles or using particular dominant colors (like dark colors, for instance). By default, the app will consider a major percentage of dark traits, but this can be personalized ("EDIT" button).</span>
               </button>
               <button id="add-batch-btn" class="batch-generation-btn add-batch-btn tooltip">Add Batch
-                <span class="tooltiptext">Add entire Generated Batch NFTs to your Collection</span>
+                <span class="tooltiptext">Add entire Generated Batch<br>NFTs to your Collection</span>
               </button>
               <div class="selected-count-display" id="selected-count-display">
                 <span id="selected-count-text">0</span> NFTs selected
               </div>
               <button id="add-selected-btn" class="batch-generation-btn add-selected-btn tooltip" disabled>Add Selected
-                <span class="tooltiptext">Add Selected NFTs to your Collection</span>
+                <span class="tooltiptext">Add Selected NFTs<br>to your Collection</span>
               </button>
               <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; margin-top: -18px;">
                 <div style="display: flex; align-items: center; gap: 4px;">
@@ -85,16 +85,15 @@ class BatchGenerationModal {
                 </div>
                 <div style="display: flex; gap: 8px;">
                   <button id="copy-selected-seeds-btn" class="batch-generation-btn copy-selected-seeds-btn tooltip" style="background: #555; opacity: 1; cursor: not-allowed; color: #888;" disabled>Copy
-                    <span class="tooltiptext">Copy All Seeds from selected NFTs to clipboard</span>
+                    <span class="tooltiptext">Copy All Seeds from<br>selected NFTs to clipboard</span>
                   </button>
                   <button id="import-seeds-btn" class="batch-generation-btn import-seeds-btn tooltip" style="background: #10b981; color: #fff;">Import
-                    <span class="tooltiptext">Import NFTs from seed list</span>
+                    <span class="tooltiptext">Import NFTs<br>from seed list</span>
                   </button>
                 </div>
               </div>
             </div>
-            <button id="close-batch-modal" class="close-btn tooltip">
-              <span class="tooltiptext">Close modal</span>
+            <button id="close-batch-modal" class="close-btn">
               &times;
             </button>
           </div>
@@ -156,52 +155,94 @@ class BatchGenerationModal {
     if (darkModeToggle) {
       darkModeToggle.onclick = () => this.toggleDarkMode();
       
-      // Position Dark NFTs tooltip above button (only when NOT active)
+      // Setup Dark NFTs tooltip using global tooltip manager (positioned ABOVE button)
       const darkTooltipText = darkModeToggle.querySelector('.tooltiptext');
       if (darkTooltipText) {
-        darkModeToggle.addEventListener('mouseenter', function() {
-          // Only show tooltip if button is NOT active
-          if (darkModeToggle.classList.contains('active')) {
-            darkTooltipText.style.visibility = 'hidden';
-            darkTooltipText.style.opacity = '0';
-            return;
-          }
-          
-          requestAnimationFrame(() => {
-            const rect = darkModeToggle.getBoundingClientRect();
-            darkTooltipText.style.position = 'fixed';
-            darkTooltipText.style.visibility = 'hidden';
-            darkTooltipText.style.opacity = '0';
-            darkTooltipText.style.display = 'block';
-            darkTooltipText.style.top = '0';
-            darkTooltipText.style.left = '0';
-            darkTooltipText.style.transform = 'none';
-            
-            // Force reflow to get accurate measurements
-            void darkTooltipText.offsetHeight;
-            const tooltipRect = darkTooltipText.getBoundingClientRect();
-            const tooltipHeight = tooltipRect.height || 60;
-            
-            // Position tooltip BELOW the button (arrow points up)
-            const top = rect.bottom + 8; // 8px gap below button
-            const left = rect.left + (rect.width / 2); // Center horizontally
-            
-            darkTooltipText.style.position = 'fixed';
-            darkTooltipText.style.top = `${top}px`;
-            darkTooltipText.style.left = `${left}px`;
-            darkTooltipText.style.transform = 'translateX(-50%) translateZ(0)'; /* Combine transforms for positioning and hardware acceleration */
-            darkTooltipText.style.zIndex = '2147483647';
-            darkTooltipText.style.isolation = 'isolate';
-            darkTooltipText.style.contain = 'layout style paint';
-            darkTooltipText.style.visibility = 'visible';
-            darkTooltipText.style.opacity = '1';
+        // Use global tooltip manager for consistent behavior and standard tooltip styles
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          // Setup tooltip with custom positioning (above button, not below)
+          tooltipManager.setupTooltip(darkModeToggle, darkTooltipText, {
+            position: 'above', // Position above button
+            zIndex: 2147483647 // Higher z-index for Dark NFTs tooltip
           });
-        });
-        
-        darkModeToggle.addEventListener('mouseleave', function() {
-          darkTooltipText.style.visibility = 'hidden';
-          darkTooltipText.style.opacity = '0';
-        });
+        } else {
+          // Fallback: Use setupTooltipPositioning from generateNftsUI if available
+          const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
+          if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
+            generateNftsUI.setupTooltipPositioning(darkModeToggle, darkTooltipText);
+          } else {
+            // Final fallback: Custom positioning above button
+            let tooltipTimeout = null;
+            
+            darkModeToggle.addEventListener('mouseenter', function() {
+              // Only show tooltip if button is NOT active
+              if (darkModeToggle.classList.contains('active')) {
+                darkTooltipText.style.setProperty('visibility', 'hidden', 'important');
+                darkTooltipText.style.setProperty('opacity', '0', 'important');
+                return;
+              }
+              
+              // Clear any existing timeout
+              if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = null;
+              }
+              
+              // Show tooltip after 1 second delay (standard tooltip delay)
+              tooltipTimeout = setTimeout(() => {
+                requestAnimationFrame(() => {
+                  const rect = darkModeToggle.getBoundingClientRect();
+                  
+                  // Temporarily show tooltip to get its dimensions (but keep it invisible)
+                  darkTooltipText.style.setProperty('position', 'fixed', 'important');
+                  darkTooltipText.style.setProperty('visibility', 'hidden', 'important');
+                  darkTooltipText.style.setProperty('opacity', '0', 'important');
+                  darkTooltipText.style.setProperty('display', 'block', 'important');
+                  darkTooltipText.style.setProperty('top', '-9999px', 'important');
+                  darkTooltipText.style.setProperty('left', '-9999px', 'important');
+                  darkTooltipText.style.setProperty('transform', 'none', 'important');
+                  
+                  // Force reflow to get accurate measurements
+                  void darkTooltipText.offsetHeight;
+                  const tooltipRect = darkTooltipText.getBoundingClientRect();
+                  const tooltipHeight = tooltipRect.height || 60;
+                  
+                  // Position tooltip ABOVE the button (arrow points down)
+                  const top = rect.top - tooltipHeight - 8; // 8px gap above button
+                  const left = rect.left + (rect.width / 2); // Center horizontally
+                  
+                  // Apply standard tooltip styles from tooltip.css
+                  darkTooltipText.style.setProperty('position', 'fixed', 'important');
+                  darkTooltipText.style.setProperty('top', `${top}px`, 'important');
+                  darkTooltipText.style.setProperty('left', `${left}px`, 'important');
+                  darkTooltipText.style.setProperty('transform', 'translateX(-50%)', 'important');
+                  darkTooltipText.style.setProperty('z-index', '2147483647', 'important');
+                  
+                  // Fade in with transition
+                  requestAnimationFrame(() => {
+                    darkTooltipText.style.setProperty('visibility', 'visible', 'important');
+                    darkTooltipText.style.setProperty('opacity', '1', 'important');
+                  });
+                });
+                tooltipTimeout = null;
+              }, 1000); // 1 second delay
+            });
+            
+            darkModeToggle.addEventListener('mouseleave', function() {
+              // Clear timeout if mouse leaves before delay completes
+              if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = null;
+              }
+              // Fade out with transition
+              darkTooltipText.style.setProperty('opacity', '0', 'important');
+              setTimeout(() => {
+                darkTooltipText.style.setProperty('visibility', 'hidden', 'important');
+              }, 1000);
+            });
+          }
+        }
       }
       
       // Create overlapped edit button for Dark NFTs configuration
@@ -232,6 +273,28 @@ class BatchGenerationModal {
       importSeedsBtn.onclick = () => this.openImportSeedsModal();
     }
 
+    // CRITICAL: Set up tooltips for batch generation modal buttons using global tooltip manager
+    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+    if (tooltipManager && tooltipManager.setupTooltip) {
+      // Set up tooltips for all batch generation modal header buttons
+      const batchButtons = [
+        this.modal.querySelector('#generate-batch-btn'),
+        this.modal.querySelector('#add-batch-btn'),
+        this.modal.querySelector('#add-selected-btn'),
+        this.modal.querySelector('#copy-selected-seeds-btn'),
+        this.modal.querySelector('#import-seeds-btn')
+      ];
+      
+      batchButtons.forEach(button => {
+        if (button) {
+          const tooltip = button.querySelector('.tooltiptext');
+          if (tooltip) {
+            tooltipManager.setupTooltip(button, tooltip);
+          }
+        }
+      });
+    }
+
     // Input validation
     const countInput = this.modal.querySelector('#batch-count-input');
     if (countInput) {
@@ -241,6 +304,27 @@ class BatchGenerationModal {
           e.target.value = 10000;
         } else if (value < 1) {
           e.target.value = 1;
+        }
+      });
+      
+      // CRITICAL: Add Enter key support - pressing Enter triggers Generate Batch button
+      countInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault(); // Prevent form submission if inside a form
+          
+          // Only trigger if input has a valid number
+          const value = parseInt(countInput.value);
+          if (value && value >= 1 && value <= 10000) {
+            // Get Generate Batch button reference
+            const generateBatchBtn = this.modal.querySelector('#generate-batch-btn');
+            // Trigger Generate Batch button click
+            if (generateBatchBtn && !generateBatchBtn.disabled) {
+              generateBatchBtn.click();
+            } else {
+              // Fallback: call startBatchGeneration directly if button click doesn't work
+              this.startBatchGeneration();
+            }
+          }
         }
       });
     }
@@ -446,63 +530,35 @@ class BatchGenerationModal {
     `;
 
     // Create tooltip text
+    // CRITICAL: Use exact same tooltip text as Generate NFTs tab Dark NFTs EDIT button
     const tooltipText = document.createElement('span');
     tooltipText.className = 'tooltiptext';
-    tooltipText.innerHTML = 'Configure dark NFT traits:<br>Select which traits to use for Dark NFT generation.';
+    tooltipText.innerHTML = 'Configure which traits are used for Dark NFT generation.<br>By default, the app considers a major percentage of dark traits,<br>but this can be personalized to match your collection style.';
     editButton.appendChild(tooltipText);
 
-    // Add hover effects and position tooltip
+    // CRITICAL: Use global tooltip manager for EDIT button tooltip (ensures only one tooltip shows at a time)
+    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+    if (tooltipManager && tooltipManager.setupTooltip) {
+      tooltipManager.setupTooltip(editButton, tooltipText);
+    }
+
+    // Add hover effects (scale transform) - separate from tooltip
     editButton.addEventListener('mouseenter', () => {
-      // Apply hover effect first (scale transform)
+      // Apply hover effect (scale transform)
       editButton.style.background = '#d63031';
       editButton.style.transform = 'scale(1.1)';
-      
-      // Position tooltip with fixed positioning
-      if (tooltipText) {
-        // Use double requestAnimationFrame to ensure scale transform is applied before measuring
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            // Temporarily show tooltip to get its dimensions (but keep it invisible)
-            tooltipText.style.position = 'fixed';
-            tooltipText.style.visibility = 'hidden';
-            tooltipText.style.opacity = '0';
-            tooltipText.style.display = 'block';
-            tooltipText.style.top = '0';
-            tooltipText.style.left = '0';
-            tooltipText.style.transform = 'none';
-            
-            // Force reflow to get accurate measurements
-            void tooltipText.offsetHeight;
-            
-            // Get button position AFTER scale transform is fully applied
-            const buttonRect = editButton.getBoundingClientRect();
-            const tooltipRect = tooltipText.getBoundingClientRect();
-            
-            // Position tooltip BELOW the button (arrow points up to button)
-            // Use button's center point for accurate positioning - account for actual button center after scale
-            const buttonCenterX = buttonRect.left + (buttonRect.width / 2);
-            const top = buttonRect.bottom + 8; // 8px gap below button
-            const left = buttonCenterX; // Center point of button
-            
-            // Apply final positioning with all necessary properties
-            tooltipText.style.position = 'fixed';
-            tooltipText.style.top = `${top}px`;
-            tooltipText.style.left = `${left}px`;
-            tooltipText.style.transform = 'translateX(-50%) translateZ(0)';
-            tooltipText.style.zIndex = '2147483647';
-            tooltipText.style.isolation = 'isolate';
-            tooltipText.style.contain = 'layout style paint';
-            tooltipText.style.visibility = 'visible';
-            tooltipText.style.opacity = '1';
-          });
-        });
-      }
     });
 
     editButton.addEventListener('mouseleave', () => {
+      // Remove hover effect
       editButton.style.background = '#e17055';
       editButton.style.transform = 'scale(1)';
-      if (tooltipText) {
+      
+      // CRITICAL: Hide tooltip using global tooltip manager (if available)
+      if (tooltipManager && tooltipManager.hideCurrentTooltip) {
+        tooltipManager.hideCurrentTooltip();
+      } else if (tooltipText) {
+        // Fallback: hide tooltip directly
         tooltipText.style.visibility = 'hidden';
         tooltipText.style.opacity = '0';
       }
@@ -669,18 +725,6 @@ class BatchGenerationModal {
     console.log('[DEBUG] Clearing temporary seeds data...');
     this.temporarySeedsList = [];
     this.editedNFTs.clear();
-  }
-
-  // Show edited icon on NFT card
-  showEditedIcon(nftIndex) {
-    const card = this.modal.querySelector(`[data-index="${nftIndex}"]`);
-    if (card) {
-      const editedIcon = card.querySelector('.edited-icon');
-      if (editedIcon) {
-        editedIcon.style.display = 'flex';
-        console.log('[DEBUG] Showing edited icon for NFT at index:', nftIndex);
-      }
-    }
   }
 
   // Get seeds for selected NFTs to add to collection
@@ -927,9 +971,6 @@ class BatchGenerationModal {
         <div class="seed-card-loading">Loading<span class="loading-dots">...</span><br>Please Wait.</div>
         ${rarityDisplay}
         ${nftNumberDisplay}
-        <div class="edited-icon tooltip" style="display: none; position: absolute; top: 8px; right: 8px; background: #ff6b35; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">✎
-          <span class="tooltiptext">This NFT has been edited</span>
-        </div>
       </div>
       <div class="seed-card-info">
         <div class="seed-card-number">${nft.seed}</div>
@@ -941,7 +982,7 @@ class BatchGenerationModal {
             <span class="tooltiptext">Copy this NFT's seed<br>to your clipboard</span>
           </button>
           <button class="seed-card-btn delete-btn tooltip" data-action="delete">DELETE
-            <span class="tooltiptext">Remove this saved NFT<br>from your collection</span>
+            <span class="tooltiptext">Remove this NFT from<br>the Bulk Generated list</span>
           </button>
         </div>
       </div>
@@ -957,133 +998,117 @@ class BatchGenerationModal {
     // Add drag event listeners
     this.setupCardDragAndDrop(card, index);
     
-    // CRITICAL: Set up edited icon tooltip with standard format
-    const editedIcon = card.querySelector('.edited-icon.tooltip');
-    if (editedIcon) {
-      const tooltipText = editedIcon.querySelector('.tooltiptext');
+    // Ensure buttons are clickable by adding direct event listeners as backup
+    // Setup tooltips using global tooltip manager for consistent behavior
+    const buttons = card.querySelectorAll('.seed-card-btn');
+    buttons.forEach(btn => {
+      const tooltipText = btn.querySelector('.tooltiptext');
       if (tooltipText) {
-        // Apply standard tooltip styling
-        tooltipText.style.setProperty('background-color', '#000000', 'important');
-        tooltipText.style.setProperty('background', '#000000', 'important');
-        tooltipText.style.setProperty('color', '#f39c12', 'important');
-        tooltipText.style.setProperty('z-index', '2147483647', 'important');
-        tooltipText.style.setProperty('position', 'fixed', 'important');
-        tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
-        
-        // Use global tooltip manager if available
+        // Use global tooltip manager for consistent behavior and standard tooltip styles
         const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
         if (tooltipManager && tooltipManager.setupTooltip) {
-          tooltipManager.setupTooltip(editedIcon, tooltipText);
+          tooltipManager.setupTooltip(btn, tooltipText);
         } else {
           // Fallback: Use setupTooltipPositioning from generateNftsUI if available
           const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
           if (generateNftsUI && generateNftsUI.setupTooltipPositioning) {
-            generateNftsUI.setupTooltipPositioning(editedIcon, tooltipText);
+            generateNftsUI.setupTooltipPositioning(btn, tooltipText);
+          } else {
+            // Final fallback: Custom positioning with standard tooltip styles
+            // CRITICAL: Apply standard tooltip styling from tooltip.css
+            tooltipText.style.setProperty('background-color', '#000000', 'important');
+            tooltipText.style.setProperty('background', '#000000', 'important');
+            tooltipText.style.setProperty('color', '#f39c12', 'important');
+            tooltipText.style.setProperty('border-radius', '6px', 'important');
+            tooltipText.style.setProperty('padding', '8px 12px', 'important');
+            tooltipText.style.setProperty('font-size', '11px', 'important');
+            tooltipText.style.setProperty('font-family', "'Archivo', sans-serif", 'important');
+            tooltipText.style.setProperty('line-height', '1.2', 'important');
+            tooltipText.style.setProperty('box-shadow', '0 3px 10px rgba(0, 0, 0, 0.5)', 'important');
+            tooltipText.style.setProperty('text-align', 'center', 'important');
+            tooltipText.style.setProperty('white-space', 'normal', 'important');
+            tooltipText.style.setProperty('max-width', '300px', 'important');
+            tooltipText.style.setProperty('width', 'max-content', 'important');
+            tooltipText.style.setProperty('z-index', '2147483647', 'important');
+            tooltipText.style.setProperty('position', 'fixed', 'important');
+            tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
+            tooltipText.style.setProperty('visibility', 'hidden', 'important');
+            tooltipText.style.setProperty('opacity', '0', 'important');
+            tooltipText.style.setProperty('pointer-events', 'none', 'important');
+            tooltipText.style.setProperty('display', 'block', 'important');
+            
+            let tooltipTimeout = null;
+            
+            btn.addEventListener('mouseenter', function() {
+              if (!tooltipText) return;
+              
+              // Clear any existing timeout
+              if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = null;
+              }
+              
+              // Show tooltip after 1 second delay (standard tooltip delay)
+              tooltipTimeout = setTimeout(() => {
+                // Use double requestAnimationFrame to ensure button is fully positioned before calculating
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    const rect = btn.getBoundingClientRect();
+                    
+                    // Temporarily show tooltip to get its dimensions (but keep it invisible)
+                    tooltipText.style.setProperty('position', 'fixed', 'important');
+                    tooltipText.style.setProperty('visibility', 'hidden', 'important');
+                    tooltipText.style.setProperty('opacity', '0', 'important');
+                    tooltipText.style.setProperty('display', 'block', 'important');
+                    tooltipText.style.setProperty('top', '-9999px', 'important');
+                    tooltipText.style.setProperty('left', '-9999px', 'important');
+                    tooltipText.style.setProperty('transform', 'none', 'important');
+                    
+                    // Force reflow to get accurate measurements
+                    void tooltipText.offsetHeight;
+                    
+                    const tooltipRect = tooltipText.getBoundingClientRect();
+                    const tooltipWidth = tooltipRect.width || 200;
+                    const tooltipHeight = tooltipRect.height || 60;
+                    
+                    // Position tooltip above the button, horizontally centered
+                    const top = rect.top - tooltipHeight - 5; // 5px gap above button
+                    const left = rect.left + (rect.width / 2); // Center horizontally on button
+                    
+                    // Apply final positioning with all necessary properties
+                    tooltipText.style.setProperty('position', 'fixed', 'important');
+                    tooltipText.style.setProperty('top', `${top}px`, 'important');
+                    tooltipText.style.setProperty('left', `${left}px`, 'important');
+                    tooltipText.style.setProperty('transform', 'translateX(-50%)', 'important'); // Center tooltip on button
+                    tooltipText.style.setProperty('z-index', '2147483647', 'important');
+                    
+                    // Fade in with transition
+                    requestAnimationFrame(() => {
+                      tooltipText.style.setProperty('visibility', 'visible', 'important');
+                      tooltipText.style.setProperty('opacity', '1', 'important');
+                    });
+                  });
+                });
+                tooltipTimeout = null;
+              }, 1000); // 1 second delay
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+              if (tooltipText) {
+                // Clear timeout if mouse leaves before delay completes
+                if (tooltipTimeout) {
+                  clearTimeout(tooltipTimeout);
+                  tooltipTimeout = null;
+                }
+                // Fade out with transition
+                tooltipText.style.setProperty('opacity', '0', 'important');
+                setTimeout(() => {
+                  tooltipText.style.setProperty('visibility', 'hidden', 'important');
+                }, 1000);
+              }
+            });
           }
         }
-      }
-    }
-    
-    // Ensure buttons are clickable by adding direct event listeners as backup
-    const buttons = card.querySelectorAll('.seed-card-btn');
-    buttons.forEach(btn => {
-      // Position tooltip dynamically using fixed positioning with standard format
-      const tooltipText = btn.querySelector('.tooltiptext');
-      if (tooltipText) {
-        // CRITICAL: Apply standard tooltip styling
-        tooltipText.style.setProperty('background-color', '#000000', 'important');
-        tooltipText.style.setProperty('background', '#000000', 'important');
-        tooltipText.style.setProperty('color', '#f39c12', 'important');
-        tooltipText.style.setProperty('border-radius', '6px', 'important');
-        tooltipText.style.setProperty('padding', '8px 12px', 'important');
-        tooltipText.style.setProperty('font-size', '11px', 'important');
-        tooltipText.style.setProperty('font-family', "'Archivo', sans-serif", 'important');
-        tooltipText.style.setProperty('line-height', '1.4', 'important');
-        tooltipText.style.setProperty('box-shadow', '0 3px 10px rgba(0, 0, 0, 0.5)', 'important');
-        tooltipText.style.setProperty('text-align', 'center', 'important');
-        tooltipText.style.setProperty('white-space', 'normal', 'important');
-        tooltipText.style.setProperty('max-width', '300px', 'important');
-        tooltipText.style.setProperty('width', 'max-content', 'important');
-        tooltipText.style.setProperty('z-index', '2147483647', 'important');
-        tooltipText.style.setProperty('position', 'fixed', 'important');
-        tooltipText.style.setProperty('transition', 'opacity 1s ease', 'important');
-        tooltipText.style.setProperty('visibility', 'hidden', 'important');
-        tooltipText.style.setProperty('opacity', '0', 'important');
-        tooltipText.style.setProperty('pointer-events', 'none', 'important');
-        tooltipText.style.setProperty('display', 'block', 'important');
-        
-        let tooltipTimeout = null;
-        
-        btn.addEventListener('mouseenter', function() {
-          if (!tooltipText) return;
-          
-          // Clear any existing timeout
-          if (tooltipTimeout) {
-            clearTimeout(tooltipTimeout);
-            tooltipTimeout = null;
-          }
-          
-          // Show tooltip after 1 second delay (standard tooltip delay)
-          tooltipTimeout = setTimeout(() => {
-            // Use double requestAnimationFrame to ensure button is fully positioned before calculating
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                const rect = btn.getBoundingClientRect();
-                
-                // Temporarily show tooltip to get its dimensions (but keep it invisible)
-                tooltipText.style.setProperty('position', 'fixed', 'important');
-                tooltipText.style.setProperty('visibility', 'hidden', 'important');
-                tooltipText.style.setProperty('opacity', '0', 'important');
-                tooltipText.style.setProperty('display', 'block', 'important');
-                tooltipText.style.setProperty('top', '-9999px', 'important');
-                tooltipText.style.setProperty('left', '-9999px', 'important');
-                tooltipText.style.setProperty('transform', 'none', 'important');
-                
-                // Force reflow to get accurate measurements
-                void tooltipText.offsetHeight;
-                
-                const tooltipRect = tooltipText.getBoundingClientRect();
-                const tooltipWidth = tooltipRect.width || 200;
-                const tooltipHeight = tooltipRect.height || 60;
-                
-                // Position tooltip above the button (arrow points down)
-                const top = rect.top - tooltipHeight - 5; // 5px gap above button
-                const left = rect.left + (rect.width / 2); // Center horizontally
-                
-                // Apply final positioning with all necessary properties
-                tooltipText.style.setProperty('position', 'fixed', 'important');
-                tooltipText.style.setProperty('top', `${top}px`, 'important');
-                tooltipText.style.setProperty('left', `${left}px`, 'important');
-                tooltipText.style.setProperty('transform', 'translateX(-50%)', 'important');
-                tooltipText.style.setProperty('z-index', '2147483647', 'important');
-                tooltipText.style.setProperty('isolation', 'isolate', 'important');
-                tooltipText.style.setProperty('contain', 'layout style paint', 'important');
-                
-                // Fade in with transition
-                requestAnimationFrame(() => {
-                  tooltipText.style.setProperty('visibility', 'visible', 'important');
-                  tooltipText.style.setProperty('opacity', '1', 'important');
-                });
-              });
-            });
-            tooltipTimeout = null;
-          }, 1000); // 1 second delay
-        });
-        
-        btn.addEventListener('mouseleave', function() {
-          if (tooltipText) {
-            // Clear timeout if mouse leaves before delay completes
-            if (tooltipTimeout) {
-              clearTimeout(tooltipTimeout);
-              tooltipTimeout = null;
-            }
-            // Fade out with transition
-            tooltipText.style.setProperty('opacity', '0', 'important');
-            setTimeout(() => {
-              tooltipText.style.setProperty('visibility', 'hidden', 'important');
-            }, 1000);
-          }
-        });
       }
       
       btn.addEventListener('click', (e) => {
@@ -1106,37 +1131,107 @@ class BatchGenerationModal {
           const seed = card.dataset.seed;
           if (seed) {
             navigator.clipboard.writeText(seed).then(() => {
-              // Change button to show "copied" feedback
+              // Change button to show "copied" feedback - CRITICAL: Preserve tooltip element
               const copyBtn = card.querySelector('.copy-btn');
               if (copyBtn) {
-                const originalText = copyBtn.textContent;
+                // Get the text node (the button text "COPY") - preserve tooltip
+                let textNode = null;
+                for (let node of copyBtn.childNodes) {
+                  if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                    textNode = node;
+                    break;
+                  }
+                }
+                const originalText = textNode ? textNode.textContent.trim() : 'COPY';
                 const originalBackground = copyBtn.style.backgroundColor;
                 
-                // Set copied state
-                copyBtn.textContent = 'Copied';
+                // Set copied state - only change the text node, not the entire content (preserves tooltip)
+                if (textNode) {
+                  textNode.textContent = 'Copied';
+                } else {
+                  // If no text node found, create one and insert before tooltip
+                  const copiedNode = document.createTextNode('Copied');
+                  const tooltipElement = copyBtn.querySelector('.tooltiptext');
+                  if (tooltipElement) {
+                    copyBtn.insertBefore(copiedNode, tooltipElement);
+                  } else {
+                    copyBtn.appendChild(copiedNode);
+                  }
+                }
                 copyBtn.style.backgroundColor = '#00ff00'; // Vivid green
                 copyBtn.style.color = '#000000'; // Black text for contrast
                 copyBtn.style.fontWeight = 'bold';
                 
                 // Reset after 1.5 seconds
                 setTimeout(() => {
-                  copyBtn.textContent = originalText;
+                  // Restore button text while preserving tooltip
+                  const currentTextNode = Array.from(copyBtn.childNodes).find(node => 
+                    node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+                  );
+                  if (currentTextNode) {
+                    currentTextNode.textContent = originalText;
+                  } else {
+                    // If no text node found, create one and insert before tooltip
+                    const textNodeToRestore = document.createTextNode(originalText);
+                    const tooltipToPreserve = copyBtn.querySelector('.tooltiptext');
+                    if (tooltipToPreserve) {
+                      copyBtn.insertBefore(textNodeToRestore, tooltipToPreserve);
+                    } else {
+                      copyBtn.appendChild(textNodeToRestore);
+                    }
+                  }
                   copyBtn.style.backgroundColor = originalBackground;
                   copyBtn.style.color = '';
                   copyBtn.style.fontWeight = '';
                 }, 1500);
               }
             }).catch(() => {
-              // If clipboard fails, show brief error feedback
+              // If clipboard fails, show brief error feedback - CRITICAL: Preserve tooltip element
               const copyBtn = card.querySelector('.copy-btn');
               if (copyBtn) {
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = 'Failed';
+                // Get the text node (the button text "COPY") - preserve tooltip
+                let textNodeForError = null;
+                for (let node of copyBtn.childNodes) {
+                  if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                    textNodeForError = node;
+                    break;
+                  }
+                }
+                const originalText = textNodeForError ? textNodeForError.textContent.trim() : 'COPY';
+                
+                // Change only the text node, not the entire content (preserves tooltip)
+                if (textNodeForError) {
+                  textNodeForError.textContent = 'Failed';
+                } else {
+                  // If no text node found, create one and insert before tooltip
+                  const failedNode = document.createTextNode('Failed');
+                  const tooltipElement = copyBtn.querySelector('.tooltiptext');
+                  if (tooltipElement) {
+                    copyBtn.insertBefore(failedNode, tooltipElement);
+                  } else {
+                    copyBtn.appendChild(failedNode);
+                  }
+                }
                 copyBtn.style.backgroundColor = '#ff0000'; // Red for error
                 copyBtn.style.color = '#ffffff';
                 
                 setTimeout(() => {
-                  copyBtn.textContent = originalText;
+                  // Restore button text while preserving tooltip
+                  const currentTextNodeForError = Array.from(copyBtn.childNodes).find(node => 
+                    node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+                  );
+                  if (currentTextNodeForError) {
+                    currentTextNodeForError.textContent = originalText;
+                  } else {
+                    // If no text node found, create one and insert before tooltip
+                    const textNodeToRestoreError = document.createTextNode(originalText);
+                    const tooltipToPreserveError = copyBtn.querySelector('.tooltiptext');
+                    if (tooltipToPreserveError) {
+                      copyBtn.insertBefore(textNodeToRestoreError, tooltipToPreserveError);
+                    } else {
+                      copyBtn.appendChild(textNodeToRestoreError);
+                    }
+                  }
                   copyBtn.style.backgroundColor = '';
                   copyBtn.style.color = '';
                 }, 1500);
@@ -3308,9 +3403,6 @@ class BatchGenerationModal {
     // Replace the old card with the new one
     existingCard.parentNode.replaceChild(newCard, existingCard);
     
-    // Show edited icon on the refreshed card
-    this.showEditedIcon(index);
-    
     console.log('[DEBUG] Single NFT card refreshed:', nftId);
   }
 
@@ -3520,7 +3612,7 @@ class BatchGenerationModal {
     if (window.NFTApp && window.NFTApp.getModule("confirmationModal")) {
       window.NFTApp.getModule("confirmationModal").show(
         "Delete NFT",
-        `<div style="margin-top: 12px;">Are you sure you want to delete this NFT from the batch with seed:</div>`,
+        `<div style="margin-top: 12px;">Are you sure you want to delete this<br>NFT from the batch with this seed?</div>`,
         `<div style="font-size: 11px; color: #95a5a6; margin-top: 4px; margin-bottom: 16px; word-break: break-all;">"${seedValue}"</div><div style="color: #fff; margin-top: 8px;">This action cannot be undone.</div>`,
         () => {
           // Remove from generatedNFTs array
@@ -3550,7 +3642,7 @@ class BatchGenerationModal {
       );
     } else {
       // Fallback to browser confirm if modal not available
-      const confirmed = confirm(`Delete NFT with seed "${seedValue}" from batch?`);
+      const confirmed = confirm(`Are you sure you want to delete this\nNFT from the batch with this seed?\n\n"${seedValue}"\n\nThis action cannot be undone.`);
       if (!confirmed) return;
       
       // Remove from generatedNFTs array

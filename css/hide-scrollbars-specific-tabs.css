@@ -227,8 +227,10 @@ html body #app .project-interface .content-area #export-nfts::-webkit-scrollbar-
 .tab-content#general-info.tab-content {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  overflow-y: hidden !important; /* Force no scrolling */
-  overflow-x: hidden !important;
+  /* CRITICAL: Use overflow: visible to prevent clipping of form container rounded corners */
+  overflow-y: visible !important; /* Changed from hidden to visible to prevent corner clipping */
+  overflow-x: visible !important; /* Changed from hidden to visible to prevent corner clipping */
+  overflow: visible !important; /* CRITICAL: Ensure visible to prevent corner clipping */
   height: auto !important;
   max-height: calc(100vh - 110px) !important;
 }

@@ -12,10 +12,15 @@ window.NFTApp.registerModule = window.NFTApp.registerModule || function (name, m
   this.modules[name] = module
   return module
 };
-window.NFTApp.getModule = window.NFTApp.getModule || function (name) {
+window.NFTApp.getModule = window.NFTApp.getModule || function (name, suppressWarning) {
   const module = this.modules[name]
-  if (!module) {
-    console.warn(`Module '${name}' not found`)
+  if (!module && !suppressWarning) {
+    // Only warn if suppressWarning is not true (allows optional chaining to work silently)
+    // Suppress warnings for modules that may not be loaded yet during initialization
+    const modulesThatMayNotExistYet = ['generateNftsUI', 'generateNfts', 'combinationRules', 'traitsRulesLayoutFix'];
+    if (!modulesThatMayNotExistYet.includes(name)) {
+      console.warn(`Module '${name}' not found`)
+    }
   }
   return module
 };

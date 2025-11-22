@@ -280,6 +280,10 @@
   border-radius: 12px !important;
   background: #222230 !important;
   box-sizing: border-box !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 .tab-content .form-column {
   flex: 1 !important;

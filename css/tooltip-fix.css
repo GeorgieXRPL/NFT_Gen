@@ -1,3 +1,5 @@
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Tooltip Styles */
 .tooltip {
   position: relative;
@@ -366,6 +368,8 @@ html body #export-nfts .blockchain-toggles-container button.tooltip:hover,
   border-radius: revert !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Ensure blockchain tooltips don't interfere with button layout */
 .blockchain-toggles-container .tooltiptext {
   position: fixed !important;
@@ -444,3 +448,15 @@ html body #export-nfts .blockchain-toggles-container button.tooltip:hover,
   position: fixed !important;
   pointer-events: none !important;
 }
+
+/* CRITICAL: Ensure ALREADY EXPORTED tooltip has wider width to display text in 3 lines */
+.already-minted-toggle .tooltiptext,
+.batch-card .already-minted-toggle .tooltiptext,
+#batch-management-section .already-minted-toggle .tooltiptext,
+#export-nfts .already-minted-toggle .tooltiptext,
+#export-nfts #batch-management-section .already-minted-toggle .tooltiptext {
+  width: 400px !important;
+  min-width: 400px !important;
+  max-width: 400px !important;
+}
+*/

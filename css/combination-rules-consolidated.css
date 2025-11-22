@@ -62,11 +62,38 @@
 /* Rule item styling */
 .rule-item {
   background-color: #2d2a3e;
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 12px !important; /* Match trait layer border radius for visual consistency */
+  overflow: hidden !important; /* Keep hidden for rounded corners, drag handle will be positioned inside */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 0.75rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative !important; /* Required for absolute positioning of drag handle */
+  padding-left: 0 !important; /* No left padding on rule-item itself */
+}
+
+/* CRITICAL: Reordering animation state - smooth movement when using arrow up/down buttons */
+.rule-item.reordering {
+  position: relative !important;
+  z-index: 1000 !important; /* Higher z-index during animation to appear above other rules */
+  will-change: transform !important; /* Optimize for animation performance */
+  pointer-events: none !important; /* Prevent interaction during animation */
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  /* CRITICAL: Ensure continuous, smooth animation without interruptions */
+  transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  backface-visibility: hidden !important; /* Prevent flickering */
+  transform: translateZ(0) !important; /* Force hardware acceleration */
+}
+
+/* Ensure smooth transition for reordering animation */
+.rule-item.reordering,
+.rule-item[style*="transform"] {
+  transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
 }
 
 .rule-item:nth-child(even) {
@@ -78,27 +105,135 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Rule header */
+/* Smooth drag-and-drop styles for rules */
+.rule-item[data-dragging="yes"] {
+  transition: none !important;
+  opacity: 0.9 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  cursor: grabbing !important;
+}
+
+/* Only drag handles are draggable, not the entire header */
 .rule-header {
+  cursor: default !important;
+  user-select: none !important;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 0.6rem 1rem;
+  padding-left: 100px !important; /* Match rule-description-details padding-left for same indent */
   background-color: rgba(0, 0, 0, 0.1);
+  gap: 1rem;
+  flex-wrap: nowrap;
+  position: relative;
+  border-bottom: none !important; /* Remove border - separator line is handled by ::after pseudo-element */
+}
+
+/* Smooth transition for non-dragged items during drag */
+.rules-list .rule-item:not([data-dragging="yes"]) {
+  transition: transform 0.2s ease-out !important;
+}
+
+/* CRITICAL: Separator line should only start where header container starts (at 100px), matching rule-description-details indent */
+.rule-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 100px; /* Start where header container starts (matches rule-description-details padding-left) */
+  right: 0;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+/* Rule drag handle - positioned absolutely on left, vertically centered with entire rule item */
+/* CRITICAL: Ensure drag handles have proper pointer events and z-index to override drag-to-scroll */
+.rule-drag-handle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 72px !important; /* 3x larger: 24px * 3 = 72px */
+  height: 72px !important; /* 3x larger: 24px * 3 = 72px */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  position: absolute !important;
+  left: 24px !important; /* 3x larger: 8px * 3 = 24px */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  cursor: grab !important;
+  background-color: transparent !important; /* No background - only show icon */
+  border-radius: 12px !important; /* 3x larger: 4px * 3 = 12px */
+  transition: all 0.2s ease !important;
+}
+
+.rule-drag-handle:hover {
+  display: flex !important;
+  cursor: grab !important;
+  background-color: transparent !important; /* No background on hover */
+}
+
+.rule-drag-handle:active {
+  display: flex !important;
+  cursor: grabbing !important;
+  background-color: transparent !important; /* No background on active */
+}
+
+/* Tooltip class should not override grab cursor */
+.rule-drag-handle.tooltip {
+  display: flex !important;
+  cursor: grab !important;
+}
+
+.rule-drag-handle.tooltip:hover {
+  display: flex !important;
+  cursor: grab !important;
+  background-color: transparent !important; /* No background on hover */
+}
+
+.rule-drag-handle.tooltip:active {
+  display: flex !important;
+  cursor: grabbing !important;
+  background-color: transparent !important; /* No background on active */
+}
+
+.rule-drag-handle svg {
+  display: block !important;
+  width: 48px !important; /* 3x larger: 16px * 3 = 48px */
+  height: 48px !important; /* 3x larger: 16px * 3 = 48px */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  color: #666666 !important; /* Dark grey icon color */
+}
+
+.rule-drag-handle:hover svg {
+  display: block !important;
+  color: #888888 !important; /* Slightly lighter grey on hover */
 }
 
 .rule-item:nth-child(even) .rule-header {
   background-color: #252236;
 }
 
-/* Rule type */
+/* Rule type - align to right of drag handle */
 .rule-type {
   display: flex;
   align-items: center;
   font-size: 0.85rem;
   font-weight: 600;
   gap: 6px;
+  flex: 1;
+  margin-left: 0;
 }
+
+/* CRITICAL: Align rule-type text with description text */
+/* Description text starts at padding-left: 72px */
+/* Header has padding-left: 72px, then icon (20px + 8px margin = 28px), then text */
+/* To align header text with description text, we need to add 28px padding to description */
+/* OR reduce header padding and add padding to account for icon */
+/* Since user wants top part to have indent to align with bottom, we add padding to description */
 
 /*
   Ensure all .rule-type and .rule-type-*-icon classes and their icons display the correct color for each rule type in the Add Combination Rule modal.
@@ -160,10 +295,26 @@
   transition: color 0.2s, background-color 0.2s;
 }
 
-.rule-actions .action-btn:hover {
+.rule-actions .action-btn:hover:not(:disabled):not([disabled]) {
   color: #fff;
   background-color: rgba(255, 255, 255, 0.1);
   cursor: help !important; /* Maintain help cursor on hover */
+}
+
+/* CRITICAL: Disabled button styling - greyed out with forbidden icon */
+.rule-actions .action-btn:disabled,
+.rule-actions .action-btn[disabled] {
+  color: #666 !important; /* Greyed out color */
+  opacity: 0.5 !important; /* Make it look disabled */
+  cursor: not-allowed !important; /* Show not-allowed cursor */
+  pointer-events: none !important; /* Prevent any interaction */
+}
+
+.rule-actions .action-btn:disabled:hover,
+.rule-actions .action-btn[disabled]:hover {
+  color: #666 !important; /* Keep greyed out on hover */
+  background-color: transparent !important; /* No background change */
+  cursor: not-allowed !important; /* Keep not-allowed cursor */
 }
 
 .rule-actions .action-btn svg {
@@ -268,14 +419,14 @@
   max-height: calc(90vh + 100px);
   display: flex;
   flex-direction: column;
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
   color: var(--text-primary);
   font-family: var(--font-family);
 }
 .combination-rule-modal .modal-header {
   position: sticky;
   top: 0;
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
   z-index: 10;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
@@ -350,13 +501,13 @@
   flex: 1;
   text-align: left;
   align-items: stretch;
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
   overflow: visible !important;
 }
 .combination-rule-modal .modal-footer {
   position: sticky;
   bottom: 0;
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
   z-index: 10;
   padding: 1rem;
   border-bottom-left-radius: 12px;
@@ -597,6 +748,8 @@ html body #app #combination-rule-modal .combination-rule-body {
 .combination-rule-modal .trait-grid-item:hover .custom-tooltip,
 .combination-rule-modal .trait-selection-name.custom-tooltip-anchor:hover > .custom-tooltip,
 .combination-rule-modal .trait-selection-name.custom-tooltip-anchor > .custom-tooltip,
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .combination-rule-modal .tooltiptext {
   background: #000000 !important;
   background-color: #000000 !important;
@@ -613,6 +766,7 @@ html body #app #combination-rule-modal .combination-rule-body {
   border-radius: 6px !important;
   text-align: center !important;
 }
+*/
 
 /* CRITICAL: Add cursor help to combination rule tooltip anchors */
 .combination-rule-modal .custom-tooltip-anchor,
@@ -635,6 +789,8 @@ html body #app #combination-rule-modal .combination-rule-body {
 .combination-rule-modal .second-selector .custom-dropdown.tooltip .tooltiptext,
 .combination-rule-modal .first-selector .custom-dropdown-selected.tooltip,
 .combination-rule-modal .second-selector .custom-dropdown-selected.tooltip,
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .combination-rule-modal .first-selector .custom-dropdown-selected.tooltip .tooltiptext,
 .combination-rule-modal .second-selector .custom-dropdown-selected.tooltip .tooltiptext {
   pointer-events: none !important;
@@ -652,6 +808,7 @@ html body #app #combination-rule-modal .combination-rule-body {
   visibility: hidden !important;
   opacity: 0 !important;
 }
+*/
 
 /* Sticky header for trait selection area - overridden by combination-rule-modal.css */
 /* .combination-rule-modal .traits-selection-header {
@@ -769,6 +926,8 @@ html body #app #combination-rule-modal .combination-rule-body {
   pointer-events: auto !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Only show 'Randomize Rarities (tiered)' tooltip on hover */
 .tooltip[data-tooltip-id="randomize-tiered"] .tooltiptext {
   display: none;
@@ -776,6 +935,7 @@ html body #app #combination-rule-modal .combination-rule-body {
 .tooltip[data-tooltip-id="randomize-tiered"]:hover .tooltiptext {
   display: block;
 }
+*/
 
 /* Make trait name easier to hover for tooltip */
 #combination-rule-modal .trait-selection-name.custom-tooltip-anchor {

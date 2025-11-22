@@ -1,0 +1,2157 @@
+/* 
+ * CONSOLIDATED TOOLTIP STYLES
+ * 
+ * This file consolidates ALL tooltip styles from:
+ * - tooltip-fix.css
+ * - tooltips-consolidated.css
+ * - randomize-tooltip-fix.css
+ * - enhanced-randomize-tooltip.css
+ * - nft-action-buttons-tooltips.css
+ * - override-randomize-tooltip.css
+ * - direct-randomize-tooltip.css
+ * - force-randomize-tooltip.css
+ * - specific-tooltips-fix.css
+ * - injected-tooltips.css
+ * 
+ * All tooltips use CSS variables from css/base/theme.css
+ */
+
+/* ============================================
+   BASE TOOLTIP STYLES
+   ============================================ */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+/* Base tooltip text styling - STANDARD ACROSS ENTIRE APP */
+/* CRITICAL: Use high specificity and !important to override all conflicting styles */
+/* Support both .tooltiptext and .tooltip-text classes (combination rules use .tooltip-text) */
+.tooltiptext,
+.tooltip-text,
+.tooltip .tooltiptext,
+.tooltip .tooltip-text,
+html body .tooltiptext,
+html body .tooltip-text,
+html body .tooltip .tooltiptext,
+html body .tooltip .tooltip-text {
+  /* CRITICAL: Don't use !important on visibility/opacity - JavaScript needs to override these */
+  /* Only set default hidden state, JavaScript will override with inline !important */
+  visibility: hidden;
+  position: fixed !important; /* JavaScript controls positioning */
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  pointer-events: none !important;
+  /* CRITICAL: Don't use !important on opacity - JavaScript needs to override this */
+  /* Support italic text in tooltips */
+  font-style: normal !important;
+}
+
+/* Italic text within tooltips */
+.tooltiptext em,
+.tooltip-text em,
+.tooltip .tooltiptext em,
+.tooltip .tooltip-text em {
+  font-style: italic !important;
+}
+
+/* ============================================
+   TOOLTIP POSITIONING VARIANTS
+   ============================================ */
+
+/* Default: Above element, centered */
+.tooltip .tooltiptext {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Bottom tooltip */
+.tooltip.tooltip-bottom .tooltiptext {
+  bottom: auto;
+  top: 125%;
+  transform: translateX(-50%);
+}
+
+/* Left tooltip */
+.tooltip.tooltip-left .tooltiptext {
+  right: 125%;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+/* Right tooltip */
+.tooltip.tooltip-right .tooltiptext {
+  left: 125%;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+
+/* ============================================
+   TOOLTIP ARROWS
+   ============================================ */
+
+/* Default arrow (pointing down) */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  margin-top: -1px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+}
+
+/* Bottom tooltip arrow (pointing up) */
+.tooltip.tooltip-bottom .tooltiptext::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent;
+}
+
+/* Left tooltip arrow (pointing right) */
+.tooltip.tooltip-left .tooltiptext::after {
+  top: 50%;
+  left: 100%;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-color: transparent transparent transparent rgba(0, 0, 0, 0.9);
+}
+
+/* Right tooltip arrow (pointing left) */
+.tooltip.tooltip-right .tooltiptext::after {
+  top: 50%;
+  right: 100%;
+  left: auto;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-color: transparent rgba(0, 0, 0, 0.9) transparent transparent;
+}
+
+/* ============================================
+   JAVASCRIPT-CONTROLLED TOOLTIPS
+   ============================================ */
+
+/* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay */
+/* JavaScript will set visibility: visible with !important, which overrides this */
+/* Don't use !important here - let JavaScript's inline !important take precedence */
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  /* JavaScript controls visibility - don't force hidden here */
+  /* JavaScript's inline !important will override any CSS rules */
+}
+
+/* CRITICAL: When JavaScript sets inline style with visibility: visible, it MUST be visible */
+/* JavaScript's inline !important overrides CSS !important, so this should work */
+/* But add this rule as a safety net to ensure tooltips can be shown */
+/* CRITICAL: Use maximum specificity to ensure this overrides hover rules */
+html body .tooltiptext[style*="visibility: visible"],
+html body .tooltiptext[style*="visibility:visible"],
+html body .tooltip-text[style*="visibility: visible"],
+html body .tooltip-text[style*="visibility:visible"],
+.tooltip .tooltiptext[style*="visibility: visible"],
+.tooltip .tooltiptext[style*="visibility:visible"],
+.tooltip .tooltip-text[style*="visibility: visible"],
+.tooltip .tooltip-text[style*="visibility:visible"] {
+  /* JavaScript has set visibility: visible with !important, so it will show */
+  /* This rule just ensures CSS doesn't interfere - JavaScript's inline !important wins */
+  /* But we can't force visibility here because CSS !important can't override JS inline !important */
+}
+
+/* Explicitly hide tooltips for disabled elements */
+.tooltip[disabled]:hover .tooltiptext,
+.tooltip:disabled:hover .tooltiptext,
+.tooltip[disabled] .tooltiptext,
+.tooltip:disabled .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Allow JavaScript to show tooltips when it sets inline styles with !important */
+/* JavaScript uses setProperty("visibility", "visible", "important") which should override CSS */
+/* But we need to ensure no CSS rules prevent this */
+/* When JavaScript sets inline style with !important, it overrides CSS !important */
+/* So we just need to make sure our default hidden state doesn't conflict */
+
+/* CRITICAL: Inline styles set via JavaScript's setProperty with !important take precedence */
+/* over CSS !important rules, so tooltips should show when JavaScript sets visibility: visible */
+/* No additional CSS rules needed - JavaScript's inline !important will win */
+
+/* ============================================
+   NAVIGATION TAB TOOLTIPS
+   ============================================ */
+
+.nav-tab.tooltip {
+  cursor: pointer !important; /* Navigation tabs use pointer, not help cursor */
+}
+
+.nav-tab.tooltip .tooltiptext {
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  z-index: var(--tooltip-z-index) !important;
+  position: fixed !important; /* JavaScript controls positioning */
+  visibility: hidden;
+  opacity: 0;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  display: block !important;
+  text-align: center !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.nav-tab.tooltip:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls visibility with delay */
+  opacity: 0;
+}
+
+/* Navigation tab tooltip arrow */
+.nav-tab.tooltip .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  margin-top: -1px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
+}
+
+/* ============================================
+   EXPORT NFTs TAB TOOLTIPS
+   ============================================ */
+
+#export-nfts .tooltip .tooltiptext {
+  position: fixed !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  z-index: var(--tooltip-z-index);
+}
+
+/* Export tab tooltips - JavaScript controlled */
+#export-nfts .tooltip .tooltiptext:not([style*="visibility: visible"]):not([style*="visibility:visible"]) {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* ============================================
+   TRAIT LAYER TOOLTIPS
+   ============================================ */
+
+.trait-layer-header .position-btn.tooltip,
+.trait-layer-header .action-btn.tooltip,
+.trait-layer-header .rename-layer.tooltip,
+.trait-layer-header .delete-layer.tooltip {
+  position: relative;
+}
+
+.trait-layer-header .position-btn.tooltip .tooltiptext,
+.trait-layer-header .action-btn.tooltip .tooltiptext,
+.trait-layer-header .rename-layer.tooltip .tooltiptext,
+.trait-layer-header .delete-layer.tooltip .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  padding: var(--tooltip-padding) !important;
+  display: block !important;
+  text-align: center !important;
+  line-height: var(--tooltip-line-height) !important;
+  visibility: hidden;
+  opacity: 0;
+  transition: var(--tooltip-transition) !important;
+  bottom: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.trait-layer-header .position-btn.tooltip:hover .tooltiptext,
+.trait-layer-header .action-btn.tooltip:hover .tooltiptext,
+.trait-layer-header .rename-layer.tooltip:hover .tooltiptext,
+.trait-layer-header .delete-layer.tooltip:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* Add arrow to header button tooltips */
+.trait-layer-header .position-btn.tooltip .tooltiptext::after,
+.trait-layer-header .action-btn.tooltip .tooltiptext::after,
+.trait-layer-header .rename-layer.tooltip .tooltiptext::after,
+.trait-layer-header .delete-layer.tooltip .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
+}
+
+/* Trait layer drag handle tooltip - should use grab cursor, not help */
+.trait-layer-drag-handle.tooltip {
+  cursor: grab !important;
+}
+
+.trait-layer-drag-handle.tooltip:active {
+  cursor: grabbing !important;
+}
+
+.trait-layer-drag-handle.tooltip .tooltiptext {
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  z-index: var(--tooltip-z-index) !important;
+  position: fixed !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  display: block !important;
+  text-align: center !important;
+}
+
+.trait-layer-drag-handle.tooltip:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* Rarity value wrapper tooltip */
+.trait-layer-header-rarity-value-wrapper.tooltip .tooltiptext {
+  position: fixed;
+  z-index: var(--tooltip-z-index);
+  border: none;
+}
+
+.trait-layer-header-rarity-value-wrapper.tooltip:hover .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Other trait layer tooltips (arrow, name, stats, expanded cards) */
+.trait-layer-bar .tooltip:not(.position-btn):not(.action-btn):not(.rename-layer):not(.delete-layer) .tooltiptext,
+.trait-layer-arrow.tooltip .tooltiptext,
+.trait-layer-name.tooltip .tooltiptext,
+.trait-layer-stats.tooltip .tooltiptext,
+.trait-layer-content .tooltip .tooltiptext,
+.expanded-trait-layer-card-delete-btn.tooltip .tooltiptext,
+.expanded-trait-layer-card-replace-btn.tooltip .tooltiptext,
+.expanded-trait-layer-card-view-btn.tooltip .tooltiptext {
+  position: fixed !important;
+  transform: none !important;
+  bottom: auto !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  z-index: var(--tooltip-z-index) !important;
+  visibility: hidden;
+  opacity: 0;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  display: block !important;
+  text-align: center !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+}
+
+/* Disable CSS hover for these tooltips - JavaScript controls */
+.trait-layer-arrow.tooltip:hover .tooltiptext,
+.trait-layer-name.tooltip:hover .tooltiptext,
+.trait-layer-stats.tooltip:hover .tooltiptext,
+.expanded-trait-layer-card-delete-btn.tooltip:hover .tooltiptext,
+.expanded-trait-layer-card-replace-btn.tooltip:hover .tooltiptext,
+/* CRITICAL: JavaScript controls visibility - don't force hidden here */
+/* Removed CSS rule that was preventing VIEW button tooltip from displaying */
+
+/* ============================================
+   ACTION BUTTON TOOLTIPS (Add Trait Layer, Add Folders, Delete All Layers, etc.)
+   ============================================ */
+
+.app-action-btn.tooltip,
+#add-layer-btn.tooltip,
+#add-layer-btn.tooltip,
+#delete-all-layers.tooltip,
+.add-folders-btn.tooltip,
+#add-folders-btn.tooltip,
+.jump-to-rules-btn.tooltip,
+#jump-to-rules-btn.tooltip,
+.jump-to-layers-btn.tooltip,
+#jump-to-layers-btn.tooltip,
+.add-traits-btn.tooltip,
+.app-action-btn.add-traits-btn.tooltip,
+.randomize-rarities-tiered-btn.tooltip,
+.randomize-unique-rarities-btn.tooltip,
+.normalize-rarities-btn.tooltip,
+.normalize-unique-rarities-btn.tooltip {
+  cursor: help !important;
+  position: relative !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
+.app-action-btn.tooltip .tooltiptext,
+#add-layer-btn.tooltip .tooltiptext,
+#add-layer-btn .tooltiptext,
+#delete-all-layers.tooltip .tooltiptext,
+#delete-all-layers .tooltiptext,
+.add-folders-btn.tooltip .tooltiptext,
+#add-folders-btn.tooltip .tooltiptext,
+#add-folders-btn .tooltiptext,
+.jump-to-rules-btn.tooltip .tooltiptext,
+#jump-to-rules-btn.tooltip .tooltiptext,
+.jump-to-layers-btn.tooltip .tooltiptext,
+#jump-to-layers-btn.tooltip .tooltiptext,
+.add-traits-btn.tooltip .tooltiptext,
+.add-traits-btn .tooltiptext,
+.app-action-btn.add-traits-btn.tooltip .tooltiptext,
+.app-action-btn.add-traits-btn .tooltiptext,
+.randomize-rarities-tiered-btn.tooltip .tooltiptext,
+.randomize-rarities-tiered-btn .tooltiptext,
+.randomize-unique-rarities-btn.tooltip .tooltiptext,
+.randomize-unique-rarities-btn .tooltiptext,
+.normalize-rarities-btn.tooltip .tooltiptext,
+.normalize-rarities-btn .tooltiptext,
+.normalize-unique-rarities-btn.tooltip .tooltiptext,
+.normalize-unique-rarities-btn .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.app-action-btn.tooltip:hover .tooltiptext,
+#add-layer-btn.tooltip:hover .tooltiptext,
+#add-layer-btn:hover .tooltiptext,
+#delete-all-layers.tooltip:hover .tooltiptext,
+#delete-all-layers:hover .tooltiptext,
+.add-folders-btn.tooltip:hover .tooltiptext,
+#add-folders-btn.tooltip:hover .tooltiptext,
+#add-folders-btn:hover .tooltiptext,
+.jump-to-rules-btn.tooltip:hover .tooltiptext,
+#jump-to-rules-btn.tooltip:hover .tooltiptext,
+.jump-to-layers-btn.tooltip:hover .tooltiptext,
+#jump-to-layers-btn.tooltip:hover .tooltiptext,
+.add-traits-btn.tooltip:hover .tooltiptext,
+.add-traits-btn:hover .tooltiptext,
+.app-action-btn.add-traits-btn.tooltip:hover .tooltiptext,
+.app-action-btn.add-traits-btn:hover .tooltiptext,
+.randomize-rarities-tiered-btn.tooltip:hover .tooltiptext,
+.randomize-rarities-tiered-btn:hover .tooltiptext,
+.randomize-unique-rarities-btn.tooltip:hover .tooltiptext,
+.randomize-unique-rarities-btn:hover .tooltiptext,
+.normalize-rarities-btn.tooltip:hover .tooltiptext,
+.normalize-rarities-btn:hover .tooltiptext,
+.normalize-unique-rarities-btn.tooltip:hover .tooltiptext,
+.normalize-unique-rarities-btn:hover .tooltiptext {
+  /* JavaScript controls visibility - don't force hidden here */
+  /* JavaScript's inline !important will override any CSS rules */
+}
+
+/* ============================================
+   RULE ACTION BUTTON TOOLTIPS (Combination Rules)
+   ============================================ */
+
+.rule-actions .action-btn {
+  position: relative;
+  cursor: help !important;
+}
+
+/* Combination rules use .tooltip-text class, not .tooltiptext */
+.rule-actions .action-btn .tooltip-text,
+.rule-item .action-btn .tooltip-text,
+#combination-rules-container .action-btn .tooltip-text,
+body > .tooltip-text[data-combination-rule-tooltip="true"] {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index to always stay visible */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  padding: var(--tooltip-padding) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  display: block !important;
+  text-align: center !important;
+  width: max-content !important;
+  max-width: 300px !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  isolation: isolate !important; /* CRITICAL: Create new stacking context */
+  contain: layout style paint !important; /* CRITICAL: Strong isolation */
+  transform: translateZ(0) !important; /* CRITICAL: Hardware acceleration - override any transform: none */
+  will-change: transform, opacity !important;
+  backface-visibility: hidden !important;
+}
+
+.rule-actions .action-btn .tooltip-text::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  margin-top: -1px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important;
+}
+
+.rule-actions .action-btn:hover .tooltip-text {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* ============================================
+   NFT ACTION BUTTONS TOOLTIPS (Create, Add, Bulk, Edit)
+   ============================================ */
+
+.nft-action-buttons-container .tooltip,
+.nft-action-btn.tooltip,
+#nft-action-create-btn.tooltip,
+#nft-action-add-btn.tooltip,
+#nft-action-bulk-btn.tooltip,
+#nft-action-edit-btn.tooltip {
+  cursor: help !important;
+}
+
+.nft-action-buttons-container .tooltip .tooltiptext,
+.nft-action-btn.tooltip .tooltiptext,
+.nft-action-btn .tooltiptext,
+#nft-action-create-btn.tooltip .tooltiptext,
+#nft-action-create-btn .tooltiptext,
+#nft-action-add-btn.tooltip .tooltiptext,
+#nft-action-add-btn .tooltiptext,
+#nft-action-bulk-btn.tooltip .tooltiptext,
+#nft-action-bulk-btn .tooltiptext,
+#nft-action-edit-btn.tooltip .tooltiptext,
+#nft-action-edit-btn .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  font-weight: normal !important; /* CRITICAL: Ensure regular font weight, not bold */
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.nft-action-buttons-container .tooltip:hover .tooltiptext,
+.nft-action-btn.tooltip:hover .tooltiptext,
+.nft-action-btn:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* ============================================
+   GENERATE NFTs TAB TOOLTIPS
+   ============================================ */
+
+/* Dark NFTs Button Tooltip */
+#generate-dark-nfts.tooltip:not(.active):not([disabled]):not([data-tooltip-disabled="true"]),
+#generate-dark-nfts:not(.active):not([disabled]):not([data-tooltip-disabled="true"]) {
+  cursor: help !important;
+}
+
+#generate-dark-nfts[disabled],
+#generate-dark-nfts:disabled,
+#generate-dark-nfts[data-tooltip-disabled="true"] {
+  cursor: default !important;
+}
+
+#generate-dark-nfts.tooltip.active,
+#generate-dark-nfts.active {
+  cursor: pointer !important;
+}
+
+#generate-dark-nfts.tooltip .tooltiptext,
+#generate-dark-nfts .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - higher than nav-container (999999) */
+  max-width: 320px !important; /* CRITICAL: Match Batch Generation Dark NFTs tooltip size */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  width: max-content !important;
+  /* CRITICAL: Ensure tooltip is not clipped by navigation bar */
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  isolation: isolate !important;
+  contain: none !important;
+  will-change: transform, opacity !important;
+}
+
+#generate-dark-nfts.tooltip:hover .tooltiptext,
+#generate-dark-nfts:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* Dark NFTs EDIT Button Tooltip */
+#generate-dark-nfts-edit-btn.tooltip .tooltiptext,
+#generate-dark-nfts-edit-btn .tooltiptext,
+.generate-dark-nfts-edit-btn.tooltip .tooltiptext,
+.generate-dark-nfts-edit-btn .tooltiptext,
+#dark-traits-edit-btn.tooltip .tooltiptext,
+#dark-traits-edit-btn .tooltiptext,
+.dark-traits-edit-btn.tooltip .tooltiptext,
+.dark-traits-edit-btn .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  /* CRITICAL: Ensure JavaScript positioning is not overridden - no CSS transforms or positioning */
+  transform: none !important; /* JavaScript controls positioning */
+  left: auto !important; /* JavaScript controls positioning */
+  right: auto !important; /* JavaScript controls positioning */
+  top: auto !important; /* JavaScript controls positioning */
+  bottom: auto !important; /* JavaScript controls positioning */
+  margin: 0 !important; /* JavaScript controls positioning */
+}
+
+/* Dark NFTs EDIT Button Tooltip - Hover rule to show tooltip */
+#dark-traits-edit-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltiptext,
+#dark-traits-edit-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltip-text,
+.dark-traits-edit-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltiptext,
+.dark-traits-edit-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltip-text {
+  /* JavaScript controls visibility with inline styles, but this ensures CSS doesn't interfere */
+  /* The global tooltip manager will set visibility: visible with !important on hover */
+}
+
+/* CRITICAL: Ensure Dark NFTs Edit button background is preserved when tooltip class is present */
+.dark-traits-edit-btn.tooltip,
+#dark-traits-edit-btn.tooltip {
+  background: #ff6b35 !important;
+  background-color: #ff6b35 !important;
+  color: #fff !important;
+  border: 2px solid #000 !important;
+}
+
+/* CRITICAL: Ensure Batch Dark Traits Edit button background is preserved when tooltip class is present */
+.batch-generation-modal .batch-dark-traits-edit-btn.tooltip,
+#batch-dark-traits-edit-btn.tooltip,
+.batch-dark-traits-edit-btn.tooltip {
+  background: #e17055 !important;
+  background-color: #e17055 !important;
+  color: #fff !important;
+  border: 2px solid #000 !important;
+  /* CRITICAL: Don't force opacity/visibility - JavaScript controls display via inline styles */
+  /* When JavaScript shows the button (display: flex), ensure background color is preserved */
+}
+
+/* CRITICAL: Override default tooltip positioning for Dark NFTs EDIT button - JavaScript controls positioning */
+.dark-traits-edit-btn.tooltip .tooltiptext,
+#dark-traits-edit-btn.tooltip .tooltiptext {
+  /* Override default .tooltip .tooltiptext positioning (left: 50%, transform: translateX(-50%)) */
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important; /* JavaScript controls positioning with fixed left value */
+  margin: 0 !important;
+}
+
+/* Seed NFT Button Tooltip - Higher z-index to appear above Dark NFTs EDIT button */
+#seed-nft-toggle.tooltip .tooltiptext,
+#seed-nft-toggle .tooltiptext,
+.seed-nft-toggle.tooltip .tooltiptext,
+.seed-nft-toggle .tooltiptext,
+button[id*="seed-nft"].tooltip .tooltiptext,
+button[id*="seed-nft"] .tooltiptext,
+#single-seed-toggle.tooltip .tooltiptext,
+#single-seed-toggle .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - higher than Dark NFT EDIT button (10000) and its tooltip (2147483647) */
+  isolation: isolate !important; /* CRITICAL: Create new stacking context to ensure it appears above Dark NFTs EDIT button tooltip */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+}
+
+/* Generate Seed Button Tooltip */
+#generate-seed-nft-btn.tooltip .tooltiptext,
+#generate-seed-nft-btn .tooltiptext,
+.generate-seed-nft-btn.tooltip .tooltiptext,
+.generate-seed-nft-btn .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: none !important; /* CRITICAL: Allow auto-sizing - no max-width restriction */
+  width: auto !important; /* CRITICAL: Auto width based on content */
+  min-width: auto !important; /* CRITICAL: No min-width restriction */
+}
+
+/* Copy Seed Button Tooltip - Standard tooltip style */
+.nft-seed-copy-btn.tooltip .tooltiptext,
+.nft-seed-copy-btn .tooltiptext,
+.copy-seed-btn.tooltip .tooltiptext,
+.copy-seed-btn .tooltiptext,
+button[class*="copy"].tooltip .tooltiptext,
+button[class*="copy"] .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - ensure tooltip doesn't interfere with button clicks */
+  pointer-events: none !important; /* CRITICAL: Ensure tooltip doesn't block clicks on button */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+}
+
+/* Copy Seed Button Tooltip - Hover rule to show tooltip */
+.nft-seed-copy-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltiptext,
+.nft-seed-copy-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltip-text,
+.copy-seed-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltiptext,
+.copy-seed-btn.tooltip:hover:not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) .tooltip-text {
+  /* JavaScript controls visibility with inline styles, but this ensures CSS doesn't interfere */
+  /* The global tooltip manager will set visibility: visible with !important on hover */
+}
+
+/* ============================================
+   RANDOMIZE/NORMALIZE BUTTON TOOLTIPS
+   ============================================ */
+
+.randomize-rarities-tiered-btn .tooltiptext,
+.normalize-rarities-btn .tooltiptext,
+.randomize-unique-rarities-btn .tooltiptext,
+.normalize-unique-rarities-btn .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+}
+
+.randomize-rarities-tiered-btn:hover .tooltiptext,
+.normalize-rarities-btn:hover .tooltiptext,
+.randomize-unique-rarities-btn:hover .tooltiptext,
+.normalize-unique-rarities-btn:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* Remove custom randomize-tooltip styles */
+.tooltip .tooltiptext.randomize-tooltip,
+.randomize-rarities-tiered-btn .tooltiptext.randomize-tooltip {
+  display: none !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none !important;
+}
+
+/* ============================================
+   EXPORT NFTs TOGGLE TOOLTIPS
+   ============================================ */
+
+.select-to-export-toggle.tooltip,
+.select-to-export-toggle,
+.already-minted-toggle.tooltip,
+.already-minted-toggle {
+  cursor: help;
+}
+
+.select-to-export-toggle .tooltiptext,
+.already-minted-toggle .tooltiptext {
+  position: fixed;
+  z-index: var(--tooltip-z-index);
+}
+
+/* ALREADY EXPORTED tooltip - wider width for 3-line text */
+.already-minted-toggle .tooltiptext {
+  width: 400px !important;
+  min-width: 400px !important;
+  max-width: 400px !important;
+}
+
+/* ============================================
+   BLOCKCHAIN TOGGLE TOOLTIPS
+   ============================================ */
+
+.blockchain-toggles-container .toggle-button.tooltip,
+.blockchain-toggles-container button.tooltip {
+  cursor: help;
+}
+
+.blockchain-toggles-container .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index);
+  max-width: 320px;
+  width: 320px;
+  min-width: 320px;
+}
+
+/* ============================================
+   MODAL TOOLTIPS (Saved Seeds, Select Trait, etc.)
+   ============================================ */
+
+/* All modal tooltips - ensure they're above modal content */
+#saved-seeds-modal .tooltip .tooltiptext,
+#saved-seeds-modal .tooltiptext,
+#saved-seeds-modal .custom-tooltip,
+.select-trait-modal .tooltip .tooltiptext,
+.select-trait-modal .tooltiptext,
+.combination-rule-modal .tooltip .tooltiptext,
+.combination-rule-modal .tooltiptext,
+.batch-generation-modal .tooltip .tooltiptext,
+.batch-generation-modal .tooltiptext,
+.dark-traits-modal .tooltip .tooltiptext,
+.dark-traits-modal .tooltiptext {
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  z-index: var(--tooltip-z-index) !important; /* Maximum z-index to ensure tooltips are above modal */
+  position: fixed !important; /* Use fixed to escape modal container boundaries */
+  transition: var(--tooltip-transition) !important;
+  display: block !important;
+  pointer-events: none !important;
+  visibility: hidden; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  opacity: 0; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  top: auto !important; /* JavaScript controls positioning */
+  left: auto !important; /* JavaScript controls positioning */
+  bottom: auto !important; /* JavaScript controls positioning */
+  right: auto !important; /* JavaScript controls positioning */
+  transform: none !important; /* JavaScript controls positioning */
+  margin: 0 !important; /* JavaScript controls positioning */
+}
+
+/* Default placement for saved-seeds tooltips: below and centered */
+/* CRITICAL: This rule applies to general tooltips, but seed card button tooltips, Calculate Trait Rarities button, and other specific buttons have more specific rules below */
+/* CRITICAL: The Calculate Trait Rarities button (#rerender-thumbnails) has a more specific rule below that overrides this */
+#saved-seeds-modal .tooltip .tooltiptext {
+  position: absolute !important;
+  top: 125% !important;
+  bottom: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Auto-fix tooltip: Use fixed positioning to escape modal container */
+#saved-seeds-modal .auto-fix-toggle {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 1 !important;
+}
+
+#saved-seeds-modal .auto-fix-toggle .tooltiptext,
+#saved-seeds-modal .auto-fix-toggle.tooltip .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - higher than Rule Violations NFTs button tooltip */
+}
+
+/* Rarity status tooltip */
+#saved-seeds-modal .rarity-status-text.tooltip {
+  position: relative !important;
+}
+
+#saved-seeds-modal .rarity-status-text.tooltip .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* Calculate Trait Rarities tooltip - ensure horizontally centered and positioned above */
+/* CRITICAL: Higher z-index than Find Rarity button tooltip to prevent overlap */
+/* CRITICAL: JavaScript controls positioning - ensure it's horizontally centered above the button */
+#saved-seeds-modal #rerender-thumbnails.tooltip .tooltiptext,
+#saved-seeds-modal #rerender-thumbnails .tooltiptext,
+#saved-seeds-modal .rerender-btn.tooltip .tooltiptext,
+#saved-seeds-modal .rerender-btn .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - higher than Find Rarity button tooltip */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  isolation: isolate !important; /* CRITICAL: Create new stacking context */
+  contain: none !important; /* CRITICAL: Don't contain to prevent clipping */
+}
+
+/* Calculate Rarity Ranks tooltip - ensure it's displayed */
+#saved-seeds-modal #calculate-rarity-ranks.tooltip .tooltiptext,
+#saved-seeds-modal #calculate-rarity-ranks .tooltiptext {
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important;
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* NFT Description button tooltip - ensure horizontally centered and positioned above */
+/* CRITICAL: JavaScript controls positioning - ensure it's horizontally centered above the button */
+/* Note: ID format is nft-description-{seed} to ensure uniqueness per card */
+#saved-seeds-modal [id^="nft-description"].tooltip .tooltiptext,
+#saved-seeds-modal [id^="nft-description"] .tooltiptext,
+#saved-seeds-modal .seed-desc-btn.tooltip .tooltiptext,
+#saved-seeds-modal .seed-desc-btn .tooltiptext,
+#saved-seeds-modal .seed-card-thumbnail .seed-desc-btn.tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-thumbnail .seed-desc-btn .tooltiptext,
+body > .tooltiptext[data-nft-description-tooltip="true"] {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index to always stay visible */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important; /* CRITICAL: JavaScript controls positioning - will center horizontally above */
+  left: auto !important; /* CRITICAL: JavaScript controls positioning - will center horizontally above */
+  bottom: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  isolation: isolate !important; /* CRITICAL: Create new stacking context */
+  transform: translateZ(0) !important; /* CRITICAL: Hardware acceleration - override any transform: none */
+  will-change: transform, opacity !important;
+  backface-visibility: hidden !important;
+  overflow: visible !important; /* CRITICAL: Ensure tooltip is never clipped */
+  clip: auto !important; /* CRITICAL: Don't clip tooltip */
+  clip-path: none !important; /* CRITICAL: Don't clip tooltip */
+}
+
+/* Modal tooltip arrows */
+#saved-seeds-modal .tooltip .tooltiptext::after,
+.select-trait-modal .tooltip .tooltiptext::after,
+.combination-rule-modal .tooltip .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
+}
+
+/* Seed NFT and Dark NFTs tooltip arrows - pointing downward (tooltips are above buttons) */
+html body #single-seed-toggle.tooltip .tooltiptext::after,
+html body #single-seed-toggle .tooltiptext::after,
+#single-seed-toggle.tooltip .tooltiptext::after,
+#single-seed-toggle .tooltiptext::after,
+html body #generate-dark-nfts.tooltip .tooltiptext::after,
+html body #generate-dark-nfts .tooltiptext::after,
+#generate-dark-nfts.tooltip .tooltiptext::after,
+#generate-dark-nfts .tooltiptext::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 100% !important; /* Position arrow at bottom of tooltip */
+  bottom: auto !important;
+  left: 50% !important;
+  margin-left: -5px !important;
+  margin-top: -1px !important; /* Small overlap to connect with tooltip */
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button - black background */
+}
+
+/* Force all tooltip arrows to use black background color */
+html body .tooltip .tooltiptext::after,
+html body .tooltiptext::after,
+html body .tooltip-text::after,
+html body .rule-actions .action-btn .tooltip-text::after,
+html body .toggle-label .tooltiptext::after,
+#saved-seeds-modal .tooltip .tooltiptext::after,
+#saved-seeds-modal .tooltiptext::after,
+.batch-generation-modal .tooltip .tooltiptext::after,
+.batch-generation-modal .tooltiptext::after,
+.combination-rule-modal .tooltiptext::after,
+.trait-layer-bar .tooltip .tooltiptext::after,
+.trait-layer-header .tooltip .tooltiptext::after,
+.trait-layer-content .tooltip .tooltiptext::after,
+.randomize-rarities-btn .tooltiptext::after,
+.normalize-rarities-btn .tooltiptext::after,
+.randomize-rarities-tiered-btn .tooltiptext::after,
+.randomize-unique-rarities-btn .tooltiptext::after,
+.normalize-unique-rarities-btn .tooltiptext::after,
+.nft-action-buttons-container .tooltip .tooltiptext::after,
+.toggle-button.tooltip .tooltiptext::after,
+.batch-generation-modal .dark-mode-toggle.tooltip .tooltiptext::after,
+.batch-generation-modal .batch-generation-btn.tooltip .tooltiptext::after,
+.batch-generation-modal .batch-dark-traits-edit-btn.tooltip .tooltiptext::after,
+#batch-dark-traits-edit-btn.tooltip .tooltiptext::after,
+.dark-traits-edit-btn.tooltip .tooltiptext::after,
+#dark-traits-edit-btn.tooltip .tooltiptext::after,
+#saved-seeds-modal .seed-card-buttons .tooltip .tooltiptext::after,
+.batch-generation-modal .seed-card-buttons .tooltip .tooltiptext::after {
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* FORCE black arrow color */
+}
+
+/* Ensure modals don't clip tooltips */
+#saved-seeds-modal,
+#saved-seeds-modal *,
+.select-trait-modal,
+.select-trait-modal *,
+.combination-rule-modal,
+.combination-rule-modal *,
+.batch-generation-modal,
+.batch-generation-modal * {
+  overflow: visible !important;
+}
+
+/* ============================================
+   GLOBAL TOOLTIP OVERRIDES
+   ============================================ */
+
+/* Ensure tooltips are always on top */
+html body .tooltip .tooltiptext,
+html body .tooltiptext,
+html body .custom-tooltip,
+html body .rule-actions .action-btn .tooltip-text {
+  z-index: var(--tooltip-z-index);
+}
+
+/* Ensure tooltips are visible within containers with overflow hidden */
+.trait-layer-header,
+.trait-layer-content,
+.trait-layer-bar,
+.trait-layers-container,
+.nav-tabs-container,
+.nav-actions,
+.trait-layer-actions,
+.trait-layer-position,
+.modal,
+.modal-body,
+.modal-content,
+.dropdown-menu,
+.trait-item,
+.trait-details,
+.trait-actions {
+  overflow: visible !important;
+}
+
+/* Ensure tooltips moved to body maintain proper styling */
+body > .tooltiptext {
+  z-index: var(--tooltip-z-index);
+  position: fixed;
+}
+
+/* ============================================
+   TOOLTIP OPACITY FIXES
+   ============================================ */
+
+/* Ensure tooltips show at full opacity when visible */
+.tooltiptext[style*="opacity: 1"],
+.tooltiptext[style*="opacity:1"],
+.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
+  opacity: 1 !important;
+}
+
+/* Fix inactive tooltips in export tab */
+#export-nfts .tooltip[style*="opacity: 0.5"] .tooltiptext,
+#export-nfts .tooltip[style*="opacity:0.5"] .tooltiptext {
+  opacity: 1 !important;
+}
+
+/* ============================================
+   BATCH CARD TOOLTIPS
+   ============================================ */
+
+[id^="select-for-export-tooltip-"],
+[id*="select-for-export-tooltip"],
+[id^="already-minted-tooltip-"],
+[id*="already-minted-tooltip"],
+.select-to-export-toggle .tooltiptext,
+.already-minted-toggle .tooltiptext {
+  z-index: var(--tooltip-z-index);
+  position: fixed;
+}
+
+.batch-card .select-to-export-toggle .tooltiptext,
+.batch-card .already-minted-toggle .tooltiptext,
+#batch-management-section .select-to-export-toggle .tooltiptext,
+#batch-management-section .already-minted-toggle .tooltiptext {
+  z-index: var(--tooltip-z-index);
+  position: fixed;
+  pointer-events: none;
+}
+
+/* ============================================
+   ADDITIONAL TOOLTIP STYLES FROM OTHER FILES
+   ============================================ */
+
+/* NFT Action Buttons - Additional tooltip styles */
+.nft-action-buttons-container .tooltip .tooltiptext {
+  line-height: 1.2 !important; /* Reduced from 1.4 for better vertical centering */
+  padding: 8px 12px !important; /* Equal top/bottom padding for vertical centering */
+}
+
+.nft-action-buttons-container #nft-action-create-btn.tooltip .tooltiptext {
+  line-height: 1.2 !important; /* Reduced from 1.4 for better vertical centering */
+  padding: 8px 12px !important; /* Equal top/bottom padding for vertical centering */
+}
+
+.nft-action-buttons-container #nft-action-create-btn.tooltip.dark-mode-active .tooltiptext {
+  font-weight: normal !important; /* CRITICAL: Use regular font weight, not bold */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Seed card buttons tooltips - additional styles */
+/* CRITICAL: Maximum z-index and proper positioning to prevent clipping */
+#saved-seeds-modal .seed-card-buttons .tooltip .tooltiptext,
+.batch-generation-modal .seed-card-buttons .tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-btn.tooltip .tooltiptext,
+.batch-generation-modal .seed-card-btn.tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-btn.edit-btn.tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-btn.copy-btn.tooltip .tooltiptext,
+#saved-seeds-modal .seed-card-btn.delete-btn.tooltip .tooltiptext,
+.batch-generation-modal .seed-card-btn.edit-btn.tooltip .tooltiptext,
+.batch-generation-modal .seed-card-btn.copy-btn.tooltip .tooltiptext,
+.batch-generation-modal .seed-card-btn.delete-btn.tooltip .tooltiptext,
+body > .tooltiptext[data-seed-card-tooltip="true"] {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index to always stay visible */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  isolation: isolate !important; /* CRITICAL: Create new stacking context */
+  contain: layout style paint !important; /* CRITICAL: Strong isolation */
+  transform: translateZ(0) !important; /* CRITICAL: Hardware acceleration */
+  will-change: transform, opacity !important;
+  backface-visibility: hidden !important;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  isolation: isolate !important; /* CRITICAL: Create new stacking context */
+  contain: none !important; /* CRITICAL: Don't contain to prevent clipping */
+  overflow: visible !important; /* CRITICAL: Ensure tooltip is never clipped */
+  clip: auto !important; /* CRITICAL: Don't clip tooltip */
+  clip-path: none !important; /* CRITICAL: Don't clip tooltip */
+  will-change: transform, opacity !important;
+  backface-visibility: hidden !important;
+}
+
+.batch-generation-modal .seed-card-buttons .tooltip:hover .tooltiptext,
+#saved-seeds-modal .seed-card-buttons .tooltip:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* Violation overlay tooltip - additional styles */
+/* CRITICAL: This rule applies to general thumbnail tooltips, but seed-desc-btn tooltips have more specific rules above */
+#saved-seeds-modal .seed-card-thumbnail .tooltip .tooltiptext {
+  text-align: justify !important;
+  text-justify: inter-word !important;
+  max-width: 260px !important;
+  position: absolute !important;
+  top: 125% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  transition: opacity 0.3s !important;
+}
+
+#saved-seeds-modal .seed-card-thumbnail .tooltip:hover .tooltiptext {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Toggle button tooltips - additional styles */
+.toggle-button.tooltip .tooltiptext {
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important; /* Orange text to match standard */
+  width: auto !important;
+  min-width: auto !important;
+  max-width: 250px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: opacity 0.3s !important;
+}
+
+/* Batch Generation Modal Dark NFTs tooltip - CRITICAL: Higher z-index and standard tooltip style */
+.batch-generation-modal .dark-mode-toggle.tooltip .tooltiptext,
+.batch-generation-modal #dark-mode-toggle.tooltip .tooltiptext,
+.batch-generation-modal #dark-mode-toggle .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - higher than other tooltips */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  opacity: 0;
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 320px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.batch-generation-modal .dark-mode-toggle.tooltip:hover .tooltiptext,
+.batch-generation-modal #dark-mode-toggle.tooltip:hover .tooltiptext,
+.batch-generation-modal #dark-mode-toggle:hover .tooltiptext {
+  visibility: hidden; /* JavaScript controls */
+}
+
+/* Dark NFTs tooltip - additional styles with maximum specificity */
+html body #generate-dark-nfts.tooltip .tooltiptext,
+html body #generate-dark-nfts .tooltiptext,
+#generate-dark-nfts.tooltip .tooltiptext,
+#generate-dark-nfts .tooltiptext,
+.toggle-button#generate-dark-nfts.tooltip .tooltiptext,
+.toggle-button#generate-dark-nfts .tooltiptext {
+  max-width: 320px !important; /* CRITICAL: Match Batch Generation Dark NFTs tooltip size */
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index - higher than nav-container (999999) */
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  isolation: isolate !important;
+  contain: none !important;
+  will-change: transform, opacity !important;
+  /* CRITICAL: Ensure tooltip escapes all parent containers including navigation */
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important; /* JavaScript will handle centering */
+  margin: 0 !important;
+}
+
+/* CRITICAL: Don't use CSS hover to show Dark NFTs tooltip - JavaScript controls visibility */
+html body #generate-dark-nfts.tooltip:hover .tooltiptext,
+html body #generate-dark-nfts:hover .tooltiptext,
+#generate-dark-nfts.tooltip:hover .tooltiptext,
+#generate-dark-nfts:hover .tooltiptext {
+  /* JavaScript controls visibility - don't force visible here */
+}
+
+/* Seed NFT tooltip - additional styles with maximum specificity */
+html body #single-seed-toggle.tooltip:not([disabled]):not(:disabled) .tooltiptext,
+html body #single-seed-toggle:not([disabled]):not(:disabled) .tooltiptext,
+#single-seed-toggle.tooltip:not([disabled]):not(:disabled) .tooltiptext,
+#single-seed-toggle:not([disabled]):not(:disabled) .tooltiptext {
+  max-width: 320px !important; /* CRITICAL: Match Dark NFTs tooltip size */
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index */
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  isolation: isolate !important;
+  contain: none !important;
+  will-change: transform, opacity !important;
+}
+
+/* CRITICAL: Allow Seed NFT tooltip to show even when disabled
+   Tooltips should explain why button is disabled, so they need to be visible
+   JavaScript controls tooltip visibility, so CSS should not hide it */
+/* REMOVED: CSS rules that hide tooltip when disabled - tooltips should show to explain disabled state */
+
+/* CRITICAL: Don't use CSS hover to show Seed NFT tooltip - JavaScript controls visibility */
+html body #single-seed-toggle.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
+html body #single-seed-toggle:hover:not([disabled]):not(:disabled) .tooltiptext,
+#single-seed-toggle.tooltip:hover:not([disabled]):not(:disabled) .tooltiptext,
+#single-seed-toggle:hover:not([disabled]):not(:disabled) .tooltiptext {
+  /* JavaScript controls visibility - don't force visible here */
+}
+
+/* Batch Generation Modal tooltips - CRITICAL: Ensure all batch generation buttons have working tooltips */
+.batch-generation-modal .batch-generation-btn.tooltip .tooltiptext,
+.batch-generation-modal #generate-batch-btn.tooltip .tooltiptext,
+.batch-generation-modal #add-batch-btn.tooltip .tooltiptext,
+.batch-generation-modal #add-selected-btn.tooltip .tooltiptext,
+.batch-generation-modal #copy-selected-seeds-btn.tooltip .tooltiptext,
+.batch-generation-modal #import-seeds-btn.tooltip .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  opacity: 0; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* Batch Dark Traits Edit Button Tooltip */
+.batch-generation-modal .batch-dark-traits-edit-btn.tooltip .tooltiptext,
+#batch-dark-traits-edit-btn.tooltip .tooltiptext {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* CRITICAL: Maximum z-index */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  pointer-events: none !important;
+  visibility: hidden; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  opacity: 0; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  display: block !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* CRITICAL: Disable CSS hover rules - JavaScript controls tooltip visibility */
+.batch-generation-modal .batch-dark-traits-edit-btn.tooltip:hover .tooltiptext,
+#batch-dark-traits-edit-btn.tooltip:hover .tooltiptext {
+  /* JavaScript controls visibility - don't force visible here */
+}
+
+/* CRITICAL: Close Modal Button Tooltips - NEVER VISIBLE */
+/* All close modal buttons must never show tooltips */
+.saved-seeds-close-btn.tooltip .tooltiptext,
+.tooltip.saved-seeds-close-btn .tooltiptext,
+.saved-seeds-close-btn .tooltiptext,
+.batch-generation-modal .close-btn.tooltip .tooltiptext,
+.batch-generation-modal .close-btn .tooltiptext,
+#close-batch-modal.tooltip .tooltiptext,
+#close-batch-modal .tooltiptext,
+.combination-rule-modal .combination-rule-close-btn.tooltip .tooltiptext,
+.combination-rule-modal .combination-rule-close-btn .tooltiptext,
+#close-combination-rule-modal.tooltip .tooltiptext,
+#close-combination-rule-modal .tooltiptext,
+#trait-selection-modal .select-trait-close-btn.tooltip .tooltiptext,
+#trait-selection-modal .select-trait-close-btn .tooltiptext,
+.select-trait-close-btn.tooltip .tooltiptext,
+.select-trait-close-btn .tooltiptext,
+#close-dark-traits-modal.tooltip .tooltiptext,
+#close-dark-traits-modal .tooltiptext,
+.close-btn.tooltip .tooltiptext,
+.close-btn .tooltiptext,
+.modal-close-btn.tooltip .tooltiptext,
+.modal-close-btn .tooltiptext,
+.modal-close.tooltip .tooltiptext,
+.modal-close .tooltiptext,
+.nft-edit-close-btn.tooltip .tooltiptext,
+.nft-edit-close-btn .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.saved-seeds-close-btn.tooltip:hover .tooltiptext,
+.tooltip.saved-seeds-close-btn:hover .tooltiptext,
+.saved-seeds-close-btn:hover .tooltiptext,
+.batch-generation-modal .close-btn.tooltip:hover .tooltiptext,
+.batch-generation-modal .close-btn:hover .tooltiptext,
+#close-batch-modal.tooltip:hover .tooltiptext,
+#close-batch-modal:hover .tooltiptext,
+.combination-rule-modal .combination-rule-close-btn.tooltip:hover .tooltiptext,
+.combination-rule-modal .combination-rule-close-btn:hover .tooltiptext,
+#close-combination-rule-modal.tooltip:hover .tooltiptext,
+#close-combination-rule-modal:hover .tooltiptext,
+#trait-selection-modal .select-trait-close-btn.tooltip:hover .tooltiptext,
+#trait-selection-modal .select-trait-close-btn:hover .tooltiptext,
+.select-trait-close-btn.tooltip:hover .tooltiptext,
+.select-trait-close-btn:hover .tooltiptext,
+#close-dark-traits-modal.tooltip:hover .tooltiptext,
+#close-dark-traits-modal:hover .tooltiptext,
+.close-btn.tooltip:hover .tooltiptext,
+.close-btn:hover .tooltiptext,
+.modal-close-btn.tooltip:hover .tooltiptext,
+.modal-close-btn:hover .tooltiptext,
+.modal-close.tooltip:hover .tooltiptext,
+.modal-close:hover .tooltiptext,
+.nft-edit-close-btn.tooltip:hover .tooltiptext,
+.nft-edit-close-btn:hover .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Combination Rule Button Tooltip */
+html body #app #traits-rules #add-combination-rule.tooltip .tooltiptext,
+html body #app #traits-rules #add-combination-rule .tooltiptext,
+#add-combination-rule.tooltip .tooltiptext,
+#add-combination-rule .tooltiptext {
+  color: var(--tooltip-text) !important; /* Orange text to match standard */
+  border: none !important;
+}
+
+/* Blockchain toggle buttons cursor */
+.blockchain-toggles-container .toggle-button.tooltip,
+.blockchain-toggles-container .toggle-button.tooltip:hover,
+.blockchain-toggles-container .toggle-button.tooltip:active,
+.blockchain-toggles-container .toggle-button.tooltip:focus,
+.blockchain-toggles-container button.tooltip,
+.blockchain-toggles-container button.tooltip:hover,
+.blockchain-toggles-container button.tooltip:active,
+.blockchain-toggles-container button.tooltip:focus,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:hover,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:active,
+#export-nfts .blockchain-toggles-container .toggle-button.tooltip:focus,
+#export-nfts .blockchain-toggles-container button.tooltip,
+#export-nfts .blockchain-toggles-container button.tooltip:hover,
+#export-nfts .blockchain-toggles-container button.tooltip:active,
+#export-nfts .blockchain-toggles-container button.tooltip:focus {
+  cursor: help !important;
+}
+
+/* ============================================
+   EXPORT IMAGE DIMENSION INPUTS - NO TOOLTIPS
+   Completely prevent all tooltips (browser, app, validation)
+   ============================================ */
+
+/* CRITICAL: Prevent ALL tooltips on export image dimension inputs */
+#export-image-width-input,
+#export-image-height-input,
+#export-image-width-input.tooltip,
+#export-image-height-input.tooltip,
+#export-image-width-input .tooltiptext,
+#export-image-height-input .tooltiptext,
+#export-image-width-input .tooltip-text,
+#export-image-height-input .tooltip-text,
+html body #export-image-width-input,
+html body #export-image-height-input,
+html body #export-image-width-input.tooltip,
+html body #export-image-height-input.tooltip,
+html body #export-image-width-input .tooltiptext,
+html body #export-image-height-input .tooltiptext,
+#export-nfts #export-image-width-input,
+#export-nfts #export-image-height-input,
+#export-nfts #export-image-width-input.tooltip,
+#export-nfts #export-image-height-input.tooltip,
+#export-nfts #export-image-width-input .tooltiptext,
+#export-nfts #export-image-height-input .tooltiptext {
+  /* Prevent app tooltips */
+  cursor: text !important;
+}
+
+#export-image-width-input:disabled,
+#export-image-height-input:disabled,
+#export-nfts #export-image-width-input:disabled,
+#export-nfts #export-image-height-input:disabled {
+  cursor: not-allowed !important;
+}
+
+/* Hide any tooltip elements that might exist */
+#export-image-width-input .tooltiptext,
+#export-image-height-input .tooltiptext,
+#export-image-width-input .tooltip-text,
+#export-image-height-input .tooltip-text,
+html body #export-image-width-input .tooltiptext,
+html body #export-image-height-input .tooltiptext,
+#export-nfts #export-image-width-input .tooltiptext,
+#export-nfts #export-image-height-input .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+/* Prevent browser validation tooltips/messages */
+#export-image-width-input:invalid,
+#export-image-height-input:invalid,
+#export-nfts #export-image-width-input:invalid,
+#export-nfts #export-image-height-input:invalid {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: inherit !important;
+}
+
+/* ============================================
+   GENERATE NFTs AND NFT TRAITS TITLE TOOLTIPS
+   Use standard app tooltip style
+   ============================================ */
+
+/* Generate NFTs title tooltip - EXCEPTION: Display below instead of above */
+#generate-nfts .nft-preview-title .tooltiptext,
+#generate-nfts .nft-preview-title-text .tooltiptext,
+html body #app #generate-nfts .nft-preview-title .tooltiptext,
+html body #app #generate-nfts .nft-preview-title-text .tooltiptext {
+  /* Use standard tooltip style from base styles */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important; /* Maximum z-index to be above nav buttons */
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  text-align: center !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: hidden;
+  opacity: 0;
+  /* CRITICAL: JavaScript will position below via inline styles, but ensure CSS doesn't override */
+  bottom: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* CRITICAL: Hide Generate NFTs title tooltip when disabled (tab greyed out) */
+#generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"] .tooltiptext,
+#generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"] ~ .tooltiptext,
+#generate-nfts .nft-preview-title:has(.nft-preview-title-text[data-tooltip-disabled="true"]) .tooltiptext,
+html body #app #generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"] .tooltiptext,
+html body #app #generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"] ~ .tooltiptext,
+html body #app #generate-nfts .nft-preview-title:has(.nft-preview-title-text[data-tooltip-disabled="true"]) .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+/* NFT Traits title tooltip - EXCEPTION: Display below instead of above */
+#generate-nfts .traits-title .tooltiptext,
+#generate-nfts .traits-title-text .tooltiptext,
+html body #app #generate-nfts .traits-title .tooltiptext,
+html body #app #generate-nfts .traits-title-text .tooltiptext {
+  /* Use standard tooltip style from base styles */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  transition: var(--tooltip-transition) !important;
+  position: fixed !important;
+  z-index: var(--tooltip-z-index) !important; /* Maximum z-index to be above nav buttons */
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  text-align: center !important;
+  pointer-events: none !important;
+  display: block !important;
+  visibility: hidden;
+  opacity: 0;
+  /* CRITICAL: JavaScript will position below via inline styles, but ensure CSS doesn't override */
+  bottom: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* CRITICAL: Hide NFT Traits title tooltip when disabled (tab greyed out) */
+#generate-nfts .traits-title-text[data-tooltip-disabled="true"] .tooltiptext,
+#generate-nfts .traits-title-text[data-tooltip-disabled="true"] ~ .tooltiptext,
+#generate-nfts .traits-title:has(.traits-title-text[data-tooltip-disabled="true"]) .tooltiptext,
+html body #app #generate-nfts .traits-title-text[data-tooltip-disabled="true"] .tooltiptext,
+html body #app #generate-nfts .traits-title-text[data-tooltip-disabled="true"] ~ .tooltiptext,
+html body #app #generate-nfts .traits-title:has(.traits-title-text[data-tooltip-disabled="true"]) .tooltiptext {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+/* CRITICAL: Hide any custom-tooltip-text elements that might exist (legacy) */
+#generate-nfts .nft-preview-title .custom-tooltip-text,
+#generate-nfts .traits-title .custom-tooltip-text,
+html body #app #generate-nfts .nft-preview-title .custom-tooltip-text,
+html body #app #generate-nfts .traits-title .custom-tooltip-text {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure title containers don't interfere with tooltip display */
+#generate-nfts .nft-preview-title.tooltip,
+#generate-nfts .traits-title.tooltip,
+html body #app #generate-nfts .nft-preview-title.tooltip,
+html body #app #generate-nfts .traits-title.tooltip {
+  cursor: default !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Title text should show help cursor when enabled */
+#generate-nfts .nft-preview-title-text:not([data-tooltip-disabled="true"]),
+#generate-nfts .traits-title-text:not([data-tooltip-disabled="true"]),
+html body #app #generate-nfts .nft-preview-title-text:not([data-tooltip-disabled="true"]),
+html body #app #generate-nfts .traits-title-text:not([data-tooltip-disabled="true"]) {
+  cursor: help !important;
+}
+
+/* CRITICAL: Override help cursor when disabled/greyed out - must override hover rules and inline styles */
+#generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"],
+#generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"]:hover,
+#generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"]:active,
+#generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"]:focus,
+#generate-nfts .traits-title-text[data-tooltip-disabled="true"],
+#generate-nfts .traits-title-text[data-tooltip-disabled="true"]:hover,
+#generate-nfts .traits-title-text[data-tooltip-disabled="true"]:active,
+#generate-nfts .traits-title-text[data-tooltip-disabled="true"]:focus,
+html body #app #generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"],
+html body #app #generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"]:hover,
+html body #app #generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"]:active,
+html body #app #generate-nfts .nft-preview-title-text[data-tooltip-disabled="true"]:focus,
+html body #app #generate-nfts .traits-title-text[data-tooltip-disabled="true"],
+html body #app #generate-nfts .traits-title-text[data-tooltip-disabled="true"]:hover,
+html body #app #generate-nfts .traits-title-text[data-tooltip-disabled="true"]:active,
+html body #app #generate-nfts .traits-title-text[data-tooltip-disabled="true"]:focus {
+  cursor: default !important; /* Default cursor when greyed out (not help) */
+}
+
+/* ============================================
+   TOGGLE LABEL TOOLTIP
+   ============================================ */
+
+/* Tooltip for toggle labels - positioned to the right */
+.toggle-label .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background-color: var(--tooltip-bg) !important; /* Standard black tooltip background */
+  background: var(--tooltip-bg) !important; /* Standard black tooltip background */
+  color: var(--tooltip-text) !important; /* Orange text to match standard */
+  border-radius: var(--tooltip-border-radius) !important;
+  padding: var(--tooltip-padding) !important; /* Standard padding */
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 260px;
+  max-width: 340px;
+  z-index: 10;
+  font-size: var(--tooltip-font-size) !important; /* Standard font size */
+  font-family: var(--font-family) !important; /* Standard font */
+  pointer-events: none;
+  white-space: normal;
+}
+
+.toggle-label:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  display: block;
+}
+
+/* ============================================
+   NFT TRAIT EDIT BUTTON TOOLTIP
+   ============================================ */
+
+/* NFT trait edit button tooltip - standard tooltip style */
+.nft-trait-edit-btn.tooltip .tooltiptext,
+.nft-trait-edit-btn .tooltiptext,
+#generate-nfts .nft-trait-edit-btn.tooltip .tooltiptext,
+#generate-nfts .nft-trait-edit-btn .tooltiptext {
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  z-index: 2147483647 !important; /* Maximum z-index */
+  position: fixed !important;
+  padding: var(--tooltip-padding) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  transition: var(--tooltip-transition) !important;
+  visibility: hidden; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  opacity: 0; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  display: block !important;
+  text-align: center !important;
+  isolation: isolate !important;
+  contain: layout style paint !important;
+  will-change: transform, opacity !important;
+  backface-visibility: hidden !important;
+}
+
+/* ============================================
+   NFT COUNT PANEL TOOLTIP
+   ============================================ */
+
+/* Tooltip for NFT count panel - High specificity to override other tooltip rules */
+#nft-count-panel .tooltiptext {
+  position: fixed !important; /* Use fixed positioning to avoid clipping */
+  background-color: var(--tooltip-bg) !important;
+  background: var(--tooltip-bg) !important;
+  color: var(--tooltip-text) !important;
+  padding: var(--tooltip-padding) !important;
+  border-radius: var(--tooltip-border-radius) !important;
+  font-size: var(--tooltip-font-size) !important;
+  font-family: var(--font-family) !important;
+  line-height: var(--tooltip-line-height) !important;
+  text-align: center !important;
+  white-space: normal !important;
+  opacity: 0; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  visibility: hidden; /* CRITICAL: Don't use !important - JavaScript needs to override */
+  transition: var(--tooltip-transition) !important;
+  z-index: 2147483647 !important; /* Highest z-index across entire app */
+  pointer-events: none !important;
+  box-shadow: var(--tooltip-box-shadow) !important;
+  border: none !important;
+  /* Allow JavaScript to control positioning */
+  top: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  word-wrap: break-word !important;
+  max-width: 300px !important;
+  width: max-content !important;
+  display: block !important; /* Use block display for proper text centering */
+}
+
+/* CRITICAL: Add cursor help to nft-count-panel when enabled */
+#nft-count-panel.tooltip:not([data-tooltip-disabled="true"]) {
+  cursor: help !important;
+}
+
+/* CRITICAL: Set default cursor for nft-count-panel when tooltip is disabled (tab greyed out) */
+#nft-count-panel[data-tooltip-disabled="true"],
+#nft-count-panel[data-tooltip-disabled="true"]:hover {
+  cursor: default !important; /* Default cursor when tooltip is disabled (not help) */
+}
+
+/* Hide tooltip when panel is greyed out */
+#nft-count-panel[style*="background-color: #23232b"]:hover .tooltiptext,
+#nft-count-panel .nft-count-container[style*="opacity: 0.6"] ~ * .tooltiptext,
+#nft-count-panel[style*="background-color: #23232b"] .tooltiptext,
+#nft-count-panel[data-tooltip-disabled="true"] .tooltiptext,
+#nft-count-panel[data-tooltip-disabled="true"]:hover .tooltiptext {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* ============================================
+   COLLECTION INFO TAB - NO TOOLTIPS
+   ============================================ */
+
+/* CRITICAL: Prevent all tooltips from displaying in Collection Info tab */
+#general-info .tooltip,
+#general-info.tab-content .tooltip,
+#general-info.tab-content.active .tooltip,
+.tab-content#general-info .tooltip,
+.tab-content#general-info.active .tooltip,
+html body #app .project-interface .content-area #general-info .tooltip,
+html body #app .project-interface .content-area #general-info.tab-content .tooltip,
+html body #app .project-interface .content-area #general-info.tab-content.active .tooltip {
+  cursor: default !important;
+}
+
+/* Hide all tooltip text elements in Collection Info tab */
+#general-info .tooltiptext,
+#general-info .tooltip-text,
+#general-info.tab-content .tooltiptext,
+#general-info.tab-content .tooltip-text,
+#general-info.tab-content.active .tooltiptext,
+#general-info.tab-content.active .tooltip-text,
+.tab-content#general-info .tooltiptext,
+.tab-content#general-info .tooltip-text,
+.tab-content#general-info.active .tooltiptext,
+.tab-content#general-info.active .tooltip-text,
+html body #app .project-interface .content-area #general-info .tooltiptext,
+html body #app .project-interface .content-area #general-info .tooltip-text,
+html body #app .project-interface .content-area #general-info.tab-content .tooltiptext,
+html body #app .project-interface .content-area #general-info.tab-content .tooltip-text,
+html body #app .project-interface .content-area #general-info.tab-content.active .tooltiptext,
+html body #app .project-interface .content-area #general-info.tab-content.active .tooltip-text,
+/* CRITICAL: Explicitly hide tooltips on Collection Description and Default NFT Description input fields */
+#collection-description.tooltip,
+#collection-description.tooltip .tooltiptext,
+#collection-description.tooltip .tooltip-text,
+#collection-description .tooltiptext,
+#collection-description .tooltip-text,
+#default-nft-description.tooltip,
+#default-nft-description.tooltip .tooltiptext,
+#default-nft-description.tooltip .tooltip-text,
+#default-nft-description .tooltiptext,
+#default-nft-description .tooltip-text,
+#general-info #collection-description.tooltip,
+#general-info #collection-description.tooltip .tooltiptext,
+#general-info #collection-description.tooltip .tooltip-text,
+#general-info #collection-description .tooltiptext,
+#general-info #collection-description .tooltip-text,
+#general-info #default-nft-description.tooltip,
+#general-info #default-nft-description.tooltip .tooltiptext,
+#general-info #default-nft-description.tooltip .tooltip-text,
+#general-info #default-nft-description .tooltiptext,
+#general-info #default-nft-description .tooltip-text {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* ============================================
+   JUMP TO RULES BUTTON TOOLTIP
+   ============================================ */
+
+/* CRITICAL: Jump to Rules button tooltips must be positioned correctly above the button */
+body > .tooltiptext[data-jump-to-rules-tooltip="true"],
+body > .tooltip-text[data-jump-to-rules-tooltip="true"] {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  isolation: isolate !important;
+  contain: layout style paint !important;
+  transform: translateZ(0) !important;
+  will-change: transform, opacity !important;
+  backface-visibility: hidden !important;
+}
+
+/* Prevent tooltips from showing on hover in Collection Info tab */
+#general-info .tooltip:hover .tooltiptext,
+#general-info .tooltip:hover .tooltip-text,
+#general-info.tab-content .tooltip:hover .tooltiptext,
+#general-info.tab-content .tooltip:hover .tooltip-text,
+#general-info.tab-content.active .tooltip:hover .tooltiptext,
+#general-info.tab-content.active .tooltip:hover .tooltip-text,
+.tab-content#general-info .tooltip:hover .tooltiptext,
+.tab-content#general-info .tooltip:hover .tooltip-text,
+.tab-content#general-info.active .tooltip:hover .tooltiptext,
+.tab-content#general-info.active .tooltip:hover .tooltip-text {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+

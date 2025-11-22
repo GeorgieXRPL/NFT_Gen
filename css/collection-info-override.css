@@ -9,7 +9,10 @@ body #app .project-interface .content-area #general-info .form-container {
   border-radius: 12px !important;
   background-color: var(--bg-secondary) !important;
   border: 1px solid var(--border-color) !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
   overflow-x: visible !important; /* Prevent clipping of content */
+  overflow-y: visible !important; /* Prevent clipping of rounded corners */
 }
 
 /* Override any section titles and descriptions to maintain consistency */
@@ -33,6 +36,10 @@ body #app .project-interface .content-area #general-info .two-column-form {
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 2rem !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 /* Form column styling for consistent layout */
@@ -41,6 +48,10 @@ body #app .project-interface .content-area #general-info .form-column {
   min-width: 400px !important;
   padding-left: 2rem !important;
   padding-right: 2rem !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 /* Form controls styling to ensure consistent appearance */
@@ -71,6 +82,10 @@ body #app .project-interface .content-area #general-info #collection-description
 /* Ensure form groups maintain proper spacing */
 body #app .project-interface .content-area #general-info .form-group {
   margin-bottom: 1.5rem !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 /* Consistently style labels */
@@ -134,6 +149,30 @@ body #app .project-interface .content-area #general-info {
   margin-left: auto !important;
   margin-right: auto !important;
   box-sizing: border-box !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of form container rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+/* CRITICAL: Ensure parent containers (.content-area and .project-interface) don't clip rounded corners */
+body #app .project-interface .content-area:has(#general-info.tab-content.active),
+body #app .project-interface:has(.content-area #general-info.tab-content.active),
+body #app .project-interface:has(#general-info.tab-content.active),
+body #app .project-interface .content-area:has(#general-info.tab-content),
+body #app .project-interface .content-area:has(#general-info.tab-content.active) {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+/* CRITICAL: Ensure form container and all its parent containers have overflow visible */
+body #app .project-interface .content-area #general-info #col-info-form-container,
+body #app .project-interface .content-area #general-info .form-container.two-column-form,
+body #app .project-interface .content-area #general-info .form-container {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 /*
@@ -144,16 +183,52 @@ body #app .project-interface .content-area #general-info #col-info-form-containe
 body #app .project-interface .content-area #general-info .form-container.two-column-form {
   width: 1557px !important;
   max-width: 1557px !important;
+  height: auto !important; /* CRITICAL: Use auto instead of fixed height to prevent clipping */
+  min-height: 630px !important; /* CRITICAL: Use min-height instead of fixed height */
+  max-height: none !important; /* CRITICAL: Remove max-height constraint to prevent clipping */
   margin-left: auto !important;
   margin-right: auto !important; /* Changed from 24px to auto to prevent clipping */
-  margin-bottom: 2rem !important;
+  margin-bottom: 3rem !important; /* CRITICAL: Increased margin-bottom to ensure bottom corners are visible */
   padding: 2rem !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
+  padding-bottom: 2.5rem !important; /* CRITICAL: Add extra padding-bottom to ensure bottom corners are visible */
   border: 2px dashed var(--border-color) !important;
   border-radius: 12px !important;
   background: #222230 !important;
   box-sizing: border-box !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  /* CRITICAL: Ensure no clipping properties are set */
+  clip-path: none !important;
+  contain: none !important;
+  isolation: auto !important;
+}
+
+/* CRITICAL: Ensure parent containers don't clip bottom corners */
+body #app .project-interface .content-area #general-info,
+body #app .project-interface .content-area:has(#general-info.tab-content.active),
+body #app .project-interface:has(.content-area #general-info.tab-content.active) {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  clip-path: none !important;
+  contain: none !important;
+  padding-bottom: 3rem !important; /* CRITICAL: Increased padding to ensure bottom corners are visible */
+  margin-bottom: 0 !important;
+}
+
+/* CRITICAL: Ensure project-interface doesn't clip when Collection Info is active */
+body #app .project-interface:has(.content-area #general-info.tab-content.active),
+body #app .project-interface:has(#general-info.tab-content.active) {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  clip-path: none !important;
+  contain: none !important;
+  padding-bottom: 3rem !important; /* CRITICAL: Ensure bottom corners are visible */
 }
 
 /* --- FINAL OVERRIDE: ENSURE COLLECTION INFO TITLE IS NEVER CUT --- */
@@ -227,6 +302,10 @@ body #app .project-interface .content-area #general-info .section-description {
   padding-right: 24px !important;
   width: 100% !important;
   max-width: none !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of form container rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 #general-info.tab-content.active .section-title,
@@ -274,21 +353,27 @@ body #app .project-interface .content-area #general-info .section-description {
    ======================================== */
 
 /* TAB SCROLLING CONTROL - FROZEN STATE */
+/* CRITICAL: Use maximum specificity and !important to prevent any JavaScript or other CSS from overriding */
 #general-info.tab-content,
 html body #app .project-interface .content-area #general-info,
 #general-info.tab-content.active,
 html body #app .project-interface .content-area .tab-content#general-info,
 html body #app .project-interface .content-area .tab-content#general-info.active,
-#collection-info {
+#collection-info,
+html body #app .project-interface .content-area:has(#general-info.tab-content.active),
+html body #app .project-interface:has(.content-area #general-info.tab-content.active) {
   /* Freeze the tab - no scrolling - minimum height */
-  overflow-y: hidden !important;
-  overflow-x: visible !important; /* Changed from hidden to visible to prevent clipping */
+  /* CRITICAL: Use overflow: visible to prevent clipping of form container rounded corners */
+  /* CRITICAL: These rules MUST NOT be overridden by JavaScript - use maximum specificity */
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+  overflow: visible !important;
   height: auto !important;
   max-height: none !important;
   min-height: auto !important;
   position: relative !important;
   margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
+  padding-bottom: 3rem !important;
   
   /* Hide scrollbars - All browsers */
   scrollbar-width: none !important;
@@ -309,20 +394,19 @@ html body #app .project-interface .content-area #general-info::-webkit-scrollbar
 
 /* Collection Info specific content area rules moved to general tab padding */
 
-/* Remove all bottom margins and padding from general-info content */
-body #app .project-interface .content-area #general-info,
-body #app .project-interface .content-area #general-info .form-container,
-body #app .project-interface .content-area #general-info .two-column-form,
+/* CRITICAL: Ensure form container has proper bottom spacing to prevent corner clipping */
+/* Don't remove bottom margins/padding from form container - it needs space for rounded corners */
 body #app .project-interface .content-area #general-info .form-column:last-child,
 body #app .project-interface .content-area #general-info .form-group:last-child {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
 }
 
-/* FORM CONTAINER SPACING */
-html body #app .project-interface .content-area #general-info .form-container {
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
+/* CRITICAL: Form container MUST have bottom spacing to prevent clipping of rounded corners */
+html body #app .project-interface .content-area #general-info .form-container,
+html body #app .project-interface .content-area #general-info #col-info-form-container {
+  padding-bottom: 2.5rem !important; /* Ensure bottom corners are visible */
+  margin-bottom: 3rem !important; /* Ensure bottom corners are visible */
 }
 
 /* SECTION DESCRIPTION SPACING */
@@ -330,15 +414,20 @@ html body #app .project-interface .content-area #general-info .form-container {
   margin-bottom: 0 !important;
 }
 
-/* REMOVE ALL EMPTY SPACE FROM COLLECTION INFO TAB */
-#general-info .form-container:last-child,
+/* CRITICAL: Don't remove bottom spacing from form container - it needs space for rounded corners */
+/* Only remove bottom spacing from form groups and columns, not the container itself */
 #general-info .form-group:last-child,
 #general-info .section-description:last-child,
-#general-info .two-column-form,
-#general-info .form-group:last-child,
-#general-info *:last-child {
+#general-info .form-column:last-child {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
+}
+
+/* CRITICAL: Form container MUST keep its bottom spacing to prevent corner clipping */
+#general-info .form-container:last-child,
+#general-info #col-info-form-container {
+  margin-bottom: 3rem !important; /* Keep margin to ensure bottom corners are visible */
+  padding-bottom: 2.5rem !important; /* Keep padding to ensure bottom corners are visible */
 }
 
 /* General tab content styles moved to main.css */

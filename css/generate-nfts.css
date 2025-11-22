@@ -87,6 +87,38 @@
   justify-content: flex-end;
 }
 
+/* CRITICAL: Grey out seed label and seed box when tab is greyed out (before project loaded or traits added) */
+.seed-display-container .seed-label[style*="color: #a0a0b0"],
+.seed-display-container .seed-label[style*="color:#a0a0b0"],
+.seed-label[style*="color: #a0a0b0"],
+.seed-label[style*="color:#a0a0b0"],
+.seed-display-container .nft-seed-box[style*="color: #a0a0b0"],
+.seed-display-container .nft-seed-box[style*="color:#a0a0b0"],
+.nft-seed-box[style*="color: #a0a0b0"],
+.nft-seed-box[style*="color:#a0a0b0"] {
+  color: #a0a0b0 !important; /* Grey when greyed out */
+}
+
+/* CRITICAL: Set default cursor for seed copy button when tooltip is disabled (tab greyed out) */
+.nft-seed-copy-btn[data-tooltip-disabled="true"],
+.nft-seed-copy-btn[data-tooltip-disabled="true"]:hover {
+  cursor: default !important; /* Default cursor when tooltip is disabled (not not-allowed, not help) */
+}
+
+/* CRITICAL: Hide seed copy button tooltip when disabled (tab greyed out) */
+.nft-seed-copy-btn[data-tooltip-disabled="true"] .tooltiptext,
+.nft-seed-copy-btn[data-tooltip-disabled="true"]:hover .tooltiptext,
+.nft-seed-copy-btn[data-tooltip-disabled="true"] .tooltip-text,
+.nft-seed-copy-btn[data-tooltip-disabled="true"]:hover .tooltip-text {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
 .seed-display-container .nft-seed-copy-btn {
   background: none;
   border: none;
@@ -97,6 +129,70 @@
   font-weight: bold;
   color: #007bff; /* Same blue as Generate Seed button */
   cursor: pointer;
+}
+
+/* CRITICAL: Ensure green verified state (#00ff24) is not overridden */
+.nft-seed-copy-btn[style*="color: #00ff24"],
+.nft-seed-copy-btn[style*="color:#00ff24"],
+.nft-seed-copy-btn[style*="color: rgb(0, 255, 36)"],
+.nft-seed-copy-btn[style*="color:rgb(0, 255, 36)"] {
+  color: #00ff24 !important; /* Verified green color - must not be overridden */
+}
+
+/* CRITICAL: Ensure seed box green color (#00ff24) is not overridden when copy button is clicked */
+.nft-seed-box[style*="color: #00ff24"],
+.nft-seed-box[style*="color:#00ff24"],
+.nft-seed-box[style*="color: rgb(0, 255, 36)"],
+.nft-seed-box[style*="color:rgb(0, 255, 36)"] {
+  color: #00ff24 !important; /* Verified green color - must not be overridden */
+}
+
+/* CRITICAL: Ensure seed label green color (#00ff24) is not overridden when copy is triggered */
+.seed-label[style*="color: #00ff24"],
+.seed-label[style*="color:#00ff24"],
+.seed-label[style*="color: rgb(0, 255, 36)"],
+.seed-label[style*="color:rgb(0, 255, 36)"] {
+  color: #00ff24 !important; /* Verified green color - must not be overridden */
+}
+
+/* CRITICAL: Make seed label and seed box clickable when enabled (not greyed out) */
+.seed-label:not([style*="color: #a0a0b0"]):not([style*="color:#a0a0b0"]),
+.nft-seed-box:not([style*="color: #a0a0b0"]):not([style*="color:#a0a0b0"]) {
+  cursor: pointer !important;
+  user-select: none !important; /* Prevent text selection */
+}
+
+/* CRITICAL: Disable cursor pointer when seed label and seed box are greyed out */
+.seed-label[style*="color: #a0a0b0"],
+.seed-label[style*="color:#a0a0b0"],
+.nft-seed-box[style*="color: #a0a0b0"],
+.nft-seed-box[style*="color:#a0a0b0"] {
+  cursor: default !important; /* Default cursor when greyed out */
+  pointer-events: none !important; /* Prevent clicks when greyed out */
+}
+
+/* CRITICAL: Prevent ALL hover effects on seed copy button when disabled/greyed out */
+.nft-seed-copy-btn[data-tooltip-disabled="true"]:hover,
+.nft-seed-copy-btn[data-tooltip-disabled="true"]:active,
+.nft-seed-copy-btn[data-tooltip-disabled="true"]:focus,
+.nft-seed-copy-btn[disabled]:hover,
+.nft-seed-copy-btn:disabled:hover,
+button.nft-seed-copy-btn[data-tooltip-disabled="true"]:hover,
+button.nft-seed-copy-btn[data-tooltip-disabled="true"]:active,
+button.nft-seed-copy-btn[data-tooltip-disabled="true"]:focus {
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: #007bff !important; /* Maintain same color - no change on hover */
+  cursor: default !important; /* Default cursor when disabled (not pointer, not help) */
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: inherit !important;
+  pointer-events: none !important; /* CRITICAL: Prevent any hover interactions */
+  transition: none !important; /* Disable all transitions */
+  font-size: 18px !important; /* No font size change */
+  font-weight: bold !important; /* No font weight change */
 }
 
 /* NFT Action Buttons Container */
@@ -122,16 +218,50 @@
   border-radius: 8px !important;
 }
 
-.nft-action-btn:hover {
+.nft-action-btn:hover:not([disabled]):not(:disabled) {
   background-color: #3a3a3a !important;
   border-color: #5a5a5a !important;
 }
 
-.nft-action-btn:active {
+.nft-action-btn:active:not([disabled]):not(:disabled) {
   background-color: #4a4a4a !important;
   border-color: #6a6a6a !important;
   transform: scale(0.98);
   box-shadow: 0 0 20px rgba(74, 74, 74, 0.6);
+}
+
+/* CRITICAL: All action buttons must use same background color as counter when greyed out (#23232b) */
+.nft-action-btn[disabled],
+.nft-action-btn:disabled {
+  background-color: #23232b !important; /* CRITICAL: Match counter background color when greyed out */
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Prevent hover and active effects on disabled action buttons - maintain #23232b background */
+.nft-action-btn[disabled]:hover,
+.nft-action-btn:disabled:hover,
+.nft-action-btn[disabled]:active,
+.nft-action-btn:disabled:active,
+.nft-action-btn[disabled]:focus,
+.nft-action-btn:disabled:focus {
+  background-color: #23232b !important; /* Must stay grey when disabled - match counter */
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
 }
 
 .nft-action-btn.pressed {
@@ -150,13 +280,45 @@
 }
 
 /* Green Create NFT Button Specific Styles */
-#nft-action-create-btn:hover {
+#nft-action-create-btn:hover:not([disabled]):not(:disabled) {
   background-color: #047857 !important;
   border-color: #047857 !important;
   box-shadow: 0 0 10px rgba(0, 255, 48, 0.8), 0 0 15px rgba(0, 255, 48, 0.5) !important;
 }
 
-#nft-action-create-btn:active {
+/* CRITICAL: Create NFT button must use same background color as counter when greyed out (#23232b) */
+#nft-action-create-btn[disabled],
+#nft-action-create-btn:disabled {
+  background-color: #23232b !important; /* CRITICAL: Match counter background color when greyed out */
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Prevent hover effects on disabled Create NFT button - maintain #23232b background */
+#nft-action-create-btn[disabled]:hover,
+#nft-action-create-btn:disabled:hover,
+#nft-action-create-btn[disabled]:active,
+#nft-action-create-btn:disabled:active {
+  background-color: #23232b !important;
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+#nft-action-create-btn:active:not([disabled]):not(:disabled) {
   background-color: #065f46 !important;
   border-color: #065f46 !important;
   transform: scale(0.98);
@@ -178,12 +340,44 @@
 }
 
 /* Dark Blue Add to Collection Button Specific Styles */
-#nft-action-add-btn:hover {
+#nft-action-add-btn:hover:not([disabled]):not(:disabled) {
   background-color: #1d4ed8 !important;
   border-color: #1d4ed8 !important;
 }
 
-#nft-action-add-btn:active {
+/* CRITICAL: Add to Collection button must use same background color as counter when greyed out (#23232b) */
+#nft-action-add-btn[disabled],
+#nft-action-add-btn:disabled {
+  background-color: #23232b !important; /* CRITICAL: Match counter background color when greyed out */
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Prevent hover effects on disabled Add to Collection button - maintain #23232b background */
+#nft-action-add-btn[disabled]:hover,
+#nft-action-add-btn:disabled:hover,
+#nft-action-add-btn[disabled]:active,
+#nft-action-add-btn:disabled:active {
+  background-color: #23232b !important;
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+#nft-action-add-btn:active:not([disabled]):not(:disabled) {
   background-color: #1e3a8a !important;
   border-color: #1e3a8a !important;
   transform: scale(0.98);
@@ -213,12 +407,44 @@
 }
 
 /* Dark Orange Bulk Generation Button Specific Styles */
-#nft-action-bulk-btn:hover {
+#nft-action-bulk-btn:hover:not([disabled]):not(:disabled) {
   background-color: #f97316 !important;
   border-color: #f97316 !important;
 }
 
-#nft-action-bulk-btn:active {
+/* CRITICAL: Bulk Generation button must use same background color as counter when greyed out (#23232b) */
+#nft-action-bulk-btn[disabled],
+#nft-action-bulk-btn:disabled {
+  background-color: #23232b !important; /* CRITICAL: Match counter background color when greyed out */
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Prevent hover effects on disabled Bulk Generation button - maintain #23232b background */
+#nft-action-bulk-btn[disabled]:hover,
+#nft-action-bulk-btn:disabled:hover,
+#nft-action-bulk-btn[disabled]:active,
+#nft-action-bulk-btn:disabled:active {
+  background-color: #23232b !important;
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+#nft-action-bulk-btn:active:not([disabled]):not(:disabled) {
   background-color: #c2410c !important;
   border-color: #c2410c !important;
   transform: scale(0.98);
@@ -248,11 +474,44 @@
 }
 
 /* Red Edit NFT Collection Button Specific Styles */
-#nft-action-edit-btn:hover {
+#nft-action-edit-btn:hover:not([disabled]):not(:disabled) {
   background-color: #ef4444 !important;
   border-color: #ef4444 !important;
 }
-#nft-action-edit-btn:active {
+
+/* CRITICAL: Edit Collection button must use same background color as counter when greyed out (#23232b) */
+#nft-action-edit-btn[disabled],
+#nft-action-edit-btn:disabled {
+  background-color: #23232b !important; /* CRITICAL: Match counter background color when greyed out */
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL: Prevent hover effects on disabled Edit Collection button - maintain #23232b background */
+#nft-action-edit-btn[disabled]:hover,
+#nft-action-edit-btn:disabled:hover,
+#nft-action-edit-btn[disabled]:active,
+#nft-action-edit-btn:disabled:active {
+  background-color: #23232b !important;
+  background: #23232b !important;
+  border-color: transparent !important;
+  border: none !important;
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+#nft-action-edit-btn:active:not([disabled]):not(:disabled) {
   background-color: #b91c1c !important;
   border-color: #b91c1c !important;
   transform: scale(0.98);
@@ -363,59 +622,8 @@
   position: relative; /* Ensure z-index works */
 }
 
-/* Tooltip for progress bar - High specificity to override other tooltip rules */
-#nft-count-panel .tooltiptext {
-  position: fixed !important; /* Use fixed positioning to avoid clipping */
-  background-color: #000000 !important;
-  background: #000000 !important;
-  color: #f39c12 !important;
-  padding: 8px 12px !important; /* Match Export NFTs tab padding */
-  border-radius: 6px !important;
-  font-size: 11px !important;
-  font-family: 'Archivo', sans-serif !important;
-  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
-  text-align: center !important; /* Center tooltip text within its background */
-  white-space: normal !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  transition: opacity 1s ease !important; /* 1 second to match Export NFTs tab */
-  z-index: 2147483647 !important; /* Highest z-index across entire app */
-  pointer-events: none !important;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important;
-  border: none !important;
-  /* Allow JavaScript to control positioning */
-  top: auto !important;
-  left: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  margin: 0 !important;
-  word-wrap: break-word;
-  max-width: 300px;
-  width: max-content;
-  display: block !important; /* Use block display for proper text centering */
-}
-
-/* CRITICAL: Add cursor help to nft-count-panel */
-#nft-count-panel.tooltip {
-  cursor: help !important;
-}
-
-/* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
-/* Only show tooltip when panel is active (not greyed out) - JavaScript will handle this */
-#nft-count-panel:hover:not([style*="background-color: #23232b"]) .tooltiptext,
-#nft-count-panel:hover:not([style*="opacity: 0.6"]) .tooltiptext {
-  /* JavaScript will control visibility and opacity with 1-second delay */
-  /* Don't force immediate display via CSS */
-}
-
-/* Hide tooltip when panel is greyed out */
-#nft-count-panel[style*="background-color: #23232b"]:hover .tooltiptext,
-#nft-count-panel .nft-count-container[style*="opacity: 0.6"] ~ * .tooltiptext,
-#nft-count-panel[style*="background-color: #23232b"] .tooltiptext {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  display: none !important;
-}
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* All tooltip styles for NFT count panel have been consolidated into tooltip.css */
 
 /* Preserve nft-count-panel and its child elements colors when tooltip is applied */
 #nft-count-panel.tooltip,
@@ -423,6 +631,13 @@
   background-color: #000000 !important;
   border-color: #8b5cf6 !important;
   color: #000000 !important;
+}
+
+/* CRITICAL: Remove border when panel is greyed out or tooltip is disabled */
+#nft-count-panel[data-tooltip-disabled="true"],
+#nft-count-panel[style*="background-color: #23232b"] {
+  border: none !important;
+  border-color: transparent !important;
 }
 
 /* Preserve child elements inside nft-count-panel when tooltip is applied */
@@ -652,7 +867,17 @@
 #generate-dark-nfts.toggle-button:hover[disabled],
 #generate-dark-nfts.toggle-button:hover:disabled,
 .toggle-button#generate-dark-nfts:hover[disabled],
-.toggle-button#generate-dark-nfts:hover:disabled {
+.toggle-button#generate-dark-nfts:hover:disabled,
+#generate-dark-nfts.toggle-button:hover[data-tooltip-disabled="true"],
+#generate-dark-nfts.toggle-button[data-tooltip-disabled="true"]:hover,
+.toggle-button#generate-dark-nfts:hover[data-tooltip-disabled="true"],
+.toggle-button#generate-dark-nfts[data-tooltip-disabled="true"]:hover,
+#generate-dark-nfts[data-tooltip-disabled="true"]:hover,
+#generate-dark-nfts[data-tooltip-disabled="true"]:active,
+#generate-dark-nfts[data-tooltip-disabled="true"]:focus,
+button#generate-dark-nfts[data-tooltip-disabled="true"]:hover,
+button#generate-dark-nfts[data-tooltip-disabled="true"]:active,
+button#generate-dark-nfts[data-tooltip-disabled="true"]:focus {
   background-color: #23232b !important;
   background: #23232b !important;
   border-color: #4a4a4a !important; /* Match Seed NFT border color when disabled */
@@ -669,6 +894,12 @@
   max-height: 32px !important;
   line-height: 1 !important; /* Prevent text stretching */
   transition: none !important; /* Disable all transitions on hover */
+  pointer-events: none !important; /* CRITICAL: Prevent any hover interactions */
+  position: relative !important; /* Maintain position - no movement */
+  top: 0 !important; /* No vertical movement */
+  left: 0 !important; /* No horizontal movement */
+  margin: 0 !important; /* No margin changes */
+  padding: 8px 14px !important; /* Maintain padding */
 }
 
 /* CRITICAL: Specific override for Seed NFT button when disabled - prevent ANY hover effects with MAXIMUM SPECIFICITY */
@@ -1051,6 +1282,8 @@ button#single-seed-toggle.tooltip:disabled:hover {
   flex-direction: column;
   width: auto !important;
   padding: 0 !important;
+  border-radius: 8px !important; /* CRITICAL: Match app's rounded corner style */
+  overflow: hidden !important; /* Ensure rounded corners are visible */
 }
 
 .nft-controls {
@@ -1193,6 +1426,26 @@ button#single-seed-toggle.tooltip:disabled:hover {
   cursor: not-allowed;
 }
 
+/* CRITICAL: Prevent ALL hover effects for Generate Seed button when disabled/greyed out */
+#generate-seed-nft-btn:disabled:hover,
+#generate-seed-nft-btn[disabled]:hover,
+.seed-controls-container #generate-seed-nft-btn:disabled:hover,
+.seed-controls-container #generate-seed-nft-btn[disabled]:hover,
+button#generate-seed-nft-btn:disabled:hover,
+button#generate-seed-nft-btn[disabled]:hover {
+  background-color: #23232b !important;
+  background: #23232b !important;
+  border: 1px solid #84a0b0 !important;
+  border-color: #84a0b0 !important;
+  color: #84a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important; /* CRITICAL: Disable transitions to prevent flicker */
+  pointer-events: auto !important; /* Allow tooltip to work */
+}
+
 .nft-preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -1222,6 +1475,15 @@ button#single-seed-toggle.tooltip:disabled:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px; /* Match app's rounded corner style */
+}
+
+/* Ensure all NFT preview images have rounded corners */
+.nft-preview-item img,
+.nft-preview-image-area img,
+#nft-preview-container img,
+.nft-single-preview-panel img {
+  border-radius: 8px !important; /* Match app's rounded corner style */
 }
 
 .nft-preview-traits {
@@ -1273,6 +1535,8 @@ button#single-seed-toggle.tooltip:disabled:hover {
   padding: 30px;
   border-radius: 12px;
   text-align: center;
+  min-height: 120px; /* Fixed height to prevent resizing when hint text is added */
+  min-width: 300px; /* Fixed width to prevent resizing */
 }
 
 /* Transparent version of loading content */
@@ -1305,10 +1569,17 @@ button#single-seed-toggle.tooltip:disabled:hover {
 }
 
 /* Tooltip */
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 .tooltip {
   position: relative;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .tooltiptext {
   visibility: hidden;
   position: absolute;
@@ -1342,8 +1613,10 @@ button#single-seed-toggle.tooltip:disabled:hover {
   visibility: visible;
   opacity: 1;
 }
+*/
 
 /* CRITICAL: Hide tooltip for disabled elements - override general rule */
+/*
 .tooltip[disabled]:hover .tooltiptext,
 .tooltip:disabled:hover .tooltiptext,
 .tooltip[disabled] .tooltiptext,
@@ -1353,6 +1626,7 @@ button#single-seed-toggle.tooltip:disabled:hover {
   display: none !important;
   pointer-events: none !important;
 }
+*/
 
 /* Make the NFT preview panel a visible square with fixed dimensions */
 .nft-single-preview-panel {

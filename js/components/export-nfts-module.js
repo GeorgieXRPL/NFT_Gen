@@ -642,11 +642,14 @@ const exportNftsModuleDefinition = {
     imageFormatTooltip.className = "tooltiptext";
     imageFormatTooltip.innerHTML = "Choose the image format for exported NFTs.<br>JPG: Smaller file size, lossy compression<br>PNG: Larger file size, lossless quality";
     imageFormatTooltip.style.visibility = "hidden";
-    imageFormatTooltip.style.width = "280px";
-    imageFormatTooltip.style.minWidth = "280px";
-    imageFormatTooltip.style.maxWidth = "280px";
-    imageFormatTooltip.style.backgroundColor = "#000000";
-    imageFormatTooltip.style.color = "#f39c12";
+    imageFormatTooltip.style.width = "auto";
+    imageFormatTooltip.style.minWidth = "auto";
+    imageFormatTooltip.style.maxWidth = "300px";
+    imageFormatTooltip.style.display = "flex";
+    imageFormatTooltip.style.flexDirection = "column";
+    imageFormatTooltip.style.setProperty("background-color", "#000000", "important");
+    imageFormatTooltip.style.setProperty("background", "#000000", "important");
+    imageFormatTooltip.style.setProperty("color", "#f39c12", "important");
     imageFormatTooltip.style.textAlign = "center";
     imageFormatTooltip.style.borderRadius = "6px";
     imageFormatTooltip.style.padding = "8px 10px";
@@ -656,8 +659,8 @@ const exportNftsModuleDefinition = {
     imageFormatTooltip.style.top = "auto";
     imageFormatTooltip.style.left = "auto";
     imageFormatTooltip.style.right = "auto";
-    imageFormatTooltip.style.opacity = "0";
-    imageFormatTooltip.style.transition = "opacity 1s";
+    imageFormatTooltip.style.setProperty("opacity", "0", "important");
+    imageFormatTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     imageFormatTooltip.style.fontSize = "11px";
     imageFormatTooltip.style.lineHeight = "1.4";
     imageFormatTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -685,12 +688,12 @@ const exportNftsModuleDefinition = {
       const rect = title.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       imageFormatTooltip.style.visibility = "visible";
-      imageFormatTooltip.style.opacity = "0";
+      imageFormatTooltip.style.setProperty("opacity", "0", "important");
       imageFormatTooltip.style.top = "-9999px";
       imageFormatTooltip.style.left = "-9999px";
         imageFormatTooltip.style.transform = "none";
-      void imageFormatTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 280; // Fixed width
+      void imageFormatTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = imageFormatTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = imageFormatTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         imageFormatTooltip.style.setProperty("position", "fixed", "important");
@@ -707,7 +710,7 @@ const exportNftsModuleDefinition = {
         imageFormatTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      imageFormatTooltip.style.opacity = "1";
+      imageFormatTooltip.style.setProperty("opacity", "1", "important");
         });
         imageFormatTooltipTimeout = null;
       }, 1000);
@@ -718,7 +721,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(imageFormatTooltipTimeout);
         imageFormatTooltipTimeout = null;
       }
-      imageFormatTooltip.style.opacity = "0";
+      imageFormatTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         imageFormatTooltip.style.visibility = "hidden";
@@ -945,11 +948,14 @@ const exportNftsModuleDefinition = {
     metadataFormatTooltip.className = "tooltiptext";
     metadataFormatTooltip.innerHTML = "Choose the metadata format for exported NFTs.<br>JSON: Standard format, widely supported<br>CSV: Spreadsheet-compatible format";
     metadataFormatTooltip.style.visibility = "hidden";
-    metadataFormatTooltip.style.width = "280px";
-    metadataFormatTooltip.style.minWidth = "280px";
-    metadataFormatTooltip.style.maxWidth = "280px";
-    metadataFormatTooltip.style.backgroundColor = "#000000";
-    metadataFormatTooltip.style.color = "#f39c12";
+    metadataFormatTooltip.style.width = "auto";
+    metadataFormatTooltip.style.minWidth = "auto";
+    metadataFormatTooltip.style.maxWidth = "300px";
+    metadataFormatTooltip.style.display = "flex";
+    metadataFormatTooltip.style.flexDirection = "column";
+    metadataFormatTooltip.style.setProperty("background-color", "#000000", "important");
+    metadataFormatTooltip.style.setProperty("background", "#000000", "important");
+    metadataFormatTooltip.style.setProperty("color", "#f39c12", "important");
     metadataFormatTooltip.style.textAlign = "center";
     metadataFormatTooltip.style.borderRadius = "6px";
     metadataFormatTooltip.style.padding = "8px 10px";
@@ -959,8 +965,8 @@ const exportNftsModuleDefinition = {
     metadataFormatTooltip.style.top = "auto";
     metadataFormatTooltip.style.left = "auto";
     metadataFormatTooltip.style.right = "auto";
-    metadataFormatTooltip.style.opacity = "0";
-    metadataFormatTooltip.style.transition = "opacity 1s";
+    metadataFormatTooltip.style.setProperty("opacity", "0", "important");
+    metadataFormatTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     metadataFormatTooltip.style.fontSize = "11px";
     metadataFormatTooltip.style.lineHeight = "1.4";
     metadataFormatTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -988,12 +994,12 @@ const exportNftsModuleDefinition = {
       const rect = title.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       metadataFormatTooltip.style.visibility = "visible";
-      metadataFormatTooltip.style.opacity = "0";
+      metadataFormatTooltip.style.setProperty("opacity", "0", "important");
       metadataFormatTooltip.style.top = "-9999px";
       metadataFormatTooltip.style.left = "-9999px";
         metadataFormatTooltip.style.transform = "none";
-      void metadataFormatTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 280; // Fixed width
+      void metadataFormatTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = metadataFormatTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = metadataFormatTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         metadataFormatTooltip.style.setProperty("position", "fixed", "important");
@@ -1010,7 +1016,7 @@ const exportNftsModuleDefinition = {
         metadataFormatTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      metadataFormatTooltip.style.opacity = "1";
+      metadataFormatTooltip.style.setProperty("opacity", "1", "important");
         });
         metadataFormatTooltipTimeout = null;
       }, 1000);
@@ -1021,7 +1027,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(metadataFormatTooltipTimeout);
         metadataFormatTooltipTimeout = null;
       }
-      metadataFormatTooltip.style.opacity = "0";
+      metadataFormatTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         metadataFormatTooltip.style.visibility = "hidden";
@@ -1257,8 +1263,9 @@ const exportNftsModuleDefinition = {
     titleTooltip.style.width = "320px";
     titleTooltip.style.minWidth = "320px";
     titleTooltip.style.maxWidth = "320px";
-    titleTooltip.style.backgroundColor = "#000000";
-    titleTooltip.style.color = "#f39c12";
+    titleTooltip.style.setProperty("background-color", "#000000", "important");
+    titleTooltip.style.setProperty("background", "#000000", "important");
+    titleTooltip.style.setProperty("color", "#f39c12", "important");
     titleTooltip.style.textAlign = "center";
     titleTooltip.style.borderRadius = "6px";
     titleTooltip.style.padding = "8px 10px";
@@ -1608,12 +1615,13 @@ const exportNftsModuleDefinition = {
     const batchDistributionTooltip = document.createElement("span");
     batchDistributionTooltip.className = "tooltiptext";
     batchDistributionTooltip.innerHTML = "This shows how many NFTs still need to be distributed across batches. When it shows 0, all NFTs from your collection have been allocated to batches. A positive number means more NFTs need to be distributed, and a negative number (shown as 'Over by X NFTs') means batches exceed the total collection size.";
-    batchDistributionTooltip.style.visibility = "hidden";
+    batchDistributionTooltip.style.setProperty("visibility", "hidden", "important");
     batchDistributionTooltip.style.width = "320px";
     batchDistributionTooltip.style.minWidth = "320px";
     batchDistributionTooltip.style.maxWidth = "320px";
-    batchDistributionTooltip.style.backgroundColor = "#000000";
-    batchDistributionTooltip.style.color = "#f39c12";
+    batchDistributionTooltip.style.setProperty("background-color", "#000000", "important");
+    batchDistributionTooltip.style.setProperty("background", "#000000", "important");
+    batchDistributionTooltip.style.setProperty("color", "#f39c12", "important");
     batchDistributionTooltip.style.textAlign = "center";
     batchDistributionTooltip.style.borderRadius = "6px";
     batchDistributionTooltip.style.padding = "8px 10px";
@@ -1623,8 +1631,8 @@ const exportNftsModuleDefinition = {
     batchDistributionTooltip.style.top = "auto";
     batchDistributionTooltip.style.left = "auto";
     batchDistributionTooltip.style.right = "auto";
-    batchDistributionTooltip.style.opacity = "0";
-    batchDistributionTooltip.style.transition = "opacity 1s";
+    batchDistributionTooltip.style.setProperty("opacity", "0", "important");
+    batchDistributionTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     batchDistributionTooltip.style.fontSize = "11px";
     batchDistributionTooltip.style.lineHeight = "1.4";
     batchDistributionTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -1652,8 +1660,8 @@ const exportNftsModuleDefinition = {
       batchDistributionTooltipTimeout = setTimeout(() => {
       const rect = titleLine2.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
-      batchDistributionTooltip.style.visibility = "visible";
-      batchDistributionTooltip.style.opacity = "0";
+      batchDistributionTooltip.style.setProperty("visibility", "visible", "important");
+      batchDistributionTooltip.style.setProperty("opacity", "0", "important");
       batchDistributionTooltip.style.top = "-9999px";
       batchDistributionTooltip.style.left = "-9999px";
         batchDistributionTooltip.style.transform = "none";
@@ -1675,7 +1683,7 @@ const exportNftsModuleDefinition = {
         batchDistributionTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      batchDistributionTooltip.style.opacity = "1";
+      batchDistributionTooltip.style.setProperty("opacity", "1", "important");
         });
         batchDistributionTooltipTimeout = null;
       }, 1000);
@@ -1686,9 +1694,9 @@ const exportNftsModuleDefinition = {
         clearTimeout(batchDistributionTooltipTimeout);
         batchDistributionTooltipTimeout = null;
       }
-      batchDistributionTooltip.style.opacity = "0";
+      batchDistributionTooltip.style.setProperty("opacity", "0", "important");
       setTimeout(() => {
-        batchDistributionTooltip.style.visibility = "hidden";
+        batchDistributionTooltip.style.setProperty("visibility", "hidden", "important");
       }, 1000);
     });
     
@@ -1789,13 +1797,16 @@ const exportNftsModuleDefinition = {
     pageIndicator.classList.add("tooltip");
     const pageIndicatorTooltip = document.createElement("span");
     pageIndicatorTooltip.className = "tooltiptext";
-    pageIndicatorTooltip.innerHTML = "This indicator shows the current page when browsing the batch cards list. Use the previous and next buttons to navigate between pages.";
-    pageIndicatorTooltip.style.visibility = "hidden";
-    pageIndicatorTooltip.style.width = "280px";
-    pageIndicatorTooltip.style.minWidth = "280px";
-    pageIndicatorTooltip.style.maxWidth = "280px";
-    pageIndicatorTooltip.style.backgroundColor = "#000000";
-    pageIndicatorTooltip.style.color = "#f39c12";
+    pageIndicatorTooltip.innerHTML = "This indicator shows the current page when<br>browsing the batch cards list. Use the previous<br> and next buttons to navigate between pages.";
+    pageIndicatorTooltip.style.setProperty("visibility", "hidden", "important");
+    pageIndicatorTooltip.style.width = "auto";
+    pageIndicatorTooltip.style.minWidth = "auto";
+    pageIndicatorTooltip.style.maxWidth = "300px";
+    pageIndicatorTooltip.style.display = "flex";
+    pageIndicatorTooltip.style.flexDirection = "column";
+    pageIndicatorTooltip.style.setProperty("background-color", "#000000", "important");
+    pageIndicatorTooltip.style.setProperty("background", "#000000", "important");
+    pageIndicatorTooltip.style.setProperty("color", "#f39c12", "important");
     pageIndicatorTooltip.style.textAlign = "center";
     pageIndicatorTooltip.style.borderRadius = "6px";
     pageIndicatorTooltip.style.padding = "8px 10px";
@@ -1805,8 +1816,8 @@ const exportNftsModuleDefinition = {
     pageIndicatorTooltip.style.top = "auto";
     pageIndicatorTooltip.style.left = "auto";
     pageIndicatorTooltip.style.right = "auto";
-    pageIndicatorTooltip.style.opacity = "0";
-    pageIndicatorTooltip.style.transition = "opacity 1s";
+    pageIndicatorTooltip.style.setProperty("opacity", "0", "important");
+    pageIndicatorTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     pageIndicatorTooltip.style.fontSize = "11px";
     pageIndicatorTooltip.style.lineHeight = "1.4";
     pageIndicatorTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -1834,13 +1845,13 @@ const exportNftsModuleDefinition = {
       pageIndicatorTooltipTimeout = setTimeout(() => {
       const rect = pageIndicator.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
-      pageIndicatorTooltip.style.visibility = "visible";
-      pageIndicatorTooltip.style.opacity = "0";
+      pageIndicatorTooltip.style.setProperty("visibility", "visible", "important");
+      pageIndicatorTooltip.style.setProperty("opacity", "0", "important");
       pageIndicatorTooltip.style.top = "-9999px";
       pageIndicatorTooltip.style.left = "-9999px";
         pageIndicatorTooltip.style.transform = "none";
-      void pageIndicatorTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 280; // Fixed width
+      void pageIndicatorTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = pageIndicatorTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = pageIndicatorTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         pageIndicatorTooltip.style.setProperty("position", "fixed", "important");
@@ -1857,7 +1868,7 @@ const exportNftsModuleDefinition = {
         pageIndicatorTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      pageIndicatorTooltip.style.opacity = "1";
+      pageIndicatorTooltip.style.setProperty("opacity", "1", "important");
         });
         pageIndicatorTooltipTimeout = null;
       }, 1000);
@@ -1868,9 +1879,9 @@ const exportNftsModuleDefinition = {
         clearTimeout(pageIndicatorTooltipTimeout);
         pageIndicatorTooltipTimeout = null;
       }
-      pageIndicatorTooltip.style.opacity = "0";
+      pageIndicatorTooltip.style.setProperty("opacity", "0", "important");
       setTimeout(() => {
-        pageIndicatorTooltip.style.visibility = "hidden";
+        pageIndicatorTooltip.style.setProperty("visibility", "hidden", "important");
       }, 1000);
     });
     
@@ -1967,6 +1978,7 @@ const exportNftsModuleDefinition = {
     container.style.maxHeight = "556px";
     container.style.padding = "20px";
     container.style.margin = "0";
+    container.style.marginTop = "0"; // Changed from -12px to 0 (moved 12px down)
     container.style.marginLeft = "0";
     container.style.border = "1px solid var(--border-color)";
     container.style.borderRadius = "12px";
@@ -1974,7 +1986,18 @@ const exportNftsModuleDefinition = {
     container.style.boxSizing = "border-box";
     container.style.display = "flex";
     container.style.flexDirection = "column";
-    container.style.gap = "16px";
+    container.style.gap = "0"; // No gap - wrapper will handle spacing
+    
+    // Create wrapper container for all utilities elements
+    // This allows moving all elements together without moving utilities-section itself
+    const utilitiesContentWrapper = document.createElement("div");
+    utilitiesContentWrapper.id = "utilities-content-wrapper";
+    utilitiesContentWrapper.style.display = "flex";
+    utilitiesContentWrapper.style.flexDirection = "column";
+    utilitiesContentWrapper.style.gap = "16px";
+    utilitiesContentWrapper.style.width = "100%";
+    utilitiesContentWrapper.style.boxSizing = "border-box";
+    utilitiesContentWrapper.style.marginTop = "-20px"; // Move 20px up (adjusted from -22px to move 2px down)
     
     // Title: "Utilities:" (12px) - horizontally aligned with utilities-card
     const title = document.createElement("div");
@@ -1983,15 +2006,21 @@ const exportNftsModuleDefinition = {
     title.style.fontWeight = "600";
     title.style.color = "var(--text-primary)";
     title.style.marginBottom = "0";
-    title.style.marginTop = "-20px"; // Move 20px up
+    title.style.marginTop = "-6px"; // Move 6px up (adjusted from -20px to move 14px down)
     title.style.marginLeft = "auto"; // Center horizontally
     title.style.marginRight = "auto"; // Center horizontally
     title.style.textAlign = "center"; // Center-align text
-    title.style.lineHeight = "30px"; // Match the height of collection-size-display (30px) for baseline alignment
+    title.style.height = "14px"; // Set height to 14px
+    title.style.minHeight = "14px"; // Set min-height to 14px
+    title.style.maxHeight = "14px"; // Set max-height to 14px
+    title.style.lineHeight = "14px"; // Match line-height to height for proper vertical centering
     title.style.display = "flex";
     title.style.alignItems = "center"; // Vertically center to match batch-header-wrapper alignment
     title.style.justifyContent = "center"; // Center content horizontally
-    container.appendChild(title);
+    // Move down 4px without affecting other elements
+    title.style.position = "relative";
+    title.style.top = "4px";
+    utilitiesContentWrapper.appendChild(title);
     
     // Card 1: Maximum number of NFTs allowed for exportation
     const maxNftsCard = document.createElement("div");
@@ -2024,9 +2053,10 @@ const exportNftsModuleDefinition = {
     maxNftsLabelTooltip.className = "tooltiptext";
     maxNftsLabelTooltip.style.visibility = "hidden";
     maxNftsLabelTooltip.style.width = "280px";
-    maxNftsLabelTooltip.style.backgroundColor = "#000000";
+    maxNftsLabelTooltip.style.setProperty("background-color", "#000000", "important");
+    maxNftsLabelTooltip.style.setProperty("background", "#000000", "important");
     maxNftsLabelTooltip.style.background = "#000000";
-    maxNftsLabelTooltip.style.color = "#f39c12";
+    maxNftsLabelTooltip.style.setProperty("color", "#f39c12", "important");
     maxNftsLabelTooltip.style.textAlign = "left";
     maxNftsLabelTooltip.style.padding = "8px";
     maxNftsLabelTooltip.style.borderRadius = "6px";
@@ -2036,13 +2066,13 @@ const exportNftsModuleDefinition = {
     maxNftsLabelTooltip.style.top = "auto";
     maxNftsLabelTooltip.style.left = "auto";
     maxNftsLabelTooltip.style.right = "auto";
-    maxNftsLabelTooltip.style.opacity = "0";
-    maxNftsLabelTooltip.style.transition = "opacity 1s";
+    maxNftsLabelTooltip.style.setProperty("opacity", "0", "important");
+    maxNftsLabelTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     maxNftsLabelTooltip.style.fontSize = "11px";
     maxNftsLabelTooltip.style.lineHeight = "1.4";
     maxNftsLabelTooltip.style.pointerEvents = "none";
     maxNftsLabelTooltip.style.boxShadow = "0 3px 10px rgba(0, 0, 0, 0.5)";
-    maxNftsLabelTooltip.innerHTML = "This limit helps prevent memory issues when exporting large collections.<br><br>If you experience crashes or slow performance during export, reduce this number. Each batch quantity cannot exceed this maximum.";
+    maxNftsLabelTooltip.innerHTML = "This limit helps prevent memory issues<br>when exporting large collections.<br><br>If you experience crashes or slow performance<br>during export, reduce this number. Each batch<br>quantity can never exceed this maximum.";
     maxNftsLabelTooltip.style.transform = "none";
     // Position off-screen initially to prevent global handlers from positioning incorrectly
     maxNftsLabelTooltip.style.top = "-9999px";
@@ -2083,7 +2113,7 @@ const exportNftsModuleDefinition = {
       const rect = maxNftsLabel.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       maxNftsLabelTooltip.style.visibility = "visible";
-      maxNftsLabelTooltip.style.opacity = "0";
+      maxNftsLabelTooltip.style.setProperty("opacity", "0", "important");
       maxNftsLabelTooltip.style.top = "-9999px";
       maxNftsLabelTooltip.style.left = "-9999px";
         maxNftsLabelTooltip.style.transform = "none";
@@ -2105,7 +2135,7 @@ const exportNftsModuleDefinition = {
         maxNftsLabelTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      maxNftsLabelTooltip.style.opacity = "1";
+      maxNftsLabelTooltip.style.setProperty("opacity", "1", "important");
         });
         maxNftsLabelTooltipTimeout = null;
       }, 1000);
@@ -2117,7 +2147,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(maxNftsLabelTooltipTimeout);
         maxNftsLabelTooltipTimeout = null;
       }
-      maxNftsLabelTooltip.style.opacity = "0";
+      maxNftsLabelTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         maxNftsLabelTooltip.style.visibility = "hidden";
@@ -2171,9 +2201,10 @@ const exportNftsModuleDefinition = {
     maxNftsInputTooltip.className = "tooltiptext";
     maxNftsInputTooltip.style.visibility = "hidden";
     maxNftsInputTooltip.style.width = "280px";
-    maxNftsInputTooltip.style.backgroundColor = "#000000";
+    maxNftsInputTooltip.style.setProperty("background-color", "#000000", "important");
+    maxNftsInputTooltip.style.setProperty("background", "#000000", "important");
     maxNftsInputTooltip.style.background = "#000000";
-    maxNftsInputTooltip.style.color = "#f39c12";
+    maxNftsInputTooltip.style.setProperty("color", "#f39c12", "important");
     maxNftsInputTooltip.style.textAlign = "left";
     maxNftsInputTooltip.style.padding = "8px";
     maxNftsInputTooltip.style.borderRadius = "6px";
@@ -2183,13 +2214,13 @@ const exportNftsModuleDefinition = {
     maxNftsInputTooltip.style.top = "auto";
     maxNftsInputTooltip.style.left = "auto";
     maxNftsInputTooltip.style.right = "auto";
-    maxNftsInputTooltip.style.opacity = "0";
-    maxNftsInputTooltip.style.transition = "opacity 1s";
+    maxNftsInputTooltip.style.setProperty("opacity", "0", "important");
+    maxNftsInputTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     maxNftsInputTooltip.style.fontSize = "11px";
     maxNftsInputTooltip.style.lineHeight = "1.4";
     maxNftsInputTooltip.style.pointerEvents = "none";
     maxNftsInputTooltip.style.boxShadow = "0 3px 10px rgba(0, 0, 0, 0.5)";
-    maxNftsInputTooltip.innerHTML = "This limit helps prevent memory issues when exporting large collections.<br><br>If you experience crashes or slow performance during export, reduce this number. Each batch quantity cannot exceed this maximum.";
+    maxNftsInputTooltip.innerHTML = "This limit helps prevent memory issues<br>when exporting large collections.<br><br>If you experience crashes or slow performance<br>during export, reduce this number. Each batch<br>quantity can never exceed this maximum.";
     maxNftsInputTooltip.style.transform = "none";
     // Position off-screen initially to prevent global handlers from positioning incorrectly
     maxNftsInputTooltip.style.top = "-9999px";
@@ -2213,7 +2244,7 @@ const exportNftsModuleDefinition = {
       const rect = maxNftsInputWrapper.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       maxNftsInputTooltip.style.visibility = "visible";
-      maxNftsInputTooltip.style.opacity = "0";
+      maxNftsInputTooltip.style.setProperty("opacity", "0", "important");
       maxNftsInputTooltip.style.top = "-9999px";
       maxNftsInputTooltip.style.left = "-9999px";
         maxNftsInputTooltip.style.transform = "none";
@@ -2235,7 +2266,7 @@ const exportNftsModuleDefinition = {
         maxNftsInputTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      maxNftsInputTooltip.style.opacity = "1";
+      maxNftsInputTooltip.style.setProperty("opacity", "1", "important");
         });
         maxNftsInputTooltipTimeout = null;
       }, 1000);
@@ -2247,7 +2278,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(maxNftsInputTooltipTimeout);
         maxNftsInputTooltipTimeout = null;
       }
-      maxNftsInputTooltip.style.opacity = "0";
+      maxNftsInputTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         maxNftsInputTooltip.style.visibility = "hidden";
@@ -2276,7 +2307,7 @@ const exportNftsModuleDefinition = {
     
     maxNftsCard.appendChild(maxNftsLabel);
     maxNftsCard.appendChild(maxNftsInputContainer);
-    container.appendChild(maxNftsCard);
+    utilitiesContentWrapper.appendChild(maxNftsCard);
     
     // Card 2: Export options (3 radio-style toggles)
     const exportOptionsCard = document.createElement("div");
@@ -2303,12 +2334,12 @@ const exportNftsModuleDefinition = {
       { 
         id: "export-option-nfts-only", 
         text: "Export NFTs Only",
-        tooltip: "Export only image files. Use this option if you experience memory problems - it reduces memory usage by skipping metadata processing"
+        tooltip: "Export only image files. Use this option<br>if you experience memory problems.<br>It reduces memory usage by skipping<br>metadata processing."
       },
       { 
         id: "export-option-metadata-only", 
         text: "Export Metadata Only",
-        tooltip: "Export only metadata files. Use this option if you experience memory problems - it reduces memory usage by skipping image processing"
+        tooltip: "Export only metadata files. Use this option if<br>you experience memory problems - it reduces<br>memory usage by skipping image processing."
       },
       { 
         id: "export-option-nfts-metadata", 
@@ -2330,13 +2361,28 @@ const exportNftsModuleDefinition = {
       // Add tooltip with proper styling
       const tooltip = document.createElement("span");
       tooltip.className = "tooltiptext";
-      tooltip.textContent = option.tooltip;
-      tooltip.style.visibility = "hidden";
-      tooltip.style.width = "280px";
-      tooltip.style.minWidth = "280px";
-      tooltip.style.maxWidth = "280px";
-      tooltip.style.backgroundColor = "#000000";
-      tooltip.style.color = "#f39c12";
+      // Use innerHTML for tooltips that contain <br> tags, textContent for others
+      if (option.tooltip.includes('<br>')) {
+        tooltip.innerHTML = option.tooltip;
+      } else {
+        tooltip.textContent = option.tooltip;
+      }
+      tooltip.style.setProperty("visibility", "hidden", "important");
+      // Set width to auto for export-option-nfts-metadata, export-option-metadata-only, and export-option-nfts-only, fixed for others
+      if (option.id === "export-option-nfts-metadata" || option.id === "export-option-metadata-only" || option.id === "export-option-nfts-only") {
+        tooltip.style.width = "auto";
+        tooltip.style.minWidth = "auto";
+        tooltip.style.maxWidth = "300px";
+        tooltip.style.display = "flex";
+        tooltip.style.flexDirection = "column";
+      } else {
+        tooltip.style.width = "280px";
+        tooltip.style.minWidth = "280px";
+        tooltip.style.maxWidth = "280px";
+      }
+      tooltip.style.setProperty("background-color", "#000000", "important");
+      tooltip.style.setProperty("background", "#000000", "important");
+      tooltip.style.setProperty("color", "#f39c12", "important");
       tooltip.style.textAlign = "center";
       tooltip.style.borderRadius = "6px";
       tooltip.style.padding = "8px 10px";
@@ -2346,7 +2392,7 @@ const exportNftsModuleDefinition = {
       tooltip.style.top = "auto";
       tooltip.style.left = "auto";
       tooltip.style.right = "auto";
-      tooltip.style.opacity = "0";
+      tooltip.style.setProperty("opacity", "0", "important");
       tooltip.style.transition = "opacity 1s ease";
       // Ensure transition works even with !important opacity
       tooltip.style.setProperty("transition", "opacity 1s ease", "important");
@@ -2400,13 +2446,16 @@ const exportNftsModuleDefinition = {
           
         const rect = toggle.getBoundingClientRect();
         // Make tooltip temporarily visible to measure height, but keep it off-screen
-        tooltip.style.visibility = "visible";
+        tooltip.style.setProperty("visibility", "visible", "important");
           tooltip.style.setProperty("opacity", "0", "important");
         tooltip.style.top = "-9999px";
         tooltip.style.left = "-9999px";
           tooltip.style.transform = "none";
-        void tooltip.offsetHeight; // Force reflow
-        const tooltipWidth = 280; // Fixed width
+        void tooltip.offsetWidth; // Force reflow to get accurate measurements
+        // Use dynamic width for export-option-nfts-metadata, export-option-metadata-only, and export-option-nfts-only, fixed for others
+        const tooltipWidth = (option.id === "export-option-nfts-metadata" || option.id === "export-option-metadata-only" || option.id === "export-option-nfts-only")
+          ? tooltip.offsetWidth 
+          : 280; // Dynamic width for nfts-metadata, metadata-only, and nfts-only, fixed for others
         const tooltipHeight = tooltip.offsetHeight;
           // CRITICAL: Set position fixed and use setProperty with important to override CSS
           tooltip.style.setProperty("position", "fixed", "important");
@@ -2443,7 +2492,7 @@ const exportNftsModuleDefinition = {
         tooltip.style.setProperty("opacity", "0", "important");
         // Wait for fade out transition to complete before hiding
         tooltipTimeout = setTimeout(() => {
-          tooltip.style.visibility = "hidden";
+          tooltip.style.setProperty("visibility", "hidden", "important");
           tooltipTimeout = null;
         }, 1000); // Match the 1s transition duration
       });
@@ -2456,15 +2505,25 @@ const exportNftsModuleDefinition = {
       toggle.style.fontWeight = index === 2 ? "600" : "400";
       toggle.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
       toggle.style.cursor = "help"; // Show help cursor for objects with tooltips
-      toggle.style.width = "100%";
-      toggle.style.minWidth = "100%";
-      toggle.style.maxWidth = "100%";
-      toggle.style.height = "auto";
-      toggle.style.minHeight = "auto";
-      toggle.style.maxHeight = "none";
+      // Set width to auto for export-option-nfts-metadata, 100% for others
+      if (option.id === "export-option-nfts-metadata") {
+        toggle.style.setProperty("width", "auto", "important");
+        toggle.style.setProperty("min-width", "auto", "important");
+        toggle.style.setProperty("max-width", "none", "important");
+      } else {
+        toggle.style.width = "100%";
+        toggle.style.minWidth = "100%";
+        toggle.style.maxWidth = "100%";
+      }
+      // Set height to 28px for all export option buttons - use setProperty with !important to override CSS
+      toggle.style.setProperty("height", "28px", "important");
+      toggle.style.setProperty("min-height", "28px", "important");
+      toggle.style.setProperty("max-height", "28px", "important");
       toggle.style.textAlign = "center";
       toggle.style.boxSizing = "border-box";
-      toggle.style.display = "block";
+      toggle.style.setProperty("display", "flex", "important");
+      toggle.style.setProperty("align-items", "center", "important");
+      toggle.style.setProperty("justify-content", "center", "important");
       // For "Export NFTs & Metadata", keep text on one line using setProperty with !important
       if (option.id === "export-option-nfts-metadata") {
         toggle.style.setProperty("white-space", "nowrap", "important");
@@ -2512,12 +2571,13 @@ const exportNftsModuleDefinition = {
       exportOptionsCard.appendChild(toggle);
     });
     
-    container.appendChild(exportOptionsCard);
+    utilitiesContentWrapper.appendChild(exportOptionsCard);
     
     // Card 3: Image Dimensions for Exportation
     const imageDimensionsCard = document.createElement("div");
     imageDimensionsCard.id = "export-image-dimensions-options";
     imageDimensionsCard.className = "utilities-card";
+    imageDimensionsCard.setAttribute("lang", "en"); // Ensure English language
     imageDimensionsCard.style.marginTop = "3px"; // 3px spacing from export-nfts-metadata-options (reduced by 1px from 4px)
     imageDimensionsCard.style.padding = "12px";
     imageDimensionsCard.style.border = "2px solid #666666";
@@ -2527,11 +2587,11 @@ const exportNftsModuleDefinition = {
     imageDimensionsCard.style.flexDirection = "column";
     imageDimensionsCard.style.gap = "8px";
     imageDimensionsCard.style.width = "174px";
-    imageDimensionsCard.style.height = "auto";
+    imageDimensionsCard.style.setProperty("height", "145px", "important");
     imageDimensionsCard.style.minWidth = "174px";
     imageDimensionsCard.style.maxWidth = "174px";
-    imageDimensionsCard.style.minHeight = "auto";
-    imageDimensionsCard.style.maxHeight = "none";
+    imageDimensionsCard.style.setProperty("min-height", "145px", "important");
+    imageDimensionsCard.style.setProperty("max-height", "145px", "important");
     imageDimensionsCard.style.boxSizing = "border-box";
     
     // Title: "Image Dimensions" and "for Exportation" (2 lines, 12px each)
@@ -2540,6 +2600,7 @@ const exportNftsModuleDefinition = {
     titleContainer.style.flexDirection = "column";
     titleContainer.style.gap = "0";
     titleContainer.style.marginBottom = "8px";
+    titleContainer.style.marginTop = "-2px"; // Move 2px up
     
     const titleLine1 = document.createElement("div");
     titleLine1.textContent = "Image Dimensions";
@@ -2552,6 +2613,110 @@ const exportNftsModuleDefinition = {
     titleLine2.style.fontSize = "12px";
     titleLine2.style.fontWeight = "600";
     titleLine2.style.color = "var(--text-primary)";
+    
+    // Add tooltip to titleContainer
+    titleContainer.style.cursor = "help";
+    titleContainer.style.position = "relative";
+    titleContainer.classList.add("tooltip");
+    
+    // Add tooltip to titleContainer
+    const imageDimensionsTooltip = document.createElement("span");
+    imageDimensionsTooltip.className = "tooltiptext";
+    imageDimensionsTooltip.innerHTML = "Set the dimensions for exported NFT images.<br>ORIGINAL: Use the same dimensions as trait images.<br>CUSTOM: Set custom width and height.";
+    imageDimensionsTooltip.style.visibility = "hidden";
+    imageDimensionsTooltip.style.width = "auto";
+    imageDimensionsTooltip.style.minWidth = "auto";
+    imageDimensionsTooltip.style.maxWidth = "300px";
+    imageDimensionsTooltip.style.setProperty("background-color", "#000000", "important");
+    imageDimensionsTooltip.style.setProperty("background", "#000000", "important");
+    imageDimensionsTooltip.style.setProperty("color", "#f39c12", "important");
+    imageDimensionsTooltip.style.textAlign = "center";
+    imageDimensionsTooltip.style.borderRadius = "6px";
+    imageDimensionsTooltip.style.padding = "8px 10px";
+    imageDimensionsTooltip.style.position = "fixed";
+    imageDimensionsTooltip.style.zIndex = "2147483647";
+    imageDimensionsTooltip.style.bottom = "auto";
+    imageDimensionsTooltip.style.top = "auto";
+    imageDimensionsTooltip.style.left = "auto";
+    imageDimensionsTooltip.style.right = "auto";
+    imageDimensionsTooltip.style.opacity = "0";
+    imageDimensionsTooltip.style.transition = "opacity 1s";
+    imageDimensionsTooltip.style.fontSize = "11px";
+    imageDimensionsTooltip.style.lineHeight = "1.4";
+    imageDimensionsTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
+    imageDimensionsTooltip.style.pointerEvents = "none";
+    imageDimensionsTooltip.style.whiteSpace = "normal";
+    imageDimensionsTooltip.style.wordWrap = "break-word";
+    imageDimensionsTooltip.style.overflowWrap = "break-word";
+    imageDimensionsTooltip.style.boxSizing = "border-box";
+    imageDimensionsTooltip.style.transform = "none";
+    imageDimensionsTooltip.style.display = "flex";
+    imageDimensionsTooltip.style.flexDirection = "column";
+    // Position off-screen initially
+    imageDimensionsTooltip.style.top = "-9999px";
+    imageDimensionsTooltip.style.left = "-9999px";
+    // Append to body instead of titleContainer to escape stacking context
+    document.body.appendChild(imageDimensionsTooltip);
+    // Store reference on titleContainer for easy access
+    titleContainer.dataset.tooltipId = imageDimensionsTooltip.id || "image-dimensions-tooltip";
+    if (!imageDimensionsTooltip.id) {
+      imageDimensionsTooltip.id = "image-dimensions-tooltip";
+    }
+    
+    // Show tooltip on hover with proper positioning
+    let imageDimensionsTooltipTimeout = null;
+    titleContainer.addEventListener("mouseenter", (e) => {
+      // Clear any existing timeout
+      if (imageDimensionsTooltipTimeout) {
+        clearTimeout(imageDimensionsTooltipTimeout);
+        imageDimensionsTooltipTimeout = null;
+      }
+      // Show tooltip after 1 second delay
+      imageDimensionsTooltipTimeout = setTimeout(() => {
+        const rect = titleContainer.getBoundingClientRect();
+        // Make tooltip temporarily visible to measure it, but keep it off-screen
+        imageDimensionsTooltip.style.visibility = "visible";
+        imageDimensionsTooltip.style.opacity = "0";
+        imageDimensionsTooltip.style.top = "-9999px";
+        imageDimensionsTooltip.style.left = "-9999px";
+        imageDimensionsTooltip.style.transform = "none";
+        // Force reflow to get accurate measurements
+        void imageDimensionsTooltip.offsetWidth;
+        // Now position it correctly - use dynamic width for accurate centering
+        const tooltipWidth = imageDimensionsTooltip.offsetWidth;
+        const tooltipHeight = imageDimensionsTooltip.offsetHeight;
+        // CRITICAL: Set position fixed and use setProperty with important to override CSS
+        imageDimensionsTooltip.style.setProperty("position", "fixed", "important");
+        imageDimensionsTooltip.style.setProperty("z-index", "2147483647", "important");
+        imageDimensionsTooltip.style.setProperty("bottom", "auto", "important");
+        imageDimensionsTooltip.style.setProperty("right", "auto", "important");
+        imageDimensionsTooltip.style.setProperty("margin", "0", "important");
+        imageDimensionsTooltip.style.setProperty("transform", "none", "important");
+        // CRITICAL: Use setProperty with important for top and left to ensure CSS can't override
+        const titleRect = titleContainer.getBoundingClientRect();
+        const centeredLeft = titleRect.left + (titleRect.width / 2) - (tooltipWidth / 2);
+        const topPosition = titleRect.top - tooltipHeight - 5;
+        imageDimensionsTooltip.style.setProperty("top", `${topPosition}px`, "important");
+        imageDimensionsTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
+        // Fade in with transition
+        requestAnimationFrame(() => {
+          imageDimensionsTooltip.style.opacity = "1";
+        });
+        imageDimensionsTooltipTimeout = null;
+      }, 1000);
+    });
+    titleContainer.addEventListener("mouseleave", () => {
+      // Clear the show timeout if mouse leaves before delay completes
+      if (imageDimensionsTooltipTimeout) {
+        clearTimeout(imageDimensionsTooltipTimeout);
+        imageDimensionsTooltipTimeout = null;
+      }
+      imageDimensionsTooltip.style.opacity = "0";
+      // Wait for fade out transition to complete before hiding
+      setTimeout(() => {
+        imageDimensionsTooltip.style.visibility = "hidden";
+      }, 1000);
+    });
     
     titleContainer.appendChild(titleLine1);
     titleContainer.appendChild(titleLine2);
@@ -2593,11 +2758,14 @@ const exportNftsModuleDefinition = {
     originalTooltip.className = "tooltiptext";
     originalTooltip.innerHTML = "Export NFTs using their original<br>dimensions from trait images.";
     originalTooltip.style.visibility = "hidden";
-    originalTooltip.style.width = "260px";
-    originalTooltip.style.minWidth = "260px";
-    originalTooltip.style.maxWidth = "260px";
-    originalTooltip.style.backgroundColor = "#000000";
-    originalTooltip.style.color = "#f39c12";
+    originalTooltip.style.width = "auto";
+    originalTooltip.style.minWidth = "auto";
+    originalTooltip.style.maxWidth = "300px";
+    originalTooltip.style.display = "flex";
+    originalTooltip.style.flexDirection = "column";
+    originalTooltip.style.setProperty("background-color", "#000000", "important");
+    originalTooltip.style.setProperty("background", "#000000", "important");
+    originalTooltip.style.setProperty("color", "#f39c12", "important");
     originalTooltip.style.textAlign = "center";
     originalTooltip.style.borderRadius = "6px";
     originalTooltip.style.padding = "8px 10px";
@@ -2607,8 +2775,8 @@ const exportNftsModuleDefinition = {
     originalTooltip.style.top = "auto";
     originalTooltip.style.left = "auto";
     originalTooltip.style.right = "auto";
-    originalTooltip.style.opacity = "0";
-    originalTooltip.style.transition = "opacity 1s";
+    originalTooltip.style.setProperty("opacity", "0", "important");
+    originalTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     originalTooltip.style.fontSize = "11px";
     originalTooltip.style.lineHeight = "1.4";
     originalTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -2636,12 +2804,12 @@ const exportNftsModuleDefinition = {
       const rect = originalToggle.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       originalTooltip.style.visibility = "visible";
-      originalTooltip.style.opacity = "0";
+      originalTooltip.style.setProperty("opacity", "0", "important");
       originalTooltip.style.top = "-9999px";
       originalTooltip.style.left = "-9999px";
         originalTooltip.style.transform = "none";
-      void originalTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 280; // Fixed width
+      void originalTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = originalTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = originalTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         originalTooltip.style.setProperty("position", "fixed", "important");
@@ -2658,7 +2826,7 @@ const exportNftsModuleDefinition = {
         originalTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      originalTooltip.style.opacity = "1";
+      originalTooltip.style.setProperty("opacity", "1", "important");
         });
         originalTooltipTimeout = null;
       }, 1000);
@@ -2669,7 +2837,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(originalTooltipTimeout);
         originalTooltipTimeout = null;
       }
-      originalTooltip.style.opacity = "0";
+      originalTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         originalTooltip.style.visibility = "hidden";
@@ -2701,13 +2869,19 @@ const exportNftsModuleDefinition = {
     // Add tooltip to CUSTOM toggle with proper styling
     const customTooltip = document.createElement("span");
     customTooltip.className = "tooltiptext";
-    customTooltip.textContent = "Set custom width and height for exported images";
+    
+    // Initialize tooltip text based on current state
+    // Use the module method to ensure consistency
+    this.updateCustomToggleAvailability();
     customTooltip.style.visibility = "hidden";
-    customTooltip.style.width = "260px";
-    customTooltip.style.minWidth = "260px";
-    customTooltip.style.maxWidth = "260px";
-    customTooltip.style.backgroundColor = "#000000";
-    customTooltip.style.color = "#f39c12";
+    customTooltip.style.width = "auto";
+    customTooltip.style.minWidth = "auto";
+    customTooltip.style.maxWidth = "250px";
+    customTooltip.style.display = "flex";
+    customTooltip.style.flexDirection = "column";
+    customTooltip.style.setProperty("background-color", "#000000", "important");
+    customTooltip.style.setProperty("background", "#000000", "important");
+    customTooltip.style.setProperty("color", "#f39c12", "important");
     customTooltip.style.textAlign = "center";
     customTooltip.style.borderRadius = "6px";
     customTooltip.style.padding = "8px 10px";
@@ -2717,8 +2891,8 @@ const exportNftsModuleDefinition = {
     customTooltip.style.top = "auto";
     customTooltip.style.left = "auto";
     customTooltip.style.right = "auto";
-    customTooltip.style.opacity = "0";
-    customTooltip.style.transition = "opacity 1s";
+    customTooltip.style.setProperty("opacity", "0", "important");
+    customTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     customTooltip.style.fontSize = "11px";
     customTooltip.style.lineHeight = "1.4";
     customTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -2746,12 +2920,12 @@ const exportNftsModuleDefinition = {
       const rect = customToggle.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       customTooltip.style.visibility = "visible";
-      customTooltip.style.opacity = "0";
+      customTooltip.style.setProperty("opacity", "0", "important");
       customTooltip.style.top = "-9999px";
       customTooltip.style.left = "-9999px";
         customTooltip.style.transform = "none";
-      void customTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 280; // Fixed width
+      void customTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = customTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = customTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         customTooltip.style.setProperty("position", "fixed", "important");
@@ -2768,7 +2942,7 @@ const exportNftsModuleDefinition = {
         customTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      customTooltip.style.opacity = "1";
+      customTooltip.style.setProperty("opacity", "1", "important");
         });
         customTooltipTimeout = null;
       }, 1000);
@@ -2779,7 +2953,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(customTooltipTimeout);
         customTooltipTimeout = null;
       }
-      customTooltip.style.opacity = "0";
+      customTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         customTooltip.style.visibility = "hidden";
@@ -2830,26 +3004,49 @@ const exportNftsModuleDefinition = {
       this.customImageWidth = this.originalImageWidth;
       this.customImageHeight = this.originalImageHeight;
       // Grey out the inputs and labels
+      widthInput.style.background = "#2a2a2a";
+      widthInput.style.color = "#666666";
+      widthInput.style.borderColor = "#4a4a4a";
       widthInput.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
-      heightInput.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
       widthInput.style.cursor = "not-allowed";
+      heightInput.style.background = "#2a2a2a";
+      heightInput.style.color = "#666666";
+      heightInput.style.borderColor = "#4a4a4a";
+      heightInput.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
       heightInput.style.cursor = "not-allowed";
+      xLabel.style.color = "#666666";
       xLabel.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
+      pxLabel.style.color = "#666666";
       pxLabel.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
     });
     
     customToggle.addEventListener("click", () => {
+      // Check if images are available before allowing CUSTOM mode
+      if (this.originalImageWidth <= 0 || this.originalImageHeight <= 0) {
+        // Images not available - prevent selection and show tooltip
+        // Tooltip will already be showing from hover, but we can ensure it stays visible briefly
+        return; // Prevent the toggle from activating
+      }
+      
       this.useOriginalImageSize = false;
       updateDimensionToggles();
       // Enable inputs
       widthInput.disabled = false;
       heightInput.disabled = false;
       // Make inputs and labels look normal (not greyed out)
+      widthInput.style.background = "var(--bg-primary)";
+      widthInput.style.color = "var(--text-primary)";
+      widthInput.style.borderColor = "#666666";
       widthInput.style.opacity = "1";
-      heightInput.style.opacity = "1";
       widthInput.style.cursor = "text";
+      heightInput.style.background = "var(--bg-primary)";
+      heightInput.style.color = "var(--text-primary)";
+      heightInput.style.borderColor = "#666666";
+      heightInput.style.opacity = "1";
       heightInput.style.cursor = "text";
+      xLabel.style.color = "var(--text-primary)";
       xLabel.style.opacity = "1";
+      pxLabel.style.color = "var(--text-primary)";
       pxLabel.style.opacity = "1";
     });
     
@@ -2863,12 +3060,64 @@ const exportNftsModuleDefinition = {
     dimensionsInputContainer.style.gap = "8px";
     dimensionsInputContainer.style.alignItems = "center";
     dimensionsInputContainer.style.justifyContent = "center";
+    // Ensure container doesn't have tooltip classes
+    dimensionsInputContainer.classList.remove("tooltip");
+    dimensionsInputContainer.setAttribute("data-no-tooltip", "true");
+    dimensionsInputContainer.setAttribute("lang", "en"); // Ensure English language
     
     const widthInput = document.createElement("input");
     widthInput.id = "export-image-width-input";
     widthInput.type = "number";
     widthInput.min = "1";
     widthInput.value = this.originalImageWidth;
+    // CRITICAL: Disable HTML5 validation to prevent browser tooltips
+    widthInput.setAttribute("novalidate", "true");
+    widthInput.setAttribute("formnovalidate", "true");
+    // Remove validation attributes that trigger browser messages
+    widthInput.removeAttribute("required");
+    widthInput.removeAttribute("pattern");
+    // Remove any browser default tooltips and ensure English language
+    widthInput.removeAttribute("title"); // Remove title to prevent browser tooltip
+    widthInput.setAttribute("lang", "en"); // Ensure English language
+    widthInput.setAttribute("data-no-tooltip", "true"); // Prevent auto-tooltip system
+    // Explicitly remove tooltip classes if they exist
+    widthInput.classList.remove("tooltip");
+    // Remove any existing tooltip elements
+    const existingWidthTooltip = widthInput.querySelector(".tooltiptext");
+    if (existingWidthTooltip) {
+      existingWidthTooltip.remove();
+    }
+    // CRITICAL: Completely disable HTML5 validation to prevent browser tooltips
+    // Prevent browser validation tooltips by handling validation manually
+    widthInput.addEventListener("invalid", (e) => {
+      e.preventDefault(); // Prevent browser validation tooltip
+      e.stopImmediatePropagation(); // Stop all event propagation immediately
+      e.stopPropagation(); // Stop event propagation
+      widthInput.setCustomValidity(""); // Clear any validation message
+      return false; // Prevent default behavior
+    }, true); // Use capture phase to catch event early
+    
+    // Prevent form submission validation
+    widthInput.setCustomValidity(""); // Clear any default validation messages
+    
+    // CRITICAL: Override checkValidity to always return true
+    const originalWidthCheckValidity = widthInput.checkValidity;
+    widthInput.checkValidity = function() { return true; };
+    widthInput.reportValidity = function() { return true; };
+    
+    // Ensure no validation messages appear on all events
+    const clearWidthValidation = () => {
+      widthInput.setCustomValidity("");
+      widthInput.removeAttribute("aria-invalid");
+    };
+    
+    widthInput.addEventListener("input", clearWidthValidation, true);
+    widthInput.addEventListener("change", clearWidthValidation, true);
+    widthInput.addEventListener("focus", clearWidthValidation, true);
+    widthInput.addEventListener("blur", clearWidthValidation, true);
+    widthInput.addEventListener("keydown", clearWidthValidation, true);
+    widthInput.addEventListener("keyup", clearWidthValidation, true);
+    widthInput.addEventListener("paste", clearWidthValidation, true);
     widthInput.style.width = "60px";
     widthInput.style.padding = "6px 8px";
     widthInput.style.border = "1px solid #666666";
@@ -2881,6 +3130,9 @@ const exportNftsModuleDefinition = {
     widthInput.style.webkitAppearance = "textfield";
     widthInput.style.boxSizing = "border-box";
     widthInput.disabled = true; // Disabled by default (ORIGINAL selected)
+    widthInput.style.background = "#2a2a2a"; // Grey background when disabled
+    widthInput.style.color = "#666666"; // Grey text when disabled
+    widthInput.style.borderColor = "#4a4a4a"; // Grey border when disabled
     widthInput.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
     widthInput.style.cursor = "not-allowed"; // Show not-allowed cursor when disabled
     
@@ -2888,7 +3140,7 @@ const exportNftsModuleDefinition = {
     xLabel.id = "export-image-x-label";
     xLabel.textContent = "x";
     xLabel.style.fontSize = "12px";
-    xLabel.style.color = "var(--text-primary)";
+    xLabel.style.color = "#666666"; // Grey by default (ORIGINAL selected)
     xLabel.style.fontWeight = "600";
     xLabel.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
     
@@ -2897,6 +3149,54 @@ const exportNftsModuleDefinition = {
     heightInput.type = "number";
     heightInput.min = "1";
     heightInput.value = this.originalImageHeight;
+    // CRITICAL: Disable HTML5 validation to prevent browser tooltips
+    heightInput.setAttribute("novalidate", "true");
+    heightInput.setAttribute("formnovalidate", "true");
+    // Remove validation attributes that trigger browser messages
+    heightInput.removeAttribute("required");
+    heightInput.removeAttribute("pattern");
+    // Remove any browser default tooltips and ensure English language
+    heightInput.removeAttribute("title"); // Remove title to prevent browser tooltip
+    heightInput.setAttribute("lang", "en"); // Ensure English language
+    heightInput.setAttribute("data-no-tooltip", "true"); // Prevent auto-tooltip system
+    // Explicitly remove tooltip classes if they exist
+    heightInput.classList.remove("tooltip");
+    // Remove any existing tooltip elements
+    const existingHeightTooltip = heightInput.querySelector(".tooltiptext");
+    if (existingHeightTooltip) {
+      existingHeightTooltip.remove();
+    }
+    // CRITICAL: Completely disable HTML5 validation to prevent browser tooltips
+    // Prevent browser validation tooltips by handling validation manually
+    heightInput.addEventListener("invalid", (e) => {
+      e.preventDefault(); // Prevent browser validation tooltip
+      e.stopImmediatePropagation(); // Stop all event propagation immediately
+      e.stopPropagation(); // Stop event propagation
+      heightInput.setCustomValidity(""); // Clear any validation message
+      return false; // Prevent default behavior
+    }, true); // Use capture phase to catch event early
+    
+    // Prevent form submission validation
+    heightInput.setCustomValidity(""); // Clear any default validation messages
+    
+    // CRITICAL: Override checkValidity to always return true
+    const originalCheckValidity = heightInput.checkValidity;
+    heightInput.checkValidity = function() { return true; };
+    heightInput.reportValidity = function() { return true; };
+    
+    // Ensure no validation messages appear on all events
+    const clearValidation = () => {
+      heightInput.setCustomValidity("");
+      heightInput.removeAttribute("aria-invalid");
+    };
+    
+    heightInput.addEventListener("input", clearValidation, true);
+    heightInput.addEventListener("change", clearValidation, true);
+    heightInput.addEventListener("focus", clearValidation, true);
+    heightInput.addEventListener("blur", clearValidation, true);
+    heightInput.addEventListener("keydown", clearValidation, true);
+    heightInput.addEventListener("keyup", clearValidation, true);
+    heightInput.addEventListener("paste", clearValidation, true);
     heightInput.style.width = "60px";
     heightInput.style.padding = "6px 8px";
     heightInput.style.border = "1px solid #666666";
@@ -2909,6 +3209,9 @@ const exportNftsModuleDefinition = {
     heightInput.style.webkitAppearance = "textfield";
     heightInput.style.boxSizing = "border-box";
     heightInput.disabled = true; // Disabled by default (ORIGINAL selected)
+    heightInput.style.background = "#2a2a2a"; // Grey background when disabled
+    heightInput.style.color = "#666666"; // Grey text when disabled
+    heightInput.style.borderColor = "#4a4a4a"; // Grey border when disabled
     heightInput.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
     heightInput.style.cursor = "not-allowed"; // Show not-allowed cursor when disabled
     
@@ -2916,36 +3219,93 @@ const exportNftsModuleDefinition = {
     pxLabel.id = "export-image-px-label";
     pxLabel.textContent = "px";
     pxLabel.style.fontSize = "12px";
-    pxLabel.style.color = "var(--text-primary)";
+    pxLabel.style.color = "#666666"; // Grey by default (ORIGINAL selected)
     pxLabel.style.fontWeight = "600";
     pxLabel.style.opacity = "1"; // Always fully opaque - use colors to indicate inactive state
     
     // Store aspect ratio based on original dimensions
     const getAspectRatio = () => {
-      return this.originalImageWidth / this.originalImageHeight;
+      // Ensure we have valid original dimensions before calculating
+      if (this.originalImageWidth > 0 && this.originalImageHeight > 0) {
+        return this.originalImageWidth / this.originalImageHeight;
+      }
+      // Fallback: if no original dimensions, use current custom dimensions or 1:1
+      if (this.customImageWidth > 0 && this.customImageHeight > 0) {
+        return this.customImageWidth / this.customImageHeight;
+      }
+      return 1; // Default to 1:1 aspect ratio if no dimensions available
     };
     
-    // Width input handler - maintain aspect ratio
-    widthInput.addEventListener("input", () => {
-      const newWidth = parseInt(widthInput.value) || 1;
+    // Function to calculate and update dimensions based on aspect ratio
+    const updateDimensionsFromWidth = () => {
+      const newWidth = parseInt(widthInput.value) || 0;
       if (newWidth > 0 && !this.useOriginalImageSize) {
         const aspectRatio = getAspectRatio();
-        const newHeight = Math.round(newWidth / aspectRatio);
-        heightInput.value = newHeight;
-        this.customImageWidth = newWidth;
-        this.customImageHeight = newHeight;
+        if (aspectRatio > 0 && !isNaN(aspectRatio) && isFinite(aspectRatio)) {
+          const newHeight = Math.round(newWidth / aspectRatio);
+          if (newHeight > 0) {
+            heightInput.value = newHeight;
+            this.customImageWidth = newWidth;
+            this.customImageHeight = newHeight;
+          } else {
+            // If calculated height is invalid, reset to original
+            widthInput.value = this.originalImageWidth || 0;
+            heightInput.value = this.originalImageHeight || 0;
+            this.customImageWidth = this.originalImageWidth || 0;
+            this.customImageHeight = this.originalImageHeight || 0;
+          }
+        }
+      } else if (newWidth <= 0) {
+        // Reset to original if invalid value
+        widthInput.value = this.originalImageWidth || 0;
+        heightInput.value = this.originalImageHeight || 0;
+        this.customImageWidth = this.originalImageWidth || 0;
+        this.customImageHeight = this.originalImageHeight || 0;
+      }
+    };
+    
+    const updateDimensionsFromHeight = () => {
+      const newHeight = parseInt(heightInput.value) || 0;
+      if (newHeight > 0 && !this.useOriginalImageSize) {
+        const aspectRatio = getAspectRatio();
+        if (aspectRatio > 0 && !isNaN(aspectRatio) && isFinite(aspectRatio)) {
+          const newWidth = Math.round(newHeight * aspectRatio);
+          if (newWidth > 0) {
+            widthInput.value = newWidth;
+            this.customImageWidth = newWidth;
+            this.customImageHeight = newHeight;
+          } else {
+            // If calculated width is invalid, reset to original
+            widthInput.value = this.originalImageWidth || 0;
+            heightInput.value = this.originalImageHeight || 0;
+            this.customImageWidth = this.originalImageWidth || 0;
+            this.customImageHeight = this.originalImageHeight || 0;
+          }
+        }
+      } else if (newHeight <= 0) {
+        // Reset to original if invalid value
+        widthInput.value = this.originalImageWidth || 0;
+        heightInput.value = this.originalImageHeight || 0;
+        this.customImageWidth = this.originalImageWidth || 0;
+        this.customImageHeight = this.originalImageHeight || 0;
+      }
+    };
+    
+    // Width input handler - maintain aspect ratio (only on blur or Enter key)
+    widthInput.addEventListener("blur", updateDimensionsFromWidth);
+    widthInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        widthInput.blur(); // This will trigger the blur event
       }
     });
     
-    // Height input handler - maintain aspect ratio
-    heightInput.addEventListener("input", () => {
-      const newHeight = parseInt(heightInput.value) || 1;
-      if (newHeight > 0 && !this.useOriginalImageSize) {
-        const aspectRatio = getAspectRatio();
-        const newWidth = Math.round(newHeight * aspectRatio);
-        widthInput.value = newWidth;
-        this.customImageWidth = newWidth;
-        this.customImageHeight = newHeight;
+    // Height input handler - maintain aspect ratio (only on blur or Enter key)
+    heightInput.addEventListener("blur", updateDimensionsFromHeight);
+    heightInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        heightInput.blur(); // This will trigger the blur event
       }
     });
     
@@ -2962,13 +3322,19 @@ const exportNftsModuleDefinition = {
       }
     });
     
-    // Update custom values when custom toggle is activated
+    // Update custom values when custom toggle is activated (only if images are available)
+    // Note: This is a duplicate listener that should only run if the first one succeeds
+    // We'll keep it but add the same check
+    const originalCustomClickHandler = customToggle.onclick;
     customToggle.addEventListener("click", () => {
-      // Update custom values to match original initially
-      this.customImageWidth = this.originalImageWidth;
-      this.customImageHeight = this.originalImageHeight;
-      widthInput.value = this.originalImageWidth;
-      heightInput.value = this.originalImageHeight;
+      // Check if images are available before updating values
+      if (this.originalImageWidth > 0 && this.originalImageHeight > 0) {
+        // Update custom values to match original initially
+        this.customImageWidth = this.originalImageWidth;
+        this.customImageHeight = this.originalImageHeight;
+        widthInput.value = this.originalImageWidth;
+        heightInput.value = this.originalImageHeight;
+      }
     });
     
     dimensionsInputContainer.appendChild(widthInput);
@@ -2977,7 +3343,7 @@ const exportNftsModuleDefinition = {
     dimensionsInputContainer.appendChild(pxLabel);
     imageDimensionsCard.appendChild(dimensionsInputContainer);
     
-    container.appendChild(imageDimensionsCard);
+    utilitiesContentWrapper.appendChild(imageDimensionsCard);
     
     // Button: "Merge Metadata Files"
     const mergeButton = document.createElement("button");
@@ -3004,16 +3370,17 @@ const exportNftsModuleDefinition = {
     // Add tooltip explaining what the button does
     const tooltip = document.createElement("span");
     tooltip.className = "tooltiptext";
-    tooltip.innerHTML = "Combine multiple JSON or CSV metadata files into one file,<br>if you need only one metadata file to mint your collection.";
-    tooltip.style.visibility = "hidden";
+    tooltip.innerHTML = "Combine multiple JSON or CSV metadata<br>files into one file, if you need only one<br>metadata file to mint your collection.";
+    tooltip.style.setProperty("visibility", "hidden", "important");
     tooltip.style.width = "auto";
     tooltip.style.minWidth = "auto";
     tooltip.style.maxWidth = "350px";
     tooltip.style.height = "auto";
     tooltip.style.minHeight = "auto";
     tooltip.style.maxHeight = "none";
-    tooltip.style.backgroundColor = "#000000";
-    tooltip.style.color = "#f39c12";
+    tooltip.style.setProperty("background-color", "#000000", "important");
+    tooltip.style.setProperty("background", "#000000", "important");
+    tooltip.style.setProperty("color", "#f39c12", "important");
     tooltip.style.textAlign = "center";
     tooltip.style.borderRadius = "6px";
     tooltip.style.padding = "8px 12px";
@@ -3023,7 +3390,7 @@ const exportNftsModuleDefinition = {
     tooltip.style.top = "auto";
     tooltip.style.left = "auto";
     tooltip.style.right = "auto";
-    tooltip.style.opacity = "0";
+    tooltip.style.setProperty("opacity", "0", "important");
     tooltip.style.transition = "opacity 1s";
     tooltip.style.fontSize = "11px";
     tooltip.style.lineHeight = "1.2";
@@ -3056,8 +3423,8 @@ const exportNftsModuleDefinition = {
       tooltipTimeout = setTimeout(() => {
       const rect = mergeButton.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
-      tooltip.style.visibility = "visible";
-      tooltip.style.opacity = "0";
+      tooltip.style.setProperty("visibility", "visible", "important");
+      tooltip.style.setProperty("opacity", "0", "important");
       tooltip.style.top = "-9999px";
       tooltip.style.left = "-9999px";
         tooltip.style.transform = "none";
@@ -3079,7 +3446,7 @@ const exportNftsModuleDefinition = {
         tooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in
         requestAnimationFrame(() => {
-      tooltip.style.opacity = "1";
+      tooltip.style.setProperty("opacity", "1", "important");
         });
         tooltipTimeout = null;
       }, 1000);
@@ -3093,10 +3460,10 @@ const exportNftsModuleDefinition = {
         tooltipTimeout = null;
       }
       // Start fade out
-      tooltip.style.opacity = "0";
+      tooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       const fadeOutTimeout = setTimeout(() => {
-        tooltip.style.visibility = "hidden";
+        tooltip.style.setProperty("visibility", "hidden", "important");
       }, 1000); // Match the 1s transition duration
       // Store fade out timeout separately to avoid conflicts
       mergeButton._fadeOutTimeout = fadeOutTimeout;
@@ -3112,7 +3479,10 @@ const exportNftsModuleDefinition = {
       this.handleMergeMetadataFiles();
     });
     
-    container.appendChild(mergeButton);
+    utilitiesContentWrapper.appendChild(mergeButton);
+    
+    // Append the wrapper to the container
+    container.appendChild(utilitiesContentWrapper);
 
     return container;
   },
@@ -3352,11 +3722,14 @@ const exportNftsModuleDefinition = {
     labelTooltip.className = "tooltiptext";
     labelTooltip.innerHTML = "Include Rarity Rank as<br>Trait in your Collection";
     labelTooltip.style.visibility = "hidden";
-    labelTooltip.style.width = "180px";
-    labelTooltip.style.minWidth = "180px";
-    labelTooltip.style.maxWidth = "180px";
-    labelTooltip.style.backgroundColor = "#000000";
-    labelTooltip.style.color = "#f39c12";
+    labelTooltip.style.width = "auto";
+    labelTooltip.style.minWidth = "auto";
+    labelTooltip.style.maxWidth = "300px";
+    labelTooltip.style.display = "flex";
+    labelTooltip.style.flexDirection = "column";
+    labelTooltip.style.setProperty("background-color", "#000000", "important");
+    labelTooltip.style.setProperty("background", "#000000", "important");
+    labelTooltip.style.setProperty("color", "#f39c12", "important");
     labelTooltip.style.textAlign = "center";
     labelTooltip.style.borderRadius = "6px";
     labelTooltip.style.padding = "8px 10px";
@@ -3396,8 +3769,8 @@ const exportNftsModuleDefinition = {
       labelTooltip.style.top = "-9999px";
       labelTooltip.style.left = "-9999px";
         labelTooltip.style.transform = "none";
-      void labelTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 180; // Fixed width
+      void labelTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = labelTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = labelTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         labelTooltip.style.setProperty("position", "fixed", "important");
@@ -3456,8 +3829,9 @@ const exportNftsModuleDefinition = {
     toggleTooltip.style.width = "180px";
     toggleTooltip.style.minWidth = "180px";
     toggleTooltip.style.maxWidth = "180px";
-    toggleTooltip.style.backgroundColor = "#000000";
-    toggleTooltip.style.color = "#f39c12";
+    toggleTooltip.style.setProperty("background-color", "#000000", "important");
+    toggleTooltip.style.setProperty("background", "#000000", "important");
+    toggleTooltip.style.setProperty("color", "#f39c12", "important");
     toggleTooltip.style.textAlign = "center";
     toggleTooltip.style.borderRadius = "6px";
     toggleTooltip.style.padding = "8px 10px";
@@ -3595,13 +3969,16 @@ const exportNftsModuleDefinition = {
     // Add tooltip to label
     const metadataLabelTooltip = document.createElement("span");
     metadataLabelTooltip.className = "tooltiptext";
-    metadataLabelTooltip.innerHTML = "ON: Export 1 metadata file per NFT (all inside a zip file)<br>OFF: Export only 1 metadata file with all metadata for all NFTs";
+    metadataLabelTooltip.innerHTML = "ON: Export 1 metadata file<br>per NFT (all inside a zip file)<br>OFF: Export only 1 metadata file<br>with all metadata for all NFTs";
     metadataLabelTooltip.style.visibility = "hidden";
     metadataLabelTooltip.style.width = "auto";
     metadataLabelTooltip.style.minWidth = "auto";
-    metadataLabelTooltip.style.maxWidth = "none";
-    metadataLabelTooltip.style.backgroundColor = "#000000";
-    metadataLabelTooltip.style.color = "#f39c12";
+    metadataLabelTooltip.style.maxWidth = "300px";
+    metadataLabelTooltip.style.display = "flex";
+    metadataLabelTooltip.style.flexDirection = "column";
+    metadataLabelTooltip.style.setProperty("background-color", "#000000", "important");
+    metadataLabelTooltip.style.setProperty("background", "#000000", "important");
+    metadataLabelTooltip.style.setProperty("color", "#f39c12", "important");
     metadataLabelTooltip.style.textAlign = "left";
     metadataLabelTooltip.style.borderRadius = "6px";
     metadataLabelTooltip.style.padding = "8px 10px";
@@ -3706,8 +4083,9 @@ const exportNftsModuleDefinition = {
     metadataToggleTooltip.style.width = "auto";
     metadataToggleTooltip.style.minWidth = "auto";
     metadataToggleTooltip.style.maxWidth = "none";
-    metadataToggleTooltip.style.backgroundColor = "#000000";
-    metadataToggleTooltip.style.color = "#f39c12";
+    metadataToggleTooltip.style.setProperty("background-color", "#000000", "important");
+    metadataToggleTooltip.style.setProperty("background", "#000000", "important");
+    metadataToggleTooltip.style.setProperty("color", "#f39c12", "important");
     metadataToggleTooltip.style.textAlign = "left";
     metadataToggleTooltip.style.borderRadius = "6px";
     metadataToggleTooltip.style.padding = "8px 10px";
@@ -3880,11 +4258,14 @@ const exportNftsModuleDefinition = {
     exportTooltip.className = "tooltiptext";
     exportTooltip.innerHTML = "Click this button to export your collection<br>once all export parameters are configured.";
     exportTooltip.style.visibility = "hidden";
-    exportTooltip.style.width = "280px";
-    exportTooltip.style.minWidth = "280px";
-    exportTooltip.style.maxWidth = "280px";
-    exportTooltip.style.backgroundColor = "#000000";
-    exportTooltip.style.color = "#f39c12";
+    exportTooltip.style.width = "auto";
+    exportTooltip.style.minWidth = "auto";
+    exportTooltip.style.maxWidth = "300px";
+    exportTooltip.style.display = "flex";
+    exportTooltip.style.flexDirection = "column";
+    exportTooltip.style.setProperty("background-color", "#000000", "important");
+    exportTooltip.style.setProperty("background", "#000000", "important");
+    exportTooltip.style.setProperty("color", "#f39c12", "important");
     exportTooltip.style.textAlign = "center";
     exportTooltip.style.borderRadius = "6px";
     exportTooltip.style.padding = "8px 10px";
@@ -3894,8 +4275,8 @@ const exportNftsModuleDefinition = {
     exportTooltip.style.top = "auto";
     exportTooltip.style.left = "auto";
     exportTooltip.style.right = "auto";
-    exportTooltip.style.opacity = "0";
-    exportTooltip.style.transition = "opacity 1s";
+    exportTooltip.style.setProperty("opacity", "0", "important");
+    exportTooltip.style.setProperty("transition", "opacity 1s ease", "important");
     exportTooltip.style.fontSize = "11px";
     exportTooltip.style.lineHeight = "1.4";
     exportTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -3920,12 +4301,12 @@ const exportNftsModuleDefinition = {
       const rect = exportBtn.getBoundingClientRect();
       // Make tooltip temporarily visible to measure height, but keep it off-screen
       exportTooltip.style.visibility = "visible";
-      exportTooltip.style.opacity = "0";
+      exportTooltip.style.setProperty("opacity", "0", "important");
       exportTooltip.style.top = "-9999px";
       exportTooltip.style.left = "-9999px";
         exportTooltip.style.transform = "none";
-      void exportTooltip.offsetHeight; // Force reflow
-      const tooltipWidth = 280; // Fixed width
+      void exportTooltip.offsetWidth; // Force reflow to get accurate measurements
+      const tooltipWidth = exportTooltip.offsetWidth; // Dynamic width based on content
       const tooltipHeight = exportTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
         exportTooltip.style.setProperty("position", "fixed", "important");
@@ -3942,7 +4323,7 @@ const exportNftsModuleDefinition = {
         exportTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
         // Fade in with transition
         requestAnimationFrame(() => {
-      exportTooltip.style.opacity = "1";
+      exportTooltip.style.setProperty("opacity", "1", "important");
         });
         exportTooltipTimeout = null;
       }, 1000);
@@ -3953,7 +4334,7 @@ const exportNftsModuleDefinition = {
         clearTimeout(exportTooltipTimeout);
         exportTooltipTimeout = null;
       }
-      exportTooltip.style.opacity = "0";
+      exportTooltip.style.setProperty("opacity", "0", "important");
       // Wait for fade out transition to complete before hiding
       setTimeout(() => {
         exportTooltip.style.visibility = "hidden";
@@ -4157,6 +4538,10 @@ const exportNftsModuleDefinition = {
     if (name.includes('<br>')) {
       toggle.innerHTML = name;
     }
+    // Set width to auto for blockchain buttons
+    toggle.style.width = "auto";
+    toggle.style.minWidth = "auto";
+    toggle.style.maxWidth = "none";
     toggle.dataset.blockchainColor = color;
     
     // Extract plain text name for tooltip (remove HTML tags)
@@ -4166,13 +4551,20 @@ const exportNftsModuleDefinition = {
     toggle.classList.add("tooltip");
     const blockchainTooltip = document.createElement("span");
     blockchainTooltip.className = "tooltiptext";
-    blockchainTooltip.innerHTML = `If selected, the metadata for <strong>${plainName}</strong><br>will be included in the exportation process.`;
+    // For Bitcoin Ordinals, format tooltip to display in 2 lines with specific text
+    if (id === "bitcoin") {
+      blockchainTooltip.innerHTML = `If selected, the metadata for <strong>Bitcoin Ordinals (Inscriptions)</strong><br>will be included in the exportation process.`;
+      blockchainTooltip.style.maxWidth = "300px"; // Force 2 lines
+    } else {
+      blockchainTooltip.innerHTML = `If selected, the metadata for <strong>${plainName}</strong><br>will be included in the exportation process.`;
+      blockchainTooltip.style.maxWidth = "350px";
+    }
     blockchainTooltip.style.visibility = "hidden";
-    blockchainTooltip.style.width = "320px";
-    blockchainTooltip.style.minWidth = "320px";
-    blockchainTooltip.style.maxWidth = "320px";
-    blockchainTooltip.style.backgroundColor = "#000000";
-    blockchainTooltip.style.color = "#f39c12";
+    blockchainTooltip.style.width = "auto";
+    blockchainTooltip.style.minWidth = "auto";
+    blockchainTooltip.style.setProperty("background-color", "#000000", "important");
+    blockchainTooltip.style.setProperty("background", "#000000", "important");
+    blockchainTooltip.style.setProperty("color", "#f39c12", "important");
     blockchainTooltip.style.textAlign = "center";
     blockchainTooltip.style.borderRadius = "6px";
     blockchainTooltip.style.padding = "8px 10px";
@@ -4196,16 +4588,16 @@ const exportNftsModuleDefinition = {
     blockchainTooltip.style.transform = "none";
     // Ensure tooltip doesn't interfere with button layout - use fixed positioning and remove from flow
     blockchainTooltip.style.position = "fixed";
-    blockchainTooltip.style.display = "block";
+    blockchainTooltip.style.display = "flex";
+    blockchainTooltip.style.flexDirection = "column";
     blockchainTooltip.style.margin = "0";
     blockchainTooltip.style.pointerEvents = "none";
-    blockchainTooltip.style.width = "320px";
-    blockchainTooltip.style.minWidth = "320px";
-    blockchainTooltip.style.maxWidth = "320px";
+    blockchainTooltip.style.width = "auto";
+    blockchainTooltip.style.minWidth = "auto";
+    // maxWidth is already set above based on whether it's Bitcoin or not
     blockchainTooltip.style.height = "auto";
-    blockchainTooltip.style.minHeight = "0";
+    blockchainTooltip.style.minHeight = "auto";
     blockchainTooltip.style.maxHeight = "none";
-    blockchainTooltip.style.flex = "none";
     blockchainTooltip.style.flexShrink = "0";
     blockchainTooltip.style.flexGrow = "0";
     blockchainTooltip.style.alignSelf = "auto";
@@ -6171,12 +6563,7 @@ const exportNftsModuleDefinition = {
                       this.originalImageHeight = detectedHeight;
                       
                       // Update UI immediately
-                      const widthInput = document.getElementById('export-image-width-input');
-                      const heightInput = document.getElementById('export-image-height-input');
-                      if (widthInput && heightInput) {
-                        widthInput.value = detectedWidth;
-                        heightInput.value = detectedHeight;
-                      }
+                      this.updateImageDimensionInputs(); // This will also update CUSTOM toggle availability
                     }
                   }
                 } else {
@@ -6248,12 +6635,7 @@ const exportNftsModuleDefinition = {
                         this.originalImageHeight = naturalHeight;
                         
                         // Update UI immediately
-                        const widthInput = document.getElementById('export-image-width-input');
-                        const heightInput = document.getElementById('export-image-height-input');
-                        if (widthInput && heightInput) {
-                          widthInput.value = naturalWidth;
-                          heightInput.value = naturalHeight;
-                        }
+                        this.updateImageDimensionInputs(); // This will also update CUSTOM toggle availability
                       }
                     }
                   }
@@ -7356,6 +7738,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
       utilitiesSection.style.setProperty("max-width", "256px", "important");
       utilitiesSection.style.setProperty("min-height", "556px", "important");
       utilitiesSection.style.setProperty("max-height", "556px", "important");
+      utilitiesSection.style.setProperty("margin-top", "0", "important");
       utilitiesSection.style.setProperty("margin-left", "0", "important");
     }
     
@@ -7587,7 +7970,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
         selectAllBatchesTooltip.style.minWidth = "320px";
         selectAllBatchesTooltip.style.maxWidth = "320px";
         selectAllBatchesTooltip.style.backgroundColor = "#000000";
-        selectAllBatchesTooltip.style.color = "#f39c12";
+        selectAllBatchesTooltip.style.setProperty("color", "#f39c12", "important");
         selectAllBatchesTooltip.style.textAlign = "center";
         selectAllBatchesTooltip.style.borderRadius = "6px";
         selectAllBatchesTooltip.style.padding = "8px 10px";
@@ -7597,8 +7980,8 @@ Each blockchain folder only contains the metadata formatted for that specific bl
         selectAllBatchesTooltip.style.top = "auto";
         selectAllBatchesTooltip.style.left = "auto";
         selectAllBatchesTooltip.style.right = "auto";
-        selectAllBatchesTooltip.style.opacity = "0";
-        selectAllBatchesTooltip.style.transition = "opacity 1s";
+        selectAllBatchesTooltip.style.setProperty("opacity", "0", "important");
+        selectAllBatchesTooltip.style.setProperty("transition", "opacity 1s ease", "important");
         selectAllBatchesTooltip.style.fontSize = "11px";
         selectAllBatchesTooltip.style.lineHeight = "1.4";
         selectAllBatchesTooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.5)";
@@ -7626,7 +8009,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
           const rect = selectAllBatchesToggle.getBoundingClientRect();
           // Make tooltip temporarily visible to measure height, but keep it off-screen
           selectAllBatchesTooltip.style.visibility = "visible";
-          selectAllBatchesTooltip.style.opacity = "0";
+          selectAllBatchesTooltip.style.setProperty("opacity", "0", "important");
           selectAllBatchesTooltip.style.top = "-9999px";
           selectAllBatchesTooltip.style.left = "-9999px";
             selectAllBatchesTooltip.style.transform = "none";
@@ -7648,7 +8031,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
             selectAllBatchesTooltip.style.setProperty("left", `${centeredLeft}px`, "important");
             // Fade in with transition
             requestAnimationFrame(() => {
-          selectAllBatchesTooltip.style.opacity = "1";
+          selectAllBatchesTooltip.style.setProperty("opacity", "1", "important");
             });
             selectAllBatchesTooltipTimeout = null;
           }, 1000);
@@ -7659,7 +8042,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
             clearTimeout(selectAllBatchesTooltipTimeout);
             selectAllBatchesTooltipTimeout = null;
           }
-          selectAllBatchesTooltip.style.opacity = "0";
+          selectAllBatchesTooltip.style.setProperty("opacity", "0", "important");
           setTimeout(() => {
             selectAllBatchesTooltip.style.visibility = "hidden";
           }, 1000);
@@ -8031,13 +8414,15 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     toggle.classList.add("tooltip");
     const selectForExportTooltip = document.createElement("span");
     selectForExportTooltip.className = "tooltiptext";
-    selectForExportTooltip.innerHTML = "When activated, this batch will be included in the export. The batch card will show a green border and halo effect to indicate it's selected for export.";
+    selectForExportTooltip.innerHTML = "When activated, this batch will be included in the<br>export. The batch card will show a green border<br>and halo effect to indicate it's selected for export.";
     selectForExportTooltip.style.visibility = "hidden";
-    selectForExportTooltip.style.width = "320px";
-    selectForExportTooltip.style.minWidth = "320px";
-    selectForExportTooltip.style.maxWidth = "320px";
+    selectForExportTooltip.style.width = "auto";
+    selectForExportTooltip.style.minWidth = "auto";
+    selectForExportTooltip.style.maxWidth = "300px";
+    selectForExportTooltip.style.display = "flex";
+    selectForExportTooltip.style.flexDirection = "column";
     selectForExportTooltip.style.backgroundColor = "#000000";
-    selectForExportTooltip.style.color = "#f39c12";
+    selectForExportTooltip.style.setProperty("color", "#f39c12", "important");
     selectForExportTooltip.style.textAlign = "center";
     selectForExportTooltip.style.borderRadius = "6px";
     selectForExportTooltip.style.padding = "8px 10px";
@@ -8084,7 +8469,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
       selectForExportTooltip.style.top = "-9999px";
       selectForExportTooltip.style.left = "-9999px";
         selectForExportTooltip.style.transform = "none";
-      void selectForExportTooltip.offsetHeight; // Force reflow
+      void selectForExportTooltip.offsetWidth; // Force reflow to get accurate measurements
       const tooltipWidth = selectForExportTooltip.offsetWidth; // Dynamic width for accurate centering
       const tooltipHeight = selectForExportTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
@@ -8374,13 +8759,15 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     toggle.classList.add("tooltip");
     const alreadyMintedTooltip = document.createElement("span");
     alreadyMintedTooltip.className = "tooltiptext";
-    alreadyMintedTooltip.innerHTML = "When activated, this batch will be marked as already exported and will be excluded from export. The batch card will be locked with a red border and the batch input will be disabled.";
+    alreadyMintedTooltip.innerHTML = "When activated, this batch will be marked<br>as already exported and will not be<br>included in future exports. The batch<br>card will be locked with a red border<br>and the batch input will be disabled.";
     alreadyMintedTooltip.style.visibility = "hidden";
-    alreadyMintedTooltip.style.width = "320px";
-    alreadyMintedTooltip.style.minWidth = "320px";
-    alreadyMintedTooltip.style.maxWidth = "320px";
+    alreadyMintedTooltip.style.width = "auto";
+    alreadyMintedTooltip.style.minWidth = "auto";
+    alreadyMintedTooltip.style.maxWidth = "280px";
+    alreadyMintedTooltip.style.display = "flex";
+    alreadyMintedTooltip.style.flexDirection = "column";
     alreadyMintedTooltip.style.backgroundColor = "#000000";
-    alreadyMintedTooltip.style.color = "#f39c12";
+    alreadyMintedTooltip.style.setProperty("color", "#f39c12", "important");
     alreadyMintedTooltip.style.textAlign = "center";
     alreadyMintedTooltip.style.borderRadius = "6px";
     alreadyMintedTooltip.style.padding = "8px 10px";
@@ -8427,7 +8814,7 @@ Each blockchain folder only contains the metadata formatted for that specific bl
       alreadyMintedTooltip.style.top = "-9999px";
       alreadyMintedTooltip.style.left = "-9999px";
         alreadyMintedTooltip.style.transform = "none";
-      void alreadyMintedTooltip.offsetHeight; // Force reflow
+      void alreadyMintedTooltip.offsetWidth; // Force reflow to get accurate measurements
       const tooltipWidth = alreadyMintedTooltip.offsetWidth; // Dynamic width for accurate centering
       const tooltipHeight = alreadyMintedTooltip.offsetHeight;
         // CRITICAL: Set position fixed and use setProperty with important to override CSS
@@ -8684,8 +9071,95 @@ Each blockchain folder only contains the metadata formatted for that specific bl
     const heightInput = document.getElementById('export-image-height-input');
     
     if (widthInput && heightInput) {
-      widthInput.value = this.originalImageWidth;
-      heightInput.value = this.originalImageHeight;
+      // CRITICAL: Completely disable HTML5 validation to prevent browser tooltips
+      // Ensure browser tooltips are disabled and language is English
+      widthInput.removeAttribute("title"); // Remove title to prevent browser tooltip
+      widthInput.setAttribute("lang", "en"); // Ensure English language
+      widthInput.setAttribute("data-no-tooltip", "true"); // Prevent auto-tooltip system
+      widthInput.setAttribute("novalidate", "true");
+      widthInput.setAttribute("formnovalidate", "true");
+      // Explicitly remove tooltip classes and elements
+      widthInput.classList.remove("tooltip");
+      const existingWidthTooltip = widthInput.querySelector(".tooltiptext");
+      if (existingWidthTooltip) {
+        existingWidthTooltip.remove();
+      }
+      // Clear any validation messages to prevent browser tooltips
+      widthInput.setCustomValidity("");
+      widthInput.removeAttribute("aria-invalid");
+      // Override validation methods
+      if (widthInput.checkValidity) {
+        widthInput.checkValidity = function() { return true; };
+      }
+      if (widthInput.reportValidity) {
+        widthInput.reportValidity = function() { return true; };
+      }
+      
+      heightInput.removeAttribute("title"); // Remove title to prevent browser tooltip
+      heightInput.setAttribute("lang", "en"); // Ensure English language
+      heightInput.setAttribute("data-no-tooltip", "true"); // Prevent auto-tooltip system
+      heightInput.setAttribute("novalidate", "true");
+      heightInput.setAttribute("formnovalidate", "true");
+      // Explicitly remove tooltip classes and elements
+      heightInput.classList.remove("tooltip");
+      const existingHeightTooltip = heightInput.querySelector(".tooltiptext");
+      if (existingHeightTooltip) {
+        existingHeightTooltip.remove();
+      }
+      // CRITICAL: Completely disable HTML5 validation to prevent browser tooltips
+      // Clear any validation messages to prevent browser tooltips
+      heightInput.setCustomValidity("");
+      heightInput.removeAttribute("aria-invalid");
+      // Override validation methods
+      if (heightInput.checkValidity) {
+        heightInput.checkValidity = function() { return true; };
+      }
+      if (heightInput.reportValidity) {
+        heightInput.reportValidity = function() { return true; };
+      }
+      
+      // If CUSTOM mode is active and we have custom values, preserve them
+      // Otherwise, update to original values
+      if (!this.useOriginalImageSize && this.customImageWidth > 0 && this.customImageHeight > 0) {
+        widthInput.value = this.customImageWidth;
+        heightInput.value = this.customImageHeight;
+      } else {
+        widthInput.value = this.originalImageWidth;
+        heightInput.value = this.originalImageHeight;
+      }
+    }
+    
+    // Also update CUSTOM toggle availability
+    this.updateCustomToggleAvailability();
+  },
+  
+  // Update CUSTOM toggle availability based on whether images are available
+  updateCustomToggleAvailability: function() {
+    const customToggle = document.getElementById('image-dimension-custom-toggle');
+    const customTooltip = customToggle ? customToggle.querySelector('.tooltiptext') : null;
+    
+    if (!customToggle || !customTooltip) {
+      return; // Toggle not created yet
+    }
+    
+    const hasImages = this.originalImageWidth > 0 && this.originalImageHeight > 0;
+    if (hasImages) {
+      customTooltip.innerHTML = "Set custom width and height<br>for exported images";
+      customToggle.style.cursor = "pointer";
+      customToggle.style.opacity = "1";
+    } else {
+      customTooltip.innerHTML = "Add at least one trait image<br>to enable custom dimensions";
+      customToggle.style.cursor = "not-allowed";
+      customToggle.style.opacity = "0.6";
+      // If CUSTOM was selected but images are no longer available, switch back to ORIGINAL
+      if (!this.useOriginalImageSize) {
+        this.useOriginalImageSize = true;
+        // Trigger the ORIGINAL toggle click to update UI
+        const originalToggle = document.getElementById('image-dimension-original-toggle');
+        if (originalToggle) {
+          originalToggle.click();
+        }
+      }
     }
   },
   
@@ -9136,26 +9610,34 @@ Each blockchain folder only contains the metadata formatted for that specific bl
       let quantity = 0;
       let isAlreadyMinted = false;
       
-      // Always check batchData first as source of truth, then fall back to DOM
-      if (this.batchData[i] && typeof this.batchData[i].quantity !== 'undefined') {
-        // Use stored data (most reliable, works for all batches including those on other pages)
-        quantity = parseInt(this.batchData[i].quantity) || 0;
-        isAlreadyMinted = this.batchData[i].alreadyMinted === true;
-      } else {
-        // Fallback to DOM if batchData not available (for batches on current page)
-        const input = document.getElementById(`batch-input-${i}`);
-        const toggle = document.getElementById(`already-minted-toggle-${i}`);
-        
-        if (input) {
-          quantity = parseInt(input.value) || 0;
-          if (toggle) {
-            isAlreadyMinted = toggle.classList.contains("active");
+      // CRITICAL: Always check DOM first for most current value, then fall back to batchData
+      // This ensures we get the most up-to-date quantity value
+      const input = document.getElementById(`batch-input-${i}`);
+      const toggle = document.getElementById(`already-minted-toggle-${i}`);
+      
+      if (input && !input.disabled) {
+        // DOM input exists and is enabled - use DOM value (most current)
+        const inputValue = input.value.trim();
+        if (inputValue !== '' && !isNaN(inputValue)) {
+          quantity = parseInt(inputValue, 10) || 0;
+        } else {
+          // Input is empty or invalid, check batchData
+          if (this.batchData[i] && typeof this.batchData[i].quantity !== 'undefined') {
+            quantity = parseInt(this.batchData[i].quantity, 10) || 0;
           }
         }
+        
+        if (toggle) {
+          isAlreadyMinted = toggle.classList.contains("active");
+        }
+      } else if (this.batchData[i] && typeof this.batchData[i].quantity !== 'undefined') {
+        // No DOM input available (batch on other page) - use stored data
+        quantity = parseInt(this.batchData[i].quantity, 10) || 0;
+        isAlreadyMinted = this.batchData[i].alreadyMinted === true;
       }
       
-      // Only count if not already minted
-      if (!isAlreadyMinted) {
+      // Only count if not already minted and quantity is greater than 0
+      if (!isAlreadyMinted && quantity > 0) {
         totalDistributed += quantity;
       }
     }

@@ -8,8 +8,10 @@
 
 ;(() => {
   // Function to force tooltip visibility
+  // CRITICAL: Optimized to only update tooltips that actually need updating
   function forceTooltipVisibility() {
-    console.log("Forcing tooltip visibility")
+    // CRITICAL: Remove console.log in production to improve performance
+    // console.log("Forcing tooltip visibility")
 
     // 1. Find all elements that might have overflow:hidden
     const potentiallyHidingElements = document.querySelectorAll(`
@@ -58,9 +60,22 @@
     document.addEventListener("DOMContentLoaded", forceTooltipVisibility)
   }
 
+  // CRITICAL: Debounce function to prevent excessive calls
+  let debounceTimeout = null;
+  const debouncedForceTooltipVisibility = () => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+    debounceTimeout = setTimeout(() => {
+      forceTooltipVisibility();
+      debounceTimeout = null;
+    }, 500); // Only run every 500ms at most
+  };
+
   // Set up a MutationObserver to detect when new elements are added
+  // CRITICAL: Use debounced version to prevent performance issues
   const observer = new MutationObserver(() => {
-    forceTooltipVisibility()
+    debouncedForceTooltipVisibility();
   })
 
   // Start observing
@@ -71,6 +86,7 @@
     attributeFilter: ["style", "class"],
   })
 
-  // Run periodically to ensure tooltips remain visible
-  setInterval(forceTooltipVisibility, 1000)
+  // CRITICAL: Remove setInterval - it's too heavy and causes performance issues
+  // The MutationObserver will handle dynamic tooltips, and we don't need to run every second
+  // setInterval(forceTooltipVisibility, 1000) // REMOVED - too heavy
 })()

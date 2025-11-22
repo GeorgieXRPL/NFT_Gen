@@ -1,0 +1,173 @@
+/* 
+ * UNIFIED THEME - Single Source of Truth for CSS Variables
+ * 
+ * This file consolidates all CSS variables from main.css and styles.css
+ * to eliminate conflicts and provide a single source of truth.
+ * 
+ * CONFLICT RESOLUTION:
+ * - main.css: --bg-primary: #121212, --bg-secondary: #1e1e1e
+ * - styles.css: --bg-primary: #000000, --bg-secondary: #111111
+ * - RESOLVED: Using styles.css values (#000000, #111111) as they appear to be the intended dark theme
+ */
+
+:root {
+  /* ============================================
+     BACKGROUND COLORS
+     ============================================ */
+  --bg-primary: #000000;        /* Main background - pure black */
+  --bg-secondary: #111111;      /* Secondary background - dark gray */
+  --bg-tertiary: #2a2a2a;       /* Tertiary background */
+  --card-bg: #252525;           /* Card background */
+  --input-bg: #111111;          /* Input field background */
+
+  /* ============================================
+     TEXT COLORS
+     ============================================ */
+  --text-primary: #ffffff;        /* Primary text - white */
+  --text-secondary: #aaaaaa;     /* Secondary text - light gray */
+  --text-tertiary: #666666;      /* Tertiary text - medium gray */
+
+  /* ============================================
+     ACCENT COLORS
+     ============================================ */
+  --accent-primary: #6c5ce7;     /* Primary accent - purple */
+  --accent-secondary: #a29bfe;   /* Secondary accent - light purple */
+  --accent-tertiary: #4834d4;    /* Tertiary accent - dark purple */
+  --accent-primary-dark: #5b4dc7; /* Darker purple for hover states */
+  --accent-primary-darker: #5649c0; /* Even darker purple */
+
+  /* ============================================
+     BUTTON COLORS
+     ============================================ */
+  --button-primary: #6c5ce7;      /* Primary button */
+  --button-secondary: #4834d4;   /* Secondary button */
+  --button-hover: #5a49e8;       /* Button hover state */
+  --button-danger: #ff4757;      /* Danger button */
+  --button-danger-hover: #ff6b6b; /* Danger button hover */
+
+  /* ============================================
+     STATUS COLORS
+     ============================================ */
+  --error-color: #ff6b6b;        /* Error messages */
+  --success-color: #1dd1a1;      /* Success messages */
+  --warning-color: #feca57;     /* Warning messages */
+  --danger-color: #ff7675;       /* Danger/destructive actions */
+
+  /* ============================================
+     BORDER & SHADOW
+     ============================================ */
+  --border-color: #333333;       /* Default border color */
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Default box shadow */
+
+  /* ============================================
+     TOOLTIP THEME (STANDARD ACROSS ENTIRE APP)
+     ============================================ */
+  --tooltip-bg: #000000;         /* Black background */
+  --tooltip-text: #f39c12;       /* Orange text */
+  --tooltip-padding: 8px 12px;    /* Equal top/bottom padding */
+  --tooltip-font-size: 11px;     /* Font size */
+  --tooltip-border-radius: 6px;  /* Border radius */
+  --tooltip-z-index: 2147483647; /* Maximum z-index */
+  --tooltip-transition: opacity 1s ease; /* Transition */
+  --tooltip-line-height: 1.2;    /* Line height */
+  --tooltip-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5); /* Box shadow */
+
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  --font-family: "Archivo", sans-serif;
+  --font-weight-thin: 100;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============================================
+     SPACING SCALE
+     ============================================ */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* ============================================
+     Z-INDEX LAYERS
+     ============================================ */
+  --z-base: 1;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 2147483647;       /* Maximum z-index for tooltips */
+
+  /* ============================================
+     SCROLLBAR COLORS
+     ============================================ */
+  --scrollbar-track: #2a2a2a;
+  --scrollbar-thumb: #555555;
+  --scrollbar-thumb-hover: #888888;
+
+  /* ============================================
+     SWITCH/TOGGLE COLORS
+     ============================================ */
+  --switch-bg: #34495e;
+  --switch-active-bg: #6c5ce7;
+
+  /* ============================================
+     TRAIT HEADER COLORS
+     ============================================ */
+  --trait-header-odd: #493da1;        /* Purple tone for odd trait headers */
+  --trait-header-even: #2a235d;       /* Darker purple tone for even trait headers */
+  --trait-header-odd-hover: #544ab2;  /* Hover color for odd trait headers */
+  --trait-header-even-hover: #352c74;  /* Hover color for even trait headers */
+
+  /* ============================================
+     RULE HEADER COLORS
+     ============================================ */
+  --rule-header-odd: #2a1a5e;         /* Darker purple for odd rule headers */
+  --rule-header-even: #1c1245;        /* Even darker purple for even rule headers */
+  --rule-header-odd-hover: #321e70;    /* Hover color for odd rule headers */
+  --rule-header-even-hover: #241857;   /* Hover color for even rule headers */
+
+  /* ============================================
+     RARITY COLOR SCHEME
+     ============================================ */
+  --rarity-common: #00b894;           /* Green - Common (high percentage) */
+  --rarity-uncommon: #00cec9;         /* Teal - Uncommon */
+  --rarity-rare: #6c5ce7;             /* Purple - Rare */
+  --rarity-very-rare: #e84393;        /* Pink - Very rare */
+  --rarity-extremely-rare: #ff7675;   /* Red - Extremely rare (low percentage) */
+
+  /* ============================================
+     SLIDER TRACK COLORS
+     ============================================ */
+  --slider-track-bg: #333;
+  --slider-track-border: #444;
+
+  /* ============================================
+     ICON SIZE
+     ============================================ */
+  --icon-size: 20px;
+
+  /* ============================================
+     TRANSITIONS
+     ============================================ */
+  --transition-speed: 0.3s;
+}
+
+/* Apply Archivo font to all elements */
+*, *::before, *::after {
+  font-family: var(--font-family) !important;
+}
+

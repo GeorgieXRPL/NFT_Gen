@@ -16,11 +16,22 @@
   background-color: #000000 !important;
 }
 
-/* Ensure navigation tab options have transparent background */
-.nav-tab,
-.nav-tabs .nav-tab {
-  background-color: transparent !important;
-  background: transparent !important;
+/* Ensure unselected navigation tab options have black background */
+.nav-tab:not(.active),
+.nav-tabs .nav-tab:not(.active) {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+/* CRITICAL: Explicitly ensure Generate NFTs tab has black background when NOT active */
+.nav-tab[data-tab="generate-nfts"]:not(.active),
+body .nav-tab[data-tab="generate-nfts"]:not(.active),
+html body .nav-tab[data-tab="generate-nfts"]:not(.active),
+.nav-tabs .nav-tab[data-tab="generate-nfts"]:not(.active),
+body .nav-tabs .nav-tab[data-tab="generate-nfts"]:not(.active) {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  background-image: none !important;
 }
 
 /* Ensure no borders are visible in the navigation area */
@@ -36,6 +47,21 @@
   border-bottom: none !important;
   border-left: none !important;
   border-right: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* CRITICAL: Remove any pseudo-elements that could create lines */
+.nav-container::after,
+.nav-container::before,
+.nav-header::after,
+.nav-header::before,
+.nav-tabs-container::after,
+.nav-tabs-container::before,
+.nav-tabs::after,
+.nav-tabs::before {
+  display: none !important;
+  content: none !important;
 }
 
 /* Ensure the navigation container has a black background */
@@ -99,23 +125,37 @@ body .nav-tab:hover {
   background: transparent !important;
 }
 
-/* Ensure navigation tabs maintain transparent background on hover - EXCEPT Generate NFTs tab */
+/* Ensure navigation tabs maintain full black background on hover - EXCEPT Generate NFTs tab */
 /* This more specific rule overrides the general transparent rule above for non-active, non-generate-nfts tabs */
 body .nav-tab:hover:not(.active):not([data-tab="generate-nfts"]) {
-  background-color: rgba(108, 92, 231, 0.1) !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
 }
 
-/* Remove hover effect for Generate NFTs tab - keep transparent */
+/* CRITICAL: Completely disable ALL hover effects for Generate NFTs tab - maintain current state */
 body .nav-tab[data-tab="generate-nfts"]:hover:not(.active) {
-  background-color: transparent !important;
-  background: transparent !important;
+  background-color: #000000 !important; /* CRITICAL: Keep black background when inactive - NO hover effect */
+  background: #000000 !important; /* CRITICAL: Match inactive state exactly */
   color: #fff !important;
-  transition: none !important;
+  transition: none !important; /* CRITICAL: Remove all transitions */
 }
 
-/* Active navigation tabs should have transparent background */
+body .nav-tab[data-tab="generate-nfts"]:hover.active,
+body .nav-tab[data-tab="generate-nfts"].active:hover {
+  background-color: #0c0c0e !important; /* CRITICAL: Keep active background when active - NO hover effect */
+  background: #0c0c0e !important; /* CRITICAL: Match active state exactly */
+  color: #fff !important;
+  transition: none !important; /* CRITICAL: Remove all transitions */
+}
+
+/* Active navigation tabs should have #0c0c0e background with no border and rounded top corners (8px to match trait-layers-actions) */
 body .nav-tab.active,
 body .nav-tab.active:hover {
-  background-color: transparent !important;
-  background: transparent !important;
+  background-color: #0c0c0e !important;
+  background: #0c0c0e !important;
+  border: none !important;
+  border-top-left-radius: 8px !important; /* Match trait-layers-actions border-radius */
+  border-top-right-radius: 8px !important; /* Match trait-layers-actions border-radius */
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }

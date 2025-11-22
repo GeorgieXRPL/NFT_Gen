@@ -208,6 +208,8 @@
   position: relative;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .tooltip .tooltiptext {
   visibility: hidden;
   width: auto;
@@ -264,8 +266,10 @@
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
 }
+*/
 
 /* Adjust tooltip position for elements near the top of the screen */
+/*
 .tooltip.tooltip-bottom .tooltiptext {
   bottom: auto;
   top: 125%;
@@ -276,6 +280,7 @@
   bottom: 100%;
   border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
 }
+*/
 
 /* Ensure tooltips don't get cut off by parent containers */
 body {
@@ -295,6 +300,7 @@ body {
 }
 
 /* Adjust tooltip position for elements near the left edge of the screen */
+/*
 .tooltip.tooltip-left .tooltiptext {
   left: 0;
   transform: none;
@@ -304,8 +310,10 @@ body {
   left: 10px;
   margin-left: 0;
 }
+*/
 
 /* Adjust tooltip position for elements near the right edge of the screen */
+/*
 .tooltip.tooltip-right .tooltiptext {
   left: auto;
   right: 0;
@@ -317,6 +325,7 @@ body {
   right: 10px;
   margin-left: 0;
 }
+*/
 
 /* Redesigned trait layer header based on the sketch */
 .trait-layer-header {
@@ -838,9 +847,15 @@ body .tab-content > * {
   min-width: 1557px !important;
 }
 
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 .tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip {
   z-index: 99999 !important;
 }
+*/
 
 /* Remove z-index from all content elements */
 .trait-item,
@@ -851,6 +866,7 @@ body .tab-content > * {
   z-index: unset !important;
 }
 /* Floating UI only */
+/*
 .tooltip,
 .tooltiptext,
 .custom-tooltip,
@@ -861,6 +877,7 @@ body .tab-content > * {
 .notification-container {
   z-index: 9999 !important;
 }
+*/
 
 /* Trait selection modal must always be on top */
 #trait-selection-modal.modal-overlay {
@@ -869,6 +886,7 @@ body .tab-content > * {
 }
 
 /* --- CRITICAL: UNIFY TOOLTIP STYLE (NO BLUE BORDER) --- */
+/*
 .tooltip, .tooltiptext, .custom-tooltip {
   background: #181818 !important;
   color: #fff !important;
@@ -877,3 +895,4 @@ body .tab-content > * {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
   outline: none !important;
 }
+*/

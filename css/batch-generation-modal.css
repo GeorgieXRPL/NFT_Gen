@@ -57,6 +57,7 @@
   background: #222;
   border-radius: 12px 12px 0 0;
   gap: 0px;
+  position: relative; /* CRITICAL: Enable absolute positioning for close button */
 }
 
 .batch-generation-title-container {
@@ -271,15 +272,34 @@
   cursor: not-allowed;
 }
 
-.dark-mode-toggle {
-  background: #4a4a4a;
-  color: #ccc;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  position: relative;
+/* CRITICAL: Dark NFTs button in Bulk Generation modal - use same style as Generate NFTs tab */
+.batch-generation-modal .dark-mode-toggle,
+.batch-generation-modal #dark-mode-toggle {
+  position: relative !important; /* Use relative positioning to stay in normal flow */
+  display: flex !important; /* Preserve flex layout */
+  align-items: center !important; /* Ensure text is vertically centered */
+  justify-content: center !important; /* Ensure text is horizontally centered */
+  background-color: #2a2a2a !important;
+  background: #2a2a2a !important;
+  border: 2px solid #4a4a4a !important;
+  border-color: #4a4a4a !important;
+  color: #ffffff !important;
+  padding: 8px 14px !important;
+  width: 99px !important;
+  min-width: 99px !important;
+  height: 32px !important; /* Must be 32px, not 40px */
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 14px !important; /* Match Seed NFT toggle font-size - CRITICAL: No font size changes on hover */
+  font-weight: 500 !important; /* Match Seed NFT toggle font-weight */
+  line-height: 1 !important; /* Reset line-height to prevent text stretching */
+  white-space: nowrap !important; /* Prevent "Dark NFTs" text from wrapping to multiple lines */
+  z-index: 1000 !important; /* Higher than NFT preview panel (z-index: 5) */
+  cursor: pointer !important; /* Default cursor for enabled state */
+  margin-top: 0 !important; /* Reset margin - parent container handles vertical alignment */
+  align-self: center !important; /* Vertically center within parent flex container */
+  gap: 0 !important; /* Remove gap */
+  transition: none !important; /* Disable transitions to prevent movement */
 }
 
 .dark-mode-toggle .toggle-icon {
@@ -291,24 +311,64 @@
   font-weight: 500 !important; /* Standard button font weight */
 }
 
-.dark-mode-toggle:hover {
-  background: #5a5a5a;
-  border-color: #6a6a6a;
+/* Dark NFTs button when disabled/greyed out */
+.batch-generation-modal .dark-mode-toggle[disabled],
+.batch-generation-modal .dark-mode-toggle:disabled,
+.batch-generation-modal #dark-mode-toggle[disabled],
+.batch-generation-modal #dark-mode-toggle:disabled,
+.batch-generation-modal .dark-mode-toggle[data-tooltip-disabled="true"],
+.batch-generation-modal #dark-mode-toggle[data-tooltip-disabled="true"] {
+  background-color: #23232b !important;
+  background: #23232b !important;
+  border-color: #4a4a4a !important; /* Match Seed NFT border color when disabled */
+  border: 2px solid #4a4a4a !important; /* Match Seed NFT border color when disabled */
+  color: #a0a0b0 !important;
+  opacity: 0.6 !important;
+  cursor: default !important; /* Default cursor when disabled/greyed out (not help, not not-allowed) */
 }
 
-.dark-mode-toggle.active {
-  background: #00ff88;
-  color: #000000;
-  border-color: #00ff88;
+.batch-generation-modal .dark-mode-toggle:hover:not(.active):not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]),
+.batch-generation-modal #dark-mode-toggle:hover:not(.active):not([disabled]):not(:disabled):not([data-tooltip-disabled="true"]) {
+  background-color: #3a3a3a !important;
+  background: #3a3a3a !important;
+  border-color: #5a5a5a !important;
+}
+
+/* Dark NFTs button active state */
+.batch-generation-modal .dark-mode-toggle.active,
+.batch-generation-modal #dark-mode-toggle.active {
+  background-color: #00ff88 !important;
+  border-color: #00ff88 !important;
+  color: #000000 !important;
   box-shadow: 
     inset 0 3px 5px rgba(0, 0, 0, 0.5),
-    0 0 8px rgba(0, 255, 136, 1.0),
-    0 0 12px rgba(0, 255, 136, 0.95),
-    0 0 16px rgba(0, 255, 136, 0.8);
-  transform: none;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  animation: darkToggleActivate 0.3s ease-out;
+    0 0 10px rgba(0, 255, 136, 0.5),
+    0 0 20px rgba(0, 255, 136, 0.3) !important; /* Green halo effect */
+  height: 32px !important; /* Maintain 32px height in active state */
+  min-height: 32px !important;
+  max-height: 32px !important;
+  line-height: 1 !important; /* Prevent text stretching */
+  white-space: nowrap !important; /* Prevent text from wrapping */
+  font-size: 14px !important; /* Explicit font size - no changes on hover */
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  cursor: pointer !important; /* Not help cursor when active (no tooltip) */
+  transform: none !important; /* No transform - prevent movement */
+  translate: none !important; /* No translate - prevent movement */
+  position: relative !important; /* Maintain relative positioning */
+  top: 0 !important; /* No vertical offset */
+  left: 0 !important; /* No horizontal offset */
+  margin: 0 !important; /* No margins */
+  padding: 8px 14px !important; /* Maintain padding */
+  will-change: auto !important; /* Prevent browser optimizations */
+  transition: none !important; /* Disable transitions to prevent movement */
+  animation: none !important; /* Disable animation */
+}
+
+.batch-generation-modal .dark-mode-toggle.active:hover,
+.batch-generation-modal #dark-mode-toggle.active:hover {
+  background-color: #00e677 !important;
+  border-color: #00e677 !important;
 }
 
 /* Dark NFTs toggle activation animation - matching Seed NFT toggle structure */
@@ -406,33 +466,37 @@
   background: #c0392b;
 }
 
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: #444;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
+/* Batch Generation Modal Close Button - match saved seeds modal format */
+.batch-generation-modal .close-btn,
+#close-batch-modal {
+  position: absolute !important; /* CRITICAL: Match saved seeds modal format */
+  top: 15px !important;
+  right: 15px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border: none !important;
+  background: #444 !important;
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  z-index: 10002 !important; /* CRITICAL: Highest z-index in entire modal - above everything including tooltips (10001) */
 }
 
-.close-btn:hover {
-  background: #ff4444;
-  transform: scale(1.1);
+.batch-generation-modal .close-btn:hover,
+#close-batch-modal:hover {
+  background: #ff4444 !important;
+  transform: scale(1.1) !important;
 }
 
-.close-btn:active {
-  transform: scale(0.95);
+.batch-generation-modal .close-btn:active,
+#close-batch-modal:active {
+  transform: scale(0.95) !important;
 }
 
 /* Grid styles */
@@ -486,6 +550,7 @@
   background: #2c2c2c;
   border: 1px solid #444;
   border-radius: 8px;
+  overflow: hidden !important; /* CRITICAL: Prevent card content from spilling outside */
   padding: 12px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   cursor: pointer;
@@ -493,6 +558,8 @@
   width: 100% !important; /* Fixed width to prevent resizing */
   min-width: 0 !important; /* Prevent grid from expanding cards */
   flex-shrink: 0 !important; /* Prevent cards from shrinking */
+  max-width: 100% !important; /* CRITICAL: Ensure card doesn't exceed grid cell width */
+  box-sizing: border-box !important; /* Ensure padding is included in width calculation */
 }
 
 .saved-seed-card:hover {
@@ -527,6 +594,7 @@
   gap: 5px;
   position: relative;
   z-index: 10;
+  overflow: visible !important; /* CRITICAL: Allow tooltips to overflow */
 }
 
 .seed-card-btn {
@@ -542,13 +610,11 @@
   font-size: 7px;
   font-weight: 500;
   font-family: 'Archivo', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  display: flex !important; /* CRITICAL: Ensure flex display for centering */
+  align-items: center !important; /* CRITICAL: Vertically center text */
+  justify-content: center !important; /* CRITICAL: Horizontally center text */
+  text-align: center !important; /* CRITICAL: Center text alignment */
   white-space: nowrap;
-  position: relative;
-  z-index: 10;
   min-width: 32px;
   height: 20px;
 }
@@ -640,12 +706,15 @@
   background: #c0392b !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Ensure tooltip text uses consistent styling */
 .batch-generation-modal .tooltip .tooltiptext {
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
 }
+*/
 
 .seed-card-image {
   width: 100%;
@@ -669,6 +738,7 @@
   font-size: 12px;
   position: relative;
   z-index: 10;
+  overflow: visible !important; /* CRITICAL: Allow tooltips to overflow */
 }
 
 .trait-item {
@@ -815,34 +885,7 @@
   font-family: 'Archivo', sans-serif;
 }
 
-.close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: #444;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.close-btn:hover {
-  background: #ff4444;
-  transform: scale(1.1);
-}
-
-.close-btn:active {
-  transform: scale(0.95);
-}
+/* Close button styles moved to lines 410-441 - use .batch-generation-modal .close-btn selector */
 
 /* Modal body */
 .modal-body {

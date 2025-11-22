@@ -87,7 +87,7 @@ class SavedSeedsModal {
       return;
     }
     
-    console.log('[DEBUG] Performing memory cleanup...');
+    // console.log('[DEBUG] Performing memory cleanup...');
     
     // Cleanup image cache if it's too large
     if (this.imageCache && Object.keys(this.imageCache).length > this.maxImageCacheSize) {
@@ -128,11 +128,11 @@ class SavedSeedsModal {
     // Force garbage collection if available
     if (window.gc) {
       window.gc();
-      console.log('[DEBUG] Forced garbage collection');
+      // console.log('[DEBUG] Forced garbage collection');
     }
     
     this.lastMemoryCleanup = now;
-    console.log('[DEBUG] Memory cleanup completed');
+    // console.log('[DEBUG] Memory cleanup completed');
   }
   
   // MEMORY OPTIMIZATION: Stop memory cleanup
@@ -1775,12 +1775,12 @@ class SavedSeedsModal {
       width: 100vw !important;
       height: 100vh !important;
       background: rgba(0, 0, 0, 0.85) !important;
-      display: flex !important;
+      display: none !important; /* CRITICAL: Hide popup but keep code - loading animation is now displayed instead */
       align-items: center !important;
       justify-content: center !important;
       z-index: 99999 !important;
       font-family: 'Archivo', sans-serif !important;
-      pointer-events: all !important;
+      pointer-events: none !important; /* CRITICAL: Disable pointer events since popup is hidden */
     `;
     
     // CRITICAL: Prevent tab navigation while popup is showing (same as project loading)
@@ -1902,6 +1902,13 @@ class SavedSeedsModal {
       }
       popup.remove();
       console.log('[DEBUG] Please Wait popup hidden');
+      
+      // CRITICAL: Hide loading animation when popup is hidden (popup is now hidden but code kept)
+      // Loading animation should be hidden when all operations complete
+      const projectService = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('projectService');
+      if (projectService && projectService.hideLoadingAnimation) {
+        projectService.hideLoadingAnimation();
+      }
       
       // CRITICAL: Update button states after "Please Wait" popup is hidden
       // This ensures buttons are enabled only after all tasks are completed
@@ -3585,8 +3592,7 @@ class SavedSeedsModal {
               <h2 class="saved-seeds-title">NFTs Collection</h2>
               <div class="saved-seeds-tip">* View, edit, reorder, scan and<br>find any NFT on your collection.</div>
             </div>
-            <button id="close-saved-seeds-modal" class="saved-seeds-close-btn tooltip">
-              <span class="tooltiptext">Close modal</span>
+            <button id="close-saved-seeds-modal" class="saved-seeds-close-btn">
               &times;
             </button>
             <div class="saved-seeds-actions">
@@ -3611,21 +3617,21 @@ class SavedSeedsModal {
                 <div id="trait-Rarities-status-text" class="rarity-status-text">---</div>
               </div>
               <div class="rarity-search-container">
-                <label for="rarity-search-input" class="rarity-search-label tooltip" id="rarity-search-label" style="cursor: pointer;">Find Rarity:
+                <label for="rarity-search-input" class="rarity-search-label tooltip" id="rarity-search-label" style="cursor: help;">Find Rarity:
                   <span class="tooltiptext">Click to toggle Between<br>Rarity and Position search.</span>
                 </label>
                 <div class="rarity-search-input-wrapper tooltip">
                   <input type="text" id="rarity-search-input" class="rarity-search-input" placeholder="Enter rarity rank or interval (e.g., 20 or 1-8)">
                   <span class="tooltiptext" id="rarity-search-tooltip">
-                    <strong>Base Search Description:</strong> Search functionality for finding NFTs in your collection.<br>
-                    <strong>Find Rarity:</strong> Enter a rarity rank number or range to find NFTs with specific rarity ranks. For example, "20" finds the NFT with rarity rank 20, or "1-8" finds NFTs with ranks between 1 and 8.
+                    Find Rarity: Enter a rarity rank number or<br>range to find NFTs with specific rarity ranks.<br><br>
+                    For example, "20" finds the NFT with rank 20,<br>or "1-8" finds NFTs with ranks between 1 and 8.
                   </span>
                 </div>
                 <button id="search-rarity-btn" class="saved-seeds-btn search-rarity-btn tooltip">Search
-                  <span class="tooltiptext">Run the search using the current mode (rarity or position) and show matching NFTs.</span>
+                  <span class="tooltiptext">Run the search using the current mode ('Find Rarity'<br>or 'Find NFT #') and show matching NFTs.</span>
                 </button>
                 <button id="clear-search-btn" class="saved-seeds-btn clear-search-btn tooltip">Clear
-                  <span class="tooltiptext">Clear the current search and restore all NFTs.</span>
+                  <span class="tooltiptext">Clear the current search<br>and display all NFTs.</span>
                 </button>
               </div>
               <div class="trait-search-container">
@@ -3633,10 +3639,10 @@ class SavedSeedsModal {
                 <div class="trait-search-input-wrapper tooltip">
                   <input type="text" id="trait-search-input" class="trait-search-input" placeholder="e.g., bandana, eyes, hat AND red, background OR eyes">
                   <span class="tooltiptext">
-                    <strong>Enhanced Search Features:</strong> You can search using single words like "red" or multiple words like "red hat" for precise results<br>
-                    <strong>Advanced Search Options:</strong> Use OR search with "hat OR cap" to find traits matching either term<br>
-                    <strong>Complex Search Patterns:</strong> Use AND search with "hat AND red" or comma separated terms like "hat, red"<br>
-                    <em>This powerful search functionality works on both trait names and layer names throughout the entire collection!</em>
+                    Search for words like "red" or multiple<br>words like "red hat" for precise results<br><br>
+                    Advanced Search Options:<br>Use OR search with "hat OR cap" to<br>find traits matching either term.<br>
+                    Complex Search Patters:<br>Use AND search with "hat AND red"<br>or comma separated terms like<br>"hat, red".<br><br>
+                    <em>This powerful search functionality<br>works on both trait names and layer<br>names throughout the entire collection!</em>
                   </span>
                 </div>
                 <button id="search-trait-btn" class="saved-seeds-btn search-trait-btn tooltip" style="display: none;">Search
@@ -3796,6 +3802,15 @@ class SavedSeedsModal {
         calculateText.textContent = originalCalculateText;
         rarityText.textContent = originalRarityText;
         button.style.opacity = '1';
+        // CRITICAL: Re-setup tooltip after button is restored to ensure it works
+        const tooltipText = button.querySelector('.tooltiptext');
+        if (tooltipText) {
+          const tooltipManagerRestore = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (tooltipManagerRestore && tooltipManagerRestore.setupTooltip) {
+            button.removeAttribute('data-tooltip-setup');
+            tooltipManagerRestore.setupTooltip(button, tooltipText);
+          }
+        }
       }
     };
     
@@ -3976,6 +3991,18 @@ class SavedSeedsModal {
       const newRerenderBtn = rerenderBtn.cloneNode(true);
       rerenderBtn.parentNode.replaceChild(newRerenderBtn, rerenderBtn);
       const freshRerenderBtn = this.modal.querySelector('#rerender-thumbnails');
+      
+      // CRITICAL: Set up tooltip for Calculate Trait Rarities button after cloning
+      // This ensures the tooltip is positioned correctly (above and horizontally centered)
+      const rerenderTooltipText = freshRerenderBtn.querySelector('.tooltiptext');
+      if (rerenderTooltipText) {
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          // Remove data-tooltip-setup attribute to allow re-setup after cloning
+          freshRerenderBtn.removeAttribute('data-tooltip-setup');
+          tooltipManager.setupTooltip(freshRerenderBtn, rerenderTooltipText);
+        }
+      }
       
       freshRerenderBtn.addEventListener('click', async (e) => {
         // Prevent action if button is disabled, but allow tooltip to show
@@ -4778,18 +4805,20 @@ class SavedSeedsModal {
     // The 'index' parameter is already the global index passed from renderPage
     const nftNumber = index + 1;
     const nftNumberDisplay = `<div class="seed-card-number-display">#${nftNumber}</div>`;
+    // CRITICAL: Make ID unique per card to avoid duplicate IDs (use seed value for uniqueness)
+    const nftDescriptionId = `nft-description-${seedObj.seed}`;
 
     card.innerHTML = `
       <div class="seed-card-thumbnail">
         <div class="seed-card-loading">Loading<span class="loading-dots">...</span><br>Please Wait.</div>
         ${rarityDisplay}
         ${nftNumberDisplay}
-          <button class="seed-desc-btn tooltip" data-action="edit-description" title="Add a custom description for this NFT" aria-label="Edit description">
+          <button id="${nftDescriptionId}" class="seed-desc-btn tooltip" data-action="edit-description" aria-label="Edit description">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 20h9"/>
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
             </svg>
-            <span class="tooltiptext">Create or edit a personalized<br>description for this particular NFT</span>
+            <span class="tooltiptext">Create or edit a description<br>for this NFT</span>
           </button>
       </div>
       <div class="seed-card-info">
@@ -4802,7 +4831,7 @@ class SavedSeedsModal {
             <span class="tooltiptext">Copy this NFT's seed<br>to your clipboard</span>
           </button>
           <button class="seed-card-btn delete-btn tooltip" data-action="delete">DELETE
-            <span class="tooltiptext">Remove this saved NFT<br>from your collection</span>
+            <span class="tooltiptext">Delete this NFT from<br>your Collection</span>
           </button>
         </div>
       </div>
@@ -5414,6 +5443,12 @@ class SavedSeedsModal {
             rerenderBtn.appendChild(tip);
           }
           tip.innerHTML = 'updated: trait rarities are in sync with current collection.';
+          // CRITICAL: Re-setup tooltip with global tooltip manager after state change (ensures horizontal centering)
+          const tooltipManagerRerenderUpdated = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (tooltipManagerRerenderUpdated && tooltipManagerRerenderUpdated.setupTooltip) {
+            rerenderBtn.removeAttribute('data-tooltip-setup');
+            tooltipManagerRerenderUpdated.setupTooltip(rerenderBtn, tip);
+          }
         } else {
           rerenderBtn.classList.remove('button-updated');
           rerenderBtn.classList.add('button-outdated');
@@ -5425,6 +5460,12 @@ class SavedSeedsModal {
             rerenderBtn.appendChild(tip);
           }
           tip.innerHTML = 'outdated: recalculate trait rarities to reflect actual usage.';
+          // CRITICAL: Re-setup tooltip with global tooltip manager after state change (ensures horizontal centering)
+          const tooltipManagerRerenderOutdated = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (tooltipManagerRerenderOutdated && tooltipManagerRerenderOutdated.setupTooltip) {
+            rerenderBtn.removeAttribute('data-tooltip-setup');
+            tooltipManagerRerenderOutdated.setupTooltip(rerenderBtn, tip);
+          }
         }
       }
     } else if (buttonType === 'calculate') {
@@ -5463,6 +5504,12 @@ class SavedSeedsModal {
             calculateBtn.appendChild(tip);
           }
           tip.innerHTML = 'updated: rarity ranks are current.';
+          // CRITICAL: Re-setup tooltip with global tooltip manager after state change
+          const tooltipManagerCalcUpdated = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (tooltipManagerCalcUpdated && tooltipManagerCalcUpdated.setupTooltip) {
+            calculateBtn.removeAttribute('data-tooltip-setup');
+            tooltipManagerCalcUpdated.setupTooltip(calculateBtn, tip);
+          }
         } else {
           calculateBtn.classList.remove('button-updated');
           calculateBtn.classList.add('button-outdated');
@@ -5482,6 +5529,12 @@ class SavedSeedsModal {
             calculateBtn.appendChild(tip);
           }
           tip.innerHTML = 'outdated: run calculation to refresh rarity ranks.';
+          // CRITICAL: Re-setup tooltip with global tooltip manager after state change
+          const tooltipManagerCalcOutdated = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (tooltipManagerCalcOutdated && tooltipManagerCalcOutdated.setupTooltip) {
+            calculateBtn.removeAttribute('data-tooltip-setup');
+            tooltipManagerCalcOutdated.setupTooltip(calculateBtn, tip);
+          }
         }
       }
     }
@@ -5539,18 +5592,34 @@ class SavedSeedsModal {
       statusElement.className = 'rarity-status-text updated';
       // Tooltip for trait rarities updated
       statusElement.classList.add('tooltip');
-      const tip = statusElement.querySelector('.tooltiptext') || document.createElement('span');
-      tip.className = 'tooltiptext';
+      let tip = statusElement.querySelector('.tooltiptext');
+      if (!tip) {
+        tip = document.createElement('span');
+        tip.className = 'tooltiptext';
+        statusElement.appendChild(tip);
+      }
       tip.innerHTML = 'your collection displays now the<br>exact rarity of every single trait.';
-      if (!tip.parentElement) statusElement.appendChild(tip);
+      // CRITICAL: Setup tooltip with global tooltip manager to ensure it's displayed
+      const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+      if (tooltipManager && tooltipManager.setupTooltip) {
+        tooltipManager.setupTooltip(statusElement, tip);
+      }
     } else if (status === 'outdated') {
       statusElement.textContent = 'outdated';
       statusElement.className = 'rarity-status-text outdated';
       statusElement.classList.add('tooltip');
-      const tip = statusElement.querySelector('.tooltiptext') || document.createElement('span');
-      tip.className = 'tooltiptext';
+      let tip = statusElement.querySelector('.tooltiptext');
+      if (!tip) {
+        tip = document.createElement('span');
+        tip.className = 'tooltiptext';
+        statusElement.appendChild(tip);
+      }
       tip.innerHTML = 'Trait rarities are outdated.<br>Recalculate to reflect actual usage.';
-      if (!tip.parentElement) statusElement.appendChild(tip);
+      // CRITICAL: Setup tooltip with global tooltip manager to ensure it's displayed
+      const tooltipManagerOutdated = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+      if (tooltipManagerOutdated && tooltipManagerOutdated.setupTooltip) {
+        tooltipManagerOutdated.setupTooltip(statusElement, tip);
+      }
     } else {
       statusElement.textContent = '---';
       statusElement.className = 'rarity-status-text';
@@ -8008,33 +8077,104 @@ class SavedSeedsModal {
   async copySeed(seedObj, button) {
     try {
       await navigator.clipboard.writeText(seedObj.seed);
-      const originalText = button.textContent;
+      // Get the text node (the button text "COPY") - preserve tooltip
+      let textNode = null;
+      for (let node of button.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+          textNode = node;
+          break;
+        }
+      }
+      const originalText = textNode ? textNode.textContent.trim() : 'COPY';
       const originalBackground = button.style.backgroundColor;
       const originalColor = button.style.color;
       const originalFontWeight = button.style.fontWeight;
       
-      // Set copied state with vivid green
-      button.textContent = 'Copied';
+      // Set copied state with vivid green - CRITICAL: Preserve tooltip element
+      // Only change the text node, not the entire content (preserves tooltip)
+      if (textNode) {
+        textNode.textContent = 'Copied';
+      } else {
+        // If no text node found, create one and insert before tooltip
+        const copiedNode = document.createTextNode('Copied');
+        const tooltipElement = button.querySelector('.tooltiptext');
+        if (tooltipElement) {
+          button.insertBefore(copiedNode, tooltipElement);
+        } else {
+          button.appendChild(copiedNode);
+        }
+      }
       button.style.backgroundColor = '#00ff00'; // Vivid green
       button.style.color = '#000000'; // Black text for contrast
       button.style.fontWeight = 'bold';
       
       setTimeout(() => {
-        button.textContent = originalText;
+        // Restore button text while preserving tooltip
+        const currentTextNode = Array.from(button.childNodes).find(node => 
+          node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+        );
+        if (currentTextNode) {
+          currentTextNode.textContent = originalText;
+        } else {
+          // If no text node found, create one and insert before tooltip
+          const textNodeToRestore = document.createTextNode(originalText);
+          const tooltipToPreserve = button.querySelector('.tooltiptext');
+          if (tooltipToPreserve) {
+            button.insertBefore(textNodeToRestore, tooltipToPreserve);
+          } else {
+            button.appendChild(textNodeToRestore);
+          }
+        }
         button.style.backgroundColor = originalBackground;
         button.style.color = originalColor;
         button.style.fontWeight = originalFontWeight;
       }, 1500);
     } catch (error) {
       console.error('Failed to copy seed:', error);
-      // Show brief error feedback instead of alert
-      const originalText = button.textContent;
-      button.textContent = 'Failed';
+      // Show brief error feedback instead of alert - CRITICAL: Preserve tooltip element
+      // Get the text node (the button text "COPY") - preserve tooltip
+      let textNodeForError = null;
+      for (let node of button.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+          textNodeForError = node;
+          break;
+        }
+      }
+      const originalText = textNodeForError ? textNodeForError.textContent.trim() : 'COPY';
+      
+      // Change only the text node, not the entire content (preserves tooltip)
+      if (textNodeForError) {
+        textNodeForError.textContent = 'Failed';
+      } else {
+        // If no text node found, create one and insert before tooltip
+        const failedNode = document.createTextNode('Failed');
+        const tooltipElement = button.querySelector('.tooltiptext');
+        if (tooltipElement) {
+          button.insertBefore(failedNode, tooltipElement);
+        } else {
+          button.appendChild(failedNode);
+        }
+      }
       button.style.backgroundColor = '#ff0000'; // Red for error
       button.style.color = '#ffffff';
       
       setTimeout(() => {
-        button.textContent = originalText;
+        // Restore button text while preserving tooltip
+        const currentTextNodeForError = Array.from(button.childNodes).find(node => 
+          node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+        );
+        if (currentTextNodeForError) {
+          currentTextNodeForError.textContent = originalText;
+        } else {
+          // If no text node found, create one and insert before tooltip
+          const textNodeToRestoreError = document.createTextNode(originalText);
+          const tooltipToPreserveError = button.querySelector('.tooltiptext');
+          if (tooltipToPreserveError) {
+            button.insertBefore(textNodeToRestoreError, tooltipToPreserveError);
+          } else {
+            button.appendChild(textNodeToRestoreError);
+          }
+        }
         button.style.backgroundColor = '';
         button.style.color = '';
       }, 1500);
@@ -12224,6 +12364,22 @@ class SavedSeedsModal {
       // Toggle visual state classes for button-like styles
       label.classList.toggle('mode-rarity', this.raritySearchMode === 'rarity');
       label.classList.toggle('mode-position', this.raritySearchMode === 'position');
+      // CRITICAL: Ensure help cursor is always shown for tooltip
+      label.style.cursor = 'help';
+      // CRITICAL: Ensure tooltip class is present
+      if (!label.classList.contains('tooltip')) {
+        label.classList.add('tooltip');
+      }
+      // CRITICAL: Re-setup tooltip after mode change to ensure it works correctly
+      const labelTooltip = label.querySelector('.tooltiptext');
+      if (labelTooltip) {
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          label.removeAttribute('data-tooltip-setup');
+          delete label.dataset.tooltipSetup;
+          tooltipManager.setupTooltip(label, labelTooltip);
+        }
+      }
     }
     
     if (input) {
@@ -12262,7 +12418,7 @@ class SavedSeedsModal {
     // Mode-specific description
     let modeDescription = '';
     if (this.raritySearchMode === 'rarity') {
-      modeDescription = '<strong>Find Rarity:</strong> Enter a rarity rank number or range to find NFTs with specific rarity ranks.<br><br>For example, "20" finds the NFT with rarity rank 20, or "1-8" finds NFTs with ranks between 1 and 8.';
+      modeDescription = 'Find Rarity: Enter a rarity rank number or<br>range to find NFTs with specific rarity ranks.<br><br>For example, "20" finds the NFT with rank 20,<br>or "1-8" finds NFTs with ranks between 1 and 8.';
     } else {
       modeDescription = '<strong>Find NFT #:</strong> Enter a position number or range to find NFTs at specific positions in your collection.<br><br>For example, "#234" finds the NFT at position 234, "1-10" finds NFTs at positions 1 through 10, or "1,5,10" finds NFTs at positions 1, 5, and 10.';
     }
@@ -13123,15 +13279,21 @@ class SavedSeedsModal {
         statusElement.className = 'rarity-status-text updated';
         // Add tooltip for updated status
         statusElement.classList.add('tooltip');
-        if (!statusElement.querySelector('.tooltiptext')) {
-          const tip = document.createElement('span');
-          tip.className = 'tooltiptext';
+        let tooltipText = statusElement.querySelector('.tooltiptext');
+        if (!tooltipText) {
+          tooltipText = document.createElement('span');
+          tooltipText.className = 'tooltiptext';
           const total = this.seedList?.length || 0;
-          tip.innerHTML = `Every NFT in your collection has it's correct<br>Rarity Rank calculated (from 1 to ${total || 'total supply'}).`;
-          statusElement.appendChild(tip);
+          tooltipText.innerHTML = `Every NFT in your collection has it's correct<br>Rarity Rank calculated (from 1 to ${total || 'total supply'}).`;
+          statusElement.appendChild(tooltipText);
         } else {
           const total = this.seedList?.length || 0;
-          statusElement.querySelector('.tooltiptext').innerHTML = `Every NFT in your collection has it's correct<br>Rarity Rank calculated (from 1 to ${total || 'total supply'}).`;
+          tooltipText.innerHTML = `Every NFT in your collection has it's correct<br>Rarity Rank calculated (from 1 to ${total || 'total supply'}).`;
+        }
+        // CRITICAL: Setup tooltip with global tooltip manager
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(statusElement, tooltipText);
         }
         break;
       case 'outdated':
@@ -13139,13 +13301,19 @@ class SavedSeedsModal {
         statusElement.className = 'rarity-status-text outdated';
         // Add tooltip for outdated status
         statusElement.classList.add('tooltip');
-        if (!statusElement.querySelector('.tooltiptext')) {
-          const tip = document.createElement('span');
-          tip.className = 'tooltiptext';
-          tip.innerHTML = 'outdated: re-run calculations<br>to update Rarity Ranks';
-          statusElement.appendChild(tip);
+        let tooltipTextOutdated = statusElement.querySelector('.tooltiptext');
+        if (!tooltipTextOutdated) {
+          tooltipTextOutdated = document.createElement('span');
+          tooltipTextOutdated.className = 'tooltiptext';
+          tooltipTextOutdated.innerHTML = 'outdated: re-run calculations<br>to update Rarity Ranks';
+          statusElement.appendChild(tooltipTextOutdated);
         } else {
-          statusElement.querySelector('.tooltiptext').innerHTML = 'outdated: re-run calculations<br>to update Rarity Ranks';
+          tooltipTextOutdated.innerHTML = 'outdated: re-run calculations<br>to update Rarity Ranks';
+        }
+        // CRITICAL: Setup tooltip with global tooltip manager
+        const tooltipManagerOutdated = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManagerOutdated && tooltipManagerOutdated.setupTooltip) {
+          tooltipManagerOutdated.setupTooltip(statusElement, tooltipTextOutdated);
         }
         break;
       case 'calculating':

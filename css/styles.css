@@ -1,6 +1,6 @@
 :root {
   --bg-primary: #000000; /* Changed from #0f0f13 to full black */
-  --bg-secondary: #111111; /* Changed from #1a1a23 to full black */
+  --bg-secondary: #111111; /* Changed from #0c0c0e to full black */
   --text-primary: #ffffff;
   --text-secondary: #a0a0b0;
   --accent-primary: #6c5ce7;
@@ -318,6 +318,7 @@ body {
   background: #000 !important;
   display: block !important;
   border-bottom: none !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
 }
 
 .nav-header, .nav-tabs-container, .nav-actions {
@@ -345,6 +346,69 @@ body {
   filter: none !important;
   opacity: 1 !important;
   visibility: visible !important;
+  border-top: none !important; /* Remove border to eliminate black line between navigation and content */
+  transition: none !important; /* CRITICAL: Remove all transitions to prevent delays */
+}
+
+/* CRITICAL: Ensure Generate NFTs tab has immediate dark background */
+#generate-nfts.tab-content,
+#generate-nfts.tab-content.active {
+  background: #0c0c0e !important; /* CRITICAL: Set dark background immediately */
+  background-color: #0c0c0e !important; /* Match active tab background */
+  transition: none !important; /* CRITICAL: Remove all transitions */
+  opacity: 1 !important; /* CRITICAL: Ensure full opacity immediately */
+  visibility: visible !important; /* CRITICAL: Ensure visibility immediately */
+}
+
+/* CRITICAL: Remove border-top from content-area to eliminate black line */
+.content-area {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+/* CRITICAL: Ensure navigation containers have no bottom border */
+.nav-container,
+.nav-header,
+.nav-tabs-container,
+.nav-tabs {
+  border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* CRITICAL: Remove all borders, outlines, and box-shadows from project-interface */
+.project-interface {
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* CRITICAL: Ensure nav-tab.active background extends seamlessly to content */
+.nav-tab.active {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+/* CRITICAL: Remove any pseudo-elements that could create lines */
+.nav-tabs-container::after,
+.nav-tabs-container::before,
+.nav-container::after,
+.nav-container::before,
+.nav-header::after,
+.nav-header::before,
+.nav-tabs::after,
+.nav-tabs::before,
+.content-area::before,
+.content-area::after,
+.tab-content::before,
+.tab-content::after {
+  display: none !important;
+  content: none !important;
 }
 .tab-content:not(.active) {
   opacity: 0 !important;
@@ -355,7 +419,8 @@ body {
 }
 
 /* Only floating UI should have z-index: 9999 */
-.modal, .modal-overlay, .tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip, .feedback-message, .feedback-fixed-position, .fixed-notification-container {
+/* CRITICAL: Tooltip z-index is now controlled by css/components/tooltip.css using CSS variables */
+.modal, .modal-overlay, .custom-tooltip, .randomize-tooltip, .feedback-message, .feedback-fixed-position, .fixed-notification-container {
   z-index: 9999 !important;
 }
 
@@ -467,49 +532,100 @@ body {
   cursor: pointer;
   transition: none !important;
   border-bottom: 3px solid transparent;
+  border: none !important; /* Remove border from navigation tab background */
   white-space: nowrap;
   flex-shrink: 0; /* Prevent tabs from shrinking */
   padding-left: 1rem !important;
   padding-right: 1rem !important;
+  box-sizing: border-box !important; /* Ensure border is included in width calculation */
+  /* CRITICAL: Ensure text positioning is fixed and does not move when selected */
+  line-height: 1 !important;
+  vertical-align: baseline !important;
 }
 
 .nav-tab.active {
   color: var(--accent-primary);
-  border-bottom: 3px solid var(--accent-primary);
+  background-color: #0c0c0e !important;
+  background: #0c0c0e !important;
+  border: none !important; /* Remove border from navigation tab background */
+  border-top-left-radius: 8px !important; /* Match trait-layers-actions border-radius */
+  border-top-right-radius: 8px !important; /* Match trait-layers-actions border-radius */
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-sizing: border-box !important; /* Ensure border is included in width calculation */
+  /* CRITICAL: Ensure text positioning is fixed and does not move when selected */
+  line-height: 1 !important;
+  vertical-align: baseline !important;
+  padding: 1rem 2rem !important; /* Match inactive tab padding exactly */
+}
+
+.nav-tab:not(.active) {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+/* CRITICAL: Explicitly ensure Generate NFTs tab has black background when NOT active */
+.nav-tab[data-tab="generate-nfts"]:not(.active),
+body .nav-tab[data-tab="generate-nfts"]:not(.active),
+html body .nav-tab[data-tab="generate-nfts"]:not(.active),
+.nav-tabs .nav-tab[data-tab="generate-nfts"]:not(.active),
+body .nav-tabs .nav-tab[data-tab="generate-nfts"]:not(.active) {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  background-image: none !important;
 }
 
 .nav-tab:hover, .nav-tab:hover:not(.active) {
-  background: none !important;
+  background: #000000 !important;
+  background-color: #000000 !important;
   color: inherit !important;
   box-shadow: none !important;
   outline: none !important;
-  border: none !important;
+  border: none !important; /* Remove border from navigation tab background */
   filter: none !important;
   transform: none !important;
   cursor: pointer !important;
   transition: none !important; /* Remove transition to prevent hover animations */
 }
 
-/* Remove all hover animations for Generate NFTs tab specifically */
-.nav-tab[data-tab="generate-nfts"]:hover,
+/* CRITICAL: Completely disable ALL hover effects for Generate NFTs tab - maintain current state */
 .nav-tab[data-tab="generate-nfts"]:hover:not(.active) {
-  background: transparent !important;
-  background-color: transparent !important;
+  background: #000000 !important; /* CRITICAL: Keep black background when inactive - NO hover effect */
+  background-color: #000000 !important; /* CRITICAL: Match inactive state exactly */
   color: #fff !important;
   box-shadow: none !important;
   outline: none !important;
   border: none !important;
   filter: none !important;
   transform: none !important;
-  transition: none !important;
+  transition: none !important; /* CRITICAL: Remove all transitions */
   cursor: pointer !important;
+  pointer-events: auto !important;
 }
 
+.nav-tab[data-tab="generate-nfts"]:hover.active,
+.nav-tab[data-tab="generate-nfts"].active:hover {
+  background: #0c0c0e !important; /* CRITICAL: Keep active background when active - NO hover effect */
+  background-color: #0c0c0e !important; /* CRITICAL: Match active state exactly */
+  color: #fff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important; /* CRITICAL: Remove all transitions */
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Disable tooltips for navigation tabs */
 /* CRITICAL: Navigation tab tooltips are controlled by JavaScript - override display: none */
 .nav-tab.tooltip .tooltiptext {
   display: block !important; /* Override display: none - JavaScript controls visibility */
 }
+*/
 
 /* Disabled navigation tabs */
 .nav-tab.disabled {
@@ -525,6 +641,8 @@ body {
   box-shadow: none !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Enable tooltips for disabled tabs */
 .nav-tab.disabled .tooltiptext {
   display: block !important;
@@ -538,12 +656,25 @@ body {
   z-index: 1000 !important;
   pointer-events: none !important;
 }
+*/
 
 /* Content Area */
 /* Add some padding to the content area to account for fixed nav */
 .content-area {
   padding-top: 1rem;
   padding: 2rem 2rem 2rem 0 !important;
+}
+
+/* CRITICAL: Override content-area padding-top when Generate NFTs tab is active */
+/* Use maximum specificity to ensure this overrides all other rules */
+html body #app .project-interface .content-area.generate-nfts-content-active,
+html body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+body #app .project-interface .content-area.generate-nfts-content-active,
+body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+.content-area.generate-nfts-content-active,
+.content-area:has(#generate-nfts.tab-content.active) {
+  padding-top: 0 !important;
+  padding: 0 2rem 2rem 0 !important; /* Override padding shorthand, keep only right and bottom padding */
 }
 
 /* ========================================
@@ -842,7 +973,7 @@ body {
 
 /* Ensure drag handle is visible */
 .trait-layer-drag-handle {
-  cursor: grab;
+  cursor: grab !important; /* CRITICAL: Grab cursor to indicate draggability */
   padding: 8px;
   margin-right: 8px;
   color: var(--text-secondary);
@@ -851,10 +982,11 @@ body {
 
 .trait-layer-drag-handle:hover {
   color: var(--text-primary);
+  cursor: grab !important; /* CRITICAL: Ensure grab cursor on hover */
 }
 
 .trait-layer-bar.expanded .trait-layer-drag-handle {
-  cursor: default;
+  cursor: not-allowed !important; /* Changed from default to not-allowed for expanded layers */
   color: var(--text-secondary);
 }
 
@@ -1012,8 +1144,18 @@ body {
   color: var(--text-primary);
 }
 
-.position-btn:disabled {
+.position-btn:disabled,
+.position-btn[disabled] {
+  color: #666;
   opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.position-btn:disabled:hover,
+.position-btn[disabled]:hover {
+  color: #666;
+  background-color: transparent;
   cursor: not-allowed;
 }
 
@@ -1271,6 +1413,8 @@ body {
   white-space: nowrap; /* Prevent text wrapping */
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .trait-rarity-actions .tooltiptext {
   width: 250px;
   white-space: normal;
@@ -1278,6 +1422,7 @@ body {
   line-height: 1.2 !important; /* Match standard tooltip line-height */
   padding: 8px 12px !important; /* Equal top/bottom padding for vertical centering */
 }
+*/
 
 /* Special styling for the randomize rarities tooltip */
 /* Make sure the randomize tooltip is visible and properly styled */
@@ -1599,6 +1744,11 @@ body {
   word-break: break-word; /* Added to prevent overflow */
 }
 
+/* CRITICAL: Seed number in notification tooltip - 2px smaller font size */
+.notification-message .notification-seed-number {
+  font-size: calc(1em - 2px) !important; /* 2px smaller than parent font size */
+}
+
 /* Add specific styles for error messages */
 .notification-message.error-message {
   font-size: 0.85rem; /* Smaller font for error messages */
@@ -1775,7 +1925,7 @@ body {
 }
 
 .modal {
-  background-color: #1a1a23; /* Dark grey background for all modals */
+  background-color: #0c0c0e; /* Dark grey background for all modals */
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
@@ -1793,7 +1943,7 @@ body {
   align-items: center;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background-color: #1a1a23; /* Dark grey background */
+  background-color: #0c0c0e; /* Dark grey background */
 }
 
 .modal-header h3 {
@@ -1808,7 +1958,7 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background-color: #1a1a23; /* Dark grey background */
+  background-color: #0c0c0e; /* Dark grey background */
 }
 
 .modal-footer {
@@ -1817,7 +1967,7 @@ body {
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-color);
-  background-color: #1a1a23; /* Dark grey background */
+  background-color: #0c0c0e; /* Dark grey background */
 }
 
 /* Specific styles for the combination rule modal */
@@ -1906,7 +2056,7 @@ body {
 
 /* Add a dark grey background to the Rules headers */
 .rule-header {
-  background-color: #1a1a23; /* Dark grey background to match modals */
+  background-color: #0c0c0e; /* Dark grey background to match modals */
   color: var(--text-primary);
 }
 
@@ -1978,12 +2128,20 @@ body {
 
 /* Find the tooltip styles and replace or add these styles */
 
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 /* Tooltip Styles */
+/*
 .tooltip {
   position: relative;
   display: inline-block;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .tooltiptext {
   position: fixed; /* Change from absolute to fixed for better positioning */
   z-index: 2147483647 !important; /* Highest z-index across entire app */
@@ -2005,8 +2163,10 @@ body {
   word-wrap: break-word; /* Ensure long words don't overflow */
   overflow: visible; /* Ensure content is not cut off */
 }
+*/
 
 /* Specific tooltip styles for app-action-btn and normalize-rarities-btn */
+/*
 .app-action-btn .tooltiptext,
 .normalize-rarities-btn .tooltiptext {
   width: 170px !important;
@@ -2016,12 +2176,14 @@ body {
 /* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
 /* Tooltips are now controlled by JavaScript in tooltip-handler-consolidated.js */
 /* This prevents immediate display via CSS :hover */
+/*
 .tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
   /* JavaScript will control visibility and opacity with 1-second delay */
   /* Don't force immediate display via CSS */
-}
+/*}
 
 /* CRITICAL: Explicitly hide tooltips for disabled elements to override any general rules */
+/*
 .tooltip[disabled]:hover .tooltiptext,
 .tooltip:disabled:hover .tooltiptext,
 .tooltip[disabled] .tooltiptext,
@@ -2033,6 +2195,7 @@ body {
 }
 
 /* Arrow styles */
+/*
 .tooltiptext::after {
   content: "";
   position: absolute;
@@ -2041,6 +2204,7 @@ body {
 }
 
 /* Top tooltip (default) */
+/*
 .tooltiptext {
   bottom: 125%;
   left: 50%;
@@ -2056,6 +2220,7 @@ body {
 }
 
 /* Bottom tooltip */
+/*
 .tooltip-bottom {
   top: 125%;
   bottom: auto;
@@ -2070,6 +2235,7 @@ body {
 }
 
 /* Left-aligned tooltip */
+/*
 .tooltip-left {
   transform: translateX(0);
   left: 0;
@@ -2079,8 +2245,10 @@ body {
   left: 10px;
   transform: translateX(0);
 }
+*/
 
 /* Right-aligned tooltip */
+/*
 .tooltip-right {
   transform: translateX(0);
   right: 0;
@@ -2092,6 +2260,7 @@ body {
   left: auto;
   transform: translateX(0);
 }
+*/
 
 /* Add these new styles for rarity indicators */
 .trait-rarity-indicator {
@@ -2298,6 +2467,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  min-height: 120px; /* Fixed height to prevent resizing when hint text is added */
+  min-width: 300px; /* Fixed width to prevent resizing */
 }
 
 .spinner-wrapper {
@@ -2324,10 +2495,44 @@ body {
   color: var(--text-primary);
   font-size: 1.1rem;
   text-align: center;
+  margin-bottom: 1rem;
   /* Ensure text doesn't rotate or animate */
   animation: none !important;
   transform: none !important;
   transition: none !important;
+}
+
+/* Progress Bar Styles */
+.progress-bar-container {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-percentage {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Archivo', sans-serif;
 }
 
 @keyframes spinner-rotate {
@@ -2506,6 +2711,11 @@ body {
   aspect-ratio: 1;
   object-fit: cover;
   background: var(--input-bg);
+  border-radius: 8px; /* Match app's rounded corner style */
+}
+
+.nft-preview-image img {
+  border-radius: 8px; /* Match app's rounded corner style */
 }
 
 .nft-preview-info {
@@ -3128,7 +3338,7 @@ body {
 
 /* Correct alignment with the navigation bar */
 .nav-container {
-  padding-left: 0 !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
 }
 
 .content-area {
@@ -3208,6 +3418,45 @@ body {
   width: auto !important;
   position: relative !important;
   pointer-events: auto !important;
+}
+
+/* CRITICAL: Ensure active tab-content stays visible during loading (prevents disappearing at 78%) */
+.tab-content.active[style*="display: block"],
+.tab-content.active[style*="display:block"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  height: auto !important;
+  width: auto !important;
+}
+
+/* CRITICAL: During loading, ensure active tab-content is always visible */
+#app:has(.loading-overlay) .tab-content.active,
+#app .project-interface .tab-content.active,
+#app:has(.loading-overlay) .tab-content.active[style*="display"],
+#app .project-interface .tab-content.active[style*="display"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  height: auto !important;
+  width: auto !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
+/* CRITICAL: Prevent tab-content from being hidden during loading at 78% */
+#app:has(.loading-overlay) #general-info.tab-content.active,
+#app:has(.loading-overlay) #traits-rules.tab-content.active,
+#app:has(.loading-overlay) #generate-nfts.tab-content.active,
+#app:has(.loading-overlay) #export-nfts.tab-content.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  height: auto !important;
+  width: auto !important;
 }
 
 /* CRITICAL: Special case for generate-nfts tab - must override .tab-content.active with higher specificity */
@@ -4142,6 +4391,18 @@ input:checked + .toggle-slider:before {
   margin-left: 0 !important;
 }
 
+/* CRITICAL: Override content-area padding-top when Generate NFTs tab is active */
+/* This must override the padding rule above - use maximum specificity */
+html body #app .project-interface .content-area.generate-nfts-content-active,
+html body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+body #app .project-interface .content-area.generate-nfts-content-active,
+body #app .project-interface .content-area:has(#generate-nfts.tab-content.active),
+.content-area.generate-nfts-content-active,
+.content-area:has(#generate-nfts.tab-content.active) {
+  padding-top: 0 !important;
+  padding: 0 2rem 2rem 0 !important; /* Override padding shorthand, keep only right and bottom padding */
+}
+
 /* Remove existing left padding from all main tab containers */
 #traits-rules,
 #generate-nfts,
@@ -4223,7 +4484,7 @@ input:checked + .toggle-slider:before {
 
 /* Ensure navigation container aligns with content */
 .nav-container {
-  padding-left: 0 !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
   margin-left: 0 !important;
   width: 100% !important;
 }
@@ -4454,17 +4715,13 @@ input:checked + .toggle-slider:before {
 
 /* Divider styles moved to final-overrides.css for consistency */
 
-.randomize-tooltip, .randomize-rarities-btn .tooltiptext.randomize-tooltip {
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* Randomize tooltip styles have been consolidated into tooltip.css */
+.randomize-tooltip {
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-}
-.randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
 }
 
 .nft-trait-name-below {
@@ -4550,7 +4807,9 @@ input:checked + .toggle-slider:before {
   min-width: 1557px !important;
 }
 
-.tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip {
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* Tooltip z-index is now controlled by css/components/tooltip.css using CSS variables */
+.custom-tooltip, .randomize-tooltip {
   z-index: 2147483647 !important; /* Highest z-index across entire app */
 }
 
@@ -4595,6 +4854,7 @@ input:checked + .toggle-slider:before {
 }
 
 /* Ensure all floating and content elements in Traits & Rules are always below the navigation, app title, and project buttons */
+/* CRITICAL: Tooltip z-index is now controlled by css/components/tooltip.css - removed from here */
 .tab-content,
 .traits-section,
 .rules-section,
@@ -4603,8 +4863,6 @@ input:checked + .toggle-slider:before {
 .trait-item,
 .modal,
 .modal-overlay,
-.tooltip,
-.tooltiptext,
 .custom-tooltip,
 .randomize-tooltip,
 .notification,
@@ -4623,10 +4881,9 @@ input:checked + .toggle-slider:before {
 }
 
 /* Only floating UI elements should have z-index: 9999, not main content containers */
+/* CRITICAL: Tooltip z-index is now controlled by css/components/tooltip.css - removed from here */
 .modal,
 .modal-overlay,
-.tooltip,
-.tooltiptext,
 .custom-tooltip,
 .randomize-tooltip,
 .notification,
@@ -4956,33 +5213,8 @@ h3.subsection-title {
   font-size: 14px;
   font-weight: 500;
 }
-/* Tooltip for toggle */
-.toggle-label .tooltiptext {
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.2s;
-  background-color: rgba(0, 0, 0, 0.9) !important; /* Standard black tooltip background */
-  background: rgba(0, 0, 0, 0.9) !important; /* Standard black tooltip background */
-  color: #ffffff !important; /* Standard white text */
-  border-radius: 6px;
-  padding: 8px 10px !important; /* Standard padding */
-  position: absolute;
-  left: 110%;
-  top: 50%;
-  transform: translateY(-50%);
-  min-width: 260px;
-  max-width: 340px;
-  z-index: 10;
-  font-size: 11px !important; /* Standard font size */
-  font-family: 'Archivo', sans-serif !important; /* Standard font */
-  pointer-events: none;
-  white-space: normal;
-}
-.toggle-label:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-  display: block;
-}
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* Toggle label tooltip styles have been consolidated into tooltip.css */
 
 /* Batch management section width and padding */
 #batch-management-section {

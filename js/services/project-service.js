@@ -55,6 +55,10 @@
     isLoading: false, // Add a flag to track load operations
     lastFileHandle: null, // Store the most recent file handle for reuse
     lastProjectDir: null, // Store the last used directory for project files
+    _spinnerAnimationFrameId: null, // Store requestAnimationFrame ID for cleanup
+    _spinnerRotationInterval: null, // Legacy: Store setInterval ID (backward compatibility)
+    _spinnerDashInterval: null, // Legacy: Store setInterval ID (backward compatibility)
+    _projectWasLoaded: false, // Flag to track if a project was loaded (vs new project)
 
     init: function () {
       console.log("Initializing project service module")
@@ -73,6 +77,14 @@
         }
       } catch (e) { console.warn('Could not access localStorage for last project path/dir', e); }
       this.bindEvents()
+      
+      // CRITICAL: Cleanup animations on page unload to prevent memory leaks
+      window.addEventListener('beforeunload', () => {
+        this.cleanup()
+      })
+      window.addEventListener('unload', () => {
+        this.cleanup()
+      })
     },
 
     bindEvents: function () {
@@ -107,10 +119,24 @@
       // Load Project button in navigation
       const loadProjectNavBtn = document.getElementById("load-project-btn")
       if (loadProjectNavBtn) {
-        loadProjectNavBtn.addEventListener("click", () => {
+        // Remove existing listener if any to prevent duplicates
+        const newLoadProjectNavBtn = loadProjectNavBtn.cloneNode(true);
+        loadProjectNavBtn.parentNode.replaceChild(newLoadProjectNavBtn, loadProjectNavBtn);
+        
+        newLoadProjectNavBtn.addEventListener("click", () => {
           const loadProjectInput = document.getElementById("load-project-input")
           if (loadProjectInput) {
+            // CRITICAL: Reset file input value BEFORE opening file picker
+            // This ensures the change event will fire even if the same file is selected again
+            loadProjectInput.value = "";
+            
+            // CRITICAL: Reset isLoading flag to allow loading again
+            this.isLoading = false;
+            
+            // Small delay to ensure value reset is processed
+            setTimeout(() => {
             loadProjectInput.click()
+            }, 10);
           }
         })
       }
@@ -118,14 +144,36 @@
       // Load Project input
       const loadProjectInput = document.getElementById("load-project-input")
       if (loadProjectInput) {
-        loadProjectInput.addEventListener("change", (event) => {
-          this.load(event)
+        // Remove existing listener if any to prevent duplicates
+        const newLoadProjectInput = loadProjectInput.cloneNode(true);
+        loadProjectInput.parentNode.replaceChild(newLoadProjectInput, loadProjectInput);
+        
+        newLoadProjectInput.addEventListener("change", (event) => {
+          // CRITICAL: Reset isLoading flag before checking files
+          // This ensures we can load again even if previous load didn't complete properly
+          this.isLoading = false;
+          
+          if (event.target.files && event.target.files.length > 0) {
+            // CRITICAL: Reset input value immediately after getting files
+            // This ensures change event will fire on next selection
+            const file = event.target.files[0];
+            this.load(event);
+            
+            // Reset input value after a short delay to allow load to start
+            setTimeout(() => {
+              if (event.target) {
+                event.target.value = "";
+              }
+            }, 100);
+          }
         })
       }
     },
 
     startNew: function() {
       console.log("Starting new project")
+      // CRITICAL: Reset flag to indicate this is a new project, not a loaded project
+      this._projectWasLoaded = false;
 
       // Reset all module states before creating new project
       this.resetAllModuleStates();
@@ -159,6 +207,9 @@
 
       // Set the current project
       window.currentProject = newProject
+
+      // CRITICAL: Do NOT show loading animation for new projects - only show when loading a project file
+      // The project interface will initialize without showing the loading overlay
 
       // Show the project interface
       if (window.NFTApp.getModule && window.NFTApp.getModule("projectInterface")) {
@@ -194,50 +245,116 @@
           // Use unified counter update system
           if (window.updateAllCounters) {
             window.updateAllCounters();
-            console.log('[DEBUG] All counters updated after starting new project');
+            // console.log('[DEBUG] All counters updated after starting new project');
           } else {
             // Fallback to individual updates if unified system not available
             if (typeof window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter === 'function') {
               window.NFTApp.getModule('generateNftsUI').refreshSeedListCounter(false);
-              console.log('[DEBUG] Seed counter updated after starting new project (fallback)');
+              // console.log('[DEBUG] Seed counter updated after starting new project (fallback)');
             }
             
             if (window.updateNftCountPanel) {
               window.updateNftCountPanel();
-              console.log('[DEBUG] NFT count panel updated after starting new project (fallback)');
+              // console.log('[DEBUG] NFT count panel updated after starting new project (fallback)');
             }
           }
         }, 500); // Increased debounce time
       }
     },
 
-    load: function(event) {
+    load: async function(event) {
       console.log("Loading project")
 
       const file = event.target.files[0]
       if (!file) {
         console.warn("No file selected")
+        // Reset file input to allow selecting the same file again
+        if (event && event.target) {
+          event.target.value = "";
+        }
         return
       }
       
-      // Prevent concurrent loads
-      if (this.isLoading) {
-        console.warn("[DEBUG] Another project is currently loading, please wait...");
-        if (window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
-          window.NFTApp.getModule("notificationService").show("Another project is loading. Please wait...", "warning");
-        }
-        event.target.value = "";
-        return;
-      }
+      // CRITICAL: Always reset everything before loading, even if a project was already loaded
+      // This ensures a clean state for each load operation
+      // console.log("[DEBUG] Resetting app state before loading project...");
       
+      // Reset loading flag first to allow new load (in case previous load didn't complete properly)
+      this.isLoading = false;
+      
+      // Reset all module states before loading to ensure clean state
+      this.resetAllModuleStates();
+      
+      // Set loading flag after reset
       this.isLoading = true;
         console.log("Loading project file:", file.name);
+
+      // CRITICAL: Apply nav-actions transform FIRST, before any other operations
+      // This prevents nav-actions from moving during load
+      const navActions = document.querySelector('.nav-actions');
+      if (navActions) {
+        navActions.style.setProperty('transform', 'translateX(-161px)', 'important');
+        navActions.style.setProperty('margin-left', '0', 'important');
+        navActions.style.setProperty('position', 'relative', 'important');
+        navActions.style.setProperty('right', 'auto', 'important');
+        navActions.style.setProperty('left', 'auto', 'important');
+      }
+      
+      // Also call navigation module's applyNavActionsTransform
+      if (window.NFTApp?.getModule?.('navigation')?.applyNavActionsTransform) {
+        window.NFTApp.getModule('navigation').applyNavActionsTransform();
+      }
 
       // Store the current active tab
       const currentTab = document.querySelector('.nav-tab.active')?.dataset.tab
 
-      // Show loading animation
-      this.showLoadingAnimation("Loading project...")
+      // CRITICAL: Show loading animation IMMEDIATELY before any file operations
+      // This ensures animation starts before blocking file read operations
+      // CRITICAL: Force reset for consecutive loads - always show full loading process
+      this.showLoadingAnimation("Loading project...", false, true) // Pass true to force reset
+      
+      // CRITICAL: Force reset progress bar to 0% for consecutive loads
+      // This ensures the loading process is displayed again even if loading twice in a row
+      const loadingOverlay = document.getElementById("loading-overlay");
+      if (loadingOverlay) {
+        // Ensure overlay is visible
+        loadingOverlay.style.setProperty("display", "flex", "important");
+        loadingOverlay.style.setProperty("visibility", "visible", "important");
+        loadingOverlay.style.setProperty("opacity", "1", "important");
+        
+        // Reset progress bar to 0%
+        const progressBarFill = loadingOverlay.querySelector('.progress-bar-fill');
+        const progressPercentage = loadingOverlay.querySelector('.progress-percentage');
+        if (progressBarFill) {
+          progressBarFill.style.setProperty("width", "0%", "important");
+        }
+        if (progressPercentage) {
+          progressPercentage.textContent = "0%";
+        }
+        
+        // Update loading text
+        const loadingText = loadingOverlay.querySelector('.loading-text');
+        if (loadingText) {
+          loadingText.textContent = "Loading project...";
+        }
+        
+        // Hide click hint if it was visible from previous "Application ready!" state
+        const clickHint = loadingOverlay.querySelector('.click-hint');
+        if (clickHint) {
+          clickHint.style.setProperty("visibility", "hidden", "important");
+        }
+        
+        // Remove any click handlers from previous "Application ready!" state
+        const existingClickHandler = loadingOverlay._applicationReadyClickHandler;
+        if (existingClickHandler) {
+          loadingOverlay.removeEventListener('click', existingClickHandler);
+          loadingOverlay._applicationReadyClickHandler = null;
+        }
+        loadingOverlay.style.cursor = '';
+      }
+      
+      // Initialize progress bar to 0% (double-check)
+      this.updateLoadingProgress(0, "Loading project...")
       
       // Do NOT show "Please Wait" popup yet - wait until Loading Project window closes
 
@@ -271,6 +388,18 @@
           this.lastFileHandle = file;
         }
       } catch (e) { console.warn('Could not save last project path', e); }
+
+      // CRITICAL: Yield multiple times BEFORE starting file read to ensure animation is running
+      // This prevents animation from freezing during file read operations
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              setTimeout(resolve, 0);
+            });
+          });
+        });
+      });
 
       const reader = new FileReader()
       
@@ -319,18 +448,18 @@
             }
             
             try {
-              console.log('[DEBUG] 📂 LOAD: Detected compressed file by extension, decompressing...');
+              // console.log('[DEBUG] 📂 LOAD: Detected compressed file by extension, decompressing...');
               const uint8Array = fileData instanceof ArrayBuffer ? new Uint8Array(fileData) : fileData;
               const decompressed = pako.inflate(uint8Array, { to: 'string' });
               jsonString = decompressed;
-              console.log('[DEBUG] 📂 LOAD: File decompressed successfully');
+              // console.log('[DEBUG] 📂 LOAD: File decompressed successfully');
             } catch (decompError) {
               throw new Error('Failed to decompress file. The file may be corrupted. Error: ' + decompError.message);
             }
           } else {
             // Old format: Regular JSON file (.json extension)
             // This ensures full backward compatibility with existing project files
-            console.log('[DEBUG] 📂 LOAD: Loading as regular JSON file (backward compatible mode)');
+            // console.log('[DEBUG] 📂 LOAD: Loading as regular JSON file (backward compatible mode)');
             
             if (fileData instanceof ArrayBuffer) {
               // If somehow read as ArrayBuffer (shouldn't happen for .json files), convert
@@ -348,14 +477,14 @@
               // Try to decompress as fallback
               if (typeof pako !== 'undefined') {
                 try {
-                  console.log('[DEBUG] 📂 LOAD: Content doesn\'t look like JSON, attempting decompression...');
+                  // console.log('[DEBUG] 📂 LOAD: Content doesn\'t look like JSON, attempting decompression...');
                   const uint8Array = new Uint8Array(fileData instanceof ArrayBuffer ? fileData : new TextEncoder().encode(jsonString));
                   const decompressed = pako.inflate(uint8Array, { to: 'string' });
                   jsonString = decompressed;
-                  console.log('[DEBUG] 📂 LOAD: Successfully decompressed (file was compressed without .gz extension)');
+                  // console.log('[DEBUG] 📂 LOAD: Successfully decompressed (file was compressed without .gz extension)');
                 } catch (decompError) {
                   // Not compressed after all - proceed with original string
-                  console.log('[DEBUG] 📂 LOAD: Decompression failed, treating as plain JSON');
+                  // console.log('[DEBUG] 📂 LOAD: Decompression failed, treating as plain JSON');
                 }
               }
             }
@@ -366,27 +495,179 @@
             throw new Error('Empty or invalid file content');
           }
           
-          // Parse JSON - this will throw if invalid, which is caught below
-          const loadedProject = JSON.parse(jsonString);
+          // CRITICAL: Break up JSON parsing into chunks to allow animation to continue
+          // Use multiple yield points to prevent blocking the main thread
+          let loadedProject;
+          try {
+          // Update progress: File read complete, starting parsing (10%)
+          this.updateLoadingProgress(10);
+          
+          // CRITICAL: Yield multiple times BEFORE parsing to ensure UI updates
+            await new Promise(resolve => {
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  setTimeout(resolve, 30);
+                });
+                });
+              });
+            });
+            
+          // Update progress: Preparing to parse JSON (12%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(12);
+            resolve();
+          }, 30));
+          
+          // Update progress: Initializing parser (14%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(14);
+            resolve();
+          }, 30));
+          
+          // Update progress: Starting JSON parsing (16%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(16);
+            resolve();
+          }, 30));
+            
+            // CRITICAL: Parse JSON using Web Worker for ALL files to prevent blocking main thread
+            // This ensures animation continues smoothly during parsing regardless of file size
+            try {
+              // Always try to use Web Worker for non-blocking parsing
+              if (typeof Worker !== 'undefined') {
+                // Update progress: Creating worker (18%)
+                await new Promise(resolve => setTimeout(() => {
+                  this.updateLoadingProgress(18);
+                  resolve();
+                }, 30));
+                
+                // Use Web Worker for ALL files to prevent blocking
+                loadedProject = await new Promise((resolve, reject) => {
+                  const workerCode = `
+                    self.onmessage = function(e) {
+                      try {
+                        const parsed = JSON.parse(e.data);
+                        self.postMessage({ success: true, data: parsed });
+                      } catch (error) {
+                        self.postMessage({ success: false, error: error.message });
+                      }
+                    };
+                  `;
+                  const blob = new Blob([workerCode], { type: 'application/javascript' });
+                  const workerUrl = URL.createObjectURL(blob);
+                  const worker = new Worker(workerUrl);
+                  
+                  // Set timeout for worker (30 seconds max)
+                  const timeoutId = setTimeout(() => {
+                    worker.terminate();
+                    URL.revokeObjectURL(workerUrl);
+                    reject(new Error('JSON parsing timeout'));
+                  }, 30000);
+                  
+                  worker.onmessage = (e) => {
+                    clearTimeout(timeoutId);
+                    worker.terminate();
+                    URL.revokeObjectURL(workerUrl);
+                    if (e.data.success) {
+                      resolve(e.data.data);
+                    } else {
+                      reject(new Error(e.data.error));
+                    }
+                  };
+                  
+                  worker.onerror = (error) => {
+                    clearTimeout(timeoutId);
+                    worker.terminate();
+                    URL.revokeObjectURL(workerUrl);
+                    reject(error);
+                  };
+                  
+                  worker.postMessage(jsonString);
+                });
+                
+                // Update progress: Parsing in progress (20%)
+                await new Promise(resolve => setTimeout(() => {
+                  this.updateLoadingProgress(20);
+                  resolve();
+                }, 30));
+                
+                // Update progress: Parsing in progress (22%)
+                await new Promise(resolve => setTimeout(() => {
+                  this.updateLoadingProgress(22);
+                  resolve();
+                }, 30));
+                
+                // Update progress: Parsing in progress (24%)
+                await new Promise(resolve => setTimeout(() => {
+                  this.updateLoadingProgress(24);
+                  resolve();
+                }, 30));
+                
+                // Update progress: Parsing in progress (26%)
+                await new Promise(resolve => setTimeout(() => {
+                  this.updateLoadingProgress(26);
+                  resolve();
+                }, 30));
+              } else {
+                // Fallback: if Worker not available, parse directly but yield frequently
+                // This should rarely happen in modern browsers
+            loadedProject = JSON.parse(jsonString);
+              }
+            } catch (workerError) {
+              // Fallback to direct parsing if Web Worker fails
+              console.warn('Web Worker parsing failed, falling back to direct parsing:', workerError);
+              loadedProject = JSON.parse(jsonString);
+            }
+            
+            // Update progress: JSON parsing complete (28%)
+            this.updateLoadingProgress(28);
+            
+            // CRITICAL: Yield IMMEDIATELY after parsing to allow UI to update
+            // Use multiple yield points to ensure animation continues smoothly
+            await new Promise(resolve => {
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    setTimeout(resolve, 50); // Small delay to ensure UI updates
+                  });
+                });
+              });
+            });
+          } catch (parseError) {
+            throw parseError;
+          }
           
           // CRITICAL VERIFICATION: Log what's being loaded from the file
-          console.log('[DEBUG] 📂 LOAD: Project file loaded successfully');
-          console.log('[DEBUG] 📂 LOAD: loadedProject.savedSeeds exists:', !!loadedProject.savedSeeds);
-          console.log('[DEBUG] 📂 LOAD: loadedProject.savedSeeds type:', Array.isArray(loadedProject.savedSeeds) ? 'Array' : typeof loadedProject.savedSeeds);
-          console.log('[DEBUG] 📂 LOAD: loadedProject.savedSeeds length:', Array.isArray(loadedProject.savedSeeds) ? loadedProject.savedSeeds.length : 'N/A');
-          if (Array.isArray(loadedProject.savedSeeds) && loadedProject.savedSeeds.length > 0) {
-            console.log('[DEBUG] 📂 LOAD: Sample loadedProject.savedSeeds[0]:', { seed: loadedProject.savedSeeds[0].seed, hasTraits: !!loadedProject.savedSeeds[0].traits });
-            console.log('[DEBUG] 📂 LOAD: First 3 seeds:', loadedProject.savedSeeds.slice(0, 3).map(s => typeof s === 'object' ? (s.seed || 'no seed prop') : s));
-          } else if (loadedProject.savedSeeds === undefined) {
-            console.log('[DEBUG] 📂 LOAD: ⚠️ WARNING - loadedProject.savedSeeds is undefined!');
-          } else if (!Array.isArray(loadedProject.savedSeeds)) {
-            console.log('[DEBUG] 📂 LOAD: ⚠️ WARNING - loadedProject.savedSeeds is not an array! Type:', typeof loadedProject.savedSeeds);
-          }
+          // console.log('[DEBUG] 📂 LOAD: Project file loaded successfully');
+          // console.log('[DEBUG] 📂 LOAD: loadedProject.savedSeeds exists:', !!loadedProject.savedSeeds);
+          // console.log('[DEBUG] 📂 LOAD: loadedProject.savedSeeds type:', Array.isArray(loadedProject.savedSeeds) ? 'Array' : typeof loadedProject.savedSeeds);
+          // console.log('[DEBUG] 📂 LOAD: loadedProject.savedSeeds length:', Array.isArray(loadedProject.savedSeeds) ? loadedProject.savedSeeds.length : 'N/A');
+          // if (Array.isArray(loadedProject.savedSeeds) && loadedProject.savedSeeds.length > 0) {
+          //   console.log('[DEBUG] 📂 LOAD: Sample loadedProject.savedSeeds[0]:', { seed: loadedProject.savedSeeds[0].seed, hasTraits: !!loadedProject.savedSeeds[0].traits });
+          //   console.log('[DEBUG] 📂 LOAD: First 3 seeds:', loadedProject.savedSeeds.slice(0, 3).map(s => typeof s === 'object' ? (s.seed || 'no seed prop') : s));
+          // } else if (loadedProject.savedSeeds === undefined) {
+          //   console.log('[DEBUG] 📂 LOAD: ⚠️ WARNING - loadedProject.savedSeeds is undefined!');
+          // } else if (!Array.isArray(loadedProject.savedSeeds)) {
+          //   console.log('[DEBUG] 📂 LOAD: ⚠️ WARNING - loadedProject.savedSeeds is not an array! Type:', typeof loadedProject.savedSeeds);
+          // }
           
           // Validate that it's actually a project file
           if (!loadedProject || typeof loadedProject !== 'object') {
             throw new Error('Invalid project file format');
           }
+          
+          // Update progress: Validating project data (30%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(30);
+            resolve();
+          }, 30));
+          
+          // Update progress: Processing project structure (32%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(32);
+            resolve();
+          }, 30));
           
           // Create a new project with default values
           const defaultProject = {
@@ -407,6 +688,12 @@
             savedSeeds: []
           }
 
+          // Update progress: Creating project structure (34%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(34);
+            resolve();
+          }, 30));
+
           // Merge loaded project with default values
           const project = {
             ...defaultProject,
@@ -426,11 +713,41 @@
           // Remove exportNftsState from loaded project to ensure fresh start
           delete project.exportNftsState;
 
+          // Update progress: Project data merged (36%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(36);
+            resolve();
+          }, 30));
+          
+          // Update progress: Project data merged (38%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(38);
+            resolve();
+          }, 30));
+
           // Migrate old project data to new format
           this.migrateProjectData(project);
 
           // CRITICAL: Ensure trait imageData is preserved after loading
           this.preserveTraitImageData(project);
+          
+          // Update progress: Data migration complete (40%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(40);
+            resolve();
+          }, 30));
+          
+          // Update progress: Migrating data (42%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(42);
+            resolve();
+          }, 30));
+          
+          // Update progress: Data migration complete (44%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(44);
+            resolve();
+          }, 30));
 
           // Always ignore any seedAlgorithm from file and use the default
           if (window.NFTApp.getModule && window.NFTApp.getModule("seedService")) {
@@ -440,11 +757,47 @@
             console.error("Seed service not available, consistent NFT generation across sessions may not work");
           }
 
+          // Update progress: Initializing seed algorithm (46%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(46);
+            resolve();
+          }, 30));
+          
+          // Update progress: Starting module reset (48%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(48);
+            resolve();
+          }, 30));
+          
+          // Update progress: Starting module reset (50%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(50);
+            resolve();
+          }, 30));
+
           // Reset all module states before loading project
           this.resetAllModuleStates();
           
           // COMPREHENSIVE CLEANUP BEFORE LOADING NEW PROJECT
           console.log("Starting cleanup before loading new project");
+          
+          // Update progress: Resetting modules (52%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(52);
+            resolve();
+          }, 30));
+          
+          // Update progress: Cleaning up state (54%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(54);
+            resolve();
+          }, 30));
+          
+          // Update progress: Cleaning up modal state (56%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(56);
+            resolve();
+          }, 30));
           
           // Clean up saved seeds modal state
           if (window.SavedSeedsModal) {
@@ -483,6 +836,18 @@
             window.savedSeedsImageCache = {};
           }
           
+          // Update progress: Clearing caches (58%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(58);
+            resolve();
+          }, 30));
+          
+          // Update progress: Clearing caches (60%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(60);
+            resolve();
+          }, 30));
+          
           // Clear global cache timestamps
           if (window.traitChangeTimestamp !== undefined) {
             window.traitChangeTimestamp = Date.now();
@@ -493,6 +858,18 @@
           
           // Set the current project first
           window.currentProject = project;
+          
+          // Update progress: Setting project data (62%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(62);
+            resolve();
+          }, 30));
+          
+          // Update progress: Updating memory manager (64%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(64);
+            resolve();
+          }, 30));
           
           // CRITICAL: Update MemoryManager with the loaded project (without syncing to localStorage)
           if (window.MemoryManager) {
@@ -512,19 +889,43 @@
             console.log("MemoryManager not available, using direct project setting");
           }
           
+          // Update progress: Updating modules (66%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(66);
+            resolve();
+          }, 30));
+          
+          // Update progress: Updating modules (68%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(68);
+            resolve();
+          }, 30));
+          
           // Update generateNftsUI module with the same project data reference
           if (window.NFTApp.getModule && window.NFTApp.getModule("generateNftsUI")) {
             try {
               const generateNftsUI = window.NFTApp.getModule("generateNftsUI");
-              console.log("[DEBUG] Updating generateNftsUI with new project data");
+              // console.log("[DEBUG] Updating generateNftsUI with new project data");
               generateNftsUI.projectData = window.currentProject; // Use the same reference
             } catch (e) {
-              console.warn("[DEBUG] Error updating generateNftsUI:", e);
+              // console.warn("[DEBUG] Error updating generateNftsUI:", e);
             }
           }
           
           // Note: localStorage will be cleared and repopulated after project interface starts
-          console.log("[DEBUG] localStorage will be cleared and repopulated with new project data");
+          // console.log("[DEBUG] localStorage will be cleared and repopulated with new project data");
+
+          // Update progress: Preparing saved seeds (70%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(70);
+            resolve();
+          }, 30));
+          
+          // Update progress: Preparing saved seeds (72%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(72);
+            resolve();
+          }, 30));
 
           // CRITICAL: Update savedSeedsModal instance EARLY with correct key and seeds
           // This must happen BEFORE project interface starts to ensure correct key is used
@@ -537,7 +938,7 @@
             // Set the correct seedListKey based on the loaded project name
             const correctSeedListKey = 'nftSeedList_' + (project.name ? encodeURIComponent(project.name) : 'default');
             window.savedSeedsModalInstance.seedListKey = correctSeedListKey;
-            console.log('[DEBUG] ✅ EARLY: Set modal seedListKey to:', correctSeedListKey, 'for project:', project.name || 'unknown');
+            // console.log('[DEBUG] ✅ EARLY: Set modal seedListKey to:', correctSeedListKey, 'for project:', project.name || 'unknown');
             
             // If project has savedSeeds, load them now
             if (project.savedSeeds && Array.isArray(project.savedSeeds) && project.savedSeeds.length > 0) {
@@ -551,22 +952,114 @@
               }).filter(seed => seed && seed.seed);
               
               window.savedSeedsModalInstance.seedList = normalizedSeeds;
-              console.log('[DEBUG] ✅ EARLY: Pre-loaded', normalizedSeeds.length, 'seeds into modal instance from project data');
+              // console.log('[DEBUG] ✅ EARLY: Pre-loaded', normalizedSeeds.length, 'seeds into modal instance from project data');
             }
           }
+
+          // Update progress: Checking for reload (74%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(74);
+            resolve();
+          }, 30));
+          
+          // Update progress: Checking for reload (76%)
+          await new Promise(resolve => setTimeout(() => {
+            this.updateLoadingProgress(76);
+            resolve();
+          }, 30));
 
           // Check if this is a reload (app container has content)
           const appContainer = document.getElementById("app");
           const isReload = appContainer && appContainer.children.length > 0;
           
+          // CRITICAL: Ensure app container remains visible during reload
+          if (appContainer) {
+            appContainer.style.setProperty("display", "block", "important");
+            appContainer.style.setProperty("visibility", "visible", "important");
+            appContainer.style.setProperty("opacity", "1", "important");
+            appContainer.style.setProperty("background-color", "#0c0c0e", "important"); // Ensure background is visible
+          }
+          
           if (isReload) {
-            console.log("[DEBUG] Detected project reload - clearing existing interface");
+            // console.log("[DEBUG] Detected project reload - clearing existing interface");
+            
+            // CRITICAL: Ensure app container, body, and html backgrounds are visible BEFORE removing interface
+            // This prevents black screen during the gap between old interface removal and new interface creation
+            if (appContainer) {
+              appContainer.style.setProperty("display", "block", "important");
+              appContainer.style.setProperty("visibility", "visible", "important");
+              appContainer.style.setProperty("opacity", "1", "important");
+              appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+              appContainer.style.setProperty("background", "#0c0c0e", "important");
+            }
+            
+            // CRITICAL: Also ensure body and html have backgrounds to prevent black screen
+            const body = document.body;
+            const html = document.documentElement;
+            if (body) {
+              body.style.setProperty("background-color", "#000000", "important");
+              body.style.setProperty("background", "#000000", "important");
+            }
+            if (html) {
+              html.style.setProperty("background-color", "#000000", "important");
+              html.style.setProperty("background", "#000000", "important");
+            }
             
             // Remove existing project interface
             const existingInterface = appContainer.querySelector('.project-interface');
             if (existingInterface) {
               existingInterface.remove();
-              console.log("[DEBUG] Existing project interface removed");
+              // console.log("[DEBUG] Existing project interface removed");
+              
+              // CRITICAL: Ensure loading overlay stays visible during the gap
+              // This prevents black screen by keeping the overlay visible until new interface is ready
+              const loadingOverlay = document.getElementById("loading-overlay");
+              if (loadingOverlay) {
+                loadingOverlay.style.setProperty("display", "flex", "important");
+                loadingOverlay.style.setProperty("visibility", "visible", "important");
+                loadingOverlay.style.setProperty("opacity", "1", "important");
+                loadingOverlay.style.setProperty("z-index", "99999", "important");
+                // Force reflow to ensure overlay is painted
+                void loadingOverlay.offsetHeight;
+              }
+              
+              // CRITICAL: Force app container, body, and html visibility IMMEDIATELY after removal
+              // This prevents black screen during the gap before new interface is created
+              if (appContainer) {
+                appContainer.style.setProperty("display", "block", "important");
+                appContainer.style.setProperty("visibility", "visible", "important");
+                appContainer.style.setProperty("opacity", "1", "important");
+                appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+                appContainer.style.setProperty("background", "#0c0c0e", "important");
+                appContainer.style.setProperty("z-index", "1", "important");
+              }
+              
+              // CRITICAL: Ensure body and html backgrounds remain set after interface removal
+              if (body) {
+                body.style.setProperty("background-color", "#000000", "important");
+                body.style.setProperty("background", "#000000", "important");
+              }
+              if (html) {
+                html.style.setProperty("background-color", "#000000", "important");
+                html.style.setProperty("background", "#000000", "important");
+              }
+              
+              // CRITICAL: Add a placeholder div to prevent empty container from showing black
+              // This ensures there's always visible content in the container
+              // The placeholder will be removed only after the new interface is confirmed visible
+              const placeholder = document.createElement("div");
+              placeholder.id = "interface-placeholder";
+              // CRITICAL: Use inline styles with !important to ensure visibility and full coverage
+              placeholder.style.cssText = "display: block !important; visibility: visible !important; opacity: 1 !important; background-color: #0c0c0e !important; background: #0c0c0e !important; width: 100vw !important; height: 100vh !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 99998 !important; pointer-events: none !important; margin: 0 !important; padding: 0 !important;";
+              document.body.appendChild(placeholder);
+              // CRITICAL: Force immediate reflow to ensure placeholder is painted
+              void placeholder.offsetHeight;
+              // console.log("[DEBUG] Added placeholder div to prevent black screen");
+              
+              // CRITICAL: Force a reflow to ensure styles are applied immediately
+              void appContainer.offsetHeight;
+              if (body) void body.offsetHeight;
+              if (html) void html.offsetHeight;
             }
             
             // Reset module states that might cause issues
@@ -574,11 +1067,226 @@
               try {
                 const navigation = window.NFTApp.getModule("navigation");
                 navigation.generateNftsTabVisited = false;
-                console.log("[DEBUG] Navigation state reset");
+                // console.log("[DEBUG] Navigation state reset");
               } catch (e) {
-                console.warn("[DEBUG] Could not reset navigation state:", e);
+                // console.warn("[DEBUG] Could not reset navigation state:", e);
               }
             }
+            
+            // CRITICAL: Final check - ensure app container, body, and html are still visible after all cleanup
+            // This prevents black screen during the gap before new interface is created
+            if (appContainer) {
+              appContainer.style.setProperty("display", "block", "important");
+              appContainer.style.setProperty("visibility", "visible", "important");
+              appContainer.style.setProperty("opacity", "1", "important");
+              appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+              appContainer.style.setProperty("background", "#0c0c0e", "important");
+            }
+            
+            // Reuse body and html variables from earlier in the function
+            const bodyFinal = document.body;
+            const htmlFinal = document.documentElement;
+            if (bodyFinal) {
+              bodyFinal.style.setProperty("background-color", "#000000", "important");
+              bodyFinal.style.setProperty("background", "#000000", "important");
+            }
+            if (htmlFinal) {
+              htmlFinal.style.setProperty("background-color", "#000000", "important");
+              htmlFinal.style.setProperty("background", "#000000", "important");
+            }
+          }
+
+          // CRITICAL: Ensure app container and body remain visible BEFORE updating to 78%
+          // This must happen synchronously, not in setTimeout, to prevent black screen flash
+          if (appContainer) {
+            appContainer.style.setProperty("display", "block", "important");
+            appContainer.style.setProperty("visibility", "visible", "important");
+            appContainer.style.setProperty("opacity", "1", "important");
+            appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+          }
+          
+          // CRITICAL: Also ensure body and html backgrounds are set to prevent black screen
+          const body = document.body;
+          const html = document.documentElement;
+          if (body) {
+            body.style.setProperty("background-color", "#000000", "important");
+            body.style.setProperty("background", "#000000", "important");
+          }
+          if (html) {
+            html.style.setProperty("background-color", "#000000", "important");
+            html.style.setProperty("background", "#000000", "important");
+          }
+          
+          // Update progress: Preparing project interface (78%)
+          // CRITICAL: Ensure visibility BEFORE updating progress to prevent content disappearing
+          console.log('[DEBUG 78% FLICKER] ========================================');
+          console.log('[DEBUG 78% FLICKER] BEFORE updating to 78%');
+          console.log('[DEBUG 78% FLICKER] - appContainer exists:', !!appContainer);
+          if (appContainer) {
+            const beforeDisplay = window.getComputedStyle(appContainer).display;
+            const beforeVisibility = window.getComputedStyle(appContainer).visibility;
+            const beforeOpacity = window.getComputedStyle(appContainer).opacity;
+            console.log('[DEBUG 78% FLICKER] - appContainer BEFORE styles:');
+            console.log('[DEBUG 78% FLICKER]   - display:', beforeDisplay);
+            console.log('[DEBUG 78% FLICKER]   - visibility:', beforeVisibility);
+            console.log('[DEBUG 78% FLICKER]   - opacity:', beforeOpacity);
+            console.log('[DEBUG 78% FLICKER]   - swappingInterface flag:', appContainer.dataset.swappingInterface);
+            
+            appContainer.style.setProperty("display", "block", "important");
+            appContainer.style.setProperty("visibility", "visible", "important");
+            appContainer.style.setProperty("opacity", "1", "important");
+            appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+            
+            const afterDisplay = window.getComputedStyle(appContainer).display;
+            const afterVisibility = window.getComputedStyle(appContainer).visibility;
+            const afterOpacity = window.getComputedStyle(appContainer).opacity;
+            console.log('[DEBUG 78% FLICKER] - appContainer AFTER setting styles:');
+            console.log('[DEBUG 78% FLICKER]   - display:', afterDisplay);
+            console.log('[DEBUG 78% FLICKER]   - visibility:', afterVisibility);
+            console.log('[DEBUG 78% FLICKER]   - opacity:', afterOpacity);
+          }
+          // CRITICAL: Ensure active tab-content is visible immediately
+          let activeTabContent = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+          console.log('[DEBUG 78% FLICKER] - activeTabContent exists:', !!activeTabContent);
+          if (activeTabContent) {
+            const beforeTabDisplay = window.getComputedStyle(activeTabContent).display;
+            const beforeTabVisibility = window.getComputedStyle(activeTabContent).visibility;
+            const beforeTabOpacity = window.getComputedStyle(activeTabContent).opacity;
+            console.log('[DEBUG 78% FLICKER] - activeTabContent BEFORE styles:');
+            console.log('[DEBUG 78% FLICKER]   - display:', beforeTabDisplay);
+            console.log('[DEBUG 78% FLICKER]   - visibility:', beforeTabVisibility);
+            console.log('[DEBUG 78% FLICKER]   - opacity:', beforeTabOpacity);
+            
+            activeTabContent.style.setProperty("display", "block", "important");
+            activeTabContent.style.setProperty("visibility", "visible", "important");
+            activeTabContent.style.setProperty("opacity", "1", "important");
+            activeTabContent.style.setProperty("position", "relative", "important");
+            activeTabContent.style.setProperty("height", "auto", "important");
+            activeTabContent.style.setProperty("width", "auto", "important");
+            
+            const afterTabDisplay = window.getComputedStyle(activeTabContent).display;
+            const afterTabVisibility = window.getComputedStyle(activeTabContent).visibility;
+            const afterTabOpacity = window.getComputedStyle(activeTabContent).opacity;
+            console.log('[DEBUG 78% FLICKER] - activeTabContent AFTER setting styles:');
+            console.log('[DEBUG 78% FLICKER]   - display:', afterTabDisplay);
+            console.log('[DEBUG 78% FLICKER]   - visibility:', afterTabVisibility);
+            console.log('[DEBUG 78% FLICKER]   - opacity:', afterTabOpacity);
+          }
+          console.log('[DEBUG 78% FLICKER] - Calling updateLoadingProgress(78)');
+          this.updateLoadingProgress(78);
+          console.log('[DEBUG 78% FLICKER] - updateLoadingProgress(78) called');
+          
+          // Check state immediately after updateLoadingProgress
+          if (appContainer) {
+            const afterProgressDisplay = window.getComputedStyle(appContainer).display;
+            const afterProgressVisibility = window.getComputedStyle(appContainer).visibility;
+            const afterProgressOpacity = window.getComputedStyle(appContainer).opacity;
+            console.log('[DEBUG 78% FLICKER] - appContainer AFTER updateLoadingProgress:');
+            console.log('[DEBUG 78% FLICKER]   - display:', afterProgressDisplay);
+            console.log('[DEBUG 78% FLICKER]   - visibility:', afterProgressVisibility);
+            console.log('[DEBUG 78% FLICKER]   - opacity:', afterProgressOpacity);
+            console.log('[DEBUG 78% FLICKER]   - swappingInterface flag:', appContainer.dataset.swappingInterface);
+          }
+          console.log('[DEBUG 78% FLICKER] ========================================');
+          // Use minimal delay to allow browser to render
+          await new Promise(resolve => setTimeout(resolve, 0));
+          
+          // Update progress: Preparing project interface (80%)
+          // CRITICAL: Ensure visibility BEFORE updating progress
+            if (appContainer) {
+              appContainer.style.setProperty("display", "block", "important");
+              appContainer.style.setProperty("visibility", "visible", "important");
+              appContainer.style.setProperty("opacity", "1", "important");
+              appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+            }
+          // CRITICAL: Ensure active tab-content remains visible
+          // CRITICAL: Set swappingInterface flag BEFORE updating progress to prevent flicker at 78%
+          console.log('[DEBUG 78% FLICKER - SECOND CALL] ========================================');
+          console.log('[DEBUG 78% FLICKER - SECOND CALL] Setting swappingInterface flag and updating to 78% again');
+          if (appContainer) {
+            console.log('[DEBUG 78% FLICKER - SECOND CALL] - Setting swappingInterface flag to true');
+            appContainer.dataset.swappingInterface = 'true';
+            console.log('[DEBUG 78% FLICKER - SECOND CALL] - swappingInterface flag set:', appContainer.dataset.swappingInterface);
+          }
+          
+          activeTabContent = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+          console.log('[DEBUG 78% FLICKER - SECOND CALL] - activeTabContent exists:', !!activeTabContent);
+          if (activeTabContent) {
+            const beforeTabDisplay2 = window.getComputedStyle(activeTabContent).display;
+            const beforeTabVisibility2 = window.getComputedStyle(activeTabContent).visibility;
+            const beforeTabOpacity2 = window.getComputedStyle(activeTabContent).opacity;
+            console.log('[DEBUG 78% FLICKER - SECOND CALL] - activeTabContent BEFORE second update:');
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - display:', beforeTabDisplay2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - visibility:', beforeTabVisibility2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - opacity:', beforeTabOpacity2);
+            
+            activeTabContent.style.setProperty("display", "block", "important");
+            activeTabContent.style.setProperty("visibility", "visible", "important");
+            activeTabContent.style.setProperty("opacity", "1", "important");
+            activeTabContent.style.setProperty("position", "relative", "important");
+            activeTabContent.style.setProperty("height", "auto", "important");
+            activeTabContent.style.setProperty("width", "auto", "important");
+            
+            const afterTabDisplay2 = window.getComputedStyle(activeTabContent).display;
+            const afterTabVisibility2 = window.getComputedStyle(activeTabContent).visibility;
+            const afterTabOpacity2 = window.getComputedStyle(activeTabContent).opacity;
+            console.log('[DEBUG 78% FLICKER - SECOND CALL] - activeTabContent AFTER second update:');
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - display:', afterTabDisplay2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - visibility:', afterTabVisibility2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - opacity:', afterTabOpacity2);
+          }
+          
+          // CRITICAL: Don't call updateLoadingProgress(78) again - it's already at 78%
+          // Calling it twice causes flicker. Just ensure visibility is maintained.
+          console.log('[DEBUG 78% FLICKER - SECOND CALL] - Skipping duplicate updateLoadingProgress(78) call to prevent flicker');
+          // Ensure visibility is maintained without updating progress again
+          if (appContainer) {
+            appContainer.style.setProperty("display", "block", "important");
+            appContainer.style.setProperty("visibility", "visible", "important");
+            appContainer.style.setProperty("opacity", "1", "important");
+            appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+          }
+          
+          // Check state immediately after second updateLoadingProgress
+          if (appContainer) {
+            const afterProgressDisplay2 = window.getComputedStyle(appContainer).display;
+            const afterProgressVisibility2 = window.getComputedStyle(appContainer).visibility;
+            const afterProgressOpacity2 = window.getComputedStyle(appContainer).opacity;
+            console.log('[DEBUG 78% FLICKER - SECOND CALL] - appContainer AFTER second updateLoadingProgress:');
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - display:', afterProgressDisplay2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - visibility:', afterProgressVisibility2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - opacity:', afterProgressOpacity2);
+            console.log('[DEBUG 78% FLICKER - SECOND CALL]   - swappingInterface flag:', appContainer.dataset.swappingInterface);
+          }
+          console.log('[DEBUG 78% FLICKER - SECOND CALL] ========================================');
+          
+          // CRITICAL: Clear swappingInterface flag after project interface starts (handled in project-interface.js)
+          // The flag will be cleared in project-interface.js after the atomic swap completes
+          // Use minimal delay to allow browser to render
+          await new Promise(resolve => setTimeout(resolve, 0));
+          
+          // CRITICAL: Set flag to indicate a project was loaded (not a new project)
+          // This will be used to determine whether to show the success notification
+          this._projectWasLoaded = true;
+          
+          // CRITICAL: Ensure app container, body, and html are visible before starting project interface
+          if (appContainer) {
+            appContainer.style.setProperty("display", "block", "important");
+            appContainer.style.setProperty("visibility", "visible", "important");
+            appContainer.style.setProperty("opacity", "1", "important");
+            appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+          }
+          
+          // CRITICAL: Also ensure body and html backgrounds are set to prevent black screen
+          const bodyBeforeStart = document.body;
+          const htmlBeforeStart = document.documentElement;
+          if (bodyBeforeStart) {
+            bodyBeforeStart.style.setProperty("background-color", "#000000", "important");
+            bodyBeforeStart.style.setProperty("background", "#000000", "important");
+          }
+          if (htmlBeforeStart) {
+            htmlBeforeStart.style.setProperty("background-color", "#000000", "important");
+            htmlBeforeStart.style.setProperty("background", "#000000", "important");
           }
 
           // Show the project interface
@@ -587,9 +1295,128 @@
               // console.log("[DEBUG] Starting project interface with new project");
               window.NFTApp.getModule("projectInterface").start(project);
               // console.log("[DEBUG] Project interface started successfully");
+              
+              // CRITICAL: Ensure new project interface is visible immediately after creation (synchronously, not in requestAnimationFrame)
+              const newInterface = appContainer ? appContainer.querySelector('.project-interface') : null;
+              if (newInterface) {
+                newInterface.style.setProperty("display", "block", "important");
+                newInterface.style.setProperty("visibility", "visible", "important");
+                newInterface.style.setProperty("opacity", "1", "important");
+                newInterface.style.setProperty("background", "#0c0c0e", "important");
+                newInterface.style.setProperty("background-color", "#0c0c0e", "important");
+                newInterface.style.setProperty("transition", "none", "important");
+              }
+              
+              // CRITICAL: Ensure content-area has background set immediately
+              const contentArea = appContainer ? appContainer.querySelector('.content-area') : null;
+              if (contentArea) {
+                contentArea.style.setProperty("display", "block", "important");
+                contentArea.style.setProperty("visibility", "visible", "important");
+                contentArea.style.setProperty("opacity", "1", "important");
+              }
+              
+              // CRITICAL: Ensure active tab-content is visible immediately to prevent disappearing
+              const activeTabContent = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+              if (activeTabContent) {
+                activeTabContent.style.setProperty("display", "block", "important");
+                activeTabContent.style.setProperty("visibility", "visible", "important");
+                activeTabContent.style.setProperty("opacity", "1", "important");
+                activeTabContent.style.setProperty("position", "relative", "important");
+                activeTabContent.style.setProperty("height", "auto", "important");
+                activeTabContent.style.setProperty("width", "auto", "important");
+              }
+              
+              if (contentArea) {
+                contentArea.style.setProperty("background", "#0c0c0e", "important");
+                contentArea.style.setProperty("background-color", "#0c0c0e", "important");
+                contentArea.style.setProperty("transition", "none", "important");
+              }
+              
+              if (appContainer) {
+                appContainer.style.setProperty("display", "block", "important");
+                appContainer.style.setProperty("visibility", "visible", "important");
+                appContainer.style.setProperty("opacity", "1", "important");
+                appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+                appContainer.style.setProperty("background", "#0c0c0e", "important");
+              }
+              
+              // CRITICAL: Double-check body and html backgrounds after interface creation
+              if (bodyBeforeStart) {
+                bodyBeforeStart.style.setProperty("background-color", "#000000", "important");
+                bodyBeforeStart.style.setProperty("background", "#000000", "important");
+              }
+              if (htmlBeforeStart) {
+                htmlBeforeStart.style.setProperty("background-color", "#000000", "important");
+                htmlBeforeStart.style.setProperty("background", "#000000", "important");
+              }
+              
+              // CRITICAL: Ensure active tab-content is visible after interface creation
+              const activeTabAfterStart = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+              if (activeTabAfterStart) {
+                activeTabAfterStart.style.setProperty("display", "block", "important");
+                activeTabAfterStart.style.setProperty("visibility", "visible", "important");
+                activeTabAfterStart.style.setProperty("opacity", "1", "important");
+                activeTabAfterStart.style.setProperty("position", "relative", "important");
+                activeTabAfterStart.style.setProperty("height", "auto", "important");
+                activeTabAfterStart.style.setProperty("width", "auto", "important");
+              }
+              
+              // CRITICAL: Force immediate reflow to ensure styles are applied
+              void appContainer?.offsetHeight;
+              
+              // Update progress: Project interface started (82%)
+              // CRITICAL: Ensure visibility BEFORE updating progress
+                if (appContainer) {
+                  appContainer.style.setProperty("display", "block", "important");
+                  appContainer.style.setProperty("visibility", "visible", "important");
+                  appContainer.style.setProperty("opacity", "1", "important");
+                }
+              // CRITICAL: Ensure active tab-content remains visible
+              let activeTab82 = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+              if (activeTab82) {
+                activeTab82.style.setProperty("display", "block", "important");
+                activeTab82.style.setProperty("visibility", "visible", "important");
+                activeTab82.style.setProperty("opacity", "1", "important");
+              }
+                this.updateLoadingProgress(82);
+              await new Promise(resolve => setTimeout(resolve, 0));
+              
+              // Update progress: Project interface started (84%)
+              // CRITICAL: Ensure visibility BEFORE updating progress
+                if (appContainer) {
+                  appContainer.style.setProperty("display", "block", "important");
+                  appContainer.style.setProperty("visibility", "visible", "important");
+                  appContainer.style.setProperty("opacity", "1", "important");
+                }
+              // CRITICAL: Ensure active tab-content remains visible
+              activeTab82 = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+              if (activeTab82) {
+                activeTab82.style.setProperty("display", "block", "important");
+                activeTab82.style.setProperty("visibility", "visible", "important");
+                activeTab82.style.setProperty("opacity", "1", "important");
+              }
+                this.updateLoadingProgress(84);
+              await new Promise(resolve => setTimeout(resolve, 0));
+              
+              // Update progress: Project interface started (86%)
+              // CRITICAL: Ensure visibility BEFORE updating progress
+                if (appContainer) {
+                  appContainer.style.setProperty("display", "block", "important");
+                  appContainer.style.setProperty("visibility", "visible", "important");
+                  appContainer.style.setProperty("opacity", "1", "important");
+                }
+              // CRITICAL: Ensure active tab-content remains visible
+              activeTab82 = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+              if (activeTab82) {
+                activeTab82.style.setProperty("display", "block", "important");
+                activeTab82.style.setProperty("visibility", "visible", "important");
+                activeTab82.style.setProperty("opacity", "1", "important");
+              }
+                this.updateLoadingProgress(86);
+              await new Promise(resolve => setTimeout(resolve, 0));
             } catch (error) {
-              console.error("[DEBUG] Error starting project interface:", error);
-              console.error("[DEBUG] Error stack:", error.stack);
+              // console.error("[DEBUG] Error starting project interface:", error);
+              // console.error("[DEBUG] Error stack:", error.stack);
               console.error("[DEBUG] Error details:", {
                 message: error.message,
                 name: error.name,
@@ -601,6 +1428,7 @@
               if (generateNftsUI && generateNftsUI.hideNftRenderingPopup) {
                 generateNftsUI.hideNftRenderingPopup();
               }
+              this._projectWasLoaded = false; // Reset flag on error
               this.hideLoadingAnimation();
               this.isLoading = false;
               if (window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
@@ -614,29 +1442,55 @@
             if (window.SavedSeedsModal && typeof window.SavedSeedsModal.hidePleaseWaitPopup === 'function') {
               window.SavedSeedsModal.hidePleaseWaitPopup();
             }
+            this._projectWasLoaded = false; // Reset flag on error
             this.hideLoadingAnimation();
             this.isLoading = false;
             alert("Sorry, the project interface is not available. Please try refreshing the page.");
             return;
           }
 
-          // Hide "Loading Project" window first
-          this.hideLoadingAnimation()
+          // Update progress: Project data loaded, starting UI setup (88%)
+          // CRITICAL: Ensure active tab-content remains visible
+          const activeTab88 = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+          if (activeTab88) {
+            activeTab88.style.setProperty("display", "block", "important");
+            activeTab88.style.setProperty("visibility", "visible", "important");
+            activeTab88.style.setProperty("opacity", "1", "important");
+          }
+            this.updateLoadingProgress(88);
+          await new Promise(resolve => setTimeout(resolve, 0));
+          
+          // Update progress: Project data loaded, starting UI setup (90%)
+          // CRITICAL: Ensure active tab-content remains visible
+          const activeTab90 = appContainer ? appContainer.querySelector('.tab-content.active') : null;
+          if (activeTab90) {
+            activeTab90.style.setProperty("display", "block", "important");
+            activeTab90.style.setProperty("visibility", "visible", "important");
+            activeTab90.style.setProperty("opacity", "1", "important");
+          }
+            this.updateLoadingProgress(90);
+          await new Promise(resolve => setTimeout(resolve, 0));
+
+          // CRITICAL: Don't hide loading animation yet - keep it running until popup is shown
+          // This ensures smooth transition from loading overlay to "Please Wait" popup
           
           this.isLoading = false; // Reset loading flag on success
           
-          // Show "Project loaded successfully" notification with standard duration (3 seconds)
-          // This notification should display immediately and hide after 3 seconds, independent of "Please Wait" popup
-          if (window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
-            window.NFTApp.getModule("notificationService").show("Project loaded successfully", "success", 3000)
-          }
-          
-          // NOW show "Please Wait" popup after showing the notification
-          // Use a small delay to ensure notification appears first
+          // CRITICAL: "Please Wait" popup is now hidden (but code kept for future use)
+          // Loading animation is displayed instead during project preparation
+          // Keep loading animation running until all operations complete
+          // The popup code is still called but will be hidden via CSS/JS
           setTimeout(() => {
             const generateNftsUI = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('generateNftsUI');
             if (generateNftsUI && generateNftsUI.showNftRenderingPopup) {
+              // Call popup function but it will be hidden - code kept for future use
               generateNftsUI.showNftRenderingPopup();
+              // CRITICAL: Keep loading animation running - don't hide it yet
+              // Loading animation will continue until all operations complete
+            } else {
+              // Fallback: hide animation if popup can't be shown
+              // Only show success notification when a project was actually loaded
+              this.hideLoadingAnimation(this._projectWasLoaded || false);
             }
           }, 100);
 
@@ -649,6 +1503,16 @@
           if (event && event.target) {
             event.target.value = "";
           }
+          
+          // CRITICAL: When project loading reaches 100%, reset to 0% and start preparation phase
+          // Update text to indicate we're now preparing the application
+          this.updateLoadingProgress(100, "Loading project...");
+          
+          // Small delay to show 100% before resetting
+          setTimeout(() => {
+            // Reset progress to 0% and change text for preparation phase
+            this.updateLoadingProgress(0, "Preparing the app...");
+          }, 300);
 
           // Popup will automatically transition from loading message to tasks
           // when the first task (selecting-traits) starts via updateTaskStatus
@@ -2602,7 +3466,23 @@
       this.isSaving = false;
     },
     
-    showLoadingAnimation: function(message = "Loading...", transparent = false) {
+    showLoadingAnimation: function(message = "Loading...", transparent = false, forceReset = false) {
+      // CRITICAL: Apply nav-actions transform FIRST, before ANY other operations
+      // This prevents nav-actions from moving during load
+      const navActions = document.querySelector('.nav-actions');
+      if (navActions) {
+        navActions.style.setProperty('transform', 'translateX(-161px)', 'important');
+        navActions.style.setProperty('margin-left', '0', 'important');
+        navActions.style.setProperty('position', 'relative', 'important');
+        navActions.style.setProperty('right', 'auto', 'important');
+        navActions.style.setProperty('left', 'auto', 'important');
+      }
+      
+      // Also call navigation module's applyNavActionsTransform immediately
+      if (window.NFTApp?.getModule?.('navigation')?.applyNavActionsTransform) {
+        window.NFTApp.getModule('navigation').applyNavActionsTransform();
+      }
+      
       // Create loading overlay if it doesn't exist
       let loadingOverlay = document.getElementById("loading-overlay")
       
@@ -2612,12 +3492,14 @@
         loadingOverlay.className = transparent ? "loading-overlay transparent" : "loading-overlay"
         loadingOverlay.innerHTML = `
           <div class="loading-content">
-            <div class="spinner-wrapper">
-              <svg class="spinner" viewBox="0 0 50 50">
-                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-              </svg>
-            </div>
             <div class="loading-text">${message}</div>
+            <div class="progress-bar-container">
+              <div class="progress-bar">
+                <div class="progress-bar-fill" style="width: 0%"></div>
+              </div>
+              <div class="progress-percentage">0%</div>
+            </div>
+            <div class="click-hint" style="margin-top: 0.5rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); font-style: italic; visibility: hidden; height: 1.2rem;">Click anywhere to continue</div>
           </div>
         `
         document.body.appendChild(loadingOverlay)
@@ -2634,6 +3516,41 @@
         } else {
           loadingOverlay.classList.remove("transparent")
         }
+        
+        // CRITICAL: If forceReset is true (for consecutive loads), reset everything
+        if (forceReset) {
+          // Reset progress bar to 0%
+          const progressBarFill = loadingOverlay.querySelector('.progress-bar-fill');
+          const progressPercentage = loadingOverlay.querySelector('.progress-percentage');
+          if (progressBarFill) {
+            progressBarFill.style.setProperty("width", "0%", "important");
+          }
+          if (progressPercentage) {
+            progressPercentage.textContent = "0%";
+          }
+          
+          // Hide click hint if it was visible from previous "Application ready!" state
+          const clickHint = loadingOverlay.querySelector('.click-hint');
+          if (clickHint) {
+            clickHint.style.setProperty("visibility", "hidden", "important");
+          }
+          
+          // Remove any click handlers from previous "Application ready!" state
+          const existingClickHandler = loadingOverlay._applicationReadyClickHandler;
+          if (existingClickHandler) {
+            loadingOverlay.removeEventListener('click', existingClickHandler);
+            loadingOverlay._applicationReadyClickHandler = null;
+          }
+          loadingOverlay.style.cursor = '';
+        }
+        
+        // CRITICAL: Don't stop animation when updating message - animation should continue running
+        // Only check if animation needs to be started (if it's not already running)
+        // This prevents animation from stopping and resuming during project loading
+        const isAnimationRunning = this._spinnerAnimationFrameId !== null && this._spinnerAnimationFrameId !== undefined
+        
+        // If animation is not running, start it (will be started below after display is set)
+        // If animation is already running, don't stop it - just update the message
       }
 
       // Show the loading overlay with high z-index
@@ -2641,144 +3558,226 @@
       loadingOverlay.style.zIndex = "99999"
       loadingOverlay.style.position = "fixed"
       
-      // Ensure animation is running (restart if needed)
-      this.restartLoadingAnimation()
+      // CRITICAL: Force a reflow to ensure overlay is visible before starting animation
+      void loadingOverlay.offsetHeight;
       
-      // Set up visibility change listener to restart animation when tab becomes visible
-      // Remove any existing listener first to avoid duplicates
-      if (this._visibilityChangeHandler) {
-        document.removeEventListener('visibilitychange', this._visibilityChangeHandler)
+      // CRITICAL: Apply nav-actions transform BEFORE showing loading overlay to prevent movement
+      // Note: navActions transform is already applied in showLoadingAnimation function above
+      // Just call the navigation module's applyNavActionsTransform for consistency
+      if (window.NFTApp?.getModule?.('navigation')?.applyNavActionsTransform) {
+        window.NFTApp.getModule('navigation').applyNavActionsTransform();
       }
       
-      // Create new visibility change handler
-      this._visibilityChangeHandler = () => {
-        if (!document.hidden && loadingOverlay && loadingOverlay.style.display !== "none") {
-          // Tab became visible and loading overlay is still showing - restart animation
-          this.restartLoadingAnimation()
+      // CRITICAL: Initialize progress bar to 0% if forceReset is true OR if overlay is not showing "Application ready!"
+      // This ensures consecutive loads always show the full loading process
+        if (loadingOverlay) {
+        const loadingText = loadingOverlay.querySelector('.loading-text');
+        const isApplicationReady = loadingText && loadingText.textContent && loadingText.textContent.includes("Application ready");
+        
+        // Reset to 0% if forceReset is true OR if we're not in the "Application ready!" state
+        if (forceReset || !isApplicationReady) {
+          this.updateLoadingProgress(0, message);
         }
+      } else {
+        // Only initialize if overlay doesn't exist yet (shouldn't happen, but just in case)
+        this.updateLoadingProgress(0, message);
       }
       
-      // Create window focus/blur handlers for browser minimize/maximize
-      this._windowFocusHandler = () => {
-        if (loadingOverlay && loadingOverlay.style.display !== "none") {
-          // Window regained focus and loading overlay is still showing - restart animation
-          this.restartLoadingAnimation()
-        }
-      }
-      
-      this._windowBlurHandler = () => {
-        // Window lost focus - animation will pause, but we'll restart it when focus returns
-        // No action needed here, focus handler will restart it
-      }
-      
-      // Add the visibility change listener
-      document.addEventListener('visibilitychange', this._visibilityChangeHandler)
-      
-      // Add window focus/blur listeners for browser minimize/maximize
-      window.addEventListener('focus', this._windowFocusHandler)
-      window.addEventListener('blur', this._windowBlurHandler)
+      // Progress bar doesn't need focus/blur handlers
     },
     
-    // Restart loading animation (useful when tab becomes visible again or window is restored)
-    restartLoadingAnimation: function() {
+    // Update loading progress bar
+    updateLoadingProgress: function(percentage, message = null) {
       const loadingOverlay = document.getElementById("loading-overlay")
-      if (!loadingOverlay || loadingOverlay.style.display === "none" || loadingOverlay.style.visibility === "hidden") {
-        return
+      if (!loadingOverlay) return
+      
+      // Clamp percentage between 0 and 100
+      percentage = Math.max(0, Math.min(100, percentage))
+      
+      // CRITICAL: Prevent duplicate calls at 78% to avoid flicker
+      const currentPercentage = parseInt(loadingOverlay.querySelector('.progress-percentage')?.textContent || '0');
+      if (percentage === 78 && currentPercentage === 78) {
+        console.log('[DEBUG 78% FLICKER] Skipping duplicate updateLoadingProgress(78) call to prevent flicker');
+        return;
       }
       
-      const spinner = loadingOverlay.querySelector('.spinner')
-      const path = loadingOverlay.querySelector('.path')
+      const progressBarFill = loadingOverlay.querySelector('.progress-bar-fill')
+      const progressPercentage = loadingOverlay.querySelector('.progress-percentage')
+      const loadingText = loadingOverlay.querySelector('.loading-text')
       
-      if (spinner && path) {
-        // More aggressive restart: completely remove and re-add animations
-        // Step 1: Remove all animation properties
-        spinner.style.removeProperty('animation')
-        spinner.style.removeProperty('animation-name')
-        spinner.style.removeProperty('animation-duration')
-        spinner.style.removeProperty('animation-timing-function')
-        spinner.style.removeProperty('animation-iteration-count')
-        spinner.style.removeProperty('animation-play-state')
-        spinner.style.removeProperty('will-change')
-        
-        path.style.removeProperty('animation')
-        path.style.removeProperty('animation-name')
-        path.style.removeProperty('animation-duration')
-        path.style.removeProperty('animation-timing-function')
-        path.style.removeProperty('animation-iteration-count')
-        path.style.removeProperty('animation-play-state')
-        path.style.removeProperty('will-change')
-        
-        // Force multiple reflows to ensure removal
-        void spinner.offsetWidth
-        void path.offsetWidth
-        void spinner.offsetHeight
-        void path.offsetHeight
-        
-        // Step 2: Use requestAnimationFrame to ensure browser has processed the removal
+      // CRITICAL: Ensure app container stays visible during progress update to prevent flicker
+      const appContainer = document.getElementById("app");
+      if (appContainer && percentage === 78) {
+        console.log('[DEBUG 78% FLICKER] updateLoadingProgress(78) - Ensuring app container visibility');
+        appContainer.style.setProperty("display", "block", "important");
+        appContainer.style.setProperty("visibility", "visible", "important");
+        appContainer.style.setProperty("opacity", "1", "important");
+        appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+      }
+      
+      if (progressBarFill) {
+        progressBarFill.style.width = percentage + '%'
+      }
+      
+      if (progressPercentage) {
+        progressPercentage.textContent = Math.round(percentage) + '%'
+      }
+      
+      // Update loading text if provided
+      if (message !== null && loadingText) {
+        loadingText.textContent = message
+        // CRITICAL: Display "Application ready!" in green (#00ff12)
+        if (message && message.includes("Application ready")) {
+          loadingText.style.setProperty("color", "#00ff12", "important");
+        } else {
+          // Reset to default color for other messages
+          loadingText.style.setProperty("color", "var(--text-primary)", "important");
+        }
+      }
+      
+      // CRITICAL: After updating progress, ensure app container is still visible
+      if (appContainer && percentage === 78) {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            // Step 3: Re-apply animations with will-change hint for better performance
-            spinner.style.willChange = 'transform'
-            path.style.willChange = 'stroke-dasharray, stroke-dashoffset'
-            
-            // Step 4: Force another reflow
-            void spinner.offsetWidth
-            void path.offsetWidth
-            
-            // Step 5: Apply animations
-            requestAnimationFrame(() => {
-              spinner.style.animation = 'spinner-rotate 2s linear infinite'
-              spinner.style.animationPlayState = 'running'
-              path.style.animation = 'spinner-dash 1.5s ease-in-out infinite'
-              path.style.animationPlayState = 'running'
-              
-              // Force repaint
-              void spinner.offsetWidth
-              void path.offsetWidth
-              
-              // Step 6: Verify animations are running and restart if needed
-              setTimeout(() => {
-                const checkSpinnerStyle = window.getComputedStyle(spinner)
-                const checkPathStyle = window.getComputedStyle(path)
-                const spinnerAnimName = checkSpinnerStyle.animationName
-                const pathAnimName = checkPathStyle.animationName
-                const spinnerPlayState = checkSpinnerStyle.animationPlayState
-                const pathPlayState = checkPathStyle.animationPlayState
-                
-                // If animations aren't running, force restart one more time
-                if (spinnerPlayState === 'paused' || pathPlayState === 'paused' ||
-                    spinnerAnimName === 'none' || pathAnimName === 'none' ||
-                    !spinnerAnimName || !pathAnimName) {
-                  // Last resort: completely reset
-                  spinner.style.animation = 'none'
-                  path.style.animation = 'none'
-                  void spinner.offsetWidth
-                  void path.offsetWidth
-                  
-                  requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                      spinner.style.animation = 'spinner-rotate 2s linear infinite'
-                      spinner.style.animationPlayState = 'running'
-                      path.style.animation = 'spinner-dash 1.5s ease-in-out infinite'
-                      path.style.animationPlayState = 'running'
-                      void spinner.offsetWidth
-                      void path.offsetWidth
-                    })
-                  })
-                }
-              }, 100)
-            })
-          })
-        })
+          appContainer.style.setProperty("display", "block", "important");
+          appContainer.style.setProperty("visibility", "visible", "important");
+          appContainer.style.setProperty("opacity", "1", "important");
+          appContainer.style.setProperty("background-color", "#0c0c0e", "important");
+        });
       }
     },
+    
+    // Update loading text without changing progress
+    updateLoadingText: function(message) {
+      const loadingOverlay = document.getElementById("loading-overlay")
+      if (!loadingOverlay) return
+      
+      const loadingText = loadingOverlay.querySelector('.loading-text')
+      if (loadingText) {
+        loadingText.textContent = message
+        // CRITICAL: Display "Application ready!" in green (#00ff12)
+        if (message && message.includes("Application ready")) {
+          loadingText.style.setProperty("color", "#00ff12", "important");
+        } else {
+          // Reset to default color for other messages
+          loadingText.style.setProperty("color", "var(--text-primary)", "important");
+        }
+      }
+    },
+    
+    // Restart loading animation (kept for compatibility but no longer needed)
+    restartLoadingAnimation: function() {
+      // Progress bar doesn't need restart - it updates via updateLoadingProgress
+      return
+    },
 
-    hideLoadingAnimation: function() {
+    // CRITICAL: Start JavaScript-based animation using requestAnimationFrame for better performance
+    // This prevents freezing by using browser-optimized animation loop instead of setInterval
+    // Stop JavaScript-based animation (kept for compatibility but no longer needed)
+    stopJavaScriptAnimation: function() {
+      // Progress bar doesn't need animation cleanup
+      if (this._spinnerAnimationFrameId !== null && this._spinnerAnimationFrameId !== undefined) {
+        cancelAnimationFrame(this._spinnerAnimationFrameId)
+        this._spinnerAnimationFrameId = null
+      }
+    },
+    
+    // CRITICAL: Cleanup function to ensure animations are stopped on page unload
+    cleanup: function() {
+      this.stopJavaScriptAnimation()
+      this.hideLoadingAnimation()
+    },
+    
+    hideLoadingAnimation: function(showSuccessNotification = false) {
+      // CRITICAL: Stop JavaScript animation when hiding
+      this.stopJavaScriptAnimation()
+      
+      // CRITICAL: Ensure app content is visible before hiding loading overlay
+      // This prevents the flash of disappearing content
+      const appContainer = document.getElementById("app");
+      const projectInterface = appContainer ? appContainer.querySelector(".project-interface") : null;
+      if (projectInterface) {
+        // Force visibility to ensure content is shown before overlay is hidden
+        projectInterface.style.setProperty("display", "block", "important");
+        projectInterface.style.setProperty("visibility", "visible", "important");
+        projectInterface.style.setProperty("opacity", "1", "important");
+      }
+      
+      // CRITICAL: Don't remove placeholder here - let project-interface.js handle it
+      // The placeholder should only be removed after the interface is fully visible AND painted
+      // and the loading overlay is confirmed hidden. This is handled in project-interface.js
+      // to prevent race conditions and ensure proper timing.
+      
       const loadingOverlay = document.getElementById("loading-overlay")
       if (loadingOverlay) {
-        loadingOverlay.style.display = "none"
-        loadingOverlay.style.visibility = "hidden"
-        loadingOverlay.style.opacity = "0"
+        // CRITICAL: Ensure progress stays at 100% and is locked until overlay is hidden
+        // Set progress to 100% and lock it to prevent any resets
+        this.updateLoadingProgress(100)
+        
+        // Lock the progress bar to prevent any changes
+        const progressBarFill = loadingOverlay.querySelector('.progress-bar-fill')
+        const progressPercentage = loadingOverlay.querySelector('.progress-percentage')
+        if (progressBarFill) {
+          progressBarFill.style.setProperty("width", "100%", "important");
+        }
+        if (progressPercentage) {
+          progressPercentage.textContent = "100%";
+        }
+        
+        // Remove click handler if it exists (for "Application ready!" click-to-dismiss)
+        const existingClickHandler = loadingOverlay._applicationReadyClickHandler;
+        if (existingClickHandler) {
+          loadingOverlay.removeEventListener('click', existingClickHandler);
+          loadingOverlay._applicationReadyClickHandler = null;
+        }
+        
+        // Reset cursor style
+        loadingOverlay.style.cursor = '';
+        
+        // CRITICAL: Use requestAnimationFrame to ensure app content is rendered before hiding overlay
+        // Keep progress at 100% during the entire hiding process
+        requestAnimationFrame(() => {
+          // CRITICAL: Ensure interface is visible before hiding overlay
+          const appContainer = document.getElementById("app");
+          const projectInterface = appContainer ? appContainer.querySelector('.project-interface') : null;
+          if (projectInterface) {
+            projectInterface.style.setProperty("display", "block", "important");
+            projectInterface.style.setProperty("visibility", "visible", "important");
+            projectInterface.style.setProperty("opacity", "1", "important");
+          }
+          if (appContainer) {
+            appContainer.style.setProperty("display", "block", "important");
+            appContainer.style.setProperty("visibility", "visible", "important");
+            appContainer.style.setProperty("opacity", "1", "important");
+          }
+          
+          requestAnimationFrame(() => {
+            // Ensure progress is still at 100% before hiding
+            if (progressBarFill) {
+              progressBarFill.style.setProperty("width", "100%", "important");
+            }
+            if (progressPercentage) {
+              progressPercentage.textContent = "100%";
+            }
+            
+            // CRITICAL: Ensure interface is still visible before hiding overlay
+            const appContainer2 = document.getElementById("app");
+            const projectInterface2 = appContainer2 ? appContainer2.querySelector('.project-interface') : null;
+            if (projectInterface2) {
+              projectInterface2.style.setProperty("display", "block", "important");
+              projectInterface2.style.setProperty("visibility", "visible", "important");
+              projectInterface2.style.setProperty("opacity", "1", "important");
+            }
+            if (appContainer2) {
+              appContainer2.style.setProperty("display", "block", "important");
+              appContainer2.style.setProperty("visibility", "visible", "important");
+              appContainer2.style.setProperty("opacity", "1", "important");
+            }
+            
+            loadingOverlay.style.display = "none"
+            loadingOverlay.style.visibility = "hidden"
+            loadingOverlay.style.opacity = "0"
+          });
+        });
       }
       // Also check for any other loading overlays that might exist
       const nftLoadingOverlay = document.getElementById("nft-loading-overlay")
@@ -2792,6 +3791,16 @@
       if (this._visibilityChangeHandler) {
         document.removeEventListener('visibilitychange', this._visibilityChangeHandler)
         this._visibilityChangeHandler = null
+      }
+      
+      // CRITICAL: Only show "Project loaded successfully" notification if explicitly requested
+      // This prevents showing the notification when starting a new project or on app refresh
+      if (showSuccessNotification) {
+      setTimeout(() => {
+        if (window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+          window.NFTApp.getModule("notificationService").show("Project loaded successfully", "success", 3000)
+        }
+      }, 100);
       }
       
       // Remove window focus/blur listeners when hiding loading animation
@@ -3204,14 +4213,24 @@
 
       console.log('🛡️ PRESERVING TRAIT IMAGEDATA AFTER PROJECT LOAD...');
 
+      // CRITICAL: Ensure app container stays visible during imageData preservation to prevent flicker
+      const appContainer = document.getElementById("app");
+      if (appContainer) {
+        appContainer.style.setProperty("display", "block", "important");
+        appContainer.style.setProperty("visibility", "visible", "important");
+        appContainer.style.setProperty("opacity", "1", "important");
+      }
+
       for (const layer of project.traits) {
         if (layer.traits) {
           for (const trait of layer.traits) {
             if (trait.imageData) {
               preservedCount++;
-              console.log(`✅ Preserved imageData for: ${layer.name} - ${trait.name}`);
+              // Commented out to reduce console spam - uncomment if needed for debugging
+              // console.log(`✅ Preserved imageData for: ${layer.name} - ${trait.name}`);
             } else {
               missingCount++;
+              // Only log missing imageData as warnings are more important
               console.warn(`❌ Missing imageData for: ${layer.name} - ${trait.name}`);
               
               // Try to restore from alternative sources
@@ -3237,6 +4256,13 @@
       }
 
       console.log(`🛡️ TRAIT IMAGEDATA PRESERVATION: ${preservedCount} preserved, ${missingCount} still missing`);
+      
+      // CRITICAL: Ensure app container remains visible after imageData preservation
+      if (appContainer) {
+        appContainer.style.setProperty("display", "block", "important");
+        appContainer.style.setProperty("visibility", "visible", "important");
+        appContainer.style.setProperty("opacity", "1", "important");
+      }
       
       // If we have missing traits, try to restore from localStorage backup
       if (missingCount > 0) {
@@ -3290,9 +4316,9 @@
       // Check if loading overlay is visible
       const loadingOverlay = document.getElementById("loading-overlay")
       if (loadingOverlay && loadingOverlay.style.display !== "none" && loadingOverlay.style.display !== "" && loadingOverlay.style.visibility !== "hidden") {
-        // Restart the loading animation
-        if (projectService.restartLoadingAnimation) {
-          projectService.restartLoadingAnimation()
+        // Restart the JavaScript loading animation (not CSS)
+        if (projectService.startJavaScriptAnimation) {
+          projectService.startJavaScriptAnimation(loadingOverlay)
         }
       }
       
@@ -3373,18 +4399,15 @@
             const spinnerStyle = window.getComputedStyle(spinner)
             const pathStyle = window.getComputedStyle(path)
             
-            // Check if animations are actually running
-            if (spinnerStyle.animationPlayState === 'paused' || 
-                pathStyle.animationPlayState === 'paused' ||
-                spinnerStyle.animationName === 'none' ||
-                pathStyle.animationName === 'none' ||
-                !spinnerStyle.animationName ||
-                !pathStyle.animationName) {
-              // Animations are not running - restart them
-              if (projectService.restartLoadingAnimation) {
-                projectService.restartLoadingAnimation()
+            // CRITICAL: Only restart JavaScript animation if intervals are not running
+            // Don't restart if intervals already exist - this prevents animation from freezing
+            if (!projectService._spinnerRotationInterval || !projectService._spinnerDashInterval) {
+              // JavaScript animations are not running - restart them
+              if (projectService.startJavaScriptAnimation) {
+                projectService.startJavaScriptAnimation(loadingOverlay)
               }
             }
+            // CRITICAL: If intervals exist, don't restart - this prevents stopping/starting loop
           }
         }
       }, 500)

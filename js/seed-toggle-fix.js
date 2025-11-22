@@ -28,14 +28,14 @@ function applySeedToggleFix() {
   if (!singleSeedToggle || !singleSeedInput || !generateSeedBtn) {
     // Check if we've exceeded max retries
     if (seedToggleFixRetryCount >= MAX_SEED_TOGGLE_FIX_RETRIES) {
-      console.warn("Could not find all seed toggle elements after " + MAX_SEED_TOGGLE_FIX_RETRIES + " retries. Stopping retry attempts.");
+      // console.warn("Could not find all seed toggle elements after " + MAX_SEED_TOGGLE_FIX_RETRIES + " retries. Stopping retry attempts.");
       return;
     }
     
     seedToggleFixRetryCount++;
     // Only log warning every 5 retries to reduce console spam
     if (seedToggleFixRetryCount % 5 === 0) {
-      console.warn("Could not find all seed toggle elements, retry attempt " + seedToggleFixRetryCount + "/" + MAX_SEED_TOGGLE_FIX_RETRIES);
+      // console.warn("Could not find all seed toggle elements, retry attempt " + seedToggleFixRetryCount + "/" + MAX_SEED_TOGGLE_FIX_RETRIES);
     }
     
     // Retry after a short delay

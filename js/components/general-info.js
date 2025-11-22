@@ -94,17 +94,108 @@ window.NFTApp.registerModule("generalInfo", {
     // Remove the Save Information button if it exists
     this.removeSaveButton()
 
-    // Store original values
+    // CRITICAL: Ensure input fields exist before trying to access them
+    // If fields don't exist, log error and return early to prevent errors
+    const collectionNameField = document.getElementById("collection-name");
+    const collectionDescriptionField = document.getElementById("collection-description");
+    const defaultNftDescriptionField = document.getElementById("default-nft-description");
+    const totalSupplyField = document.getElementById("total-supply");
+    const filenamePrefixField = document.getElementById("filename-prefix");
+    
+    // CRITICAL: Check if required fields exist - if not, something went wrong
+    if (!collectionNameField || !collectionDescriptionField || !defaultNftDescriptionField || !totalSupplyField || !filenamePrefixField) {
+      console.error('[CRITICAL ERROR] One or more input fields are missing from Collection Info tab!', {
+        collectionName: !!collectionNameField,
+        collectionDescription: !!collectionDescriptionField,
+        defaultNftDescription: !!defaultNftDescriptionField,
+        totalSupply: !!totalSupplyField,
+        filenamePrefix: !!filenamePrefixField
+      });
+      // CRITICAL: Don't proceed if fields are missing - this prevents errors
+      return;
+    }
+    
+    // CRITICAL: Load project data values into fields AFTER ensuring they exist
+    // This prevents fields from being deleted when project loads
+    if (projectData) {
+      if (projectData.name !== undefined) {
+        collectionNameField.value = projectData.name || "";
+      }
+      if (projectData.description !== undefined) {
+        collectionDescriptionField.value = projectData.description || "";
+      }
+      if (projectData.defaultNftDescription !== undefined) {
+        defaultNftDescriptionField.value = projectData.defaultNftDescription || "";
+      }
+      if (projectData.size !== undefined) {
+        totalSupplyField.value = projectData.size || "";
+      }
+      if (projectData.filenamePrefix !== undefined) {
+        filenamePrefixField.value = projectData.filenamePrefix || "";
+      }
+    }
+    
+    // Store original values AFTER loading project data
     this.originalValues = {
-      collectionName: document.getElementById("collection-name").value,
-      collectionDescription: document.getElementById("collection-description").value,
-      defaultNftDescription: document.getElementById("default-nft-description").value,
-      totalSupply: document.getElementById("total-supply").value.replace(/,/g, ''),
-      filenamePrefix: document.getElementById("filename-prefix").value,
+      collectionName: collectionNameField.value,
+      collectionDescription: collectionDescriptionField.value,
+      defaultNftDescription: defaultNftDescriptionField.value,
+      totalSupply: totalSupplyField.value.replace(/,/g, ''),
+      filenamePrefix: filenamePrefixField.value,
     }
 
     // Get all input fields in the general info tab
     const inputFields = document.querySelectorAll("#general-info input, #general-info textarea")
+
+    // CRITICAL: Remove tooltip classes and elements from Collection Description and Default NFT Description fields
+    // CRITICAL: Only remove tooltip-related classes and elements, NEVER remove the fields themselves
+    // CRITICAL: Use global tooltip manager to prevent tooltip setup for these fields
+    if (collectionDescriptionField) {
+      // CRITICAL: Ensure field remains visible and in DOM
+      collectionDescriptionField.classList.remove('tooltip');
+      const existingTooltip = collectionDescriptionField.querySelector('.tooltiptext') || collectionDescriptionField.querySelector('.tooltip-text');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+      collectionDescriptionField.style.cursor = "text";
+      // CRITICAL: Ensure field remains visible - clear any hiding styles
+      collectionDescriptionField.style.display = '';
+      collectionDescriptionField.style.visibility = '';
+      collectionDescriptionField.style.opacity = '';
+      // CRITICAL: Remove any inline styles that might hide the field
+      collectionDescriptionField.style.removeProperty('display');
+      collectionDescriptionField.style.removeProperty('visibility');
+      collectionDescriptionField.style.removeProperty('opacity');
+      // CRITICAL: Set attribute to prevent tooltip manager from setting up tooltips
+      collectionDescriptionField.setAttribute('data-no-tooltip', 'true');
+      // CRITICAL: Verify field still exists in DOM
+      if (!document.getElementById("collection-description")) {
+        console.error('[CRITICAL ERROR] collection-description field was removed from DOM during setupEventListeners!');
+      }
+    }
+    if (defaultNftDescriptionField) {
+      // CRITICAL: Ensure field remains visible and in DOM
+      defaultNftDescriptionField.classList.remove('tooltip');
+      const existingTooltip = defaultNftDescriptionField.querySelector('.tooltiptext') || defaultNftDescriptionField.querySelector('.tooltip-text');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+      defaultNftDescriptionField.style.cursor = "text";
+      // CRITICAL: Ensure field remains visible - clear any hiding styles
+      defaultNftDescriptionField.style.display = '';
+      defaultNftDescriptionField.style.visibility = '';
+      defaultNftDescriptionField.style.opacity = '';
+      // CRITICAL: Remove any inline styles that might hide the field
+      defaultNftDescriptionField.style.removeProperty('display');
+      defaultNftDescriptionField.style.removeProperty('visibility');
+      defaultNftDescriptionField.style.removeProperty('opacity');
+      // CRITICAL: Set attribute to prevent tooltip manager from setting up tooltips
+      defaultNftDescriptionField.setAttribute('data-no-tooltip', 'true');
+      // CRITICAL: Verify field still exists in DOM
+      if (!document.getElementById("default-nft-description")) {
+        console.error('[CRITICAL ERROR] default-nft-description field was removed from DOM during setupEventListeners!');
+      }
+    }
 
     // Add event listeners to each input field
     inputFields.forEach((input) => {

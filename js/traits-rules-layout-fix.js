@@ -6,25 +6,25 @@
 
   // Prevent multiple initializations
   if (window.traitsRulesLayoutFixInitialized) {
-    console.log('[DEBUG] Traits Rules Layout Fix already initialized, skipping');
+    // console.log('[DEBUG] Traits Rules Layout Fix already initialized, skipping');
     return;
   }
   window.traitsRulesLayoutFixInitialized = true;
   
   // Log script loading for debugging
-  console.log('[DEBUG] Traits & Rules Layout Fix loaded - Script execution #' + (window.traitsRulesLayoutFixCount || 0));
+  // console.log('[DEBUG] Traits & Rules Layout Fix loaded - Script execution #' + (window.traitsRulesLayoutFixCount || 0));
   window.traitsRulesLayoutFixCount = (window.traitsRulesLayoutFixCount || 0) + 1;
   
   // Check if this script is being loaded multiple times
   if (window.traitsRulesLayoutFixCount > 1) {
-    console.warn('[DEBUG] WARNING: Traits Rules Layout Fix script loaded multiple times! This may cause conflicts.');
+    // console.warn('[DEBUG] WARNING: Traits Rules Layout Fix script loaded multiple times! This may cause conflicts.');
   }
   
   // Track MemoryManager errors to see if they're related to our script
   const originalConsoleError = console.error;
   console.error = function(...args) {
     if (args[0] && args[0].includes && args[0].includes('MemoryManager')) {
-      console.log('[DEBUG] MemoryManager error detected - checking if related to our script');
+      // console.log('[DEBUG] MemoryManager error detected - checking if related to our script');
       console.trace('[DEBUG] MemoryManager error stack trace');
     }
     originalConsoleError.apply(console, args);
@@ -41,7 +41,7 @@
     // Get the traits-rules tab
     const traitsRulesTab = document.getElementById('traits-rules');
     if (!traitsRulesTab) {
-      console.log('[DEBUG] Traits & Rules tab not found');
+      // console.log('[DEBUG] Traits & Rules tab not found');
       return;
     }
     
@@ -190,9 +190,9 @@
           
           isProcessingTabSwitch = true;
           tabSwitchTimeout = setTimeout(() => {
-            // If switching to traits-rules tab, update rules section visibility
+            // Note: updateRulesSectionVisibility is only called on project load and layer deletion
+            // Once visible, the section stays visible until conditions are not met
             if (tabId === 'traits-rules') {
-              updateRulesSectionVisibility();
               forceNativeScrollbar();
             }
             
@@ -245,7 +245,7 @@
             // If switching to traits-rules tab
             if (tabId === 'traits-rules') {
               setTimeout(() => {
-                updateRulesSectionVisibility();
+                // Note: updateRulesSectionVisibility is only called on project load and layer deletion
                 forceNativeScrollbar();
               }, 100);
             }
@@ -295,7 +295,7 @@
           // Defer non-critical operations to avoid blocking
           requestAnimationFrame(() => {
             updateButtonVisibility();
-            updateRulesSectionVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load and layer deletion
             forceNativeScrollbar();
           });
           return result;
@@ -310,7 +310,7 @@
           // Defer non-critical operations to avoid blocking
           requestAnimationFrame(() => {
             updateButtonVisibility();
-            updateRulesSectionVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load and layer deletion
             forceNativeScrollbar();
           });
           return result;
@@ -325,7 +325,7 @@
           // Defer non-critical operations to avoid blocking
           requestAnimationFrame(() => {
             updateButtonVisibility();
-            updateRulesSectionVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load and layer deletion
             forceNativeScrollbar();
           });
           return result;
@@ -339,6 +339,8 @@
           const result = originalDeleteTraitLayer.apply(this, args);
           setTimeout(() => {
             updateButtonVisibility();
+            // CRITICAL: Update rules section visibility when layer is deleted
+            // This is one of the only two places where it should be called
             updateRulesSectionVisibility();
             forceNativeScrollbar();
           }, 100);
@@ -353,6 +355,8 @@
           const result = originalDeleteAllTraitLayers.apply(this, args);
           setTimeout(() => {
             updateButtonVisibility();
+            // CRITICAL: Update rules section visibility when all layers are deleted
+            // This is one of the only two places where it should be called
             updateRulesSectionVisibility();
             forceNativeScrollbar();
           }, 100);
@@ -368,7 +372,7 @@
           setTimeout(() => {
             updateButtonVisibility();
             updateRulesFilterVisibility();
-            updateRulesSectionVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load and layer deletion
           }, 100);
           return result;
         };
@@ -380,22 +384,27 @@
 
   // Add functionality to the jump to rules button
   function setupJumpToRulesButton() {
+    // Setup jump-to-rules-btn button (in Trait Layers section)
     const jumpButton = document.getElementById('jump-to-rules-btn');
-    if (!jumpButton) {
-      console.log('[DEBUG] Jump to rules button not found, retrying...');
+    
+    const buttonsToSetup = [jumpButton].filter(btn => btn !== null);
+    
+    if (buttonsToSetup.length === 0) {
+      console.log('[DEBUG] Jump to rules buttons not found, retrying...');
       setTimeout(setupJumpToRulesButton, 100);
       return;
     }
     
-    // Prevent duplicate event listeners
-    if (jumpButton.dataset.listenerAdded) {
-      console.log('[DEBUG] Jump to rules button already has event listener');
-      return;
-    }
+    // console.log('[DEBUG] Setting up jump to rules buttons');
     
-    console.log('[DEBUG] Setting up jump to rules button');
-    
-    jumpButton.addEventListener('click', (e) => {
+    buttonsToSetup.forEach(jumpButton => {
+      // Prevent duplicate event listeners
+      if (jumpButton.dataset.listenerAdded) {
+        // console.log('[DEBUG] Jump to rules button already has event listener');
+        return;
+      }
+      
+      jumpButton.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
@@ -448,8 +457,9 @@
     
     // Mark as having event listener
     jumpButton.dataset.listenerAdded = 'true';
+    });
     
-    console.log('[DEBUG] Jump to rules button setup complete');
+    console.log('[DEBUG] Jump to rules buttons setup complete');
   }
 
   // Position jump-to-layers button - Now inside combination-rules-filter-container
@@ -484,11 +494,11 @@
     
     // Prevent duplicate event listeners
     if (jumpButton.dataset.listenerAdded) {
-      console.log('[DEBUG] Jump to layers button already has event listener');
+      // console.log('[DEBUG] Jump to layers button already has event listener');
       return;
     }
     
-    console.log('[DEBUG] Setting up jump to layers button');
+    // console.log('[DEBUG] Setting up jump to layers button');
     
     // Button is now inside combination-rules-filter-container, positioning handled by CSS
     // Reset any absolute positioning that might interfere
@@ -626,11 +636,11 @@
     
     // Prevent duplicate event listeners
     if (jumpToLayersBottomBtn.dataset.listenerAdded && jumpToRulesBottomBtn.dataset.listenerAdded) {
-      console.log('[DEBUG] Bottom buttons already have event listeners');
+      // console.log('[DEBUG] Bottom buttons already have event listeners');
       return;
     }
     
-    console.log('[DEBUG] Setting up bottom buttons');
+    // console.log('[DEBUG] Setting up bottom buttons');
     
     // Jump to layers bottom button
     if (!jumpToLayersBottomBtn.dataset.listenerAdded) {
@@ -822,18 +832,14 @@
       }
     }
     
-    // Count trait layers and combination rules for Jump to Layers button visibility
-    const traitLayersCount = projectData.traits ? projectData.traits.length : 0;
-    const combinationRulesCount = projectData.rules ? projectData.rules.length : 0;
-    
-    // Show Jump to Layers bottom button if there are 5 or more trait layers OR 5 or more combination rules
-    const shouldShowJumpToLayersBottom = traitLayersCount >= 5 || combinationRulesCount >= 5;
+    // CRITICAL: jump-to-layers-bottom-btn now uses the same conditions as other jump-to buttons
+    // Removed shouldShowJumpToLayersBottom - all buttons now use shouldShowJumpToRulesButtons
+    // (at least 2 trait layers with 1 trait each)
     
     // console.log('[DEBUG] Button visibility check:', {
     //   shouldShowJumpToRulesButtons,
-    //   shouldShowJumpToLayersBottom,
-    //   traitLayersCount,
-    //   combinationRulesCount,
+    //   traitLayersCount: projectData.traits ? projectData.traits.length : 0,
+    //   combinationRulesCount: projectData.rules ? projectData.rules.length : 0,
     //   projectData: !!projectData
     // });
     
@@ -843,21 +849,142 @@
       'jump-to-rules-bottom-btn'
     ];
     
+    // CRITICAL: Also update jump-to-layers-btn visibility (it's in combination-rules-buttons-container)
+    const jumpToLayersBtn = document.getElementById('jump-to-layers-btn');
+    if (jumpToLayersBtn && jumpToLayersBtn.closest('.combination-rules-buttons-container')) {
+      // CRITICAL: Use visibility instead of display to keep space when hidden
+      if (shouldShowJumpToRulesButtons) {
+        jumpToLayersBtn.style.setProperty('display', 'flex', 'important');
+        jumpToLayersBtn.style.setProperty('visibility', 'visible', 'important');
+        jumpToLayersBtn.style.setProperty('opacity', '1', 'important');
+        
+        // CRITICAL: Ensure parent container is visible
+        const parentContainer = jumpToLayersBtn.closest('.jump-to-layers-container');
+        if (parentContainer) {
+          parentContainer.style.setProperty('display', 'flex', 'important');
+          parentContainer.style.setProperty('visibility', 'visible', 'important');
+          parentContainer.style.setProperty('opacity', '1', 'important');
+        }
+        
+        // CRITICAL: Re-setup tooltip when button becomes visible
+        setTimeout(() => {
+          const tooltip = jumpToLayersBtn.querySelector(".tooltiptext");
+          if (tooltip) {
+            if (!jumpToLayersBtn.contains(tooltip)) {
+              jumpToLayersBtn.appendChild(tooltip);
+            }
+            const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+            if (tooltipManager && tooltipManager.setupTooltip) {
+              jumpToLayersBtn.removeAttribute('data-tooltip-setup');
+              delete jumpToLayersBtn.dataset.tooltipSetup;
+              tooltipManager.setupTooltip(jumpToLayersBtn, tooltip);
+            }
+          }
+        }, 50);
+      } else {
+        // CRITICAL: Use visibility: hidden instead of display: none to keep space
+        jumpToLayersBtn.style.setProperty('display', 'flex', 'important');
+        jumpToLayersBtn.style.setProperty('visibility', 'hidden', 'important');
+        jumpToLayersBtn.style.setProperty('opacity', '0', 'important');
+      }
+    }
+    
     jumpToRulesButtons.forEach(buttonId => {
       const button = document.getElementById(buttonId);
       if (button) {
-        button.style.display = shouldShowJumpToRulesButtons ? 'flex' : 'none';
-        // console.log(`[DEBUG] Button ${buttonId} visibility: ${shouldShowJumpToRulesButtons ? 'visible' : 'hidden'}`);
+        if (shouldShowJumpToRulesButtons) {
+          // CRITICAL: Use visibility instead of display to keep space when hidden
+          // CRITICAL: Display stays flex to reserve space, visibility controls actual visibility
+          button.style.setProperty('display', 'flex', 'important');
+          button.style.setProperty('visibility', 'visible', 'important');
+          button.style.setProperty('opacity', '1', 'important');
+          // CRITICAL: Remove inline style="display: none;" if present
+          if (button.getAttribute('style') && button.getAttribute('style').includes('display: none')) {
+            button.setAttribute('style', button.getAttribute('style').replace(/display:\s*none[^;]*;?/gi, ''));
+          }
+          
+          // CRITICAL: Ensure parent container is visible (for jump-to-rules-btn in trait layers section)
+          if (buttonId === 'jump-to-rules-btn') {
+            const parentContainer = button.closest('.trait-layers-actions-right');
+            if (parentContainer) {
+              parentContainer.style.setProperty('display', 'flex', 'important');
+              parentContainer.style.setProperty('visibility', 'visible', 'important');
+              parentContainer.style.setProperty('opacity', '1', 'important');
+            }
+          }
+          
+          // CRITICAL: Re-setup tooltip when button becomes visible to ensure it works
+          // CRITICAL: Use setTimeout to ensure DOM is ready and tooltip can be properly attached
+          setTimeout(() => {
+            const tooltip = button.querySelector(".tooltiptext");
+            if (tooltip) {
+              // CRITICAL: Ensure tooltip is properly attached to button before setup
+              if (!button.contains(tooltip)) {
+                button.appendChild(tooltip);
+              }
+              const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+              if (tooltipManager && tooltipManager.setupTooltip) {
+                button.removeAttribute('data-tooltip-setup');
+                delete button.dataset.tooltipSetup;
+                tooltipManager.setupTooltip(button, tooltip);
+              } else {
+                // Fallback to trait-layers setupTooltipPositioning
+                const traitLayersModule = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('traitLayers');
+                if (traitLayersModule && traitLayersModule.setupTooltipPositioning) {
+                  button.removeAttribute('data-tooltip-setup');
+                  delete button.dataset.tooltipSetup;
+                  traitLayersModule.setupTooltipPositioning(button, tooltip);
+                }
+              }
+            }
+          }, 50);
+          // console.log(`[DEBUG] Button ${buttonId} is now VISIBLE`);
+        } else {
+          // CRITICAL: Use visibility: hidden instead of display: none to keep space
+          // This prevents layout shift when button is hidden/shown
+          button.style.setProperty('display', 'flex', 'important'); // Keep flex to reserve space
+          button.style.setProperty('visibility', 'hidden', 'important');
+          button.style.setProperty('opacity', '0', 'important');
+          // console.log(`[DEBUG] Button ${buttonId} is now HIDDEN (space reserved)`);
+        }
       } else {
-        // console.log(`[DEBUG] Button ${buttonId} not found`);
+        // console.warn(`[DEBUG] Button ${buttonId} not found in DOM - will retry on next update`);
       }
     });
     
-    // Update visibility of Jump to Layers bottom button - keep existing logic
+    // CRITICAL: Update visibility of Jump to Layers bottom button - use same conditions as other jump-to buttons
+    // Must use shouldShowJumpToRulesButtons (at least 2 trait layers with 1 trait each) instead of shouldShowJumpToLayersBottom
     const jumpToLayersBottomBtn = document.getElementById('jump-to-layers-bottom-btn');
     if (jumpToLayersBottomBtn) {
-      jumpToLayersBottomBtn.style.display = shouldShowJumpToLayersBottom ? 'flex' : 'none';
-      // console.log(`[DEBUG] Button jump-to-layers-bottom-btn visibility: ${shouldShowJumpToLayersBottom ? 'visible' : 'hidden'}`);
+      if (shouldShowJumpToRulesButtons) {
+        // CRITICAL: Use visibility instead of display to keep space when hidden (consistent with other buttons)
+        jumpToLayersBottomBtn.style.setProperty('display', 'flex', 'important');
+        jumpToLayersBottomBtn.style.setProperty('visibility', 'visible', 'important');
+        jumpToLayersBottomBtn.style.setProperty('opacity', '1', 'important');
+        
+        // CRITICAL: Re-setup tooltip when button becomes visible
+        setTimeout(() => {
+          const tooltip = jumpToLayersBottomBtn.querySelector(".tooltiptext");
+          if (tooltip) {
+            if (!jumpToLayersBottomBtn.contains(tooltip)) {
+              jumpToLayersBottomBtn.appendChild(tooltip);
+            }
+            const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+            if (tooltipManager && tooltipManager.setupTooltip) {
+              jumpToLayersBottomBtn.removeAttribute('data-tooltip-setup');
+              delete jumpToLayersBottomBtn.dataset.tooltipSetup;
+              tooltipManager.setupTooltip(jumpToLayersBottomBtn, tooltip);
+            }
+          }
+        }, 50);
+        // console.log(`[DEBUG] Button jump-to-layers-bottom-btn is now VISIBLE`);
+      } else {
+        // CRITICAL: Use visibility: hidden instead of display: none to keep space (consistent with other buttons)
+        jumpToLayersBottomBtn.style.setProperty('display', 'flex', 'important'); // Keep flex to reserve space
+        jumpToLayersBottomBtn.style.setProperty('visibility', 'hidden', 'important');
+        jumpToLayersBottomBtn.style.setProperty('opacity', '0', 'important');
+        // console.log(`[DEBUG] Button jump-to-layers-bottom-btn is now HIDDEN (space reserved)`);
+      }
     }
     
     // Note: jump-to-layers-btn is now inside the combination-rules-filter-container
@@ -869,8 +996,9 @@
     const isRulesSectionVisible = rulesSection && rulesSection.style.display !== 'none' && !rulesSection.classList.contains('hidden');
     
     if (bottomContainer) {
-      // Show bottom container if rules section is visible AND at least one button should be visible
-      const shouldShowContainer = isRulesSectionVisible && (shouldShowJumpToRulesButtons || shouldShowJumpToLayersBottom);
+      // CRITICAL: Show bottom container if rules section is visible AND at least one button should be visible
+      // Since jump-to-layers-bottom-btn now uses shouldShowJumpToRulesButtons, we only need to check that
+      const shouldShowContainer = isRulesSectionVisible && shouldShowJumpToRulesButtons;
       if (shouldShowContainer) {
         bottomContainer.style.display = 'flex';
         bottomContainer.style.visibility = 'visible';
@@ -944,11 +1072,204 @@
     }
   }
 
+  // CRITICAL: Global cleanup function to remove ALL duplicate dropdowns
+  // Expose it globally so it can be called from anywhere
+  window.cleanupDuplicateDropdowns = function cleanupDuplicateDropdowns() {
+    // CRITICAL: Find the CORRECT dropdown (the one in the correct container from project-interface.js)
+    const filterContainer = document.getElementById('combination-rules-filter-container');
+    const correctDropdown = filterContainer ? filterContainer.querySelector('#rules-filter-dropdown') : null;
+    
+    // CRITICAL: If custom dropdown exists for rules-filter-dropdown, hide the native select
+    const allCustomDropdowns = document.querySelectorAll('.custom-dropdown');
+    const rulesFilterCustomDropdown = Array.from(allCustomDropdowns).find(cd => {
+      const dataFor = cd.querySelector('[data-for="rules-filter-dropdown"]');
+      return dataFor !== null;
+    });
+    
+    // If custom dropdown exists, hide ALL native select elements
+    if (rulesFilterCustomDropdown) {
+      const allDropdowns = document.querySelectorAll('#rules-filter-dropdown');
+      allDropdowns.forEach((dropdown) => {
+        // Hide the native select - custom dropdown will handle display
+        dropdown.style.setProperty('display', 'none', 'important');
+        dropdown.style.setProperty('visibility', 'hidden', 'important');
+        dropdown.style.setProperty('opacity', '0', 'important');
+        dropdown.style.setProperty('position', 'absolute', 'important');
+        dropdown.style.setProperty('width', '0', 'important');
+        dropdown.style.setProperty('height', '0', 'important');
+        dropdown.style.setProperty('pointer-events', 'none', 'important');
+        console.log('[CLEANUP] Hiding native rules-filter-dropdown select (custom dropdown exists)');
+      });
+    }
+    
+    // Remove ALL duplicate select elements - keep ONLY the correct one
+    const allDropdowns = document.querySelectorAll('#rules-filter-dropdown');
+    if (allDropdowns.length > 1 || (allDropdowns.length === 1 && allDropdowns[0] !== correctDropdown)) {
+      console.log('[CLEANUP] Found', allDropdowns.length, 'rules-filter-dropdown select elements, cleaning up duplicates');
+      allDropdowns.forEach((dropdown, index) => {
+        if (dropdown !== correctDropdown) {
+          const duplicateContainer = dropdown.closest('.combination-rules-filter-container');
+          const duplicateWrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+          if (duplicateContainer && duplicateContainer !== filterContainer) {
+            console.log('[CLEANUP] Removing duplicate filter container', index);
+            duplicateContainer.remove();
+          } else if (duplicateWrapper && duplicateWrapper !== filterContainer?.querySelector('.rules-filter-dropdown-wrapper')) {
+            console.log('[CLEANUP] Removing duplicate dropdown wrapper', index);
+            duplicateWrapper.remove();
+          } else {
+            console.log('[CLEANUP] Removing duplicate dropdown element', index);
+            dropdown.remove();
+          }
+        }
+      });
+    }
+    
+    // CRITICAL: Remove ALL duplicate custom dropdown containers - keep ONLY the one for the correct dropdown
+    // Reuse allCustomDropdowns variable declared above
+    const rulesFilterCustomDropdowns = Array.from(allCustomDropdowns).filter(cd => {
+      const dataFor = cd.querySelector('[data-for="rules-filter-dropdown"]');
+      return dataFor !== null;
+    });
+    
+    // Find the correct custom dropdown (the one next to the correct select)
+    const correctCustomDropdown = correctDropdown && correctDropdown.nextElementSibling && 
+                                   correctDropdown.nextElementSibling.classList.contains('custom-dropdown') &&
+                                   correctDropdown.nextElementSibling.querySelector('[data-for="rules-filter-dropdown"]') ?
+                                   correctDropdown.nextElementSibling : null;
+    
+    if (rulesFilterCustomDropdowns.length > 1 || (rulesFilterCustomDropdowns.length === 1 && rulesFilterCustomDropdowns[0] !== correctCustomDropdown)) {
+      console.log('[CLEANUP] Found', rulesFilterCustomDropdowns.length, 'custom dropdown containers, cleaning up duplicates');
+      rulesFilterCustomDropdowns.forEach((customDropdown, index) => {
+        if (customDropdown !== correctCustomDropdown) {
+          console.log('[CLEANUP] Removing duplicate custom dropdown container', index);
+          customDropdown.remove();
+        }
+      });
+    }
+    
+    // Remove any custom display overlays that might conflict with custom-dropdown.js
+    const allWrappers = document.querySelectorAll('.rules-filter-dropdown-wrapper');
+    allWrappers.forEach(wrapper => {
+      const customDisplay = wrapper.querySelector('.rules-filter-dropdown-custom-display');
+      const select = wrapper.querySelector('#rules-filter-dropdown');
+      if (customDisplay && select && select.classList.contains('custom-dropdown-convert')) {
+        // If select has custom-dropdown-convert class, custom-dropdown.js will handle it
+        // Remove the custom display overlay to prevent conflicts
+        console.log('[CLEANUP] Removing custom display overlay - custom-dropdown.js will handle it');
+        customDisplay.remove();
+      }
+    });
+    
+    // CRITICAL: Final check - ensure only ONE dropdown exists
+    const finalCheck = document.querySelectorAll('#rules-filter-dropdown');
+    if (finalCheck.length > 1) {
+      console.error('[CLEANUP ERROR] Still found', finalCheck.length, 'dropdowns after cleanup! Removing all but first');
+      for (let i = 1; i < finalCheck.length; i++) {
+        finalCheck[i].closest('.combination-rules-filter-container')?.remove() || finalCheck[i].remove();
+      }
+    }
+  }
+  
+  // CRITICAL: Set up a MutationObserver to aggressively clean up duplicates whenever DOM changes
+  if (typeof MutationObserver !== 'undefined') {
+    const cleanupObserver = new MutationObserver(() => {
+      const dropdownCount = document.querySelectorAll('#rules-filter-dropdown').length;
+      const customDropdownCount = document.querySelectorAll('.custom-dropdown [data-for="rules-filter-dropdown"]').length;
+      
+      // If custom dropdown exists, hide all native selects
+      if (customDropdownCount > 0) {
+        const allDropdowns = document.querySelectorAll('#rules-filter-dropdown');
+        allDropdowns.forEach((dropdown) => {
+          dropdown.style.setProperty('display', 'none', 'important');
+          dropdown.style.setProperty('visibility', 'hidden', 'important');
+          dropdown.style.setProperty('opacity', '0', 'important');
+          dropdown.style.setProperty('position', 'absolute', 'important');
+          dropdown.style.setProperty('width', '0', 'important');
+          dropdown.style.setProperty('height', '0', 'important');
+          dropdown.style.setProperty('pointer-events', 'none', 'important');
+        });
+      }
+      
+      if (dropdownCount > 1) {
+        console.log('[CLEANUP OBSERVER] Detected', dropdownCount, 'dropdowns, running cleanup');
+        window.cleanupDuplicateDropdowns();
+      }
+    });
+    
+    // Start observing when DOM is ready
+    if (document.body) {
+      cleanupObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        cleanupObserver.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      });
+    }
+  }
+
     // Setup the rules filter functionality
     function setupRulesFilter() {
+      // CRITICAL: Run cleanup FIRST, before any checks
+      cleanupDuplicateDropdowns();
+      
+      // CRITICAL: Prevent multiple initializations
+      if (window._rulesFilterSetupComplete) {
+        // console.log('[DEBUG] Rules filter already set up, skipping');
+        return;
+      }
+      
       // console.log('[DEBUG] Setting up rules filter');
       
+      // Cleanup already done by cleanupDuplicateDropdowns() above
+      // Now get the filter container after cleanup
       const filterContainer = document.getElementById('combination-rules-filter-container');
+      
+      // CRITICAL: Check for and remove any duplicate dropdowns
+      // Find all select elements with id="rules-filter-dropdown" - there should only be one
+      const allDropdowns = document.querySelectorAll('#rules-filter-dropdown');
+      if (allDropdowns.length > 1) {
+        console.log('[DEBUG] Found', allDropdowns.length, 'duplicate rules-filter-dropdown elements, removing duplicates');
+        // Keep only the first one (the one in the correct container), remove the rest
+        const correctContainer = filterContainer?.querySelector('#rules-filter-dropdown');
+        for (let i = 0; i < allDropdowns.length; i++) {
+          const dropdown = allDropdowns[i];
+          if (dropdown !== correctContainer) {
+            const duplicateWrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+            const duplicateContainer = dropdown.closest('.combination-rules-filter-container');
+            if (duplicateContainer && duplicateContainer !== filterContainer) {
+              console.log('[DEBUG] Removing duplicate filter container');
+              duplicateContainer.remove();
+            } else if (duplicateWrapper && duplicateWrapper !== filterContainer?.querySelector('.rules-filter-dropdown-wrapper')) {
+              console.log('[DEBUG] Removing duplicate dropdown wrapper');
+              duplicateWrapper.remove();
+            } else {
+              console.log('[DEBUG] Removing duplicate dropdown element');
+              dropdown.remove();
+            }
+          }
+        }
+      }
+      
+      // CRITICAL: Also check for duplicate custom dropdown containers
+      const allCustomDropdownsCheck = document.querySelectorAll('.custom-dropdown');
+      const rulesFilterCustomDropdowns = Array.from(allCustomDropdownsCheck).filter(cd => {
+        const dataFor = cd.querySelector('[data-for="rules-filter-dropdown"]');
+        return dataFor !== null;
+      });
+      if (rulesFilterCustomDropdowns.length > 1) {
+        console.log('[DEBUG] Found', rulesFilterCustomDropdowns.length, 'duplicate custom dropdown containers for rules-filter-dropdown, removing duplicates');
+        // Keep only the first one, remove the rest
+        for (let i = 1; i < rulesFilterCustomDropdowns.length; i++) {
+          console.log('[DEBUG] Removing duplicate custom dropdown container');
+          rulesFilterCustomDropdowns[i].remove();
+        }
+      }
+      
       const clearBtn = document.getElementById('clear-rules-filter-btn');
       const dropdown = document.getElementById('rules-filter-dropdown');
       const jumpBtn = document.getElementById('jump-to-layers-btn');
@@ -959,10 +1280,18 @@
         dropdown.setAttribute('title', ''); // Set empty title to prevent native tooltip
         // Ensure dropdown doesn't have tooltip class
         dropdown.classList.remove('tooltip');
+        // CRITICAL: Ensure dropdown is enabled and clickable
+        dropdown.removeAttribute('disabled');
+        dropdown.removeAttribute('readonly');
+        dropdown.disabled = false;
         // CRITICAL: Ensure dropdown has proper appearance settings to remove native arrows
         dropdown.style.setProperty('appearance', 'none', 'important');
         dropdown.style.setProperty('-webkit-appearance', 'none', 'important');
         dropdown.style.setProperty('-moz-appearance', 'none', 'important');
+        // CRITICAL: Ensure dropdown can receive clicks
+        dropdown.style.setProperty('pointer-events', 'auto', 'important');
+        dropdown.style.setProperty('z-index', '2', 'important');
+        dropdown.style.setProperty('position', 'relative', 'important');
         // CRITICAL: Remove any child elements that might be icons or checkmarks
         const dropdownChildren = Array.from(dropdown.children);
         dropdownChildren.forEach(child => {
@@ -990,10 +1319,31 @@
       return;
     }
     
-    // Prevent duplicate event listeners
+    // Prevent duplicate event listeners AND duplicate custom display setup
     if (clearBtn.dataset.listenerAdded && dropdown.dataset.listenerAdded && jumpBtn.dataset.listenerAdded) {
-      // console.log('[DEBUG] Rules filter already has event listeners');
+      // Check if custom display already exists
+      const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+      if (wrapper && wrapper.querySelector('.rules-filter-dropdown-custom-display')) {
+        // console.log('[DEBUG] Rules filter already has event listeners and custom display');
+        // CRITICAL: Still ensure "All Rule Types" is selected by default
+        if (dropdown && dropdown.options.length > 0 && dropdown.options[0].value === '') {
+          if (dropdown.selectedIndex !== 0 || dropdown.value !== '') {
+            dropdown.selectedIndex = 0;
+            dropdown.value = '';
+            // Update display if custom display exists
+            const customDisplay = wrapper.querySelector('.rules-filter-dropdown-custom-display');
+            if (customDisplay) {
+              // Force update display
+              const selectedOption = dropdown.options[0];
+              if (selectedOption) {
+                customDisplay.innerHTML = `<span style="color: #ffffff;">All Rule Types</span>`;
+                customDisplay.style.color = '#ffffff';
+              }
+            }
+          }
+        }
       return;
+      }
     }
     
     // console.log('[DEBUG] All filter elements found, setting up event listeners');
@@ -1015,6 +1365,345 @@
       }, { capture: true });
       clearBtn.dataset.listenerAdded = 'true';
       // console.log('[DEBUG] Clear button event listener added');
+      
+      // CRITICAL: Setup tooltip for Clear Filter button
+      const setupClearFilterTooltip = () => {
+        if (!clearBtn || !document.body.contains(clearBtn)) {
+          return;
+        }
+        
+        const computedStyle = window.getComputedStyle(clearBtn);
+        if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') {
+          setTimeout(setupClearFilterTooltip, 500);
+          return;
+        }
+        
+        let tooltip = clearBtn.querySelector(".tooltiptext");
+        
+        if (!tooltip) {
+          const tooltipId = clearBtn.getAttribute('data-tooltip-id');
+          if (tooltipId) {
+            tooltip = document.getElementById(tooltipId);
+          }
+          if (!tooltip && clearBtn.parentElement) {
+            tooltip = clearBtn.parentElement.querySelector(`.tooltiptext[data-for="${clearBtn.id}"]`);
+          }
+        }
+        
+        if (tooltip) {
+          if (!clearBtn.contains(tooltip)) {
+            clearBtn.appendChild(tooltip);
+          }
+          clearBtn.style.setProperty("cursor", "default", "important");
+          if (!clearBtn.classList.contains('tooltip')) {
+            clearBtn.classList.add('tooltip');
+          }
+          
+          const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (tooltipManager && tooltipManager.setupTooltip) {
+            clearBtn.removeAttribute('data-tooltip-setup');
+            delete clearBtn.dataset.tooltipSetup;
+            tooltipManager.setupTooltip(clearBtn, tooltip);
+          }
+        } else {
+          setTimeout(setupClearFilterTooltip, 500);
+        }
+      };
+      
+      // Setup tooltip immediately and retry if needed
+      setupClearFilterTooltip();
+      setTimeout(setupClearFilterTooltip, 100);
+      setTimeout(setupClearFilterTooltip, 300);
+      setTimeout(setupClearFilterTooltip, 500);
+      setTimeout(setupClearFilterTooltip, 1000);
+      setTimeout(setupClearFilterTooltip, 2000);
+      
+      // CRITICAL: Also ensure tooltip is set up when button becomes visible
+      // Use MutationObserver to watch for visibility changes
+      if (clearBtn && typeof MutationObserver !== 'undefined') {
+        const tooltipObserver = new MutationObserver(() => {
+          const computedStyle = window.getComputedStyle(clearBtn);
+          if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden') {
+            setupClearFilterTooltip();
+          }
+        });
+        
+        tooltipObserver.observe(clearBtn, {
+          attributes: true,
+          attributeFilter: ['style', 'class'],
+          childList: true,
+          subtree: true
+        });
+      }
+    }
+    
+    // CRITICAL: Setup custom display overlay for dropdown to show colors and symbols
+    // This avoids creating duplicate dropdowns while still showing colored text and symbols
+    // NOTE: If custom-dropdown.js is converting this dropdown, it will handle the display
+    // But we still set up the overlay as a fallback for collapsed state consistency
+    function setupDropdownCustomDisplay() {
+      const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+      if (!wrapper) return;
+      
+      // Check if custom-dropdown.js has already converted this dropdown
+      // Custom-dropdown.js hides the select and creates a new container after it
+      // So we check if the select is hidden (display: none) and if there's a custom-dropdown container nearby
+      const isSelectHidden = dropdown.style.display === 'none' || window.getComputedStyle(dropdown).display === 'none';
+      const nextSibling = dropdown.nextElementSibling;
+      const hasCustomDropdown = nextSibling && nextSibling.classList && nextSibling.classList.contains('custom-dropdown');
+      
+      if (isSelectHidden && hasCustomDropdown) {
+        // Custom-dropdown.js is handling this, so we don't need the overlay
+        // The custom dropdown will handle both collapsed and expanded states
+        console.log('[DEBUG] Custom-dropdown.js is handling rules-filter-dropdown, skipping custom display overlay');
+        return;
+      }
+      
+      // Check if custom display already exists to prevent duplicates
+      let customDisplay = wrapper.querySelector('.rules-filter-dropdown-custom-display');
+      if (customDisplay) {
+        // Update existing display
+        updateDropdownDisplay();
+        return;
+      }
+      
+      // Create custom display element
+      customDisplay = document.createElement('div');
+      customDisplay.className = 'rules-filter-dropdown-custom-display';
+      customDisplay.setAttribute('aria-hidden', 'true');
+      
+      // CRITICAL: Ensure custom display is visible and properly styled
+      customDisplay.style.cssText = `
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 2.5rem !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        padding: 0.75rem 1rem !important;
+        pointer-events: none !important;
+        z-index: 1 !important;
+        font-family: "Archivo", sans-serif !important;
+        font-size: 0.9rem !important;
+        line-height: 1.5 !important;
+        box-sizing: border-box !important;
+        background: transparent !important;
+        overflow: hidden !important;
+      `;
+      
+      // Insert custom display inside wrapper, after select (positioned absolutely to overlay)
+      wrapper.appendChild(customDisplay);
+      
+      // CRITICAL: Ensure custom display doesn't block clicks - set pointer-events via JS as well
+      customDisplay.style.pointerEvents = 'none';
+      customDisplay.style.setProperty('pointer-events', 'none', 'important');
+      
+      // CRITICAL: Ensure all children of custom display also don't block clicks
+      const observer = new MutationObserver(() => {
+        const children = customDisplay.querySelectorAll('*');
+        children.forEach(child => {
+          child.style.setProperty('pointer-events', 'none', 'important');
+        });
+      });
+      observer.observe(customDisplay, { childList: true, subtree: true });
+      
+      // Update display initially
+      updateDropdownDisplay();
+      
+      // Update display on change (separate listener to avoid conflicts)
+      const changeHandler = () => {
+        updateDropdownDisplay();
+      };
+      dropdown.addEventListener('change', changeHandler);
+      
+      // CRITICAL: Ensure select element can receive clicks - make sure it's above custom display
+      dropdown.style.setProperty('z-index', '2', 'important');
+      dropdown.style.setProperty('position', 'relative', 'important');
+      dropdown.style.setProperty('pointer-events', 'auto', 'important');
+      
+      // Update display when dropdown opens/closes (for visual feedback)
+      dropdown.addEventListener('focus', () => {
+        customDisplay.classList.add('focused');
+        // Hide custom display when dropdown is open (native options should be visible)
+        customDisplay.style.setProperty('opacity', '0', 'important');
+        customDisplay.style.setProperty('visibility', 'hidden', 'important');
+      });
+      dropdown.addEventListener('blur', () => {
+        customDisplay.classList.remove('focused');
+        // Show custom display when dropdown closes (collapsed state)
+        customDisplay.style.setProperty('opacity', '1', 'important');
+        customDisplay.style.setProperty('visibility', 'visible', 'important');
+        // CRITICAL: Update display on blur to ensure correct selection is shown when collapsed
+        updateDropdownDisplay();
+      });
+    }
+    
+    // Function to update the custom display with correct colors and symbols
+    function updateDropdownDisplay() {
+      const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+      if (!wrapper) return;
+      
+      const customDisplay = wrapper.querySelector('.rules-filter-dropdown-custom-display');
+      if (!customDisplay) return;
+      
+      const selectedOption = dropdown.options[dropdown.selectedIndex];
+      if (!selectedOption) return;
+      
+      const ruleType = selectedOption.value;
+      const optionText = selectedOption.textContent.trim();
+      
+      // CRITICAL: Use centralized color and SVG icon definitions for consistency
+      const RULE_TYPE_COLORS = window.RULE_TYPE_COLORS || {
+        'never-combine': '#ff0000',
+        'always-combine': '#00b894',
+        'conditional-restriction': '#fdcb6e',
+        'always-above': '#006cff',
+        'always-below': '#ff6600',
+        'immediately-above': '#9000ff',
+        'immediately-below': '#ffe400',
+      };
+      
+      let color = RULE_TYPE_COLORS[ruleType] || '#ffffff';
+      let symbol = '';
+      
+      // CRITICAL: Use centralized SVG icon definitions
+      if (window.RULE_TYPE_SVG_ICONS && window.RULE_TYPE_SVG_ICONS[ruleType]) {
+        // Get the SVG from centralized definitions and add inline styles for dropdown display
+        const svgIcon = window.RULE_TYPE_SVG_ICONS[ruleType](color);
+        // Add inline styles for proper display in dropdown
+        symbol = svgIcon.replace('<svg', `<svg style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"`);
+      } else {
+        // Fallback to inline definitions if global not available
+      if (ruleType === 'never-combine') {
+        symbol = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rule-type-never-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
+      } else if (ruleType === 'always-combine') {
+        symbol = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rule-type-always-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+      } else if (ruleType === 'always-above') {
+        symbol = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rule-type-above-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>`;
+      } else if (ruleType === 'always-below') {
+        symbol = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rule-type-below-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"><polyline points="17 11 12 16 7 11"></polyline><polyline points="17 4 12 9 7 4"></polyline></svg>`;
+      } else if (ruleType === 'immediately-above') {
+        symbol = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rule-type-above-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"><polyline points="17 11 12 6 7 11"></polyline></svg>`;
+      } else if (ruleType === 'immediately-below') {
+        symbol = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rule-type-below-icon" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"><polyline points="7 13 12 18 17 13"></polyline></svg>`;
+        }
+      }
+      
+      // Update custom display content
+      // For "All Rule Types" (empty value), don't show symbol
+      if (ruleType === '') {
+        customDisplay.innerHTML = `<span style="color: #ffffff !important;">All Rule Types</span>`;
+        customDisplay.style.color = '#ffffff';
+        customDisplay.style.setProperty('color', '#ffffff', 'important');
+      } else {
+        customDisplay.innerHTML = symbol + `<span style="color: ${color} !important;">${optionText}</span>`;
+      customDisplay.style.color = color;
+        customDisplay.style.setProperty('color', color, 'important');
+        // CRITICAL: Ensure SVG icon color is set correctly
+        const svgIcon = customDisplay.querySelector('svg');
+        if (svgIcon) {
+          svgIcon.style.setProperty('stroke', color, 'important');
+        }
+      }
+    }
+    
+    // CRITICAL: Ensure "All Rule Types" is selected by default FIRST (before setting up display)
+    // Only set if not already set to avoid unnecessary updates
+    if (dropdown && dropdown.options.length > 0 && dropdown.options[0].value === '') {
+      if (dropdown.selectedIndex !== 0 || dropdown.value !== '') {
+        dropdown.selectedIndex = 0;
+        dropdown.value = '';
+      }
+    }
+    
+    // CRITICAL: Check if custom-dropdown.js should handle this dropdown
+    // If it has custom-dropdown-convert class, let custom-dropdown.js handle it
+    const shouldUseCustomDropdown = dropdown.classList.contains('custom-dropdown-convert');
+    
+    if (shouldUseCustomDropdown) {
+      // Custom-dropdown.js will handle this, so we don't need the custom display overlay
+      // CRITICAL: Remove any existing custom display overlay to prevent duplicates
+      const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+      if (wrapper) {
+        const existingCustomDisplay = wrapper.querySelector('.rules-filter-dropdown-custom-display');
+        if (existingCustomDisplay) {
+          console.log('[DEBUG] Removing custom display overlay - custom-dropdown.js will handle it');
+          existingCustomDisplay.remove();
+        }
+      }
+      
+      // But we need to ensure custom-dropdown.js initializes it
+      if (window.NFTApp && window.NFTApp.customDropdown && typeof window.NFTApp.customDropdown.init === 'function') {
+        // Check if already converted
+        const isAlreadyConverted = dropdown.customDropdown || (dropdown.nextElementSibling && dropdown.nextElementSibling.classList.contains('custom-dropdown'));
+        
+        if (!isAlreadyConverted) {
+          // Initialize custom dropdown for this specific element
+          console.log('[DEBUG] Initializing custom-dropdown.js for rules-filter-dropdown');
+          // Call init which will find and convert all .custom-dropdown-convert elements
+          window.NFTApp.customDropdown.init();
+        } else {
+          // Already converted, just update it
+          if (window.NFTApp.customDropdown.updateDropdown) {
+            window.NFTApp.customDropdown.updateDropdown(dropdown);
+          }
+        }
+      }
+    } else {
+      // Setup custom display overlay (only if not using custom-dropdown.js)
+      setupDropdownCustomDisplay();
+      
+      // CRITICAL: Function to ensure dropdown display is correct
+      const ensureDropdownDisplay = () => {
+        updateDropdownDisplay();
+        // Also ensure the select text is transparent so custom display shows (only when not focused)
+        if (dropdown && !dropdown.matches(':focus')) {
+          dropdown.style.setProperty('color', 'transparent', 'important');
+        }
+        // Ensure custom display is visible when collapsed
+        const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+        const customDisplay = wrapper ? wrapper.querySelector('.rules-filter-dropdown-custom-display') : null;
+        if (customDisplay && !dropdown.matches(':focus')) {
+          customDisplay.style.setProperty('opacity', '1', 'important');
+          customDisplay.style.setProperty('visibility', 'visible', 'important');
+        }
+      };
+      
+      // CRITICAL: Force update display after setup to ensure it shows correctly with icon and color
+      // Use multiple timeouts to ensure it updates even if DOM isn't ready
+      setTimeout(ensureDropdownDisplay, 50);
+      setTimeout(ensureDropdownDisplay, 150);
+      setTimeout(ensureDropdownDisplay, 300);
+      
+      // CRITICAL: Also update on any focus/blur to ensure correct display
+      // Only set up these handlers if using custom display overlay (not custom-dropdown.js)
+      if (!dropdown.dataset.displayHandlerAdded) {
+        dropdown.addEventListener('focus', () => {
+          // Hide custom display when focused (dropdown is open)
+          const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+          const customDisplay = wrapper ? wrapper.querySelector('.rules-filter-dropdown-custom-display') : null;
+          if (customDisplay) {
+            customDisplay.style.setProperty('opacity', '0', 'important');
+            customDisplay.style.setProperty('visibility', 'hidden', 'important');
+          }
+          dropdown.style.setProperty('color', '#ffffff', 'important');
+        });
+        
+        dropdown.addEventListener('blur', () => {
+          // Show custom display when blurred (dropdown is closed)
+          setTimeout(() => {
+            if (typeof ensureDropdownDisplay === 'function') {
+              ensureDropdownDisplay();
+            }
+          }, 100); // Small delay to ensure selection is updated
+        });
+        
+        dropdown.dataset.displayHandlerAdded = 'true';
+      }
+      
+      // CRITICAL: Mark setup as complete to prevent re-initialization
+      window._rulesFilterSetupComplete = true;
     }
     
     // Dropdown change functionality
@@ -1025,6 +1714,22 @@
         e.stopImmediatePropagation();
         // console.log('[DEBUG] Rules filter dropdown changed to:', e.target.value);
         filterRules(e.target.value);
+        
+        // CRITICAL: Update custom display immediately when selection changes
+        updateDropdownDisplay();
+        
+        // CRITICAL: Ensure custom display is visible when collapsed (after change)
+        const wrapper = dropdown.closest('.rules-filter-dropdown-wrapper');
+        const customDisplay = wrapper ? wrapper.querySelector('.rules-filter-dropdown-custom-display') : null;
+        if (customDisplay) {
+          customDisplay.style.setProperty('opacity', '1', 'important');
+          customDisplay.style.setProperty('visibility', 'visible', 'important');
+        }
+        
+        // CRITICAL: Ensure select text is transparent so custom display shows
+        if (!dropdown.matches(':focus')) {
+          dropdown.style.setProperty('color', 'transparent', 'important');
+        }
         
         // Show notification
         if (window.NFTApp?.getModule('notificationService')) {
@@ -1154,18 +1859,22 @@
       
       // Show jump-to-layers-btn using the same conditions as other jump buttons
       // Should show if there are 5+ traits OR 5+ rules (same as updateButtonVisibility)
-      if (jumpBtn) {
+      // CRITICAL: jump-to-layers-btn is in combination-rules-buttons-container, not filter container
+      // This code handles the button if it's in the filter container (legacy)
+      if (jumpBtn && jumpBtn.closest('#combination-rules-filter-container')) {
         const shouldShow = rulesCount >= 5 || traitsCount >= 5;
-        jumpBtn.style.display = shouldShow ? 'flex' : 'none';
+        // CRITICAL: Use visibility instead of display to keep space when hidden
+        jumpBtn.style.setProperty('display', 'flex', 'important');
+        jumpBtn.style.setProperty('visibility', shouldShow ? 'visible' : 'hidden', 'important');
+        jumpBtn.style.setProperty('opacity', shouldShow ? '1' : '0', 'important');
         // console.log(`[DEBUG] Jump-to-layers-btn visibility: ${shouldShow ? 'visible' : 'hidden'} (traits count: ${traitsCount}, rules count: ${rulesCount})`);
         
-        // Reposition the button after visibility changes
-        if (shouldShow) {
-          setTimeout(() => {
-            if (typeof positionJumpToLayersButton === 'function') {
-              positionJumpToLayersButton();
-            }
-          }, 100);
+        // CRITICAL: Ensure parent container is visible
+        const parentContainer = jumpBtn.closest('.jump-to-layers-container');
+        if (parentContainer) {
+          parentContainer.style.setProperty('display', 'flex', 'important');
+          parentContainer.style.setProperty('visibility', 'visible', 'important');
+          parentContainer.style.setProperty('opacity', '1', 'important');
         }
       }
     } else {
@@ -1219,28 +1928,9 @@
   }
 
   // CRITICAL FIX: Update rules section visibility based on trait layers count
+  // ONCE minimum conditions are met, the section stays visible FOREVER (never hidden again)
   function updateRulesSectionVisibility() {
     // console.log('[DEBUG] updateRulesSectionVisibility called');
-    
-    // Try multiple ways to get project data
-    let projectData = null;
-    
-    if (window.NFTApp?.getModule('generateNftsUI')?.projectData) {
-      projectData = window.NFTApp.getModule('generateNftsUI').projectData;
-    } else if (window.currentProject) {
-      projectData = window.currentProject;
-    } else if (window.NFTApp?.getModule('traitLayers')?.projectData) {
-      projectData = window.NFTApp.getModule('traitLayers').projectData;
-    } else if (window.NFTApp?.getModule('combinationRules')?.projectData) {
-      projectData = window.NFTApp.getModule('combinationRules').projectData;
-    } else if (window.NFTApp?.getModule('projectInterface')?.projectData) {
-      projectData = window.NFTApp.getModule('projectInterface').projectData;
-    }
-    
-    if (!projectData) {
-      // console.log('[DEBUG] No project data available for rules section visibility check');
-      return;
-    }
     
     const rulesSection = document.querySelector('.rules-section');
     if (!rulesSection) {
@@ -1248,11 +1938,143 @@
       return;
     }
     
+    // CRITICAL: Check if project is currently loading - if so, don't hide the section to prevent flicker
+    const projectService = window.NFTApp?.getModule('projectService');
+    const isLoading = projectService?.isLoading === true || (projectService?._projectWasLoaded === false && projectService?.isLoading !== false);
+    
+    // CRITICAL: Also check if interface is being swapped (happens at 80% progress)
+    const appContainer = document.getElementById('app');
+    const isSwappingInterface = appContainer?.dataset.swappingInterface === 'true';
+    
+    if (isLoading || isSwappingInterface) {
+      // During project load or interface swap, ensure section stays visible to prevent flicker
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      return; // Early return during loading/swap to prevent flicker
+    }
+    
+    // CRITICAL: Check if section has ever been visible (minimum conditions met)
+    // Once this flag is set, the section will NEVER be hidden again
+    const hasEverBeenVisible = rulesSection.dataset.hasEverBeenVisible === 'true';
+    
+    // CRITICAL: Get project data FIRST before checking hasEverBeenVisible
+    // This ensures we can properly evaluate conditions on project load
+    let projectData = null;
+    
+    // CRITICAL: Always prefer window.currentProject first as it's the most up-to-date source
+    // This ensures we get newly added rules immediately
+    if (window.currentProject) {
+      projectData = window.currentProject;
+      // console.log('[DEBUG] Using window.currentProject for rules visibility check (has', projectData.rules?.length || 0, 'rules)');
+    } else if (window.NFTApp?.getModule('combinationRules')?.projectData) {
+      projectData = window.NFTApp.getModule('combinationRules').projectData;
+      // console.log('[DEBUG] Using combinationRules module projectData for rules visibility check');
+    } else if (window.NFTApp?.getModule('generateNftsUI')?.projectData) {
+      projectData = window.NFTApp.getModule('generateNftsUI').projectData;
+    } else if (window.NFTApp?.getModule('traitLayers')?.projectData) {
+      projectData = window.NFTApp.getModule('traitLayers').projectData;
+    } else if (window.NFTApp?.getModule('projectInterface')?.projectData) {
+      projectData = window.NFTApp.getModule('projectInterface').projectData;
+    }
+    
+    // If section has ever been visible AND we have project data, ALWAYS show it and return immediately
+    // This ensures once minimum conditions are met, it stays visible forever
+    // BUT: On project load, we still need to check conditions first to set the flag
+    if (hasEverBeenVisible && projectData && projectData.traits && Array.isArray(projectData.traits) && projectData.traits.length > 0) {
+      // console.log('[DEBUG] Rules section has ever been visible - ALWAYS showing (never hiding again)');
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('flex-direction', 'column', 'important');
+      rulesSection.style.setProperty('align-items', 'flex-start', 'important');
+      const combinationRulesContainer = document.getElementById('combination-rules-container');
+      if (combinationRulesContainer) {
+        combinationRulesContainer.style.setProperty('display', 'block', 'important');
+        combinationRulesContainer.style.setProperty('visibility', 'visible', 'important');
+        combinationRulesContainer.style.setProperty('opacity', '1', 'important');
+      }
+      return; // Early return - never check conditions again once visible
+    }
+    
+    // If we don't have project data yet, try to get it
+    if (!projectData) {
+      // CRITICAL: Try multiple ways to get project data, prioritizing the most up-to-date source
+      // Priority: 1) window.currentProject (most up-to-date), 2) combinationRules module, 3) other modules
+      if (window.currentProject) {
+        projectData = window.currentProject;
+        // console.log('[DEBUG] Using window.currentProject for rules visibility check (has', projectData.rules?.length || 0, 'rules)');
+      } else if (window.NFTApp?.getModule('combinationRules')?.projectData) {
+        projectData = window.NFTApp.getModule('combinationRules').projectData;
+        // console.log('[DEBUG] Using combinationRules module projectData for rules visibility check');
+      } else if (window.NFTApp?.getModule('generateNftsUI')?.projectData) {
+        projectData = window.NFTApp.getModule('generateNftsUI').projectData;
+      } else if (window.NFTApp?.getModule('traitLayers')?.projectData) {
+        projectData = window.NFTApp.getModule('traitLayers').projectData;
+      } else if (window.NFTApp?.getModule('projectInterface')?.projectData) {
+        projectData = window.NFTApp.getModule('projectInterface').projectData;
+      }
+    }
+    
+    if (!projectData) {
+      // console.log('[DEBUG] No project data available for rules section visibility check');
+      return;
+    }
+    
+    // CRITICAL: Check if rules section is currently being updated - if so, don't hide it
+    const isUpdatingRules = rulesSection.dataset.updatingRules === 'true';
+    if (isUpdatingRules) {
+      // console.log('[DEBUG] Rules section is being updated - forcing visibility');
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      return; // Early return - don't hide while updating
+    }
+    
+    // CRITICAL: Check if rules exist first - if so, always show the section
+    // This prevents the section from being hidden when rules exist, even if other conditions aren't met
+    // Check both projectData and DOM as a safeguard against stale data
+    const hasRulesInProjectData = projectData.rules && Array.isArray(projectData.rules) && projectData.rules.length > 0;
+    
+    // CRITICAL: Also check the DOM for existing rules as a final safeguard
+    // This prevents hiding the section if rules exist in the DOM but projectData is stale
+    const rulesContainer = document.getElementById('combination-rules-container');
+    const existingRulesInDOM = rulesContainer ? rulesContainer.querySelectorAll('.rule-item, [data-rule-id]').length : 0;
+    const hasRulesInDOM = existingRulesInDOM > 0;
+    
+    const hasRules = hasRulesInProjectData || hasRulesInDOM;
+    
+    // CRITICAL: If rules exist (in projectData OR DOM), ALWAYS show the section immediately and return early
+    // This is the most important check - never hide if rules exist
+    if (hasRules) {
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('flex-direction', 'column', 'important');
+      rulesSection.style.setProperty('align-items', 'flex-start', 'important');
+      // console.log('[DEBUG] Rules exist - showing rules section (projectData:', hasRulesInProjectData ? projectData.rules.length : 0, 'DOM:', existingRulesInDOM, ')');
+      return; // Early return - NEVER hide if rules exist
+    }
+    
+    // CRITICAL: Final DOM check before hiding (in case rules were just added)
+    // This is a final safeguard against race conditions
+    const finalDOMCheck = rulesContainer ? rulesContainer.querySelectorAll('.rule-item, [data-rule-id]').length : 0;
+    if (finalDOMCheck > 0) {
+      // console.log('[DEBUG] Final DOM check found', finalDOMCheck, 'rules - showing section');
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('flex-direction', 'column', 'important');
+      rulesSection.style.setProperty('align-items', 'flex-start', 'important');
+      return; // Early return - NEVER hide if DOM has rules
+    }
+    
     // Check if projectData has traits array
+    // Only check this if there are no rules
     if (!projectData.traits || !Array.isArray(projectData.traits)) {
-      // Hide the rules section
+      // Hide the rules section only if there are no rules
       rulesSection.style.setProperty('display', 'none', 'important');
-      // console.log('[DEBUG] Rules section is now hidden - no traits array');
+      // console.log('[DEBUG] Rules section is now hidden - no traits array and no rules');
       return;
     }
     
@@ -1267,18 +2089,37 @@
     
     const shouldShow = hasAtLeastOneLayer && allLayersHaveTraits;
     
+    // CRITICAL: Also check if there are existing rules - if so, always show the section
+    // Note: hasRules was already declared above at line 1683
+    // If we reach this point, hasRules should be false (otherwise we would have returned early)
+    // But we check again to be safe in case projectData was updated between the early return check and here
+    // Re-check rules (can't redeclare const, so we check the condition again)
+    const hasRulesNow = projectData.rules && Array.isArray(projectData.rules) && projectData.rules.length > 0;
+    const shouldShowWithRules = shouldShow || hasRulesNow;
+    
     // console.log('[DEBUG] Rules section visibility check:', {
     //   traitLayersCount,
     //   hasAtLeastOneLayer,
     //   allLayersHaveTraits,
-    //   shouldShow
+    //   shouldShow,
+    //   hasRules,
+    //   shouldShowWithRules
     // });
     
-    if (shouldShow) {
+    if (shouldShowWithRules) {
       // Show the rules section
       rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
       rulesSection.style.setProperty('flex-direction', 'column', 'important');
       rulesSection.style.setProperty('align-items', 'flex-start', 'important');
+      
+      // CRITICAL: Mark that section has ever been visible - this means it will NEVER be hidden again
+      // Set this flag ONCE when minimum conditions are first met
+      if (!hasEverBeenVisible) {
+        rulesSection.dataset.hasEverBeenVisible = 'true';
+        // console.log('[DEBUG] Rules section minimum conditions met - marking as permanently visible (will never hide again)');
+      }
       // console.log('[DEBUG] Rules section is now visible');
       
       // CRITICAL: Ensure bottom buttons are visible when rules section is shown
@@ -1294,28 +2135,44 @@
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            width: 100% !important;
+            width: 1557px !important;
+            max-width: 1557px !important;
+            min-width: 1557px !important;
             z-index: 100 !important;
-            justify-content: center !important;
+            justify-content: flex-end !important;
             align-items: center !important;
-            gap: 1rem !important;
+            gap: 10px !important;
+            row-gap: 10px !important;
+            column-gap: 10px !important;
             padding: 1rem !important;
+            padding-left: 0 !important;
+            padding-right: 1rem !important;
             margin: 0 !important;
             border-top: 1px solid var(--border-color) !important;
             background: transparent !important;
             pointer-events: auto !important;
             box-sizing: border-box !important;
+            text-align: right !important;
           `;
           console.log('[DEBUG] Bottom buttons forced visible in updateRulesSectionVisibility');
         }
       }, 100);
     } else {
+      // CRITICAL: Only hide if section has NEVER been visible (minimum conditions never met)
+      // If it has ever been visible, NEVER hide it again
+      if (!hasEverBeenVisible) {
       // Hide the rules section
       rulesSection.style.setProperty('display', 'none', 'important');
       if (!hasAtLeastOneLayer) {
-        // console.log('[DEBUG] Rules section is now hidden - need at least 1 trait layer');
+          // console.log('[DEBUG] Rules section is now hidden - need at least 1 trait layer (has never been visible)');
       } else {
-        // console.log('[DEBUG] Rules section is now hidden - each layer needs at least one trait loaded');
+          // console.log('[DEBUG] Rules section is now hidden - each layer needs at least one trait loaded (has never been visible)');
+        }
+      } else {
+        // Section has been visible before - keep it visible even if conditions aren't met
+        rulesSection.style.setProperty('display', 'flex', 'important');
+        rulesSection.style.setProperty('visibility', 'visible', 'important');
+        rulesSection.style.setProperty('opacity', '1', 'important');
       }
     }
   }
@@ -1339,26 +2196,46 @@
     // Look for all possible rule element selectors
     const ruleElements = rulesContainer.querySelectorAll('.rule-item, .combination-rule-item, .combination-rule, [data-rule-id]');
     
-    if (!ruleType) {
-      // Show all rules
+    if (!ruleType || ruleType === 'all' || ruleType === '') {
+      // Show all rules - CRITICAL: Reset ALL style properties that might have been set during filtering
       ruleElements.forEach(element => {
-        element.style.display = '';
-        element.style.visibility = '';
+        // Reset all properties that were set during filtering
+        element.style.removeProperty('display');
+        element.style.removeProperty('visibility');
+        element.style.removeProperty('position');
+        element.style.removeProperty('height');
+        element.style.removeProperty('overflow');
+        // Ensure element is visible by removing inline styles that might hide it
+        // CSS will handle the default display/visibility
       });
       console.log('[DEBUG] Showing all rules');
     } else {
       // Filter by rule type
+      // CRITICAL: First reset all elements to ensure clean state before filtering
+      ruleElements.forEach(element => {
+        // Reset all properties that might have been set during previous filtering
+        element.style.removeProperty('display');
+        element.style.removeProperty('visibility');
+        element.style.removeProperty('position');
+        element.style.removeProperty('height');
+        element.style.removeProperty('overflow');
+      });
+      
       let visibleCount = 0;
       ruleElements.forEach(element => {
+        // CRITICAL: Only check data-rule-type attribute (rule items don't have classes matching rule type directly)
         const ruleTypeAttr = element.getAttribute('data-rule-type');
-        const ruleTypeClass = element.classList.contains(ruleType);
         
-        if (ruleTypeAttr === ruleType || ruleTypeClass) {
-          element.style.display = '';
-          element.style.visibility = '';
+        if (ruleTypeAttr === ruleType) {
+          // Show matching rule - ensure all display properties are reset
+          element.style.removeProperty('display');
+          element.style.removeProperty('visibility');
+          element.style.removeProperty('position');
+          element.style.removeProperty('height');
+          element.style.removeProperty('overflow');
           visibleCount++;
         } else {
-          // CRITICAL: Use display: none but ensure it doesn't affect layout
+          // Hide non-matching rule - CRITICAL: Use display: none but ensure it doesn't affect layout
           element.style.display = 'none';
           element.style.visibility = 'hidden';
           element.style.position = 'absolute';
@@ -1372,11 +2249,29 @@
     // CRITICAL: Ensure Trait Layers section remains fixed and unaffected
     const traitsSection = document.querySelector('#traits-rules .traits-section');
     if (traitsSection) {
-      // Force traits section to maintain its position
+      // Force traits section to maintain its position - prevent any layout shifts
       traitsSection.style.setProperty('position', 'relative', 'important');
       traitsSection.style.setProperty('top', 'auto', 'important');
       traitsSection.style.setProperty('left', 'auto', 'important');
       traitsSection.style.setProperty('transform', 'none', 'important');
+      traitsSection.style.setProperty('margin-top', '0', 'important');
+      traitsSection.style.setProperty('margin-bottom', '0', 'important');
+      traitsSection.style.setProperty('margin-left', 'auto', 'important');
+      traitsSection.style.setProperty('margin-right', 'auto', 'important');
+      // CRITICAL: Ensure traits section doesn't participate in flex layout that might shift it
+      traitsSection.style.setProperty('flex-shrink', '0', 'important');
+      traitsSection.style.setProperty('flex-grow', '0', 'important');
+      traitsSection.style.setProperty('align-self', 'auto', 'important');
+    }
+    
+    // CRITICAL: Ensure rules section doesn't affect traits section position
+    const rulesSection = document.querySelector('#traits-rules .rules-section');
+    if (rulesSection) {
+      // Ensure rules section is isolated and doesn't affect parent layout
+      rulesSection.style.setProperty('position', 'relative', 'important');
+      rulesSection.style.setProperty('margin-top', '0', 'important');
+      rulesSection.style.setProperty('flex-shrink', '1', 'important');
+      rulesSection.style.setProperty('flex-grow', '0', 'important');
     }
   }
 
@@ -1422,12 +2317,16 @@
       const originalStart = projectInterfaceModule.start;
       projectInterfaceModule.start = function(projectData) {
         const result = originalStart.call(this, projectData);
-        setTimeout(() => {
-          updateButtonVisibility();
-          updateRulesFilterVisibility();
-          updateRulesSectionVisibility();
-          forceNativeScrollbar();
-        }, 1000);
+        // CRITICAL: Use requestAnimationFrame instead of setTimeout to prevent content disappearing
+        // This ensures updates happen immediately after render, not after a delay
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            updateButtonVisibility();
+            updateRulesFilterVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
+            forceNativeScrollbar();
+          });
+        });
         return result;
       };
     }
@@ -1438,12 +2337,15 @@
       const originalStartNew = projectServiceModule.startNew;
       projectServiceModule.startNew = function() {
         const result = originalStartNew.call(this);
-        setTimeout(() => {
-          updateButtonVisibility();
-          updateRulesFilterVisibility();
-          updateRulesSectionVisibility();
-          forceNativeScrollbar();
-        }, 1000);
+        // CRITICAL: Use requestAnimationFrame instead of setTimeout to prevent content disappearing
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            updateButtonVisibility();
+            updateRulesFilterVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
+            forceNativeScrollbar();
+          });
+        });
         return result;
       };
     }
@@ -1457,7 +2359,7 @@
           setTimeout(() => {
             updateButtonVisibility();
             updateRulesFilterVisibility();
-            updateRulesSectionVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
             forceNativeScrollbar();
           }, 500);
           return result;
@@ -1470,25 +2372,34 @@
       const originalLoad = projectServiceModule.load;
       projectServiceModule.load = function(event) {
         const result = originalLoad.call(this, event);
-        // CRITICAL: Update button visibility after project is loaded (with multiple delays to catch all cases)
-        setTimeout(() => {
+        // CRITICAL: Ensure tab-content stays visible during loading
+        const activeTabContent = document.querySelector('.tab-content.active');
+        if (activeTabContent) {
+          activeTabContent.style.setProperty("display", "block", "important");
+          activeTabContent.style.setProperty("visibility", "visible", "important");
+          activeTabContent.style.setProperty("opacity", "1", "important");
+        }
+        // CRITICAL: Use requestAnimationFrame instead of setTimeout to prevent content disappearing
+        // Update immediately, then check again after render
+        requestAnimationFrame(() => {
           updateButtonVisibility();
           updateRulesFilterVisibility();
-          updateRulesSectionVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
           forceNativeScrollbar();
-        }, 1500); // Wait for projectInterface.start to complete
-        setTimeout(() => {
-          updateButtonVisibility();
-          updateRulesFilterVisibility();
-          updateRulesSectionVisibility();
-          forceNativeScrollbar();
-        }, 2500); // Additional check after all modules are initialized
-        setTimeout(() => {
-          updateButtonVisibility();
-          updateRulesFilterVisibility();
-          updateRulesSectionVisibility();
-          forceNativeScrollbar();
-        }, 3500); // Final check to ensure buttons are visible if conditions are met
+          // Ensure tab-content remains visible
+          if (activeTabContent) {
+            activeTabContent.style.setProperty("display", "block", "important");
+            activeTabContent.style.setProperty("visibility", "visible", "important");
+            activeTabContent.style.setProperty("opacity", "1", "important");
+          }
+          // Additional check after next frame
+          requestAnimationFrame(() => {
+            updateButtonVisibility();
+            updateRulesFilterVisibility();
+            // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
+            forceNativeScrollbar();
+          });
+        });
         return result;
       };
     }
@@ -1510,7 +2421,7 @@
     // Update visibility (will show buttons if conditions are met)
     updateButtonVisibility();
     updateRulesFilterVisibility();
-    updateRulesSectionVisibility();
+    // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
     
     // Force setup of jump-to-layers-btn if it's in the filter container
     const jumpBtn = document.getElementById('jump-to-layers-btn');
@@ -1562,7 +2473,7 @@
       jumpBtn.dataset.listenerAdded = 'true';
     }
     
-    console.log('[DEBUG] Complete setup finished');
+    // console.log('[DEBUG] Complete setup finished');
   }
 
   // Setup the button when the page loads
@@ -1635,11 +2546,8 @@
         enforceTraitsRulesLayout();
         updateButtonVisibility();
         updateRulesFilterVisibility();
-        // CRITICAL: Update combination rules section visibility when tab is activated
-        const projectData = window.currentProject;
-        if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('combinationRules') && window.NFTApp.getModule('combinationRules').updateRulesSectionVisibility) {
-          window.NFTApp.getModule('combinationRules').updateRulesSectionVisibility(projectData);
-        }
+        // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
+        // Once visible, the section stays visible until conditions are not met
       }, 100);
     }
   });
@@ -1652,11 +2560,8 @@
         console.log('[DEBUG] Traits & Rules tab clicked, updating button visibility');
         updateButtonVisibility();
         updateRulesFilterVisibility();
-        // CRITICAL: Update combination rules section visibility when tab is activated
-        const projectData = window.currentProject;
-        if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('combinationRules') && window.NFTApp.getModule('combinationRules').updateRulesSectionVisibility) {
-          window.NFTApp.getModule('combinationRules').updateRulesSectionVisibility(projectData);
-        }
+        // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
+        // Once visible, the section stays visible until conditions are not met
       }, 200);
     }
   });
@@ -1670,11 +2575,9 @@
           setTimeout(() => {
             updateButtonVisibility();
             updateRulesFilterVisibility();
-            // CRITICAL: Update combination rules section visibility when tab becomes active
-            const projectData = window.currentProject;
-            if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('combinationRules') && window.NFTApp.getModule('combinationRules').updateRulesSectionVisibility) {
-              window.NFTApp.getModule('combinationRules').updateRulesSectionVisibility(projectData);
-            }
+            // CRITICAL: Don't call updateRulesSectionVisibility here - it can cause flicker
+            // The section should stay visible once hasEverBeenVisible is set
+            // Only check visibility on project load and layer deletion
           }, 100);
         }
       }
@@ -1801,10 +2704,10 @@
       // If height decreased significantly, console is likely open
       if (currentHeight < viewportHeight - 100) {
         isConsoleOpen = true;
-        console.log('[DEBUG] Console detected as OPEN - height decreased by', heightDiff);
+        // console.log('[DEBUG] Console detected as OPEN - height decreased by', heightDiff);
       } else if (currentHeight > viewportHeight + 50) {
         isConsoleOpen = false;
-        console.log('[DEBUG] Console detected as CLOSED - height increased by', heightDiff);
+        // console.log('[DEBUG] Console detected as CLOSED - height increased by', heightDiff);
       }
       
       viewportHeight = currentHeight;
@@ -2156,6 +3059,14 @@
     function canDrag(element) {
       if (!element) return false;
       
+      // CRITICAL: Don't allow drag-to-scroll if clicking on drag handles (they have their own drag-and-drop functionality)
+      if (element.classList && (
+        element.classList.contains('trait-layer-drag-handle') ||
+        element.classList.contains('rule-drag-handle')
+      )) {
+        return false;
+      }
+      
       // Don't allow dragging on interactive elements
       const interactiveTags = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A'];
       if (interactiveTags.includes(element.tagName)) {
@@ -2173,16 +3084,26 @@
         return false;
       }
       
-      // Check parent elements for draggable attributes or trait layer classes
+      // Check parent elements for drag handles, draggable attributes or trait layer classes
       let parent = element.parentElement;
       while (parent && parent !== traitsRulesTab) {
+        // CRITICAL: Don't allow scrolling if clicking on drag handles (they have their own drag-and-drop functionality)
+        if (parent.classList && (
+          parent.classList.contains('trait-layer-drag-handle') ||
+          parent.classList.contains('rule-drag-handle')
+        )) {
+          return false;
+        }
+        
         // Don't allow scrolling if clicking on trait layer elements (they have their own drag functionality)
         if (parent.classList && (
           parent.classList.contains('trait-layer-bar') ||
           parent.classList.contains('trait-layer-header') ||
           parent.classList.contains('trait-layer-content') ||
           parent.classList.contains('trait-item') ||
-          parent.classList.contains('saved-seed-card')
+          parent.classList.contains('saved-seed-card') ||
+          parent.classList.contains('rule-item') ||
+          parent.classList.contains('rule-header')
         )) {
           return false;
         }
@@ -2202,6 +3123,13 @@
     function handleMouseDown(e) {
       // Only allow dragging with left mouse button
       if (e.button !== 0) return;
+      
+      // CRITICAL: Check if clicking on drag handles first - they should NOT trigger drag-to-scroll
+      const clickedDragHandle = e.target.closest('.trait-layer-drag-handle, .rule-drag-handle');
+      if (clickedDragHandle) {
+        // Don't interfere with drag-and-drop functionality
+        return;
+      }
       
       // Check if we can drag from this element
       if (!canDrag(e.target)) {
@@ -2225,6 +3153,16 @@
     // Mouse move handler
     function handleMouseMove(e) {
       if (!isDragging) return;
+      
+      // CRITICAL: Don't interfere if drag-and-drop is active
+      const activeDragItem = document.querySelector('.trait-layer-bar[data-dragging="yes"], .rule-item[data-dragging="yes"]');
+      if (activeDragItem) {
+        // Drag-and-drop is active, don't scroll
+        isDragging = false;
+        traitsRulesTab.style.cursor = '';
+        traitsRulesTab.style.userSelect = '';
+        return;
+      }
       
       const deltaY = startY - e.clientY;
       const newScrollTop = startScrollTop + deltaY;
@@ -2250,6 +3188,13 @@
     // Touch handlers for mobile support
     function handleTouchStart(e) {
       if (e.touches.length !== 1) return;
+      
+      // CRITICAL: Check if clicking on drag handles first - they should NOT trigger drag-to-scroll
+      const clickedDragHandle = e.target.closest('.trait-layer-drag-handle, .rule-drag-handle');
+      if (clickedDragHandle) {
+        // Don't interfere with drag-and-drop functionality
+        return;
+      }
       
       // Check if we can drag from this element
       if (!canDrag(e.target)) {
@@ -2283,8 +3228,9 @@
       traitsRulesTab.style.userSelect = '';
     }
 
-    // Add event listeners
-    traitsRulesTab.addEventListener('mousedown', handleMouseDown);
+    // Add event listeners with capture phase to ensure drag handles get priority
+    // Use capture: false so drag handles can stop propagation first
+    traitsRulesTab.addEventListener('mousedown', handleMouseDown, false);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     
@@ -2296,7 +3242,7 @@
     // Clean up on mouse leave (in case mouse is released outside)
     traitsRulesTab.addEventListener('mouseleave', handleMouseUp);
     
-    console.log('[DEBUG] Drag-to-scroll functionality initialized for Traits & Rules tab');
+    // console.log('[DEBUG] Drag-to-scroll functionality initialized for Traits & Rules tab');
   }
 
   // Initialize drag-to-scroll when DOM is ready
@@ -2326,5 +3272,24 @@
     attributes: true,
     attributeFilter: ['class']
   });
+
+  // Register as NFTApp module so it can be accessed by other modules
+  if (window.NFTApp && typeof window.NFTApp.registerModule === 'function') {
+    const traitsRulesLayoutFixModule = {
+      updateVisibility: function() {
+        updateButtonVisibility();
+        updateRulesFilterVisibility();
+        // Note: updateRulesSectionVisibility is only called on project load (in setup) and layer deletion
+        forceNativeScrollbar();
+      },
+      updateButtonVisibility: updateButtonVisibility,
+      updateRulesFilterVisibility: updateRulesFilterVisibility,
+      updateRulesSectionVisibility: updateRulesSectionVisibility,
+      forceNativeScrollbar: forceNativeScrollbar
+    };
+    
+    window.NFTApp.registerModule('traitsRulesLayoutFix', traitsRulesLayoutFixModule);
+    // console.log('[DEBUG] Registered traitsRulesLayoutFix module');
+  }
 
 })();

@@ -82,6 +82,8 @@
   display: none !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .randomize-tooltip, .randomize-rarities-btn .tooltiptext.randomize-tooltip {
   display: none !important;
   opacity: 0 !important;
@@ -101,6 +103,7 @@
 .randomize-rarities-btn:hover .tooltiptext {
   display: block !important;
 }
+*/
 
 .trait-details {
   width: 175px !important;

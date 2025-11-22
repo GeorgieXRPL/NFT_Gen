@@ -86,7 +86,7 @@
 
 /* Drag handle styling */
 .trait-layer-drag-handle {
-  cursor: grab !important;
+  cursor: grab !important; /* CRITICAL: Grab cursor to indicate draggability */
   color: var(--text-secondary) !important;
   margin-right: 8px !important;
   display: flex !important;
@@ -94,6 +94,10 @@
   justify-content: center !important;
   background: transparent !important;
   background-color: transparent !important;
+}
+
+.trait-layer-drag-handle:hover {
+  cursor: grab !important; /* CRITICAL: Ensure grab cursor on hover */
 }
 
 .trait-layer-drag-handle:active {
@@ -116,56 +120,8 @@
   position: relative !important;
 }
 
-.rule-actions .action-btn .tooltip-text {
-  visibility: hidden !important;
-  opacity: 0 !important;
-  position: fixed !important; /* Use fixed positioning to escape container constraints */
-  z-index: 2147483647 !important; /* Highest z-index to match standard tooltips */
-  bottom: auto !important;
-  top: auto !important; /* JavaScript will set exact position */
-  left: auto !important; /* JavaScript will set exact position */
-  right: auto !important;
-  transform: none !important; /* JavaScript will handle centering */
-  width: max-content !important;
-  max-width: 300px !important;
-  white-space: normal !important;
-  word-wrap: break-word !important;
-  background-color: #000000 !important; /* Match standard tooltip black background */
-  background: #000000 !important;
-  color: #f39c12 !important; /* Match standard tooltip orange text */
-  font-size: 11px !important; /* Match standard tooltip font size */
-  font-family: 'Archivo', sans-serif !important; /* Match standard tooltip font */
-  padding: 8px 12px !important; /* Equal top/bottom padding (8px) for vertical centering */
-  border-radius: 6px !important;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5) !important; /* Match standard tooltip shadow */
-  transition: opacity 1s ease !important; /* 1 second to match standard tooltips */
-  pointer-events: none !important;
-  margin: 0 !important;
-  /* CRITICAL: Center text both horizontally and vertically */
-  display: block !important; /* Use block instead of flex for better text wrapping */
-  text-align: center !important; /* Horizontal centering */
-  line-height: 1.2 !important; /* Reduced from 1.4 to 1.2 for better vertical centering */
-  /* Vertical centering achieved through equal padding (8px top/bottom) */
-}
-
-.rule-actions .action-btn .tooltip-text::after {
-  content: "" !important;
-  position: absolute !important;
-  top: 100% !important; /* Position arrow at bottom of tooltip (tooltip is above button) */
-  bottom: auto !important;
-  left: 50% !important;
-  margin-left: -5px !important;
-  margin-top: -1px !important; /* Small overlap to connect with tooltip */
-  border-width: 5px !important;
-  border-style: solid !important;
-  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to button */
-}
-
-/* CRITICAL: Don't use CSS hover to show tooltip - JavaScript will control visibility with delay */
-.rule-actions .action-btn:hover .tooltip-text {
-  /* JavaScript will control visibility and opacity with 1-second delay */
-  /* Don't force immediate display via CSS */
-}
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* All rule-actions tooltip-text styles have been consolidated into tooltip.css */
 
 .trait-layer-header {
   box-shadow: none !important;
@@ -200,12 +156,15 @@
   background-color: transparent !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* CRITICAL: Ensure tooltip has proper styling (not transparent) */
 .trait-layer-drag-handle .tooltiptext {
   background-color: #000000 !important; /* Black background for standard tooltip */
   background: #000000 !important;
   color: #f39c12 !important; /* Orange text for standard tooltip */
 }
+*/
 
 .trait-layer-header-rarity,
 .trait-layer-header-rarity .tooltip,

@@ -2007,9 +2007,13 @@ body .nav-container, .nav-container {
   left: 0 !important;
   width: 100% !important;
   z-index: 1000 !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
   background: #000 !important;
   display: block !important;
   border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 body .content-area, .content-area {
@@ -2020,6 +2024,11 @@ body .content-area, .content-area {
   padding-top: 0 !important;
   margin-top: 110px !important;
   display: block !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Only floating UI should have z-index: 9999 */
@@ -2762,9 +2771,13 @@ body .nav-container, .nav-container {
   left: 0 !important;
   width: 100% !important;
   z-index: 1000 !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
   background: #000 !important;
   display: block !important;
   border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 body .content-area, .content-area {
@@ -2775,6 +2788,11 @@ body .content-area, .content-area {
   padding-top: 0 !important;
   margin-top: 110px !important;
   display: block !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Only floating UI should have z-index: 9999 */

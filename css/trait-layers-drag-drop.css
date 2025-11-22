@@ -101,6 +101,29 @@
   background-color: rgba(108, 92, 231, 0.08) !important;
 }
 
+/* Smooth drag-and-drop styles for trait layers */
+.trait-layer-bar[data-dragging="yes"] {
+  transition: none !important;
+  opacity: 0.9 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  cursor: grabbing !important;
+}
+
+/* Only drag handles are draggable, not the entire header */
+.trait-layer-header {
+  cursor: default !important;
+  user-select: none !important;
+}
+
+.trait-layer-bar.expanded .trait-layer-header {
+  cursor: default !important;
+}
+
+/* Smooth transition for non-dragged items during drag */
+.trait-layers-container .trait-layer-bar:not([data-dragging="yes"]) {
+  transition: transform 0.2s ease-out !important;
+}
+
 @keyframes pulse-border {
   0% {
     border-color: var(--accent-primary-light, rgba(108, 92, 231, 0.3)) !important;
@@ -114,23 +137,45 @@
 }
 
 /* Visual indicator for drag handle */
+/* CRITICAL: Ensure drag handles have proper pointer events and z-index to override drag-to-scroll */
 .trait-layer-drag-handle {
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  position: relative !important;
   transition: all 0.2s ease !important;
   background: transparent !important;
   background-color: transparent !important;
+  cursor: grab !important; /* CRITICAL: Always show grab cursor on drag handle */
+}
+
+.trait-layer-drag-handle svg {
+  pointer-events: none !important; /* CRITICAL: Allow cursor to show on handle, not SVG */
+}
+
+.trait-layer-drag-handle:hover {
+  cursor: grab !important; /* CRITICAL: Ensure grab cursor on hover */
 }
 
 .trait-layer-bar:not(.expanded):hover .trait-layer-drag-handle {
   color: var(--accent-primary) !important;
   transform: scale(1.1) !important;
+  cursor: grab !important; /* CRITICAL: Ensure grab cursor on hover */
 }
 
-/* Cursor styles */
+/* Cursor styles - only drag handles are draggable */
 .trait-layer-bar:not(.expanded) {
-  cursor: grab !important;
+  cursor: default !important;
 }
 
-.trait-layer-bar.dragging {
+.trait-layer-bar:not(.expanded) .trait-layer-drag-handle {
+  cursor: grab !important; /* CRITICAL: Grab cursor for drag handle */
+}
+
+.trait-layer-bar:not(.expanded) .trait-layer-drag-handle:hover {
+  cursor: grab !important; /* CRITICAL: Ensure grab cursor on hover */
+}
+
+.trait-layer-bar.dragging .trait-layer-drag-handle {
   cursor: grabbing !important;
 }
 
@@ -262,7 +307,8 @@
   cursor: grab !important;
 }
 
-.trait-layer-bar:not(.expanded) .trait-layer-drag-handle:active {
+.trait-layer-bar:not(.expanded) .trait-layer-drag-handle:active,
+.trait-layer-bar.dragging .trait-layer-drag-handle {
   cursor: grabbing !important;
 }
 

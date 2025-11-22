@@ -5,14 +5,19 @@
   background-color: rgba(51, 51, 51, 0.1); /* Very light background */
   color: #f39c12;
   padding: 10px 12px;
-  border-radius: 6px;
+  border-radius: 12px !important; /* Match app standard rounded corners */
   margin-bottom: 12px;
   margin-left: 0; /* Reset margin-left since parent container handles positioning */
   font-size: 0.8em;
   width: 100%; /* Full width of parent container */
   box-sizing: border-box;
-  border: 1px solid rgba(243, 156, 18, 0.3); /* Subtle orange border */
-  border-left: 3px solid #f39c12; /* Stronger left border for emphasis */
+  border: 1px solid rgba(243, 156, 18, 0.3) !important; /* Single 1px border all around */
+  /* CRITICAL: Ensure warning stays fixed above rules and doesn't interfere with animations */
+  position: relative !important;
+  z-index: 1 !important; /* Lower than reordering items (z-index: 1000) and custom-dropdown (z-index: 10001) */
+  pointer-events: auto !important; /* Allow interaction with warning */
+  flex-shrink: 0 !important; /* Prevent shrinking */
+  order: -1 !important; /* Ensure it appears before rules-list */
 }
 
 .combination-rules-warning .warning-icon {
@@ -55,7 +60,7 @@
 /* Updated rule-item styling with consistent dark grey border */
 .rule-item {
   border: 1px solid #444; /* Dark grey border for all rules */
-  border-radius: 6px;
+  border-radius: 12px !important; /* Match trait layer border radius for visual consistency */
   overflow: hidden;
   background-color: #292736; /* Dark background for all rule items */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -78,7 +83,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 15px;
-  border-bottom: 1px solid #444; /* Dark grey border */
+  border-bottom: none !important; /* Remove border - separator line is handled by ::after pseudo-element */
 }
 
 .rule-type {

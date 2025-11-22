@@ -115,9 +115,9 @@
         const shouldPreserveHeight = isTabSwitching && heightToPreserve;
         
         if (shouldPreserveHeight) {
-          console.log(`[FLICKER DEBUG] removeInlineStyles: Preserving height during tab switch: attr=${preservedHeightAttr}, height=${currentHeight}, min-height=${currentMinHeight}, using=${heightToPreserve}`);
+          // console.log(`[FLICKER DEBUG] removeInlineStyles: Preserving height during tab switch: attr=${preservedHeightAttr}, height=${currentHeight}, min-height=${currentMinHeight}, using=${heightToPreserve}`);
         } else if (isTabSwitching) {
-          console.log(`[FLICKER DEBUG] removeInlineStyles: Tab switching but no preserved height found: attr=${preservedHeightAttr}, height=${currentHeight}, min-height=${currentMinHeight}`);
+          // console.log(`[FLICKER DEBUG] removeInlineStyles: Tab switching but no preserved height found: attr=${preservedHeightAttr}, height=${currentHeight}, min-height=${currentMinHeight}`);
         }
         
         // Force remove margin-top but preserve height if we're switching tabs
@@ -147,7 +147,7 @@
             if (!preservedHeightAttr) {
               contentArea.setAttribute('data-preserved-height', heightToPreserve);
             }
-            console.log(`[FLICKER DEBUG] removeInlineStyles: Re-applied preserved height: ${heightToPreserve}`);
+            // console.log(`[FLICKER DEBUG] removeInlineStyles: Re-applied preserved height: ${heightToPreserve}`);
           }
         }
         contentArea.style.setProperty('max-height', 'none', 'important');
@@ -234,21 +234,21 @@
   const observer = new MutationObserver(function(mutations) {
     // DEBUG: Track MutationObserver activity
     const mutationTime = performance.now();
-    console.log(`[FLICKER DEBUG] MutationObserver fired: isProcessing=${isProcessing}, isTabSwitching=${isTabSwitching}, mutations=${mutations.length}`);
+    // console.log(`[FLICKER DEBUG] MutationObserver fired: isProcessing=${isProcessing}, isTabSwitching=${isTabSwitching}, mutations=${mutations.length}`);
     
     // Skip if already processing or if we're switching tabs to prevent flickering
     if (isProcessing || isTabSwitching) {
-      console.log(`[FLICKER DEBUG] MutationObserver skipped: isProcessing=${isProcessing}, isTabSwitching=${isTabSwitching}`);
+      // console.log(`[FLICKER DEBUG] MutationObserver skipped: isProcessing=${isProcessing}, isTabSwitching=${isTabSwitching}`);
       return;
     }
     
     mutations.forEach(function(mutation) {
       if (mutation.type === 'attributes') {
         const target = mutation.target;
-        console.log(`[FLICKER DEBUG] MutationObserver: attribute change on ${target.id || target.className}, attribute=${mutation.attributeName}`);
+        // console.log(`[FLICKER DEBUG] MutationObserver: attribute change on ${target.id || target.className}, attribute=${mutation.attributeName}`);
         
         if (target.id === 'generate-nfts' && target.classList.contains('active')) {
-          console.log(`[FLICKER DEBUG] MutationObserver: generate-nfts became active, processing...`);
+          // console.log(`[FLICKER DEBUG] MutationObserver: generate-nfts became active, processing...`);
           isProcessing = true;
           // Inject style tag to ensure CSS is available
           injectStyleTag();
@@ -259,29 +259,29 @@
           requestAnimationFrame(() => {
             forceApplyFix();
             isProcessing = false;
-            console.log(`[FLICKER DEBUG] MutationObserver: finished processing generate-nfts active`);
+            // console.log(`[FLICKER DEBUG] MutationObserver: finished processing generate-nfts active`);
           });
         }
         // Also watch for project-interface style changes - OPTIMIZED
         if (target.classList && target.classList.contains('project-interface') && !isProcessing) {
-          console.log(`[FLICKER DEBUG] MutationObserver: project-interface style change, processing...`);
+          // console.log(`[FLICKER DEBUG] MutationObserver: project-interface style change, processing...`);
           isProcessing = true;
           requestAnimationFrame(() => {
             removeInlineStyles();
             forceApplyFix();
             isProcessing = false;
-            console.log(`[FLICKER DEBUG] MutationObserver: finished processing project-interface`);
+            // console.log(`[FLICKER DEBUG] MutationObserver: finished processing project-interface`);
           });
         }
         // Watch for content-area style changes - OPTIMIZED
         if (target.classList && target.classList.contains('content-area') && !isProcessing) {
-          console.log(`[FLICKER DEBUG] MutationObserver: content-area style change, processing...`);
+          // console.log(`[FLICKER DEBUG] MutationObserver: content-area style change, processing...`);
           isProcessing = true;
           requestAnimationFrame(() => {
             removeInlineStyles();
             forceApplyFix();
             isProcessing = false;
-            console.log(`[FLICKER DEBUG] MutationObserver: finished processing content-area`);
+            // console.log(`[FLICKER DEBUG] MutationObserver: finished processing content-area`);
           });
         }
       }
@@ -351,36 +351,36 @@
   function hookIntoNavigation() {
     // CRITICAL: Prevent duplicate hook attempts
     if (_hookAttempted && _hookSuccess) {
-      console.log(`[FLICKER DEBUG] remove-inline-styles: Hook already successful, skipping`);
+      // console.log(`[FLICKER DEBUG] remove-inline-styles: Hook already successful, skipping`);
       return;
     }
     
     _hookAttempted = true;
     
     const navigationModule = window.NFTApp?.getModule('navigation');
-    console.log(`[FLICKER DEBUG] remove-inline-styles: Attempting to hook into navigation module`, {
+    /* console.log(`[FLICKER DEBUG] remove-inline-styles: Attempting to hook into navigation module`, {
       hasNFTApp: !!window.NFTApp,
       hasNavigationModule: !!navigationModule,
       hasShowTab: !!(navigationModule && typeof navigationModule.showTab === 'function'),
       alreadyHooked: !!(navigationModule && navigationModule.showTab && navigationModule.showTab._removeInlineStylesHooked),
       hookSuccess: _hookSuccess
-    });
+    }); */
     
     if (navigationModule && typeof navigationModule.showTab === 'function') {
       // Check if already hooked to prevent duplicate hooks
       if (navigationModule.showTab._removeInlineStylesHooked) {
-        console.log(`[FLICKER DEBUG] remove-inline-styles: Already hooked, marking as success`);
+        // console.log(`[FLICKER DEBUG] remove-inline-styles: Already hooked, marking as success`);
         _hookSuccess = true;
         return; // Already hooked
       }
       
       const originalShowTab = navigationModule.showTab;
       navigationModule.showTab = function(tabId, isUserInitiated) {
-        console.log(`[FLICKER DEBUG] remove-inline-styles hook: showTab(${tabId}) called`);
+        // console.log(`[FLICKER DEBUG] remove-inline-styles hook: showTab(${tabId}) called`);
         
         // CRITICAL: Set isTabSwitching flag BEFORE calling originalShowTab to prevent MutationObserver from firing
         if (tabId === 'generate-nfts') {
-          console.log(`[FLICKER DEBUG] remove-inline-styles: Setting isTabSwitching=true BEFORE showTab`);
+          // console.log(`[FLICKER DEBUG] remove-inline-styles: Setting isTabSwitching=true BEFORE showTab`);
           isTabSwitching = true;
         }
         
@@ -388,13 +388,13 @@
         
         // Defer operations to avoid blocking tab switch
         if (tabId === 'generate-nfts') {
-          console.log(`[FLICKER DEBUG] remove-inline-styles: Deferring operations for generate-nfts`);
+          // console.log(`[FLICKER DEBUG] remove-inline-styles: Deferring operations for generate-nfts`);
           // Use triple requestAnimationFrame to ensure tab is fully visible and height is stable
           // This prevents removeInlineStyles from clearing the preserved height too early
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                console.log(`[FLICKER DEBUG] remove-inline-styles: Executing deferred operations (tab should be fully visible now)`);
+                // console.log(`[FLICKER DEBUG] remove-inline-styles: Executing deferred operations (tab should be fully visible now)`);
                 
                 // CRITICAL: Check if height was preserved and needs to be set to auto
                 // Check both the data attribute (most reliable) and inline styles
@@ -411,7 +411,7 @@
                                             (currentHeight && currentHeight !== 'auto' && currentHeight.includes('px')) ||
                                             (currentMinHeight && currentMinHeight !== '0' && currentMinHeight !== '0px' && currentMinHeight.includes('px'));
                   
-                  console.log(`[FLICKER DEBUG] remove-inline-styles: Checking preserved height: attr=${preservedHeightAttr}, height=${currentHeight}, minHeight=${currentMinHeight}, hasPreserved=${!!hasPreservedHeight}`);
+                  // console.log(`[FLICKER DEBUG] remove-inline-styles: Checking preserved height: attr=${preservedHeightAttr}, height=${currentHeight}, minHeight=${currentMinHeight}, hasPreserved=${!!hasPreservedHeight}`);
                   
                   if (hasPreservedHeight) {
                     // CRITICAL: Before setting to auto, ensure the generate-nfts tab content is fully rendered
@@ -420,7 +420,7 @@
                     const tabScrollHeight = generateNftsTab ? generateNftsTab.scrollHeight : 0;
                     const actualContentHeight = Math.max(tabContentHeight, tabScrollHeight);
                     
-                    console.log(`[FLICKER DEBUG] remove-inline-styles: Tab content height check: offsetHeight=${tabContentHeight}, scrollHeight=${tabScrollHeight}, actual=${actualContentHeight}`);
+                    // console.log(`[FLICKER DEBUG] remove-inline-styles: Tab content height check: offsetHeight=${tabContentHeight}, scrollHeight=${tabScrollHeight}, actual=${actualContentHeight}`);
                     
                     // Use the data attribute value if available, otherwise use the inline style
                     const heightToUse = preservedHeightAttr || currentHeight || currentMinHeight;
@@ -428,14 +428,14 @@
                     // Only set to auto if the tab content has actual height (is rendered)
                     // Otherwise, keep the preserved height to prevent collapse
                     if (actualContentHeight > 100) {
-                      console.log(`[FLICKER DEBUG] remove-inline-styles: Preserved height detected (${heightToUse}), tab content is rendered (${actualContentHeight}px), setting to auto now`);
+                      // console.log(`[FLICKER DEBUG] remove-inline-styles: Preserved height detected (${heightToUse}), tab content is rendered (${actualContentHeight}px), setting to auto now`);
                       // Set to auto now that tab is fully visible and stable
                       contentArea.style.setProperty('height', 'auto', 'important');
                       contentArea.style.setProperty('min-height', '0', 'important');
                       // Clear the data attribute since we've now set it to auto
                       contentArea.removeAttribute('data-preserved-height');
                     } else {
-                      console.log(`[FLICKER DEBUG] remove-inline-styles: Preserved height detected (${heightToUse}), but tab content not fully rendered yet (${actualContentHeight}px), keeping preserved height`);
+                      // console.log(`[FLICKER DEBUG] remove-inline-styles: Preserved height detected (${heightToUse}), but tab content not fully rendered yet (${actualContentHeight}px), keeping preserved height`);
                       // Re-apply preserved height to ensure it doesn't collapse
                       if (heightToUse) {
                         contentArea.style.setProperty('height', heightToUse, 'important');
@@ -445,7 +445,7 @@
                       setTimeout(() => {
                         const retryContentHeight = generateNftsTab ? generateNftsTab.offsetHeight : 0;
                         if (retryContentHeight > 100) {
-                          console.log(`[FLICKER DEBUG] remove-inline-styles: Retry - tab content now rendered (${retryContentHeight}px), setting to auto`);
+                          // console.log(`[FLICKER DEBUG] remove-inline-styles: Retry - tab content now rendered (${retryContentHeight}px), setting to auto`);
                           contentArea.style.setProperty('height', 'auto', 'important');
                           contentArea.style.setProperty('min-height', '0', 'important');
                           contentArea.removeAttribute('data-preserved-height');
@@ -453,7 +453,7 @@
                       }, 50);
                     }
                   } else {
-                    console.log(`[FLICKER DEBUG] remove-inline-styles: No preserved height detected, skipping height=auto`);
+                    // console.log(`[FLICKER DEBUG] remove-inline-styles: No preserved height detected, skipping height=auto`);
                   }
                 }
                 
@@ -461,13 +461,13 @@
                 isTabSwitching = false; // Clear flag BEFORE calling removeInlineStyles
                 removeInlineStyles();
                 forceApplyFix();
-                console.log(`[FLICKER DEBUG] remove-inline-styles: Finished deferred operations, isTabSwitching=false`);
+                // console.log(`[FLICKER DEBUG] remove-inline-styles: Finished deferred operations, isTabSwitching=false`);
               });
             });
           });
         } else {
           // If switching away from generate-nfts, reset the flag
-          console.log(`[FLICKER DEBUG] remove-inline-styles: Switching away from generate-nfts, resetting flag`);
+          // console.log(`[FLICKER DEBUG] remove-inline-styles: Switching away from generate-nfts, resetting flag`);
           isTabSwitching = false;
         }
         return result;

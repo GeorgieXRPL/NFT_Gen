@@ -10,14 +10,16 @@
   function forceFreezeTabs() {
     // console.log('🔒 Force freezing tabs...');
     
-    // Freeze Collection Info tab
+    // CRITICAL: Do NOT freeze Collection Info tab - it needs overflow: visible to prevent clipping
+    // Collection Info tab overflow is handled by collection-info-override.css and navigation.js
+    // Only freeze Generate NFTs tab
     const collectionInfo = document.getElementById('collection-info') || document.getElementById('general-info');
     if (collectionInfo) {
-      collectionInfo.style.setProperty('overflow-y', 'hidden', 'important');
-      collectionInfo.style.setProperty('overflow-x', 'hidden', 'important');
+      // CRITICAL: Only set scrollbar properties, NOT overflow - overflow must stay visible for Collection Info
       collectionInfo.style.setProperty('scrollbar-width', 'none', 'important');
       collectionInfo.style.setProperty('-ms-overflow-style', 'none', 'important');
-      // console.log('✅ Collection Info tab force frozen');
+      // DO NOT set overflow here - let CSS and navigation.js handle it
+      // console.log('✅ Collection Info tab scrollbars hidden (overflow left to CSS)');
     }
     
     // Freeze Generate NFTs tab

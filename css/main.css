@@ -28,7 +28,7 @@
   --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition-speed: 0.3s;
   --card-bg: #252525;
-  --input-bg: #2a2a2a;
+  --input-bg: #111111;
   --icon-size: 20px;
   --trait-header-odd: #493da1;
   --trait-header-even: #2a235d;
@@ -81,6 +81,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  /* CRITICAL: Ensure overflow is visible when Collection Info tab is active to prevent clipping */
+  overflow: visible;
+  overflow-x: visible;
+  overflow-y: visible;
 }
 
 .container {
@@ -355,6 +359,7 @@ body {
   background: #000 !important;
   display: block !important;
   border-bottom: none !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
 }
 
 .nav-header, .nav-tabs-container, .nav-actions {
@@ -436,36 +441,106 @@ body {
   cursor: pointer;
   transition: none !important;
   border-bottom: 3px solid transparent;
+  border: none !important; /* Remove border from navigation tab background */
   white-space: nowrap;
   flex-shrink: 0;
+  box-sizing: border-box !important; /* Ensure border is included in width calculation */
+  /* CRITICAL: Ensure text positioning is fixed and does not move when selected */
+  line-height: 1 !important;
+  vertical-align: baseline !important;
 }
 
 .nav-tab.active {
   color: var(--accent-primary);
-  border-bottom: 3px solid var(--accent-primary);
+  background-color: #0c0c0e !important;
+  background: #0c0c0e !important;
+  border: none !important; /* Remove border from navigation tab background */
+  border-top-left-radius: 8px !important; /* Match trait-layers-actions border-radius */
+  border-top-right-radius: 8px !important; /* Match trait-layers-actions border-radius */
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-sizing: border-box !important; /* Ensure border is included in width calculation */
+  /* CRITICAL: Ensure text positioning is fixed and does not move when selected */
+  line-height: 1 !important;
+  vertical-align: baseline !important;
+  padding: 1rem 2rem !important; /* Match inactive tab padding exactly */
+}
+
+.nav-tab:not(.active) {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+/* CRITICAL: Explicitly ensure Generate NFTs tab has black background when NOT active */
+.nav-tab[data-tab="generate-nfts"]:not(.active),
+body .nav-tab[data-tab="generate-nfts"]:not(.active),
+html body .nav-tab[data-tab="generate-nfts"]:not(.active),
+.nav-tabs .nav-tab[data-tab="generate-nfts"]:not(.active),
+body .nav-tabs .nav-tab[data-tab="generate-nfts"]:not(.active) {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  background-image: none !important;
 }
 
 .nav-tab:hover, .nav-tab:hover:not(.active) {
-  background: none !important;
+  background: #000000 !important;
+  background-color: #000000 !important;
   color: inherit !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important; /* Remove border from navigation tab background */
+  filter: none !important;
+  transform: none !important;
+  cursor: pointer !important;
+}
+
+/* CRITICAL: Completely disable ALL hover effects for Generate NFTs tab - maintain current state */
+.nav-tab[data-tab="generate-nfts"]:hover:not(.active) {
+  background: #000000 !important; /* CRITICAL: Keep black background when inactive - NO hover effect */
+  background-color: #000000 !important; /* CRITICAL: Match inactive state exactly */
+  color: #fff !important;
   box-shadow: none !important;
   outline: none !important;
   border: none !important;
   filter: none !important;
   transform: none !important;
+  transition: none !important; /* CRITICAL: Remove all transitions */
   cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+.nav-tab[data-tab="generate-nfts"]:hover.active,
+.nav-tab[data-tab="generate-nfts"].active:hover {
+  background: #0c0c0e !important; /* CRITICAL: Keep active background when active - NO hover effect */
+  background-color: #0c0c0e !important; /* CRITICAL: Match active state exactly */
+  color: #fff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  filter: none !important;
+  transform: none !important;
+  transition: none !important; /* CRITICAL: Remove all transitions */
+  cursor: pointer !important;
+  pointer-events: auto !important;
 }
 
 /* Content Area */
 .content-area {
   position: relative !important;
   overflow-y: visible !important;
+  overflow-x: visible !important;
+  overflow: visible !important;
   height: auto !important;
   /* padding-top moved to general rule below */
   margin-top: 110px !important;
   display: block !important;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  border-top: none !important;
+  border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 /* Use browser's native scrollbar - no custom styling to avoid duplicates */
 
@@ -484,6 +559,8 @@ html body #app .project-interface .content-area #export-nfts,
   padding-top: 80px !important;
   margin-top: 0 !important;
   z-index: auto !important;
+  /* CRITICAL: Do NOT set overflow here - let collection-info-override.css handle it for general-info */
+  /* Other tabs will have their overflow set by specific rules below */
 }
 
 /* Generate NFTs tab needs more padding to clear navigation */
@@ -1234,6 +1311,8 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   white-space: nowrap;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .trait-rarity-actions .tooltiptext {
   width: 250px;
   white-space: normal;
@@ -1241,6 +1320,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   line-height: 1.2 !important; /* Match standard tooltip line-height */
   padding: 8px 12px !important; /* Equal top/bottom padding for vertical centering */
 }
+*/
 
 .randomize-tooltip {
   width: 300px !important;
@@ -1487,11 +1567,18 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
 }
 
 /* Tooltip Styles */
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 .tooltip {
   position: relative;
   display: inline-block;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .tooltiptext {
   position: fixed;
   z-index: 99999;
@@ -1513,8 +1600,10 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   word-wrap: break-word;
   overflow: visible;
 }
+*/
 
 /* Specific tooltip styles for app-action-btn and normalize-rarities-btn */
+/*
 .app-action-btn .tooltiptext,
 .normalize-rarities-btn .tooltiptext {
   width: 170px !important;
@@ -1524,12 +1613,14 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
 /* CRITICAL: Disable CSS hover rules - JavaScript controls all tooltips with 1-second delay and fade in/out */
 /* Tooltips are now controlled by JavaScript in tooltip-handler-consolidated.js */
 /* This prevents immediate display via CSS :hover */
+/*
 .tooltip:hover:not([disabled]):not(:disabled) .tooltiptext {
   /* JavaScript will control visibility and opacity with 1-second delay */
   /* Don't force immediate display via CSS */
-}
+/*}
 
 /* CRITICAL: Explicitly hide tooltips for disabled elements */
+/*
 .tooltip[disabled]:hover .tooltiptext,
 .tooltip:disabled:hover .tooltiptext,
 .tooltip[disabled] .tooltiptext,
@@ -1540,6 +1631,8 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   pointer-events: none !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .tooltiptext::after {
   content: "";
   position: absolute;
@@ -1560,6 +1653,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   transform: translateX(-50%);
   border-color: #333 transparent transparent transparent;
 }
+*/
 
 .tooltip-bottom {
   top: 125%;
@@ -1595,6 +1689,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   left: auto;
   transform: translateX(0);
 }
+*/
 
 /* Modal Styles */
 .modal-overlay {
@@ -1612,7 +1707,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
 }
 
 .modal {
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
@@ -1630,7 +1725,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   align-items: center;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
 }
 
 .modal-header h3 {
@@ -1645,7 +1740,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
 }
 
 .modal-footer {
@@ -1654,7 +1749,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-color);
-  background-color: #1a1a23;
+  background-color: #0c0c0e;
 }
 
 .combination-rule-modal {
@@ -1759,6 +1854,11 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   overflow: visible;
   line-height: 1.4;
   word-break: break-word;
+}
+
+/* CRITICAL: Seed number in notification tooltip - 2px smaller font size */
+.notification-message .notification-seed-number {
+  font-size: calc(1em - 2px) !important; /* 2px smaller than parent font size */
 }
 
 .notification-message.error-message {
@@ -1894,6 +1994,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   max-height: 100%;
   object-fit: contain;
   display: block;
+  border-radius: 8px; /* Match app's rounded corner style */
 }
 
 .nft-preview-placeholder {
@@ -1972,7 +2073,7 @@ html body #app .project-interface .content-area #generate-nfts .section-descript
   justify-content: start !important;
   align-items: flex-start !important;
   justify-items: center !important;
-  min-height: 330px !important;
+  min-height: 0 !important; /* Remove fixed min-height to prevent empty space */
   max-height: none !important;
   overflow-y: auto !important;
   box-sizing: border-box !important;

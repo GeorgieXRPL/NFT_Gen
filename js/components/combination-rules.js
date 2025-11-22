@@ -27,6 +27,25 @@ const RULE_TYPE_COLORS = {
   'immediately-below': '#ffe400',
 };
 
+// CRITICAL: Centralized SVG icon definitions for all rule types
+// These must be used consistently across all three locations:
+// 1. Add Combination Rule modal dropdown
+// 2. Added rules headers
+// 3. "All Rule Types" filter dropdown (collapsed and expanded)
+const RULE_TYPE_SVG_ICONS = {
+  'never-combine': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-never-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`,
+  'always-combine': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-always-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+  'conditional-restriction': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-conditional-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>`,
+  'always-above': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-above-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>`,
+  'always-below': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-below-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 16 7 11"></polyline><polyline points="17 4 12 9 7 4"></polyline></svg>`,
+  'immediately-above': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-above-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"></polyline></svg>`,
+  'immediately-below': (color) => `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-below-icon" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline></svg>`,
+};
+
+// Make RULE_TYPE_COLORS and RULE_TYPE_SVG_ICONS globally accessible
+window.RULE_TYPE_COLORS = RULE_TYPE_COLORS;
+window.RULE_TYPE_SVG_ICONS = RULE_TYPE_SVG_ICONS;
+
 // Color map for "Rules Applies to" options (must match colors in custom-dropdown.js)
 const RULE_APPLIES_TO_COLORS = {
   'between-layers': '#5c6bc0',      // Indigo/Blue (matches dropdown)
@@ -46,21 +65,46 @@ const RULE_APPLIES_TO_COLORS = {
   // Store the module definition on NFTApp for later registration if needed
 window.NFTApp = window.NFTApp || {};
   window.NFTApp._combinationRulesModuleDef = {
+  // CRITICAL: Reordering state for animation (similar to trait layers)
+  _reorderingState: {
+    isAnimating: false,
+    pendingTimeouts: [],
+    transitionEndHandlers: []
+  },
+
+  // Helper to cancel all pending animations
+  _cancelPendingAnimations: function() {
+    // Cancel all pending timeouts
+    this._reorderingState.pendingTimeouts.forEach(timeout => clearTimeout(timeout));
+    this._reorderingState.pendingTimeouts = [];
+    
+    // Remove all transitionend handlers
+    this._reorderingState.transitionEndHandlers.forEach(({ element, handler }) => {
+      element.removeEventListener('transitionend', handler);
+    });
+    this._reorderingState.transitionEndHandlers = [];
+    
+    // Clean up any elements still in reordering state
+    const container = document.getElementById("combination-rules-container");
+    if (container) {
+      const reorderingElements = container.querySelectorAll(".rule-item.reordering");
+      reorderingElements.forEach(element => {
+        element.style.transition = "";
+        element.style.transform = "";
+        element.style.zIndex = "";
+        element.classList.remove("reordering");
+      });
+    }
+    
+    this._reorderingState.isAnimating = false;
+  },
+
   // Set up the combination rules functionality
   setup: function (projectData) {
     console.log("Setting up combination rules module")
 
-    // CRITICAL FIX: Check if there are at least 2 trait layers before showing rules section
-    // Use setTimeout to ensure project data is fully loaded
-    setTimeout(() => {
-      this.updateRulesSectionVisibility(projectData)
-    }, 0)
-    
-    // Also retry after a delay to catch cases where traits load asynchronously
-    setTimeout(() => {
-      this.updateRulesSectionVisibility(projectData)
-    }, 200)
-    
+    // CRITICAL: Check visibility ONCE when project is loaded
+    // Use a single timeout to ensure project data is fully loaded
     setTimeout(() => {
       this.updateRulesSectionVisibility(projectData)
     }, 500)
@@ -74,8 +118,7 @@ window.NFTApp = window.NFTApp || {};
 
   // Initialize the rules container
   initRulesContainer: function (projectData) {
-    // CRITICAL FIX: Always update rules section visibility on initialization
-    this.updateRulesSectionVisibility(projectData)
+    // Note: updateRulesSectionVisibility is called in setup() - no need to call it here
     
     // Function to try updating rules UI
     const tryUpdateRules = () => {
@@ -111,12 +154,13 @@ window.NFTApp = window.NFTApp || {};
   },
 
   // CRITICAL FIX: Update rules section visibility based on trait layers count and traits
+  // ONCE minimum conditions are met, the section stays visible FOREVER (never hidden again)
   updateRulesSectionVisibility: function (projectData) {
     console.log("[DEBUG] Updating rules section visibility")
     
     const rulesSection = document.querySelector('.rules-section')
     if (!rulesSection) {
-      console.warn("[DEBUG] Rules section not found")
+      // console.warn("[DEBUG] Rules section not found")
       return
     }
     
@@ -125,27 +169,171 @@ window.NFTApp = window.NFTApp || {};
     const subsectionTitle = rulesSection.querySelector('.subsection-title')
     const combinationRulesContainer = rulesSection.querySelector('.combination-rules-container')
     
-    // Try to get fresh project data if not provided or if it seems incomplete
-    let currentProjectData = projectData
-    if (!currentProjectData || !currentProjectData.traits || !Array.isArray(currentProjectData.traits) || currentProjectData.traits.length === 0) {
-      // Try to get from window.currentProject
-      if (window.currentProject && window.currentProject.traits && Array.isArray(window.currentProject.traits)) {
-        currentProjectData = window.currentProject
-        console.log("[DEBUG] Using window.currentProject for rules visibility check")
-      }
-      // Try to get from MemoryManager
-      if ((!currentProjectData || !currentProjectData.traits) && window.MemoryManager && window.MemoryManager.state && window.MemoryManager.state.currentProject) {
+    // CRITICAL: Always use window.currentProject FIRST as it's the most up-to-date source
+    // This ensures we get newly added rules immediately, even if stale projectData is passed
+    // Priority: 1) window.currentProject (most up-to-date), 2) provided projectData, 3) MemoryManager, 4) module projectData
+    let currentProjectData = null
+    
+    // CRITICAL: Always check window.currentProject FIRST to get the latest rules
+    if (window.currentProject && window.currentProject.rules && Array.isArray(window.currentProject.rules)) {
+      currentProjectData = window.currentProject
+      console.log("[DEBUG] Using window.currentProject for rules visibility check (has", currentProjectData.rules.length, "rules)")
+    } else if (projectData && projectData.rules && Array.isArray(projectData.rules)) {
+      // Fallback to provided projectData if currentProject doesn't have rules
+      currentProjectData = projectData
+      console.log("[DEBUG] Using provided projectData for rules visibility check (has", currentProjectData.rules.length, "rules)")
+    } else {
+      // Try other sources
+      if (window.MemoryManager && window.MemoryManager.state && window.MemoryManager.state.currentProject) {
         const memProject = window.MemoryManager.state.currentProject
-        if (memProject && memProject.traits && Array.isArray(memProject.traits)) {
+        if (memProject && memProject.rules && Array.isArray(memProject.rules)) {
           currentProjectData = memProject
-          console.log("[DEBUG] Using MemoryManager.currentProject for rules visibility check")
+          console.log("[DEBUG] Using MemoryManager.currentProject for rules visibility check (has", currentProjectData.rules.length, "rules)")
         }
+      }
+      if ((!currentProjectData || !currentProjectData.rules) && window.NFTApp?.getModule('combinationRules')?.projectData) {
+        const moduleProjectData = window.NFTApp.getModule('combinationRules').projectData
+        if (moduleProjectData && moduleProjectData.rules && Array.isArray(moduleProjectData.rules)) {
+          currentProjectData = moduleProjectData
+          console.log("[DEBUG] Using combinationRules module projectData for rules visibility check (has", currentProjectData.rules.length, "rules)")
+        }
+      }
+      // Last resort: use provided projectData even if it doesn't have rules
+      if (!currentProjectData && projectData) {
+        currentProjectData = projectData
+        console.log("[DEBUG] Using provided projectData as fallback (may not have rules)")
       }
     }
     
+    // CRITICAL: Also check the DOM for existing rules as a final safeguard
+    // This prevents hiding the section if rules exist in the DOM but projectData is stale
+    const rulesContainer = document.getElementById('combination-rules-container');
+    const existingRulesInDOM = rulesContainer ? rulesContainer.querySelectorAll('.rule-item, [data-rule-id]').length : 0;
+    const hasRulesInDOM = existingRulesInDOM > 0;
+    
+    if (hasRulesInDOM && (!currentProjectData || !currentProjectData.rules || currentProjectData.rules.length === 0)) {
+      console.log("[DEBUG] Rules exist in DOM but not in projectData - using DOM count (", existingRulesInDOM, "rules)");
+      // Create a temporary projectData-like object with rules count from DOM
+      if (!currentProjectData) {
+        currentProjectData = { rules: [] };
+      }
+      // Set a flag to indicate rules exist
+      currentProjectData._hasRulesInDOM = true;
+      currentProjectData._rulesCountFromDOM = existingRulesInDOM;
+    }
+    
+    // Also ensure traits array exists
+    if (!currentProjectData || !currentProjectData.traits || !Array.isArray(currentProjectData.traits) || currentProjectData.traits.length === 0) {
+      // Try to get from window.currentProject
+      if (window.currentProject && window.currentProject.traits && Array.isArray(window.currentProject.traits)) {
+        // Merge traits from window.currentProject but keep rules from currentProjectData
+        if (currentProjectData) {
+          currentProjectData.traits = window.currentProject.traits
+        } else {
+        currentProjectData = window.currentProject
+        }
+        console.log("[DEBUG] Using window.currentProject traits for rules visibility check")
+      }
+    }
+    
+    // CRITICAL: Check if section has ever been visible (minimum conditions met)
+    // Once this flag is set, the section will NEVER be hidden again
+    const hasEverBeenVisible = rulesSection.dataset.hasEverBeenVisible === 'true';
+    
+    // CRITICAL: If section has ever been visible AND we have project data with traits, ALWAYS show it and return immediately
+    // This ensures once minimum conditions are met, it stays visible forever
+    // BUT: On project load, we still need to check conditions first to set the flag
+    if (hasEverBeenVisible && currentProjectData && currentProjectData.traits && Array.isArray(currentProjectData.traits) && currentProjectData.traits.length > 0) {
+      console.log("[DEBUG] Rules section has ever been visible - ALWAYS showing (never hiding again)");
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('flex-direction', 'column', 'important');
+      rulesSection.style.setProperty('align-items', 'flex-start', 'important');
+      if (combinationRulesContainer) {
+        combinationRulesContainer.style.setProperty('display', 'block', 'important');
+        combinationRulesContainer.style.setProperty('visibility', 'visible', 'important');
+        combinationRulesContainer.style.setProperty('opacity', '1', 'important');
+      }
+      return; // Early return - never check conditions again once visible
+    }
+    
+    // CRITICAL: Check if rules section is currently being updated - if so, don't hide it
+    const isUpdatingRules = rulesSection && rulesSection.dataset.updatingRules === 'true';
+    
+    // CRITICAL: Check if rules exist first - if so, always show the section
+    // Check both projectData and DOM
+    const hasRulesInProjectData = currentProjectData && currentProjectData.rules && Array.isArray(currentProjectData.rules) && currentProjectData.rules.length > 0;
+    const hasRules = hasRulesInProjectData || hasRulesInDOM || (currentProjectData && currentProjectData._hasRulesInDOM);
+    
+    console.log("[DEBUG] Rules check - projectData:", hasRulesInProjectData ? currentProjectData.rules.length : 0, "DOM:", existingRulesInDOM, "hasRules:", hasRules, "isUpdating:", isUpdatingRules);
+    
+    // CRITICAL: If rules section is being updated, always show it
+    if (isUpdatingRules) {
+      console.log("[DEBUG] Rules section is being updated - forcing visibility");
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      if (combinationRulesContainer) {
+        combinationRulesContainer.style.setProperty('display', 'block', 'important');
+        combinationRulesContainer.style.setProperty('visibility', 'visible', 'important');
+        combinationRulesContainer.style.setProperty('opacity', '1', 'important');
+      }
+      return; // Early return - don't hide while updating
+    }
+    
+    // CRITICAL: If rules exist (in projectData OR DOM), ALWAYS show the section - this is the most important check
+    // This prevents hiding even if called with stale projectData
+    if (hasRules) {
+      console.log("[DEBUG] Rules exist - ALWAYS showing rules section (projectData:", hasRulesInProjectData ? currentProjectData.rules.length : 0, "DOM:", existingRulesInDOM, ")");
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('flex-direction', 'column', 'important');
+      rulesSection.style.setProperty('align-items', 'flex-start', 'important');
+      if (subsectionHeader) {
+        subsectionHeader.style.setProperty('display', 'flex', 'important');
+        subsectionHeader.style.setProperty('visibility', 'visible', 'important');
+        subsectionHeader.style.setProperty('opacity', '1', 'important');
+      }
+      if (subsectionTitle) {
+        subsectionTitle.style.setProperty('display', 'flex', 'important');
+        subsectionTitle.style.setProperty('visibility', 'visible', 'important');
+        subsectionTitle.style.setProperty('opacity', '1', 'important');
+      }
+      if (combinationRulesContainer) {
+        combinationRulesContainer.style.setProperty('display', 'block', 'important');
+        combinationRulesContainer.style.setProperty('visibility', 'visible', 'important');
+        combinationRulesContainer.style.setProperty('opacity', '1', 'important');
+      }
+      return; // Early return - NEVER hide if rules exist
+    }
+    
+    // CRITICAL: Re-check DOM rules one more time before hiding (in case rules were just added)
+    // This is a final safeguard against race conditions
+    const finalDOMCheck = rulesContainer ? rulesContainer.querySelectorAll('.rule-item, [data-rule-id]').length : 0;
+    if (finalDOMCheck > 0) {
+      console.log("[DEBUG] Final DOM check found", finalDOMCheck, "rules - showing section");
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      if (combinationRulesContainer) {
+        combinationRulesContainer.style.setProperty('display', 'block', 'important');
+        combinationRulesContainer.style.setProperty('visibility', 'visible', 'important');
+        combinationRulesContainer.style.setProperty('opacity', '1', 'important');
+      }
+      return; // Early return - NEVER hide if DOM has rules
+    }
+    
     // Check if projectData exists and has traits
-    if (!currentProjectData || !currentProjectData.traits || !Array.isArray(currentProjectData.traits)) {
-      console.log("[DEBUG] No project data or traits array - hiding rules section")
+    // CRITICAL: Only hide if there are NO rules (in projectData OR DOM) AND no traits
+    // Note: We've already checked hasRules above, so if we reach here, there are no rules
+    if (!currentProjectData || ((!currentProjectData.traits || !Array.isArray(currentProjectData.traits)) && !hasRules && finalDOMCheck === 0)) {
+      // CRITICAL: Only hide if section has NEVER been visible (minimum conditions never met)
+      // If it has ever been visible, NEVER hide it again
+      if (!hasEverBeenVisible) {
+        // Only hide if there are no rules AND no traits
+        console.log("[DEBUG] No project data or traits array, and no rules - hiding rules section (has never been visible)")
       rulesSection.style.setProperty('display', 'none', 'important')
       rulesSection.style.setProperty('visibility', 'hidden', 'important')
       rulesSection.style.setProperty('opacity', '0', 'important')
@@ -165,28 +353,49 @@ window.NFTApp = window.NFTApp || {};
         combinationRulesContainer.style.setProperty('opacity', '0', 'important')
       }
       return
+      } else if (hasEverBeenVisible) {
+        // Section has been visible before - keep it visible even if conditions aren't met
+        console.log("[DEBUG] Rules section has ever been visible - keeping visible (never hiding again)")
+        rulesSection.style.setProperty('display', 'flex', 'important')
+        rulesSection.style.setProperty('visibility', 'visible', 'important')
+        rulesSection.style.setProperty('opacity', '1', 'important')
+        if (combinationRulesContainer) {
+          combinationRulesContainer.style.setProperty('display', 'block', 'important')
+          combinationRulesContainer.style.setProperty('visibility', 'visible', 'important')
+          combinationRulesContainer.style.setProperty('opacity', '1', 'important')
+        }
+        return
+      }
     }
     
     // Check conditions:
-    // 1. At least 2 trait layers exist (changed from 1 to 2)
+    // 1. At least 1 trait layer exists (changed back to 1 to match traits-rules-layout-fix.js)
     // 2. Each trait layer has at least one trait loaded
     const traitLayersCount = currentProjectData.traits.length
-    const hasAtLeastTwoLayers = traitLayersCount >= 2
+    const hasAtLeastOneLayer = traitLayersCount >= 1
     const allLayersHaveTraits = currentProjectData.traits.every(layer => 
       layer && layer.traits && Array.isArray(layer.traits) && layer.traits.length > 0
     )
     
-    const shouldShow = hasAtLeastTwoLayers && allLayersHaveTraits
+    const shouldShow = hasAtLeastOneLayer && allLayersHaveTraits
+    
+    // CRITICAL: Also check if there are existing rules - if so, always show the section
+    // This prevents the section from being hidden when rules exist, even if conditions aren't fully met
+    // Note: hasRules was already checked above, but we check again here to be safe
+    const shouldShowWithRules = shouldShow || hasRules;
     
     console.log("[DEBUG] Rules visibility check:", {
       traitLayersCount,
-      hasAtLeastTwoLayers,
+      hasAtLeastOneLayer,
       allLayersHaveTraits,
       shouldShow,
+      hasRules,
+      shouldShowWithRules,
+      rulesCount: hasRules ? currentProjectData.rules.length : 0,
       traits: currentProjectData.traits.map(l => ({ name: l.name, traitCount: l.traits?.length || 0 }))
     })
     
-    if (shouldShow) {
+    if (shouldShowWithRules) {
       // Show the rules section with flex display to maintain layout
       rulesSection.style.setProperty('display', 'flex', 'important')
       rulesSection.style.setProperty('visibility', 'visible', 'important')
@@ -213,6 +422,13 @@ window.NFTApp = window.NFTApp || {};
       
       console.log("[DEBUG] Rules section is now visible")
       
+      // CRITICAL: Mark that section has ever been visible - this means it will NEVER be hidden again
+      // Set this flag ONCE when minimum conditions are first met
+      if (!hasEverBeenVisible) {
+        rulesSection.dataset.hasEverBeenVisible = 'true';
+        console.log("[DEBUG] Rules section minimum conditions met - marking as permanently visible (will never hide again)");
+      }
+      
       // CRITICAL: Ensure bottom buttons are visible when rules section is shown
       setTimeout(() => {
         const bottomButtons = combinationRulesContainer?.querySelector('.bottom-shortcut-buttons')
@@ -227,10 +443,12 @@ window.NFTApp = window.NFTApp || {};
             right: 0 !important;
             width: 100% !important;
             z-index: 100 !important;
-            justify-content: center !important;
+            justify-content: flex-end !important;
             align-items: center !important;
-            gap: 1rem !important;
+            gap: 0 !important;
             padding: 1rem !important;
+            padding-left: 0 !important;
+            padding-right: 1rem !important;
             margin: 0 !important;
             border-top: 1px solid var(--border-color) !important;
             background: transparent !important;
@@ -241,6 +459,9 @@ window.NFTApp = window.NFTApp || {};
         }
       }, 100)
     } else {
+      // CRITICAL: Only hide if section has NEVER been visible (minimum conditions never met)
+      // If it has ever been visible, NEVER hide it again
+      if (!hasEverBeenVisible) {
       // Hide the rules section and all its child elements
       rulesSection.style.setProperty('display', 'none', 'important')
       rulesSection.style.setProperty('visibility', 'hidden', 'important')
@@ -262,10 +483,49 @@ window.NFTApp = window.NFTApp || {};
         combinationRulesContainer.style.setProperty('opacity', '0', 'important')
       }
       
-      if (!hasAtLeastTwoLayers) {
-        console.log("[DEBUG] Rules section is now hidden - need at least 2 trait layers")
+        // CRITICAL: Don't hide if rules exist
+        if (hasRules) {
+          console.log("[DEBUG] Rules exist but conditions not met - showing section anyway (has", currentProjectData.rules.length, "rules)")
+          // Show the section because rules exist
+          rulesSection.style.setProperty('display', 'flex', 'important')
+          rulesSection.style.setProperty('visibility', 'visible', 'important')
+          rulesSection.style.setProperty('opacity', '1', 'important')
+          rulesSection.style.setProperty('flex-direction', 'column', 'important')
+          rulesSection.style.setProperty('align-items', 'flex-start', 'important')
+          if (subsectionHeader) {
+            subsectionHeader.style.setProperty('display', 'flex', 'important')
+            subsectionHeader.style.setProperty('visibility', 'visible', 'important')
+            subsectionHeader.style.setProperty('opacity', '1', 'important')
+          }
+          if (subsectionTitle) {
+            subsectionTitle.style.setProperty('display', 'flex', 'important')
+            subsectionTitle.style.setProperty('visibility', 'visible', 'important')
+            subsectionTitle.style.setProperty('opacity', '1', 'important')
+          }
+          if (combinationRulesContainer) {
+            combinationRulesContainer.style.setProperty('display', 'block', 'important')
+            combinationRulesContainer.style.setProperty('visibility', 'visible', 'important')
+            combinationRulesContainer.style.setProperty('opacity', '1', 'important')
+          }
+          return
+        }
+        
+        if (!hasAtLeastOneLayer) {
+          console.log("[DEBUG] Rules section is now hidden - need at least 1 trait layer")
       } else {
         console.log("[DEBUG] Rules section is now hidden - each layer needs at least one trait loaded")
+        }
+      } else if (hasEverBeenVisible) {
+        // Section has been visible before - keep it visible even if conditions aren't met
+        console.log("[DEBUG] Rules section has ever been visible - keeping visible (never hiding again)")
+        rulesSection.style.setProperty('display', 'flex', 'important')
+        rulesSection.style.setProperty('visibility', 'visible', 'important')
+        rulesSection.style.setProperty('opacity', '1', 'important')
+        if (combinationRulesContainer) {
+          combinationRulesContainer.style.setProperty('display', 'block', 'important')
+          combinationRulesContainer.style.setProperty('visibility', 'visible', 'important')
+          combinationRulesContainer.style.setProperty('opacity', '1', 'important')
+        }
       }
     }
   },
@@ -274,11 +534,8 @@ window.NFTApp = window.NFTApp || {};
   setupEventListeners: function (projectData) {
     console.log("Setting up combination rules event listeners")
     
-    // CRITICAL FIX: Listen for layer updates to update rules section visibility
-    document.addEventListener('layers-updated', () => {
-      console.log("[DEBUG] Layers updated event received, updating rules section visibility")
-      this.updateRulesSectionVisibility(projectData)
-    })
+    // Note: updateRulesSectionVisibility is only called on project load and when layers are deleted
+    // It's not needed on every layer update - once visible, it stays visible
 
     // Add event listener for add combination rule button
     const addRuleBtn = document.getElementById("add-combination-rule")
@@ -298,8 +555,12 @@ window.NFTApp = window.NFTApp || {};
       // Setup tooltip for Add Combination Rule button
       const tooltip = newBtn.querySelector(".tooltiptext")
       if (tooltip) {
+        // CRITICAL: Ensure cursor is help for tooltip
+        newBtn.style.setProperty("cursor", "help", "important");
         const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
         if (tooltipManager && tooltipManager.setupTooltip) {
+          newBtn.removeAttribute('data-tooltip-setup');
+          delete newBtn.dataset.tooltipSetup;
           tooltipManager.setupTooltip(newBtn, tooltip);
         }
       }
@@ -325,8 +586,12 @@ window.NFTApp = window.NFTApp || {};
       // Setup tooltip for Check Rule Conflicts button
       const tooltip = newConflictsBtn.querySelector(".tooltiptext")
       if (tooltip) {
+        // CRITICAL: Ensure cursor is help for tooltip (even when disabled)
+        newConflictsBtn.style.setProperty("cursor", "help", "important");
         const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
         if (tooltipManager && tooltipManager.setupTooltip) {
+          newConflictsBtn.removeAttribute('data-tooltip-setup');
+          delete newConflictsBtn.dataset.tooltipSetup;
           tooltipManager.setupTooltip(newConflictsBtn, tooltip);
         }
       }
@@ -340,21 +605,42 @@ window.NFTApp = window.NFTApp || {};
   setupRuleActionTooltip: function(btn, tooltip) {
     if (!btn || !tooltip) return;
     
-    // CRITICAL: Skip if already set up to prevent duplicate event listeners
-    if (btn.dataset.tooltipSetup === "true") {
+    // CRITICAL: Skip all tooltips inside Collection Info tab (general-info)
+    const isInCollectionInfoTab = btn.closest('#general-info') !== null || 
+                                   btn.closest('.tab-content#general-info') !== null ||
+                                   (btn.id === 'general-info');
+    if (isInCollectionInfoTab) {
+      // Remove tooltip class and tooltip element if present
+      btn.classList.remove('tooltip');
+      const existingTooltip = btn.querySelector('.tooltiptext') || btn.querySelector('.tooltip-text');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+      btn.style.cursor = btn.disabled ? "not-allowed" : "default";
       return;
     }
-    btn.dataset.tooltipSetup = "true";
+    
+    // CRITICAL: Always use global tooltip manager if available - it handles delays and visibility correctly
+    // Remove old setup flag to allow re-setup
+    if (btn.dataset.tooltipSetup === "true") {
+      delete btn.dataset.tooltipSetup;
+    }
     
     // CRITICAL: Add cursor help to element (use setProperty with important to override CSS)
     btn.style.setProperty("cursor", "help", "important");
     
-    // Use global tooltip manager if available
+    // CRITICAL: Use global tooltip manager - it handles delays and visibility correctly
     const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
     if (tooltipManager && tooltipManager.setupTooltip) {
       tooltipManager.setupTooltip(btn, tooltip);
       return;
     }
+    
+    // CRITICAL: Skip if already set up to prevent duplicate event listeners (only for fallback)
+    if (btn.dataset.tooltipSetup === "true") {
+      return;
+    }
+    btn.dataset.tooltipSetup = "true";
 
     // CRITICAL: Ensure tooltip has 1 second transition (matching All Rule Types tooltip)
     tooltip.style.setProperty("transition", "opacity 1s ease", "important");
@@ -404,8 +690,12 @@ window.NFTApp = window.NFTApp || {};
       // Show tooltip after 1 second delay (matching All Rule Types tooltip)
       tooltipTimeout = setTimeout(() => {
         // CRITICAL: Set position fixed and z-index FIRST, before making tooltip visible
+        // CRITICAL: z-index must be BELOW custom-dropdown (10001 and 999999) to prevent overlap
         tooltip.style.setProperty("position", "fixed", "important");
-        tooltip.style.setProperty("z-index", "2147483647", "important");
+        // Check if tooltip is in combination-rules-filter-container
+        const isInFilterContainer = btn.closest('.combination-rules-filter-container');
+        const tooltipZIndex = isInFilterContainer ? "999998" : "9998";
+        tooltip.style.setProperty("z-index", tooltipZIndex, "important");
         tooltip.style.setProperty("bottom", "auto", "important");
         tooltip.style.setProperty("right", "auto", "important");
         tooltip.style.setProperty("margin", "0", "important");
@@ -921,7 +1211,7 @@ window.NFTApp = window.NFTApp || {};
     // Create modal content
     const modalContent = document.createElement("div")
     modalContent.className = "modal conflicts-modal"
-    modalContent.style.cssText = "background: #1a1a23; border-radius: 12px; width: 90%; max-width: 1200px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;"
+    modalContent.style.cssText = "background: #0c0c0e; border-radius: 12px; width: 90%; max-width: 1200px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;"
 
     // Modal header
     const header = document.createElement("div")
@@ -1014,7 +1304,7 @@ window.NFTApp = window.NFTApp || {};
       comparison.appendChild(rule2Card)
     } else if (conflict.type === 'circular-dependency') {
       const cycleInfo = document.createElement("div")
-      cycleInfo.style.cssText = "background: #1a1a23; border: 1px solid #666; border-radius: 6px; padding: 15px;"
+      cycleInfo.style.cssText = "background: #0c0c0e; border: 1px solid #666; border-radius: 6px; padding: 15px;"
       cycleInfo.innerHTML = `
         <div style="color: #ff8888; font-weight: 600; margin-bottom: 8px;">Circular Path:</div>
         <div style="color: #ccc; font-size: 13px; font-family: monospace;">${conflict.cyclePath ? conflict.cyclePath.join(' → ') : 'N/A'}</div>
@@ -1029,7 +1319,7 @@ window.NFTApp = window.NFTApp || {};
   // Create a display card for a single rule with Edit/Delete buttons
   createRuleDisplayCard: function(rule, ruleIndex, projectData, ruleNumber, conflictingRule = null) {
     const ruleCard = document.createElement("div")
-    ruleCard.style.cssText = "background: #1a1a23; border: 1px solid #666; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px;"
+    ruleCard.style.cssText = "background: #0c0c0e; border: 1px solid #666; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px;"
 
     // Rule header
     const ruleHeader = document.createElement("div")
@@ -1447,8 +1737,7 @@ window.NFTApp = window.NFTApp || {};
               <h2 class="combination-rule-title">${ruleToEdit ? "Edit" : "Add"} Combination Rule</h2>
               <div class="combination-rule-tip">Configure rules to control how traits can or cannot appear together in your NFTs</div>
             </div>
-            <button id="close-combination-rule-modal" class="combination-rule-close-btn tooltip">
-              <span class="tooltiptext">Close modal</span>
+            <button id="close-combination-rule-modal" class="combination-rule-close-btn">
               &times;
             </button>
           </div>
@@ -1567,7 +1856,12 @@ window.NFTApp = window.NFTApp || {};
     // Initialize custom dropdowns
     setTimeout(() => {
       console.log("Initializing custom dropdowns after modal is shown")
+      // CRITICAL: Only init if not already initialized for rules-filter-dropdown
+      // The rules-filter-dropdown should already be initialized by setupRulesFilter
+      // This init is only for modal dropdowns
+      if (NFTApp.customDropdown && typeof NFTApp.customDropdown.init === 'function') {
       NFTApp.customDropdown.init()
+      }
       
       // Function to remove tooltips from dropdowns
       const removeTooltipsFromDropdowns = () => {
@@ -2647,8 +2941,17 @@ window.NFTApp = window.NFTApp || {};
     const firstLayerId = document.getElementById("first-layer").value
     const secondLayerId = document.getElementById("second-layer").value
 
+    console.log('[DEBUG RULE ADDITION] Starting saveRule:', {
+      ruleType,
+      ruleAppliesTo,
+      firstLayerId,
+      secondLayerId,
+      timestamp: new Date().toISOString()
+    });
+
     // Prevent saving if the same layer is selected in both dropdowns
     if (firstLayerId === secondLayerId) {
+      console.log('[DEBUG RULE ADDITION] ERROR: Same layer selected in both dropdowns:', firstLayerId);
       // Show the warning if it's not already shown
       this.showSameLayerWarning(modalOverlay)
       return // Stop execution here
@@ -2736,6 +3039,24 @@ window.NFTApp = window.NFTApp || {};
     switch (ruleAppliesTo) {
       case "between-layers":
         // For between-layers, we already have all the necessary information
+        // CRITICAL: No trait validation needed for between-layers rules
+        // Just ensure layers are different (already checked above)
+        console.log('[DEBUG RULE ADDITION] Adding between-layers rule:', {
+          ruleType,
+          firstLayerId,
+          secondLayerId,
+          firstLayerName: firstLayer.name,
+          secondLayerName: secondLayer.name
+        });
+        // CRITICAL: Ensure rule object has all required properties for between-layers
+        rule.firstLayerId = firstLayerId;
+        rule.secondLayerId = secondLayerId;
+        rule.firstLayerName = firstLayer.name;
+        rule.secondLayerName = secondLayer.name;
+        // CRITICAL: For between-layers, traits arrays should be empty
+        rule.firstTraits = [];
+        rule.secondTraits = [];
+        console.log('[DEBUG RULE ADDITION] between-layers rule created successfully:', rule);
         break
 
       case "between-traits": {
@@ -2764,32 +3085,36 @@ window.NFTApp = window.NFTApp || {};
         // --- DEBUG: Log selected trait IDs ---
         console.log('[DEBUG] saveRule: selected firstTraitsList', firstTraitsList.map(t => t.id));
         console.log('[DEBUG] saveRule: selected secondTraitsList', secondTraitsList.map(t => t.id));
-        // Validate that at least one trait is selected from each layer
-        if (ruleType === "always-above" || ruleType === "always-below" || ruleType === "immediately-above" || ruleType === "immediately-below") {
-          if (firstTraitsList.length === 0) {
-            const firstTraitsListEl = document.getElementById("first-traits-list")
-            addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
-            hasErrors = true
-            console.log('[DEBUG] saveRule: no first traits selected (immediately-above/below)');
-          }
-          if (secondTraitsList.length === 0) {
-            const secondTraitsListEl = document.getElementById("second-traits-list")
-            addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
-            hasErrors = true
-            console.log('[DEBUG] saveRule: no second traits selected (immediately-above/below)');
-          }
-        } else if (firstTraitsList.length === 0 || secondTraitsList.length === 0) {
-          if (firstTraitsList.length === 0) {
-            const firstTraitsListEl = document.getElementById("first-traits-list")
-            addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
-            hasErrors = true
-            console.log('[DEBUG] saveRule: no first traits selected');
-          }
-          if (secondTraitsList.length === 0) {
-            const secondTraitsListEl = document.getElementById("second-traits-list")
-            addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
-            hasErrors = true
-            console.log('[DEBUG] saveRule: no second traits selected');
+        // CRITICAL: Skip trait validation for between-layers rules - they don't need traits
+        // Only validate traits for between-traits rules
+        if (ruleAppliesTo !== "between-layers") {
+          // Validate that at least one trait is selected from each layer
+          if (ruleType === "always-above" || ruleType === "always-below" || ruleType === "immediately-above" || ruleType === "immediately-below") {
+            if (firstTraitsList.length === 0) {
+              const firstTraitsListEl = document.getElementById("first-traits-list")
+              addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
+              hasErrors = true
+              console.log('[DEBUG] saveRule: no first traits selected (immediately-above/below)');
+            }
+            if (secondTraitsList.length === 0) {
+              const secondTraitsListEl = document.getElementById("second-traits-list")
+              addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
+              hasErrors = true
+              console.log('[DEBUG] saveRule: no second traits selected (immediately-above/below)');
+            }
+          } else if (firstTraitsList.length === 0 || secondTraitsList.length === 0) {
+            if (firstTraitsList.length === 0) {
+              const firstTraitsListEl = document.getElementById("first-traits-list")
+              addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
+              hasErrors = true
+              console.log('[DEBUG] saveRule: no first traits selected');
+            }
+            if (secondTraitsList.length === 0) {
+              const secondTraitsListEl = document.getElementById("second-traits-list")
+              addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
+              hasErrors = true
+              console.log('[DEBUG] saveRule: no second traits selected');
+            }
           }
         }
         if (hasErrors) {
@@ -2858,12 +3183,15 @@ window.NFTApp = window.NFTApp || {};
     }
 
     // For Always on Top, Always on Bottom, Immediately Above, and Immediately Below rules, use the same logic as above
+    // CRITICAL: Only collect traits if rule applies to traits, NOT for between-layers
     if (
-      ruleType === "always-above" ||
+      ruleAppliesTo !== "between-layers" &&
+      (ruleType === "always-above" ||
       ruleType === "always-below" ||
       ruleType === "immediately-above" ||
-      ruleType === "immediately-below"
+      ruleType === "immediately-below")
     ) {
+      console.log('[DEBUG RULE ADDITION] Collecting traits for stacking order rule (not between-layers):', ruleType);
       // Get selected traits from both selectors
       rule.firstTraits = Array.from(document.querySelectorAll('#first-traits-list .trait-checkbox-label.selected')).map(label => {
         const traitId = label.getAttribute('data-trait-id');
@@ -2885,11 +3213,58 @@ window.NFTApp = window.NFTApp || {};
           layerName: secondLayer.name
         };
       });
+      console.log('[DEBUG RULE ADDITION] Collected traits:', {
+        firstTraits: rule.firstTraits.length,
+        secondTraits: rule.secondTraits.length
+      });
+    } else if (ruleAppliesTo === "between-layers") {
+      // CRITICAL: For between-layers, ensure traits arrays are empty
+      console.log('[DEBUG RULE ADDITION] Ensuring empty traits arrays for between-layers rule');
+      rule.firstTraits = rule.firstTraits || []
+      rule.secondTraits = rule.secondTraits || []
+      rule.layerId = null
+      rule.layerName = null
+      rule.traits = []
     }
 
     // Add the new rule to the project data
     projectData.rules = projectData.rules || []
+    console.log('[DEBUG RULE ADDITION] Adding rule to projectData:', {
+      ruleId: rule.id,
+      ruleType: rule.type,
+      appliesTo: rule.appliesTo,
+      firstLayerId: rule.firstLayerId,
+      secondLayerId: rule.secondLayerId,
+      totalRulesBefore: projectData.rules.length
+    });
     projectData.rules.push(rule)
+    console.log('[DEBUG RULE ADDITION] Rule added successfully. Total rules now:', projectData.rules.length);
+    
+    // CRITICAL: Ensure window.currentProject is updated with the new rule
+    // This ensures updateRulesSectionVisibility can see the newly added rule
+    if (window.currentProject) {
+      // If currentProject is the same reference, it's already updated
+      // If it's a different reference, update it
+      if (window.currentProject !== projectData) {
+        window.currentProject.rules = projectData.rules;
+        console.log('[DEBUG] Updated window.currentProject.rules with new rule (now has', window.currentProject.rules.length, 'rules)');
+      } else {
+        console.log('[DEBUG] window.currentProject is same reference as projectData, already updated (has', window.currentProject.rules.length, 'rules)');
+      }
+    } else {
+      // If currentProject doesn't exist, set it
+      window.currentProject = projectData;
+      console.log('[DEBUG] Set window.currentProject to projectData (has', projectData.rules.length, 'rules)');
+    }
+    
+    // CRITICAL: Also update the combinationRules module's projectData reference
+    if (this.projectData && this.projectData !== projectData) {
+      this.projectData.rules = projectData.rules;
+      console.log('[DEBUG] Updated combinationRules module projectData.rules');
+    } else if (!this.projectData) {
+      this.projectData = projectData;
+      console.log('[DEBUG] Set combinationRules module projectData');
+    }
 
     // Notify that rules have changed
     if (window.SavedSeedsModal && window.SavedSeedsModal.notifyRuleChange) {
@@ -2902,9 +3277,73 @@ window.NFTApp = window.NFTApp || {};
       this.autoUpdateThumbnailsForRule(rule, projectData);
     }
 
-    // Update the UI
-    this.updateRulesUI(projectData)
-    this.updateCheckConflictsButtonState(projectData)
+    // CRITICAL: Set updating flag and hasEverBeenVisible flag BEFORE any UI updates to prevent visibility checks from hiding the section
+    const rulesSection = document.querySelector('.rules-section');
+    if (rulesSection) {
+      // CRITICAL: Set hasEverBeenVisible flag IMMEDIATELY since we're adding a rule (rules will exist)
+      // This ensures the section stays visible even during the brief moment when innerHTML is cleared
+      rulesSection.dataset.hasEverBeenVisible = 'true';
+      rulesSection.dataset.updatingRules = 'true';
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      console.log('[DEBUG] saveRule - Set hasEverBeenVisible and updatingRules flags BEFORE UI update');
+    }
+    
+    // CRITICAL: Update the UI with flicker prevention
+    // Ensure container is visible BEFORE updating UI to prevent flicker
+    const rulesContainer = document.getElementById("combination-rules-container");
+    if (rulesContainer) {
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+    }
+    if (rulesSection) {
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+    }
+    
+    // CRITICAL: Use requestAnimationFrame to batch DOM updates and prevent flicker
+    // But ensure visibility is set synchronously first
+    console.log('[DEBUG RULE ADDITION] About to update UI, rules count:', projectData.rules ? projectData.rules.length : 0);
+    requestAnimationFrame(() => {
+      console.log('[DEBUG RULE ADDITION] Updating UI in requestAnimationFrame');
+      this.updateRulesUI(projectData);
+      this.updateCheckConflictsButtonState(projectData);
+    });
+    
+    // CRITICAL: Force rules section to stay visible after update
+    // Use requestAnimationFrame to ensure visibility is set after DOM updates
+    requestAnimationFrame(() => {
+      if (rulesSection) {
+        rulesSection.style.setProperty('display', 'flex', 'important');
+        rulesSection.style.setProperty('visibility', 'visible', 'important');
+        rulesSection.style.setProperty('opacity', '1', 'important');
+      }
+      const rulesContainer = document.getElementById("combination-rules-container");
+      if (rulesContainer) {
+        rulesContainer.style.setProperty('display', 'block', 'important');
+        rulesContainer.style.setProperty('visibility', 'visible', 'important');
+        rulesContainer.style.setProperty('opacity', '1', 'important');
+      }
+      
+      // Note: updateRulesSectionVisibility is not called here - once visible, section stays visible
+      // It's only checked on project load and when layers are deleted
+      
+      // CRITICAL: Clear the updating flag after a delay, but keep hasEverBeenVisible
+      // Use a longer delay to ensure all visibility checks have completed
+      setTimeout(() => {
+        if (rulesSection) {
+          delete rulesSection.dataset.updatingRules;
+          // Force visibility one more time after clearing flag
+          rulesSection.style.setProperty('display', 'flex', 'important');
+          rulesSection.style.setProperty('visibility', 'visible', 'important');
+          rulesSection.style.setProperty('opacity', '1', 'important');
+          console.log('[DEBUG] saveRule - Cleared updatingRules flag, kept hasEverBeenVisible');
+        }
+      }, 1200); // Increased delay to prevent any race conditions
+    });
 
     // Close the modal
     modalOverlay.style.display = "none"
@@ -3018,28 +3457,32 @@ window.NFTApp = window.NFTApp || {};
             }
           })
 
-        // Validate that at least one trait is selected from each layer
-        if (ruleType === "always-above" || ruleType === "always-below" || ruleType === "immediately-above" || ruleType === "immediately-below") {
-          if (firstTraitsList.length === 0) {
-            const firstTraitsListEl = document.getElementById("first-traits-list")
-            addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
-            hasErrors = true
-          }
-          if (secondTraitsList.length === 0) {
-            const secondTraitsListEl = document.getElementById("second-traits-list")
-            addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
-            hasErrors = true
-          }
-        } else if (firstTraitsList.length === 0 || secondTraitsList.length === 0) {
-          if (firstTraitsList.length === 0) {
-            const firstTraitsListEl = document.getElementById("first-traits-list")
-            addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
-            hasErrors = true
-          }
-          if (secondTraitsList.length === 0) {
-            const secondTraitsListEl = document.getElementById("second-traits-list")
-            addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
-            hasErrors = true
+        // CRITICAL: Skip trait validation for between-layers rules - they don't need traits
+        // Only validate traits for between-traits rules
+        if (ruleAppliesTo !== "between-layers") {
+          // Validate that at least one trait is selected from each layer
+          if (ruleType === "always-above" || ruleType === "always-below" || ruleType === "immediately-above" || ruleType === "immediately-below") {
+            if (firstTraitsList.length === 0) {
+              const firstTraitsListEl = document.getElementById("first-traits-list")
+              addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
+              hasErrors = true
+            }
+            if (secondTraitsList.length === 0) {
+              const secondTraitsListEl = document.getElementById("second-traits-list")
+              addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
+              hasErrors = true
+            }
+          } else if (firstTraitsList.length === 0 || secondTraitsList.length === 0) {
+            if (firstTraitsList.length === 0) {
+              const firstTraitsListEl = document.getElementById("first-traits-list")
+              addErrorMessage(firstTraitsListEl, "Please select at least one trait from the first layer")
+              hasErrors = true
+            }
+            if (secondTraitsList.length === 0) {
+              const secondTraitsListEl = document.getElementById("second-traits-list")
+              addErrorMessage(secondTraitsListEl, "Please select at least one trait from the second layer")
+              hasErrors = true
+            }
           }
         }
         if (hasErrors) {
@@ -3165,50 +3608,193 @@ window.NFTApp = window.NFTApp || {};
       return
     }
 
-    // CRITICAL: Preserve bottom-shortcut-buttons before clearing, or create if they don't exist
-    let bottomButtons = rulesContainer.querySelector('.bottom-shortcut-buttons')
-    let bottomButtonsElement = null
-    
-    if (bottomButtons) {
-      bottomButtonsElement = bottomButtons.cloneNode(true)
-      console.log('[DEBUG] Preserved bottom-shortcut-buttons before clearing container')
-    } else {
-      // Create bottom buttons if they don't exist
-      bottomButtonsElement = document.createElement('div')
-      bottomButtonsElement.className = 'bottom-shortcut-buttons'
-      bottomButtonsElement.innerHTML = `
-        <button id="jump-to-layers-bottom-btn" class="jump-to-layers-btn tooltip" style="display: none;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-            <polyline points="18 15 12 9 6 15"></polyline>
-          </svg>
-          Jump to Layers
-          <span class="tooltiptext">Quickly scroll up to the Trait Layers section</span>
-        </button>
-        <button id="jump-to-rules-bottom-btn" class="jump-to-rules-btn tooltip" style="display: none;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-            <polyline points="18 15 12 9 6 15"></polyline>
-          </svg>
-          Jump to Rules
-          <span class="tooltiptext">Quickly scroll up to the Combination Rules section</span>
-        </button>
-      `
-      console.log('[DEBUG] Created bottom-shortcut-buttons (they were missing)')
+    // CRITICAL: Ensure container stays visible BEFORE any operations to prevent black screen
+    const rulesSection = document.querySelector('.rules-section');
+    if (rulesContainer) {
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+      rulesContainer.style.setProperty('background', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-image', 'none', 'important');
+    }
+    if (rulesSection) {
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('background', 'transparent', 'important');
+      rulesSection.style.setProperty('background-color', 'transparent', 'important');
+      rulesSection.style.setProperty('background-image', 'none', 'important');
+      
+      // CRITICAL: Set a flag to prevent updateRulesSectionVisibility from hiding it immediately
+      // This flag should already be set before updateRulesUI is called, but set it again to be safe
+      // Also set a timestamp to track when update started
+      rulesSection.dataset.updatingRules = 'true';
+      rulesSection.dataset.updateStartTime = Date.now().toString();
+      // Clear the flag after a longer delay to ensure all visibility checks have completed
+      // Use a longer timeout to prevent race conditions with calls from trait-layers.js
+      setTimeout(() => {
+        if (rulesSection) {
+          // Before clearing, do a final check to ensure rules exist
+          const rulesContainer = document.getElementById('combination-rules-container');
+          const hasRulesInDOM = rulesContainer ? rulesContainer.querySelectorAll('.rule-item, [data-rule-id]').length > 0 : false;
+          const hasRulesInProject = projectData && projectData.rules && Array.isArray(projectData.rules) && projectData.rules.length > 0;
+          
+          if (hasRulesInDOM || hasRulesInProject) {
+            // Rules exist, safe to clear flag but force visibility
+            delete rulesSection.dataset.updatingRules;
+            rulesSection.style.setProperty('display', 'flex', 'important');
+            rulesSection.style.setProperty('visibility', 'visible', 'important');
+            rulesSection.style.setProperty('opacity', '1', 'important');
+          } else {
+            // No rules, keep flag a bit longer and check again
+            setTimeout(() => {
+              if (rulesSection) {
+                delete rulesSection.dataset.updatingRules;
+              }
+            }, 300);
+          }
+        }
+      }, 800); // Increased from 500ms to 800ms
     }
 
-    // Clear existing rules
-    rulesContainer.innerHTML = ""
-
-    // Check if there are rules to display
+    // CRITICAL: Preserve bottom-shortcut-buttons reference (don't clone - use existing element)
+    // The buttons are already created in project-interface.js, so we just need to preserve the reference
+    let bottomButtonsElement = rulesContainer.querySelector('.bottom-shortcut-buttons')
+    
+    // CRITICAL: Only clear rule items, not the entire container (which might contain other elements)
+    // Remove only .rule-item elements and .rules-list, preserve everything else including bottom buttons
+    // CRITICAL: Ensure container stays visible during removal operations
+    // CRITICAL: Create new rules-list FIRST and render content BEFORE removing old one to prevent empty container
+    let newRulesList = document.createElement("div")
+    newRulesList.className = "rules-list"
+    
+    // CRITICAL: Ensure container stays visible before any operations
+    rulesContainer.style.setProperty('display', 'block', 'important');
+    rulesContainer.style.setProperty('visibility', 'visible', 'important');
+    rulesContainer.style.setProperty('opacity', '1', 'important');
+    rulesContainer.style.setProperty('background', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-image', 'none', 'important');
+    
+    // CRITICAL: Get existing rules-list but DON'T remove it yet - we'll swap atomically
+    const existingRulesList = rulesContainer.querySelector('.rules-list')
+    
+    // CRITICAL: Check if there are rules to display
     const hasRules = projectData.rules && projectData.rules.length > 0
+    
+    // CRITICAL: Now atomically swap - add new list BEFORE removing old one to prevent empty container
+    // This ensures there's always content visible and prevents flicker
+    // Do the swap synchronously to maintain atomicity, but force reflow to prevent flicker
+    if (existingRulesList) {
+      // Insert new list right before old one, then remove old one atomically
+      // This ensures there's always content visible during the swap
+      rulesContainer.insertBefore(newRulesList, existingRulesList);
+      // Force reflow to ensure new list is painted before removing old one
+      void newRulesList.offsetHeight;
+      existingRulesList.remove();
+    } else {
+      // No existing list, just append
+      rulesContainer.appendChild(newRulesList);
+      // Force reflow to ensure new list is painted
+      void newRulesList.offsetHeight;
+    }
+    
+    // CRITICAL: Force visibility again after swap to prevent flicker
+    rulesContainer.style.setProperty('display', 'block', 'important');
+    rulesContainer.style.setProperty('visibility', 'visible', 'important');
+    rulesContainer.style.setProperty('opacity', '1', 'important');
+    
+    // CRITICAL: Also remove any orphaned rule items that might exist outside rules-list
+    const existingRuleItems = rulesContainer.querySelectorAll('.rule-item:not(.rules-list .rule-item)')
+    existingRuleItems.forEach(item => {
+      item.remove()
+    })
+    
+    // CRITICAL: Force visibility again after swap to prevent black screen
+    rulesContainer.style.setProperty('display', 'block', 'important');
+    rulesContainer.style.setProperty('visibility', 'visible', 'important');
+    rulesContainer.style.setProperty('opacity', '1', 'important');
+    rulesContainer.style.setProperty('background', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-image', 'none', 'important');
+    
+    // CRITICAL: Ensure bottom buttons are right-aligned if they exist
+    if (bottomButtonsElement) {
+      bottomButtonsElement.style.cssText = `
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 1557px !important;
+        max-width: 1557px !important;
+        min-width: 1557px !important;
+        z-index: 100 !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 10px !important;
+        row-gap: 10px !important;
+        column-gap: 10px !important;
+        padding: 1rem !important;
+        padding-left: 0 !important;
+        padding-right: 1rem !important;
+        margin: 0 !important;
+        border-top: 1px solid var(--border-color) !important;
+        background: transparent !important;
+        pointer-events: auto !important;
+        box-sizing: border-box !important;
+        text-align: right !important;
+      `
+    }
 
-    // Create a container for the rules list
-    const rulesList = document.createElement("div")
-    rulesList.className = "rules-list"
+    // CRITICAL: Use the rules-list we already created and swapped above (newRulesList)
+    // This prevents empty container that causes black screen
+    // CRITICAL: Always use newRulesList which is already in the DOM after the swap
+    const rulesList = newRulesList
+    if (!rulesList) {
+      console.error('[ERROR] newRulesList not found after swap - this should not happen')
+      // CRITICAL: Create fallback list if newRulesList is somehow missing
+      const fallbackList = document.createElement("div")
+      fallbackList.className = "rules-list"
+      rulesContainer.appendChild(fallbackList)
+      // Use fallback
+      const actualRulesList = fallbackList
+      
+      // CRITICAL: Ensure container stays visible
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+      
+      if (!hasRules) {
+        actualRulesList.innerHTML = "<p>No combination rules added yet.</p>"
+      }
+      // Don't return - continue to render rules if they exist
+    } else {
+      // CRITICAL: Ensure rulesList is in the DOM and visible
+      if (!rulesContainer.contains(rulesList)) {
+        console.warn('[WARN] rulesList not in container, appending it')
+        rulesContainer.appendChild(rulesList)
+      }
+    }
     
-    // Add the rules list to the container first
-    rulesContainer.appendChild(rulesList)
+    // CRITICAL: Ensure container stays visible
+    rulesContainer.style.setProperty('display', 'block', 'important');
+    rulesContainer.style.setProperty('visibility', 'visible', 'important');
+    rulesContainer.style.setProperty('opacity', '1', 'important');
+    rulesContainer.style.setProperty('background', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-image', 'none', 'important');
     
-    // Then add the warning at the top of the rules list instead of directly to the container
+    // CRITICAL: Add warning OUTSIDE of rules-list, in a fixed position above the rules
+    // Remove any existing warning first to prevent duplicates
+    const existingWarning = rulesContainer.querySelector('.combination-rules-warning');
+    if (existingWarning) {
+      existingWarning.remove();
+    }
+    
     if (hasRules) {
       const warningDiv = document.createElement("div")
       warningDiv.className = "combination-rules-warning"
@@ -3222,44 +3808,41 @@ window.NFTApp = window.NFTApp || {};
         <strong>Warning:</strong> Combination rules can significantly impact your collection's traits. Make sure to test your rules thoroughly before generating your final collection.
       </span>
       `
-      rulesList.appendChild(warningDiv)
+      // Insert warning BEFORE rules-list, so it stays fixed above rules
+      rulesContainer.insertBefore(warningDiv, rulesList);
     }
     
-    // If there are no rules, display a message
+    // If there are no rules, display a message and return early
     if (!hasRules) {
+      // CRITICAL: Ensure container stays visible before setting innerHTML
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+      rulesContainer.style.setProperty('background', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-image', 'none', 'important');
+      
       rulesList.innerHTML = "<p>No combination rules added yet.</p>"
-      // CRITICAL: Restore bottom buttons even when there are no rules
+      
+      // CRITICAL: Ensure container stays visible after setting innerHTML
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+      rulesContainer.style.setProperty('background', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-image', 'none', 'important');
+      
+      // CRITICAL: Bottom buttons are already in the container from project-interface.js, no need to append
+      // Just ensure they're properly styled and have event listeners
       if (bottomButtonsElement) {
-        rulesContainer.appendChild(bottomButtonsElement)
-        // Apply styling to restored buttons
-        bottomButtonsElement.style.cssText = `
-          display: flex !important;
-          visibility: visible !important;
-          opacity: 1 !important;
-          position: absolute !important;
-          bottom: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          width: 100% !important;
-          z-index: 100 !important;
-          justify-content: center !important;
-          align-items: center !important;
-          gap: 1rem !important;
-          padding: 1rem !important;
-          margin: 0 !important;
-          border-top: 1px solid var(--border-color) !important;
-          background: transparent !important;
-          pointer-events: auto !important;
-          box-sizing: border-box !important;
-        `
-        console.log('[DEBUG] Restored bottom-shortcut-buttons after clearing (no rules case) with styling')
-        
-        // Reattach event listeners if they exist
+        // Ensure event listeners are attached (they should be handled by traits-rules-layout-fix.js)
+        // But we'll ensure they work here as well
         setTimeout(() => {
           const jumpToLayersBtn = document.getElementById('jump-to-layers-bottom-btn')
           const jumpToRulesBtn = document.getElementById('jump-to-rules-bottom-btn')
           
-          if (jumpToLayersBtn && !jumpToLayersBtn.hasAttribute('data-listener-attached')) {
+          // CRITICAL: Use consistent attribute name (dataset.listenerAdded) to match traits-rules-layout-fix.js
+          if (jumpToLayersBtn && !jumpToLayersBtn.dataset.listenerAdded) {
             jumpToLayersBtn.addEventListener('click', (e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -3304,10 +3887,11 @@ window.NFTApp = window.NFTApp || {};
                 }
               }
             }, { capture: true })
-            jumpToLayersBtn.setAttribute('data-listener-attached', 'true')
+            jumpToLayersBtn.dataset.listenerAdded = 'true'
           }
           
-          if (jumpToRulesBtn && !jumpToRulesBtn.hasAttribute('data-listener-attached')) {
+          // CRITICAL: Use consistent attribute name (dataset.listenerAdded) to match traits-rules-layout-fix.js
+          if (jumpToRulesBtn && !jumpToRulesBtn.dataset.listenerAdded) {
             jumpToRulesBtn.addEventListener('click', (e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -3352,18 +3936,52 @@ window.NFTApp = window.NFTApp || {};
                 }
               }
             }, { capture: true })
-            jumpToRulesBtn.setAttribute('data-listener-attached', 'true')
+            jumpToRulesBtn.dataset.listenerAdded = 'true'
           }
         }, 50)
       }
       return
     }
 
+    // CRITICAL: Ensure rulesList exists and is in the DOM before rendering rules
+    // This should never be null at this point, but double-check
+    if (!rulesList) {
+      console.error('[ERROR] rulesList is null when trying to render rules - this should not happen')
+      return
+    }
+    if (!rulesContainer.contains(rulesList)) {
+      console.warn('[WARN] rulesList not in container before rendering, appending it')
+      rulesContainer.appendChild(rulesList)
+    }
+    
+    // CRITICAL: Set flags BEFORE any DOM manipulation to prevent flicker
+    if (rulesSection) {
+      rulesSection.dataset.updatingRules = 'true';
+      if (hasRules && rulesSection.dataset.hasEverBeenVisible !== 'true') {
+        rulesSection.dataset.hasEverBeenVisible = 'true';
+      }
+      // CRITICAL: Force visibility BEFORE any DOM changes to prevent flicker
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+    }
+    rulesContainer.style.setProperty('display', 'block', 'important');
+    rulesContainer.style.setProperty('visibility', 'visible', 'important');
+    rulesContainer.style.setProperty('opacity', '1', 'important');
+    
+    // CRITICAL: Don't clear innerHTML - rulesList is already empty (newly created)
+    // This prevents any flicker from clearing existing content
+    // rulesList is a fresh element, so no need to clear it
+
+    // CRITICAL: Log rules count for debugging
+    // console.log('[DEBUG] updateRulesUI - About to render', projectData.rules.length, 'rules');
+    // console.log('[DEBUG] updateRulesUI - rulesList exists:', !!rulesList, 'rulesList in container:', rulesContainer.contains(rulesList));
+
     // Loop through the rules and add them to the list (render in reverse order)
     [...projectData.rules].slice().reverse().forEach((rule, i) => {
       const index = projectData.rules.length - 1 - i;
       // DEBUG: Log each rule being rendered
-      console.log('[DEBUG] updateRulesUI - rendering rule:', JSON.stringify(rule, null, 2));
+      // console.log('[DEBUG] updateRulesUI - rendering rule:', index, rule.type, rule.id);
       const { ruleTypeText, appliesToText } = this.getRuleTypeAndAppliesToText(rule)
 
       // Create rule item
@@ -3400,7 +4018,11 @@ window.NFTApp = window.NFTApp || {};
           ruleTypeClass = "rule-type-below";
           break;
       }
-      // Use ruleTypeColor for the SVG icon stroke and for the rule name color
+      // Use centralized SVG icon definitions for consistency across all locations
+      if (window.RULE_TYPE_SVG_ICONS && window.RULE_TYPE_SVG_ICONS[rule.type]) {
+        ruleTypeIcon = window.RULE_TYPE_SVG_ICONS[rule.type](ruleTypeColor);
+      } else {
+        // Fallback to inline definitions if global not available
       switch (rule.type) {
         case "never-combine":
           ruleTypeIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-never-icon" viewBox="0 0 24 24" fill="none" stroke="${ruleTypeColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
@@ -3423,13 +4045,35 @@ window.NFTApp = window.NFTApp || {};
         case "immediately-below":
           ruleTypeIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="rule-type-below-icon" viewBox="0 0 24 24" fill="none" stroke="${ruleTypeColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 13 12 18 17 13"></polyline></svg>`;
           break;
+        }
       }
 
-      const moveUpDisabled = index === 0 ? 'disabled' : '';
-      const moveDownDisabled = index === projectData.rules.length - 1 ? 'disabled' : '';
+      // CRITICAL: Disabled logic - rules are rendered in reverse order
+      // Array index 0 = oldest rule = visually at bottom
+      // Array index N-1 = newest rule = visually at top
+      // move-up-rule moves UP visually (to higher array index), so disable when already at top (index === length - 1)
+      // move-down-rule moves DOWN visually (to lower array index), so disable when already at bottom (index === 0)
+      const moveUpDisabled = index === projectData.rules.length - 1 ? 'disabled' : '';
+      const moveDownDisabled = index === 0 ? 'disabled' : '';
       
       // Get color for the applies-to text
       const appliesToColor = RULE_APPLIES_TO_COLORS[rule.appliesTo] || '#ddd';
+      
+      // CRITICAL: Drag handle is now outside header to be vertically centered with entire rule item
+      let dragHandle = `
+        <div class="rule-drag-handle tooltip">
+          <!-- Enhanced drag handle icon: six dots in two columns -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="7" cy="6" r="1.5" fill="currentColor"/>
+            <circle cx="7" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="7" cy="18" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="6" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="13" cy="18" r="1.5" fill="currentColor"/>
+          </svg>
+          <span class="tooltiptext">Drag to reorder</span>
+        </div>
+      `;
       
       let ruleHeader = `
         <div class="rule-header">
@@ -3440,13 +4084,27 @@ window.NFTApp = window.NFTApp || {};
           </div>
           <div class="rule-actions" style="display: flex; gap: 8px; align-items: center;">
             <button class="action-btn move-up-rule tooltip" data-rule-idx="${index}" aria-label="Move rule up" ${moveUpDisabled}>
+              ${moveUpDisabled ? `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                </svg>
+              ` : `
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-              <div class="tooltip-text">Move up</div>
+              `}
+              <div class="tooltip-text">${moveUpDisabled ? 'Cannot move up<br>(already at top)' : 'Move this rule<br>up in the list.'}</div>
               <div class="tooltip-text">Rules on Top (last added Rules) have priority over the Rules on Bottom (older added Rules)</div>
             </button>
             <button class="action-btn move-down-rule tooltip" data-rule-idx="${index}" aria-label="Move rule down" ${moveDownDisabled}>
+              ${moveDownDisabled ? `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                </svg>
+              ` : `
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              <div class="tooltip-text">Move down</div>
+              `}
+              <div class="tooltip-text">${moveDownDisabled ? 'Cannot move down<br>(already at bottom)' : 'Move this rule<br>down in the list.'}</div>
               <div class="tooltip-text">Rules on Top (last added Rules) have priority over the Rules on Bottom (older added Rules)</div>
             </button>
             <button class="action-btn edit-rule tooltip" data-rule-id="${rule.id}" aria-label="Edit rule">
@@ -3469,7 +4127,12 @@ window.NFTApp = window.NFTApp || {};
         </div>
       `;
       // Build the rule description
-      let ruleDescription = '<div class="rule-description-details" style="padding-left:15px !important;padding-right:15px !important;padding-bottom:15px !important;">';
+      // CRITICAL: Align description text with header text
+      // Header: padding-left 72px + icon (20px + 8px margin = 28px) = text starts at 100px
+      // Description: padding-left should be 100px to align with header text
+      // Drag handle is at left: 16px, width: 24px, so we need 16px + 24px + 1rem margin = ~72px total
+      // But to align text, we need 72px + 28px (icon width) = 100px
+      let ruleDescription = '<div class="rule-description-details" style="padding-left:100px !important;padding-right:1rem !important;padding-bottom:15px !important;padding-top:0.5rem !important;">';
       const labelStyle = 'font-style: italic; color: #888;';
       if (rule.appliesTo === 'between-layers') {
         // Between Entire Layers
@@ -3505,31 +4168,178 @@ window.NFTApp = window.NFTApp || {};
         ruleDescription += `<div><span style="${labelStyle}">Second Layer:</span> <span class="rule-description-label-highlight rule-description-label-${ruleTypeClass}">${rule.secondLayerName || rule.layerName || ''}</span></div>`;
       }
       ruleDescription += '</div>';
-      ruleItem.innerHTML = ruleHeader + ruleDescription;
+      // CRITICAL: Drag handle is first, then header and description, so it can be vertically centered
+      ruleItem.innerHTML = dragHandle + ruleHeader + ruleDescription;
+      
+      // CRITICAL: Ensure container stays visible while appending each rule item
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+      rulesContainer.style.setProperty('background', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+      rulesContainer.style.setProperty('background-image', 'none', 'important');
+      
+      // CRITICAL: Ensure rulesList is still in the DOM before appending
+      if (!rulesContainer.contains(rulesList)) {
+        console.warn('[WARN] rulesList not in container during append, re-adding it')
+        rulesContainer.appendChild(rulesList)
+      }
+      
+      // CRITICAL: Ensure rulesList is not null/undefined before appending
+      if (!rulesList) {
+        console.error('[ERROR] rulesList became null during rule rendering - this should not happen');
+        return; // Skip this rule if rulesList is missing
+      }
+      
+      // CRITICAL: Ensure container stays visible while appending
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+      
       rulesList.appendChild(ruleItem);
+      // console.log('[DEBUG] updateRulesUI - appended rule', index, 'Total children:', rulesList.children.length);
     });
+    
+    // CRITICAL: Final check - ensure rulesList has content and is visible
+    const finalRuleCount = rulesList ? rulesList.children.length : 0;
+    // console.log('[DEBUG] updateRulesUI - Final check: rulesList.children.length =', finalRuleCount, 'projectData.rules.length =', projectData.rules ? projectData.rules.length : 0);
+    
+    if (finalRuleCount === 0 && projectData.rules && projectData.rules.length > 0) {
+      console.error('[ERROR] No rules were appended to rulesList despite having', projectData.rules.length, 'rules in projectData');
+      console.error('[ERROR] rulesList exists:', !!rulesList, 'rulesList in container:', rulesContainer.contains(rulesList));
+      // Force re-render as fallback
+      setTimeout(() => {
+        // console.log('[DEBUG] Retrying updateRulesUI after 100ms');
+        this.updateRulesUI(projectData)
+      }, 100)
+    }
+    // else if (finalRuleCount > 0) {
+    //   console.log('[DEBUG] Successfully rendered', finalRuleCount, 'rules');
+    // }
+    
+    // CRITICAL: Ensure container stays visible after all operations
+    // Apply immediately, don't defer to requestAnimationFrame
+    rulesContainer.style.setProperty('display', 'block', 'important');
+    rulesContainer.style.setProperty('visibility', 'visible', 'important');
+    rulesContainer.style.setProperty('opacity', '1', 'important');
+    rulesContainer.style.setProperty('background', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+    rulesContainer.style.setProperty('background-image', 'none', 'important');
+    
+    if (rulesSection) {
+      // CRITICAL: Clear updatingRules flag after all operations complete
+      requestAnimationFrame(() => {
+        delete rulesSection.dataset.updatingRules;
+      });
+      rulesSection.style.setProperty('display', 'flex', 'important');
+      rulesSection.style.setProperty('visibility', 'visible', 'important');
+      rulesSection.style.setProperty('opacity', '1', 'important');
+      rulesSection.style.setProperty('background', 'transparent', 'important');
+      rulesSection.style.setProperty('background-color', 'transparent', 'important');
+      rulesSection.style.setProperty('background-image', 'none', 'important');
+    }
+    
+    // CRITICAL: Re-apply filter after rendering rules to ensure correct visibility
+    // This ensures that if a filter is active, it's applied to newly rendered rules
+    // BUT: Only apply filter if dropdown exists and has a value (not empty/"All Rule Types")
+    setTimeout(() => {
+      const dropdown = document.getElementById('rules-filter-dropdown');
+      if (dropdown && dropdown.value !== undefined && dropdown.value !== '' && dropdown.value !== 'all') {
+        // Trigger filter update if filterRules function exists
+        if (typeof window.filterRules === 'function') {
+          window.filterRules(dropdown.value);
+        } else {
+          // Try to find filterRules in traits-rules-layout-fix scope
+          // Since it's in a closure, we'll trigger the change event instead
+          const changeEvent = new Event('change', { bubbles: true });
+          dropdown.dispatchEvent(changeEvent);
+        }
+      } else {
+        // CRITICAL: If "All Rule Types" is selected (or no filter), ensure all rules are visible
+        const ruleElements = rulesContainer.querySelectorAll('.rule-item, [data-rule-id]');
+        ruleElements.forEach(element => {
+          element.style.removeProperty('display');
+          element.style.removeProperty('visibility');
+          element.style.removeProperty('position');
+          element.style.removeProperty('height');
+          element.style.removeProperty('overflow');
+        });
+      }
+      
+      // CRITICAL: Ensure rules section stays visible after filter application
+      if (rulesSection) {
+        rulesSection.style.setProperty('display', 'flex', 'important');
+        rulesSection.style.setProperty('visibility', 'visible', 'important');
+        rulesSection.style.setProperty('opacity', '1', 'important');
+      }
+      rulesContainer.style.setProperty('display', 'block', 'important');
+      rulesContainer.style.setProperty('visibility', 'visible', 'important');
+      rulesContainer.style.setProperty('opacity', '1', 'important');
+    }, 50);
+    
+    // Also ensure visibility in next frame as backup
+    requestAnimationFrame(() => {
+          rulesContainer.style.setProperty('display', 'block', 'important');
+          rulesContainer.style.setProperty('visibility', 'visible', 'important');
+          rulesContainer.style.setProperty('opacity', '1', 'important');
+          rulesContainer.style.setProperty('background', 'transparent', 'important');
+          rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+          rulesContainer.style.setProperty('background-image', 'none', 'important');
+      
+        if (rulesSection) {
+          rulesSection.style.setProperty('display', 'flex', 'important');
+          rulesSection.style.setProperty('visibility', 'visible', 'important');
+          rulesSection.style.setProperty('opacity', '1', 'important');
+          rulesSection.style.setProperty('background', 'transparent', 'important');
+          rulesSection.style.setProperty('background-color', 'transparent', 'important');
+          rulesSection.style.setProperty('background-image', 'none', 'important');
+        }
+    });
+    
+    // CRITICAL: Update button visibility after rules are rendered
+    setTimeout(() => {
+      try {
+        // Try to get layout fix module, but don't error if it doesn't exist
+        let layoutFix = null;
+        if (window.NFTApp && typeof window.NFTApp.getModule === 'function') {
+          try {
+            layoutFix = window.NFTApp.getModule('traitsRulesLayoutFix');
+          } catch (error) {
+            // Module not found or not registered - this is okay, continue without it
+            layoutFix = null;
+          }
+        }
+        if (layoutFix && layoutFix.updateVisibility) {
+          layoutFix.updateVisibility();
+        }
+      } catch (error) {
+        // Module not found or not available - this is okay, just skip the update
+        // console.log('traitsRulesLayoutFix module not available:', error);
+      }
+      
+      // CRITICAL: Final visibility check after all operations complete
+          rulesContainer.style.setProperty('display', 'block', 'important');
+          rulesContainer.style.setProperty('visibility', 'visible', 'important');
+          rulesContainer.style.setProperty('opacity', '1', 'important');
+          rulesContainer.style.setProperty('background', 'transparent', 'important');
+          rulesContainer.style.setProperty('background-color', 'transparent', 'important');
+          rulesContainer.style.setProperty('background-image', 'none', 'important');
+      
+        if (rulesSection) {
+          rulesSection.style.setProperty('display', 'flex', 'important');
+          rulesSection.style.setProperty('visibility', 'visible', 'important');
+          rulesSection.style.setProperty('opacity', '1', 'important');
+          rulesSection.style.setProperty('background', 'transparent', 'important');
+          rulesSection.style.setProperty('background-color', 'transparent', 'important');
+          rulesSection.style.setProperty('background-image', 'none', 'important');
+        }
+    }, 50);
 
-    // Add event listeners for move up/down buttons (fix for reversed rendering)
-    rulesList.querySelectorAll('.move-up-rule').forEach((btn, visualIdx) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // In reversed order, visualIdx 0 is the newest (top), so to move up visually, move to a higher index in the array
-        const idx = projectData.rules.length - 1 - visualIdx;
-        if (idx < projectData.rules.length - 1) {
-          this.moveRuleDown(projectData, idx);
-        }
-      });
-    });
-    rulesList.querySelectorAll('.move-down-rule').forEach((btn, visualIdx) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // In reversed order, visualIdx 0 is the newest (top), so to move down visually, move to a lower index in the array
-        const idx = projectData.rules.length - 1 - visualIdx;
-        if (idx > 0) {
-          this.moveRuleUp(projectData, idx);
-        }
-      });
-    });
+    // Add event listeners for move up/down buttons using direct click listeners (like trait layers)
+    // This is simpler and more reliable than delegation
+    // Just call reattachMoveButtonListeners which handles everything
+    this.reattachMoveButtonListeners(projectData);
+    
     // Add event listeners for edit rule buttons
     rulesList.querySelectorAll('.edit-rule').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -3541,9 +4351,10 @@ window.NFTApp = window.NFTApp || {};
         }
       });
       // Setup tooltip for edit rule button
-      const tooltip = btn.querySelector('.tooltip-text')
+      // CRITICAL: Check both .tooltiptext and .tooltip-text classes
+      const tooltip = btn.querySelector('.tooltiptext') || btn.querySelector('.tooltip-text');
       if (tooltip) {
-        this.setupRuleActionTooltip(btn, tooltip)
+        this.setupRuleActionTooltip(btn, tooltip);
       }
     });
     // Add event listeners for delete rule buttons
@@ -3587,17 +4398,19 @@ window.NFTApp = window.NFTApp || {};
         }
       });
       // Setup tooltip for delete rule button
-      const tooltip = btn.querySelector('.tooltip-text')
+      // CRITICAL: Check both .tooltiptext and .tooltip-text classes
+      const tooltip = btn.querySelector('.tooltiptext') || btn.querySelector('.tooltip-text');
       if (tooltip) {
-        this.setupRuleActionTooltip(btn, tooltip)
+        this.setupRuleActionTooltip(btn, tooltip);
       }
     });
     // Setup tooltips for move up/down rule buttons
     rulesList.querySelectorAll('.move-up-rule, .move-down-rule').forEach(btn => {
-      const tooltips = btn.querySelectorAll('.tooltip-text')
+      // CRITICAL: Check both .tooltiptext and .tooltip-text classes
+      const tooltips = btn.querySelectorAll('.tooltiptext, .tooltip-text');
       if (tooltips.length > 0) {
-        // Use the first tooltip-text (the short one) for standard tooltip
-        // Hide the second tooltip-text (the long one) to avoid conflicts
+        // Use the first tooltip (the short one) for standard tooltip
+        // Hide the second tooltip (the long one) to avoid conflicts
         if (tooltips.length > 1) {
           tooltips[1].style.display = 'none';
         }
@@ -3606,268 +4419,41 @@ window.NFTApp = window.NFTApp || {};
       }
     });
     
+    // CRITICAL: Call reattachMoveButtonListeners to ensure all listeners are properly attached
+    // This ensures buttons work correctly after DOM updates (including drag-and-drop)
+    setTimeout(() => {
+      this.reattachMoveButtonListeners(projectData);
+    }, 50);
+    
     // CRITICAL: Setup tooltips for all action buttons that weren't set up above
     rulesList.querySelectorAll('.action-btn.tooltip').forEach(btn => {
       // Skip if already set up
       if (btn.dataset.tooltipSetup === "true") {
         return;
       }
-      const tooltip = btn.querySelector('.tooltip-text');
-      if (tooltip && !tooltip.style.display || tooltip.style.display !== 'none') {
+      // CRITICAL: Check both .tooltiptext and .tooltip-text classes
+      const tooltip = btn.querySelector('.tooltiptext') || btn.querySelector('.tooltip-text');
+      if (tooltip && (!tooltip.style.display || tooltip.style.display !== 'none')) {
         this.setupRuleActionTooltip(btn, tooltip);
         btn.dataset.tooltipSetup = "true";
       }
     });
 
-    // Enable drag-and-drop for rule reordering
-    let dragSrcEl = null;
-    let lastPlaceholderIndex = -1;
-    let placeholder = document.createElement('div');
-    placeholder.className = 'rule-item rule-placeholder';
-    placeholder.style.height = '48px';
-    placeholder.style.background = 'rgba(108,92,231,0.12)';
-    placeholder.style.border = '2px dashed #6c5ce7';
-    placeholder.style.margin = '8px 0';
-    placeholder.style.borderRadius = '8px';
-    placeholder.style.display = 'none';
-    placeholder.style.pointerEvents = 'none'; // Make placeholder non-interactive
-
-    const self = this; // Store reference for event handlers
-    
-    // Function to perform the reorder based on placeholder position
-    const performReorder = function() {
-      try {
-        if (!dragSrcEl || !placeholder || !placeholder.parentNode) {
-          console.warn('[WARN] Cannot perform reorder: missing dragSrcEl or placeholder');
-          return;
-        }
-        
-        // Get all rule items (excluding placeholder)
-        const allItems = Array.from(rulesList.querySelectorAll('.rule-item:not(.rule-placeholder)'));
-        const dragIndex = allItems.indexOf(dragSrcEl);
-        
-        if (dragIndex === -1) {
-          console.warn('[WARN] Cannot find dragged item in list');
-          return;
-        }
-        
-        // Find where the placeholder is positioned
-        const siblings = Array.from(rulesList.children);
-        const placeholderIndex = siblings.indexOf(placeholder);
-        
-        if (placeholderIndex === -1) {
-          console.warn('[WARN] Cannot find placeholder in list');
-          return;
-        }
-        
-        // Count how many actual rule items are before the placeholder
-        let dropIndex = 0;
-        for (let i = 0; i < placeholderIndex; i++) {
-          if (siblings[i].classList.contains('rule-item') && !siblings[i].classList.contains('rule-placeholder')) {
-            dropIndex++;
-          }
-        }
-        
-        console.log('[DEBUG] Drag and Drop:', {
-          visualDragIndex: dragIndex,
-          visualDropIndex: dropIndex,
-          placeholderIndex: placeholderIndex
-        });
-        
-        // Rules are displayed in reverse order (newest first)
-        // Convert visual indices to data indices
-        const dataLength = projectData.rules.length;
-        
-        if (dataLength === 0) {
-          console.warn('[WARN] No rules to reorder');
-          return;
-        }
-        
-        const fromDataIndex = dataLength - 1 - dragIndex;
-        const toDataIndex = dataLength - 1 - dropIndex;
-        
-        // Validate indices
-        if (fromDataIndex < 0 || fromDataIndex >= dataLength || toDataIndex < 0 || toDataIndex >= dataLength) {
-          console.error('[ERROR] Invalid data indices:', { fromDataIndex, toDataIndex, dataLength });
-          return;
-        }
-        
-        console.log('[DEBUG] Data indices:', {
-          fromDataIndex: fromDataIndex,
-          toDataIndex: toDataIndex
-        });
-        
-        if (fromDataIndex !== toDataIndex) {
-          // Perform the reorder
-          const [movedRule] = projectData.rules.splice(fromDataIndex, 1);
-          projectData.rules.splice(toDataIndex, 0, movedRule);
-          
-          // Notify that rules have changed
-          if (window.SavedSeedsModal && window.SavedSeedsModal.notifyRuleChange) {
-            window.SavedSeedsModal.notifyRuleChange();
-          }
-          
-          // Update UI with error handling
-          try {
-            self.updateRulesUI(projectData);
-            self.updateCheckConflictsButtonState(projectData);
-            
-            // Show success notification
-            if (NFTApp.getModule && NFTApp.getModule("notificationService")) {
-              NFTApp.getModule("notificationService").show("Rule order updated", "success");
-            }
-          } catch (updateError) {
-            console.error('[ERROR] Failed to update UI after reorder:', updateError);
-            // Try to restore rules visibility
-            self.updateRulesUI(projectData);
-          }
-        }
-      } catch (error) {
-        console.error('[ERROR] performReorder error:', error);
-        // Ensure rules are still visible even if reorder fails
-        try {
-          self.updateRulesUI(projectData);
-        } catch (updateError) {
-          console.error('[ERROR] Failed to restore rules UI:', updateError);
+    // CRITICAL: Setup tooltips for drag handles - use global tooltip manager (same as trait-layer-drag-handle)
+    rulesList.querySelectorAll('.rule-drag-handle.tooltip').forEach(dragHandle => {
+      const tooltip = dragHandle.querySelector('.tooltiptext');
+      if (tooltip) {
+        // CRITICAL: Use global tooltip manager (same approach as trait-layer-drag-handle)
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(dragHandle, tooltip);
+              } else {
+          // Fallback: use setupRuleActionTooltip if global manager not available
+          this.setupRuleActionTooltip(dragHandle, tooltip);
         }
       }
-    };
-
-    // Add dragover and drop to the rulesList container
-    rulesList.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    });
-    
-    rulesList.addEventListener('drop', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      performReorder();
     });
 
-    // Add event listeners to each rule item
-    rulesList.querySelectorAll('.rule-item').forEach((item, visualIdx) => {
-      item.setAttribute('draggable', 'true');
-      
-      // Prevent child elements from blocking drag
-      const childElements = item.querySelectorAll('.rule-header, .rule-description, button, .rule-actions');
-      childElements.forEach(child => {
-        child.setAttribute('draggable', 'false');
-        child.style.userSelect = 'none';
-        child.style.pointerEvents = 'auto'; // Allow clicks but not drag
-      });
-      
-      item.addEventListener('dragstart', function(e) {
-        try {
-          // If drag started on a child element, find the parent rule-item
-          let targetItem = e.target;
-          while (targetItem && !targetItem.classList.contains('rule-item')) {
-            targetItem = targetItem.parentElement;
-          }
-          
-          if (!targetItem || !targetItem.classList.contains('rule-item')) {
-            e.preventDefault();
-            return;
-          }
-          
-          dragSrcEl = targetItem;
-          targetItem.classList.add('dragging');
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/html', targetItem.innerHTML);
-          // Add slight delay to allow drag image to render before hiding
-          setTimeout(() => { 
-            if (targetItem) {
-              targetItem.style.opacity = '0.4';
-            }
-          }, 0);
-        } catch (error) {
-          console.error('[ERROR] Drag start error:', error);
-          e.preventDefault();
-          dragSrcEl = null;
-        }
-      });
-      
-      item.addEventListener('dragend', function(e) {
-        try {
-          // Find the dragged item
-          let targetItem = e.target;
-          while (targetItem && !targetItem.classList.contains('rule-item')) {
-            targetItem = targetItem.parentElement;
-          }
-          
-          if (targetItem) {
-            targetItem.classList.remove('dragging');
-            targetItem.style.opacity = '';
-          }
-          
-          // Clean up placeholder
-          if (placeholder && placeholder.parentNode) {
-            placeholder.parentNode.removeChild(placeholder);
-          }
-          if (placeholder) {
-            placeholder.style.display = 'none';
-          }
-          dragSrcEl = null;
-        } catch (error) {
-          console.error('[ERROR] Drag end error:', error);
-          dragSrcEl = null;
-        }
-      });
-      
-      item.addEventListener('dragover', function(e) {
-        try {
-          e.preventDefault();
-          e.stopPropagation();
-          e.dataTransfer.dropEffect = 'move';
-          
-          // Find the target rule-item
-          let targetItem = e.target;
-          while (targetItem && !targetItem.classList.contains('rule-item')) {
-            targetItem = targetItem.parentElement;
-          }
-          
-          if (!targetItem || !targetItem.classList.contains('rule-item')) {
-            return;
-          }
-          
-          if (targetItem !== dragSrcEl && dragSrcEl && !targetItem.classList.contains('rule-placeholder')) {
-            // Calculate position relative to this item
-            const rect = targetItem.getBoundingClientRect();
-            const midpoint = rect.top + rect.height / 2;
-            const insertBefore = e.clientY < midpoint;
-            
-            // Insert placeholder
-            const parent = targetItem.parentNode;
-            if (parent) {
-              if (insertBefore) {
-                parent.insertBefore(placeholder, targetItem);
-              } else {
-                parent.insertBefore(placeholder, targetItem.nextSibling);
-              }
-              placeholder.style.display = '';
-            }
-          }
-        } catch (error) {
-          console.error('[ERROR] Drag over error:', error);
-        }
-      });
-      
-      item.addEventListener('drop', function(e) {
-        try {
-          e.preventDefault();
-          e.stopPropagation();
-          performReorder();
-        } catch (error) {
-          console.error('[ERROR] Drop error:', error);
-          // Ensure rules are still visible even if drop fails
-          if (dragSrcEl) {
-            dragSrcEl.classList.remove('dragging');
-            dragSrcEl.style.opacity = '';
-            dragSrcEl = null;
-          }
-        }
-      });
-    });
 
     // --- FORCE COLOR PATCH: After rendering, set color directly on all .rule-type-text-colored spans and icons ---
     setTimeout(() => {
@@ -3900,32 +4486,10 @@ window.NFTApp = window.NFTApp || {};
     }, 0);
     // --- END FORCE COLOR PATCH ---
     
-    // CRITICAL: Restore bottom buttons after all rules are rendered
+    // CRITICAL: Bottom buttons are already in the container from project-interface.js
+    // No need to append them again - they're already there and styled correctly
+    // Just ensure event listeners are attached
     if (bottomButtonsElement) {
-      rulesContainer.appendChild(bottomButtonsElement)
-      // Apply styling to restored buttons
-      bottomButtonsElement.style.cssText = `
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        z-index: 100 !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 1rem !important;
-        padding: 1rem !important;
-        margin: 0 !important;
-        border-top: 1px solid var(--border-color) !important;
-        background: transparent !important;
-        pointer-events: auto !important;
-        box-sizing: border-box !important;
-      `
-      console.log('[DEBUG] Restored bottom-shortcut-buttons after rendering rules with styling')
-      
       // Reattach event listeners if they exist
       setTimeout(() => {
         const jumpToLayersBtn = document.getElementById('jump-to-layers-bottom-btn')
@@ -4033,8 +4597,8 @@ window.NFTApp = window.NFTApp || {};
       // when the requirements are met (at least 2 trait layers with 1 trait each)
     }
     
-    // Update rules section visibility after updating UI
-    this.updateRulesSectionVisibility(projectData)
+    // Note: updateRulesSectionVisibility is not called here - once visible, section stays visible
+    // It's only checked on project load and when layers are deleted
   },
 
   // At the end of the module object, add an init function to inject CSS
@@ -4261,18 +4825,722 @@ window.NFTApp = window.NFTApp || {};
     }
   },
   moveRuleUp: function(projectData, idx) {
-    if (idx <= 0) return;
+    // CRITICAL: Cancel any pending animations to prevent conflicts
+    if (this._reorderingState.isAnimating) {
+      this._cancelPendingAnimations();
+    }
+
+    if (idx <= 0) return; // Already at the top
+
+    // Get DOM elements before updating
+    const rulesContainer = document.getElementById("combination-rules-container");
+    const rulesList = rulesContainer?.querySelector('.rules-list');
+    
+    if (!rulesList) {
+      // Fallback to instant update if container not found
+      const rules = projectData.rules;
+      [rules[idx - 1], rules[idx]] = [rules[idx], rules[idx - 1]];
+      this.updateRulesUI(projectData);
+      setTimeout(() => {
+        this.reattachMoveButtonListeners(projectData);
+      }, 50);
+      return;
+    }
+
+    // Rules are rendered in reverse order (newest first)
+    // idx is the array index, so we need to find elements in reversed DOM
     const rules = projectData.rules;
+    const reversedIdx1 = rules.length - 1 - idx; // Current rule position in reversed DOM
+    const reversedIdx2 = rules.length - 1 - (idx - 1); // Rule above position in reversed DOM
+    
+    // CRITICAL: Only select .rule-item elements, exclude warning and other elements
+    const ruleItems = Array.from(rulesList.querySelectorAll('.rule-item')).filter(item => 
+      item.classList.contains('rule-item') && !item.classList.contains('combination-rules-warning')
+    );
+    const currentRuleItem = ruleItems[reversedIdx1];
+    const aboveRuleItem = ruleItems[reversedIdx2];
+    
+    if (!currentRuleItem || !aboveRuleItem) {
+      // Fallback to instant update if elements not found
+      [rules[idx - 1], rules[idx]] = [rules[idx], rules[idx - 1]];
+      this.updateRulesUI(projectData);
+      setTimeout(() => {
+        this.reattachMoveButtonListeners(projectData);
+      }, 50);
+      return;
+    }
+
+    // Mark animation as in progress
+    this._reorderingState.isAnimating = true;
+
+    // Calculate the distance to move (move current rule to where above rule is)
+    const currentRect = currentRuleItem.getBoundingClientRect();
+    const aboveRect = aboveRuleItem.getBoundingClientRect();
+    // Distance to move current rule up (negative value)
+    const moveDistance = aboveRect.top - currentRect.top;
+    // Distance to move above rule down (positive value) - current rule's height + gap
+    const aboveMoveDistance = currentRect.bottom - aboveRect.top;
+
+    // CRITICAL: Ensure both elements are visible and in document flow before animation
+    currentRuleItem.style.visibility = "visible";
+    currentRuleItem.style.opacity = "1";
+    currentRuleItem.style.display = "";
+    aboveRuleItem.style.visibility = "visible";
+    aboveRuleItem.style.opacity = "1";
+    aboveRuleItem.style.display = "";
+    
+    // Clean up any existing transforms first
+    currentRuleItem.style.transition = "";
+    currentRuleItem.style.transform = "";
+    currentRuleItem.style.zIndex = "";
+    aboveRuleItem.style.transition = "";
+    aboveRuleItem.style.transform = "";
+    aboveRuleItem.style.zIndex = "";
+    
+    // Force reflow to ensure styles are reset
+    void currentRuleItem.offsetHeight;
+    void aboveRuleItem.offsetHeight;
+
+    // Add animation class to both elements simultaneously
+    currentRuleItem.classList.add("reordering");
+    aboveRuleItem.classList.add("reordering");
+    
+    // CRITICAL: Use faster, smoother animation with optimized cubic-bezier timing for fluid motion
+    const animationDuration = 200; // 0.2 seconds total for fluid reordering animation
+    
+    // CRITICAL: Enable hardware acceleration and prevent flickering
+    currentRuleItem.style.backfaceVisibility = "hidden";
+    currentRuleItem.style.transform = "translateZ(0)";
+    aboveRuleItem.style.backfaceVisibility = "hidden";
+    aboveRuleItem.style.transform = "translateZ(0)";
+    
+    // CRITICAL: Set transition on both elements simultaneously with optimized easing
+    currentRuleItem.style.transition = `transform ${animationDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+    aboveRuleItem.style.transition = `transform ${animationDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+    
+    // CRITICAL: Set z-index on both elements to ensure they're both visible during animation
+    currentRuleItem.style.zIndex = "1000";
+    aboveRuleItem.style.zIndex = "1000";
+    
+    // Force reflow to ensure transition and z-index are set before transform
+    void currentRuleItem.offsetHeight;
+    void aboveRuleItem.offsetHeight;
+    
+    // CRITICAL: Apply transforms to both elements in the same frame to ensure simultaneous animation
+    // Use double requestAnimationFrame for smoother start (browser optimization)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        currentRuleItem.style.transform = `translateZ(0) translateY(${moveDistance}px)`;
+        aboveRuleItem.style.transform = `translateZ(0) translateY(${aboveMoveDistance}px)`;
+      });
+    });
+
+    // Update the data order - swap rules in array
     [rules[idx - 1], rules[idx]] = [rules[idx], rules[idx - 1]];
-    this.updateRulesUI(projectData);
-    this.updateCheckConflictsButtonState(projectData);
+
+    // Use transitionend events for reliable cleanup (more reliable than setTimeout)
+    let completedCount = 0;
+    const requiredCompletions = 2; // Both elements need to complete
+    
+    const cleanup = () => {
+      completedCount++;
+      if (completedCount >= requiredCompletions) {
+        // CRITICAL: Move DOM elements FIRST while transforms are still visually applied
+        // This ensures the elements are in their new positions before removing transforms
+        const container = document.getElementById("combination-rules-container");
+        const rulesList = container?.querySelector('.rules-list');
+        if (rulesList) {
+          // CRITICAL: Get all rule items in current DOM order, exclude warning and other elements
+          const allItems = Array.from(rulesList.querySelectorAll('.rule-item')).filter(item => 
+            item.classList.contains('rule-item') && !item.classList.contains('combination-rules-warning')
+          );
+          
+          // Reorder DOM elements to match projectData.rules order (already swapped above)
+          // Rules are rendered in reverse, so we need to reverse the array indices
+          rules.forEach((rule, arrayIdx) => {
+            const domIdx = rules.length - 1 - arrayIdx; // Reverse index for DOM
+            const item = allItems.find(i => i.getAttribute('data-rule-id') === rule.id);
+            if (item && item.parentNode === rulesList) {
+              // Move element to correct position if needed
+              const currentIndex = Array.from(rulesList.children).indexOf(item);
+              const targetIndex = domIdx;
+              if (currentIndex !== targetIndex) {
+                const referenceNode = rulesList.children[targetIndex];
+                if (referenceNode && referenceNode !== item) {
+                  rulesList.insertBefore(item, referenceNode);
+                } else if (!referenceNode) {
+                  rulesList.appendChild(item);
+                }
+              }
+            }
+          });
+        }
+        
+        // CRITICAL: Now remove transforms - elements are already in new DOM positions
+      requestAnimationFrame(() => {
+        // Remove transforms - elements are already in correct DOM positions
+        currentRuleItem.style.transition = "";
+        currentRuleItem.style.transform = "";
+        currentRuleItem.style.zIndex = "";
+        currentRuleItem.classList.remove("reordering");
+        
+        aboveRuleItem.style.transition = "";
+        aboveRuleItem.style.transform = "";
+        aboveRuleItem.style.zIndex = "";
+        aboveRuleItem.classList.remove("reordering");
+        
+          // CRITICAL: Update button states and reattach listeners after DOM manipulation
+          setTimeout(() => {
+            // CRITICAL: Update button data attributes and disabled states
+            // Only select .rule-item elements, exclude warning and other elements
+            const allItems = Array.from(rulesList.querySelectorAll('.rule-item')).filter(item => 
+              item.classList.contains('rule-item') && !item.classList.contains('combination-rules-warning')
+            );
+            allItems.forEach((item, domIdx) => {
+              const arrayIdx = rules.length - 1 - domIdx; // Reverse to get array index
+              const moveUpBtn = item.querySelector('.move-up-rule');
+              const moveDownBtn = item.querySelector('.move-down-rule');
+              
+              if (moveUpBtn) {
+                moveUpBtn.setAttribute('data-rule-idx', arrayIdx);
+                const isUpDisabled = (arrayIdx === rules.length - 1);
+                moveUpBtn.disabled = isUpDisabled;
+                if (isUpDisabled) {
+                  moveUpBtn.setAttribute('disabled', 'disabled');
+                  // Update icon to forbidden sign
+                  const svg = moveUpBtn.querySelector('svg');
+                  if (svg && !svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                      </svg>
+                    `;
+                  }
+                } else {
+                  moveUpBtn.removeAttribute('disabled');
+                  // Update icon to up arrow if currently showing forbidden
+                  const svg = moveUpBtn.querySelector('svg');
+                  if (svg && svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    `;
+                  }
+                }
+              }
+              if (moveDownBtn) {
+                moveDownBtn.setAttribute('data-rule-idx', arrayIdx);
+                const isDownDisabled = (arrayIdx === 0);
+                moveDownBtn.disabled = isDownDisabled;
+                if (isDownDisabled) {
+                  moveDownBtn.setAttribute('disabled', 'disabled');
+                  // Update icon to forbidden sign
+                  const svg = moveDownBtn.querySelector('svg');
+                  if (svg && !svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                      </svg>
+                    `;
+                  }
+                } else {
+                  moveDownBtn.removeAttribute('disabled');
+                  // Update icon to down arrow if currently showing forbidden
+                  const svg = moveDownBtn.querySelector('svg');
+                  if (svg && svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    `;
+                  }
+                }
+              }
+            });
+            
+            // Reattach move button listeners after DOM manipulation
+            this.reattachMoveButtonListeners(projectData);
+            
+            // Update conflict check button state
+            this.updateCheckConflictsButtonState(projectData);
+            
+            // Save project data after reordering
+            if (window.NFTApp && window.NFTApp.getModule) {
+              const projectService = window.NFTApp.getModule('projectService');
+              if (projectService && typeof projectService.saveProjectData === 'function') {
+                projectService.saveProjectData();
+              } else if (window.MemoryManager && typeof window.MemoryManager.updateProject === 'function') {
+                window.MemoryManager.updateProject({ rules: projectData.rules }, { syncToModules: false });
+              }
+            } else if (window.MemoryManager && typeof window.MemoryManager.updateProject === 'function') {
+              window.MemoryManager.updateProject({ rules: projectData.rules }, { syncToModules: false });
+            }
+          }, 50);
+        });
+        
+        // Reset animation state
+        this._reorderingState.isAnimating = false;
+        this._reorderingState.pendingTimeouts = [];
+        this._reorderingState.transitionEndHandlers = [];
+      }
+    };
+
+    // Add transitionend handlers
+    const currentHandler = (e) => {
+      if (e.target === currentRuleItem && e.propertyName === 'transform') {
+        cleanup();
+        currentRuleItem.removeEventListener('transitionend', currentHandler);
+      }
+    };
+    
+    const aboveHandler = (e) => {
+      if (e.target === aboveRuleItem && e.propertyName === 'transform') {
+        cleanup();
+        aboveRuleItem.removeEventListener('transitionend', aboveHandler);
+      }
+    };
+
+    currentRuleItem.addEventListener('transitionend', currentHandler);
+    aboveRuleItem.addEventListener('transitionend', aboveHandler);
+    
+    // Store handlers for potential cleanup
+    this._reorderingState.transitionEndHandlers.push(
+      { element: currentRuleItem, handler: currentHandler },
+      { element: aboveRuleItem, handler: aboveHandler }
+    );
+
+    // Fallback timeout in case transitionend doesn't fire (shouldn't happen, but safety net)
+    const fallbackTimeout = setTimeout(() => {
+      if (this._reorderingState.isAnimating) {
+        cleanup();
+      }
+    }, 500); // Slightly longer than animation duration
+    
+    this._reorderingState.pendingTimeouts.push(fallbackTimeout);
   },
   moveRuleDown: function(projectData, idx) {
+    // CRITICAL: Cancel any pending animations to prevent conflicts
+    if (this._reorderingState.isAnimating) {
+      this._cancelPendingAnimations();
+    }
+
     const rules = projectData.rules;
-    if (idx >= rules.length - 1) return;
+    if (idx >= rules.length - 1) return; // Already at the bottom
+
+    // Get DOM elements before updating
+    const rulesContainer = document.getElementById("combination-rules-container");
+    const rulesList = rulesContainer?.querySelector('.rules-list');
+    
+    if (!rulesList) {
+      // Fallback to instant update if container not found
+      [rules[idx], rules[idx + 1]] = [rules[idx + 1], rules[idx]];
+      this.updateRulesUI(projectData);
+      setTimeout(() => {
+        this.reattachMoveButtonListeners(projectData);
+      }, 50);
+      return;
+    }
+
+    // Rules are rendered in reverse order (newest first)
+    // idx is the array index, so we need to find elements in reversed DOM
+    const reversedIdx1 = rules.length - 1 - idx; // Current rule position in reversed DOM
+    const reversedIdx2 = rules.length - 1 - (idx + 1); // Rule below position in reversed DOM
+    
+    // CRITICAL: Only select .rule-item elements, exclude warning and other elements
+    const ruleItems = Array.from(rulesList.querySelectorAll('.rule-item')).filter(item => 
+      item.classList.contains('rule-item') && !item.classList.contains('combination-rules-warning')
+    );
+    const currentRuleItem = ruleItems[reversedIdx1];
+    const belowRuleItem = ruleItems[reversedIdx2];
+    
+    if (!currentRuleItem || !belowRuleItem) {
+      // Fallback to instant update if elements not found
+      [rules[idx], rules[idx + 1]] = [rules[idx + 1], rules[idx]];
+      this.updateRulesUI(projectData);
+      setTimeout(() => {
+        this.reattachMoveButtonListeners(projectData);
+      }, 50);
+      return;
+    }
+
+    // Mark animation as in progress
+    this._reorderingState.isAnimating = true;
+
+    // Calculate the distance to move (move current rule to where below rule is)
+    const currentRect = currentRuleItem.getBoundingClientRect();
+    const belowRect = belowRuleItem.getBoundingClientRect();
+    // Distance to move current rule down (positive value)
+    const moveDistance = belowRect.top - currentRect.top;
+    // Distance to move below rule up (negative value) - current rule's height + gap
+    const belowMoveDistance = -(belowRect.top - currentRect.bottom);
+
+    // CRITICAL: Ensure both elements are visible and in document flow before animation
+    currentRuleItem.style.visibility = "visible";
+    currentRuleItem.style.opacity = "1";
+    currentRuleItem.style.display = "";
+    belowRuleItem.style.visibility = "visible";
+    belowRuleItem.style.opacity = "1";
+    belowRuleItem.style.display = "";
+    
+    // Clean up any existing transforms first
+    currentRuleItem.style.transition = "";
+    currentRuleItem.style.transform = "";
+    currentRuleItem.style.zIndex = "";
+    belowRuleItem.style.transition = "";
+    belowRuleItem.style.transform = "";
+    belowRuleItem.style.zIndex = "";
+    
+    // Force reflow to ensure styles are reset
+    void currentRuleItem.offsetHeight;
+    void belowRuleItem.offsetHeight;
+
+    // Add animation class to both elements simultaneously
+    currentRuleItem.classList.add("reordering");
+    belowRuleItem.classList.add("reordering");
+    
+    // CRITICAL: Use faster, smoother animation with optimized cubic-bezier timing for fluid motion
+    const animationDuration = 200; // 0.2 seconds total for fluid reordering animation
+    
+    // CRITICAL: Enable hardware acceleration and prevent flickering
+    currentRuleItem.style.backfaceVisibility = "hidden";
+    currentRuleItem.style.transform = "translateZ(0)";
+    belowRuleItem.style.backfaceVisibility = "hidden";
+    belowRuleItem.style.transform = "translateZ(0)";
+    
+    // CRITICAL: Set transition on both elements simultaneously with optimized easing
+    currentRuleItem.style.transition = `transform ${animationDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+    belowRuleItem.style.transition = `transform ${animationDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+    
+    // CRITICAL: Set z-index on both elements to ensure they're both visible during animation
+    currentRuleItem.style.zIndex = "1000";
+    belowRuleItem.style.zIndex = "1000";
+    
+    // Force reflow to ensure transition and z-index are set before transform
+    void currentRuleItem.offsetHeight;
+    void belowRuleItem.offsetHeight;
+    
+    // CRITICAL: Apply transforms to both elements in the same frame to ensure simultaneous animation
+    // Use double requestAnimationFrame for smoother start (browser optimization)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        currentRuleItem.style.transform = `translateZ(0) translateY(${moveDistance}px)`;
+        belowRuleItem.style.transform = `translateZ(0) translateY(${belowMoveDistance}px)`;
+      });
+    });
+
+    // Update the data order - swap rules in array
     [rules[idx], rules[idx + 1]] = [rules[idx + 1], rules[idx]];
-    this.updateRulesUI(projectData);
-    this.updateCheckConflictsButtonState(projectData);
+
+    // Use transitionend events for reliable cleanup (more reliable than setTimeout)
+    let completedCount = 0;
+    const requiredCompletions = 2; // Both elements need to complete
+    
+    const cleanup = () => {
+      completedCount++;
+      if (completedCount >= requiredCompletions) {
+        // CRITICAL: Move DOM elements FIRST while transforms are still visually applied
+        // This ensures the elements are in their new positions before removing transforms
+        const container = document.getElementById("combination-rules-container");
+        const rulesList = container?.querySelector('.rules-list');
+        if (rulesList) {
+          // CRITICAL: Get all rule items in current DOM order, exclude warning and other elements
+          const allItems = Array.from(rulesList.querySelectorAll('.rule-item')).filter(item => 
+            item.classList.contains('rule-item') && !item.classList.contains('combination-rules-warning')
+          );
+          
+          // Reorder DOM elements to match projectData.rules order (already swapped above)
+          // Rules are rendered in reverse, so we need to reverse the array indices
+          rules.forEach((rule, arrayIdx) => {
+            const domIdx = rules.length - 1 - arrayIdx; // Reverse index for DOM
+            const item = allItems.find(i => i.getAttribute('data-rule-id') === rule.id);
+            if (item && item.parentNode === rulesList) {
+              // Move element to correct position if needed
+              const currentIndex = Array.from(rulesList.children).indexOf(item);
+              const targetIndex = domIdx;
+              if (currentIndex !== targetIndex) {
+                const referenceNode = rulesList.children[targetIndex];
+                if (referenceNode && referenceNode !== item) {
+                  rulesList.insertBefore(item, referenceNode);
+                } else if (!referenceNode) {
+                  rulesList.appendChild(item);
+                }
+              }
+            }
+          });
+        }
+        
+        // CRITICAL: Now remove transforms - elements are already in new DOM positions
+      requestAnimationFrame(() => {
+        // Remove transforms - elements are already in correct DOM positions
+        currentRuleItem.style.transition = "";
+        currentRuleItem.style.transform = "";
+        currentRuleItem.style.zIndex = "";
+        currentRuleItem.classList.remove("reordering");
+        
+        belowRuleItem.style.transition = "";
+        belowRuleItem.style.transform = "";
+        belowRuleItem.style.zIndex = "";
+        belowRuleItem.classList.remove("reordering");
+        
+          // CRITICAL: Update button states and reattach listeners after DOM manipulation
+          setTimeout(() => {
+            // CRITICAL: Update button data attributes and disabled states
+            // Only select .rule-item elements, exclude warning and other elements
+            const allItems = Array.from(rulesList.querySelectorAll('.rule-item')).filter(item => 
+              item.classList.contains('rule-item') && !item.classList.contains('combination-rules-warning')
+            );
+            allItems.forEach((item, domIdx) => {
+              const arrayIdx = rules.length - 1 - domIdx; // Reverse to get array index
+              const moveUpBtn = item.querySelector('.move-up-rule');
+              const moveDownBtn = item.querySelector('.move-down-rule');
+              
+              if (moveUpBtn) {
+                moveUpBtn.setAttribute('data-rule-idx', arrayIdx);
+                const isUpDisabled = (arrayIdx === rules.length - 1);
+                moveUpBtn.disabled = isUpDisabled;
+                if (isUpDisabled) {
+                  moveUpBtn.setAttribute('disabled', 'disabled');
+                  // Update icon to forbidden sign
+                  const svg = moveUpBtn.querySelector('svg');
+                  if (svg && !svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                      </svg>
+                    `;
+                  }
+                } else {
+                  moveUpBtn.removeAttribute('disabled');
+                  // Update icon to up arrow if currently showing forbidden
+                  const svg = moveUpBtn.querySelector('svg');
+                  if (svg && svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    `;
+                  }
+                }
+              }
+              if (moveDownBtn) {
+                moveDownBtn.setAttribute('data-rule-idx', arrayIdx);
+                const isDownDisabled = (arrayIdx === 0);
+                moveDownBtn.disabled = isDownDisabled;
+                if (isDownDisabled) {
+                  moveDownBtn.setAttribute('disabled', 'disabled');
+                  // Update icon to forbidden sign
+                  const svg = moveDownBtn.querySelector('svg');
+                  if (svg && !svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                      </svg>
+                    `;
+                  }
+                } else {
+                  moveDownBtn.removeAttribute('disabled');
+                  // Update icon to down arrow if currently showing forbidden
+                  const svg = moveDownBtn.querySelector('svg');
+                  if (svg && svg.querySelector('line[x1="4.93"]')) {
+                    svg.outerHTML = `
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    `;
+                  }
+                }
+              }
+            });
+            
+            // Reattach move button listeners after DOM manipulation
+            this.reattachMoveButtonListeners(projectData);
+            
+            // Update conflict check button state
+            this.updateCheckConflictsButtonState(projectData);
+            
+            // Save project data after reordering
+            if (window.NFTApp && window.NFTApp.getModule) {
+              const projectService = window.NFTApp.getModule('projectService');
+              if (projectService && typeof projectService.saveProjectData === 'function') {
+                projectService.saveProjectData();
+              } else if (window.MemoryManager && typeof window.MemoryManager.updateProject === 'function') {
+                window.MemoryManager.updateProject({ rules: projectData.rules }, { syncToModules: false });
+              }
+            } else if (window.MemoryManager && typeof window.MemoryManager.updateProject === 'function') {
+              window.MemoryManager.updateProject({ rules: projectData.rules }, { syncToModules: false });
+            }
+          }, 50);
+        });
+        
+        // Reset animation state
+        this._reorderingState.isAnimating = false;
+        this._reorderingState.pendingTimeouts = [];
+        this._reorderingState.transitionEndHandlers = [];
+      }
+    };
+
+    // Add transitionend handlers
+    const currentHandler = (e) => {
+      if (e.target === currentRuleItem && e.propertyName === 'transform') {
+        cleanup();
+        currentRuleItem.removeEventListener('transitionend', currentHandler);
+      }
+    };
+    
+    const belowHandler = (e) => {
+      if (e.target === belowRuleItem && e.propertyName === 'transform') {
+        cleanup();
+        belowRuleItem.removeEventListener('transitionend', belowHandler);
+      }
+    };
+
+    currentRuleItem.addEventListener('transitionend', currentHandler);
+    belowRuleItem.addEventListener('transitionend', belowHandler);
+    
+    // Store handlers for potential cleanup
+    this._reorderingState.transitionEndHandlers.push(
+      { element: currentRuleItem, handler: currentHandler },
+      { element: belowRuleItem, handler: belowHandler }
+    );
+
+    // Fallback timeout in case transitionend doesn't fire (shouldn't happen, but safety net)
+    const fallbackTimeout = setTimeout(() => {
+      if (this._reorderingState.isAnimating) {
+        cleanup();
+      }
+    }, 500); // Slightly longer than animation duration
+    
+    this._reorderingState.pendingTimeouts.push(fallbackTimeout);
+  },
+  
+  // CRITICAL: Reattach event listeners for move up/down buttons after DOM changes
+  // This ensures the arrow buttons continue to work after drag-and-drop or DOM swaps
+  reattachMoveButtonListeners: function(projectData) {
+    const rulesContainer = document.getElementById("combination-rules-container");
+    if (!rulesContainer) return;
+    
+    const rulesList = rulesContainer.querySelector('.rules-list');
+    if (!rulesList) return;
+    
+    // Use direct click listeners like trait layers (simpler and more reliable)
+    const combinationRulesModule = this;
+    
+    // Move up buttons - move visually up (call moveRuleDown to increase array index)
+    rulesList.querySelectorAll('.move-up-rule').forEach((btn) => {
+      // Clone button to remove old listeners
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      
+      // Update disabled state
+      const idx = parseInt(newBtn.getAttribute('data-rule-idx'), 10);
+      if (!isNaN(idx)) {
+        const isDisabled = (idx === projectData.rules.length - 1);
+        newBtn.disabled = isDisabled;
+        if (isDisabled) {
+          newBtn.setAttribute('disabled', 'disabled');
+          // Update icon to forbidden sign
+          const svg = newBtn.querySelector('svg');
+          if (svg) {
+            svg.outerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+              </svg>
+            `;
+          }
+          // Update tooltip text
+          const tooltipText = newBtn.querySelector('.tooltip-text');
+          if (tooltipText) {
+            tooltipText.textContent = 'Cannot move up\n(already at top)';
+          }
+        } else {
+          newBtn.removeAttribute('disabled');
+          // Update icon to up arrow
+          const svg = newBtn.querySelector('svg');
+          if (svg && svg.querySelector('line[x1="4.93"]')) {
+            svg.outerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+            `;
+          }
+          // Update tooltip text
+          const tooltipText = newBtn.querySelector('.tooltip-text');
+          if (tooltipText && tooltipText.textContent.includes('Cannot move up')) {
+            tooltipText.textContent = 'Move this rule\nup in the list.';
+          }
+        }
+      }
+      
+      // Attach click listener (like trait layers)
+      newBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const button = this;
+        if (button.disabled || button.hasAttribute('disabled')) {
+          return;
+        }
+        
+        const idx = parseInt(button.getAttribute('data-rule-idx'), 10);
+        if (!isNaN(idx) && idx < projectData.rules.length - 1) {
+          combinationRulesModule.moveRuleDown(projectData, idx);
+        }
+      });
+    });
+    
+    // Move down buttons - move visually down (call moveRuleUp to decrease array index)
+    rulesList.querySelectorAll('.move-down-rule').forEach((btn) => {
+      // Clone button to remove old listeners
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      
+      // Update disabled state
+      const idx = parseInt(newBtn.getAttribute('data-rule-idx'), 10);
+      if (!isNaN(idx)) {
+        const isDisabled = (idx === 0);
+        newBtn.disabled = isDisabled;
+        if (isDisabled) {
+          newBtn.setAttribute('disabled', 'disabled');
+          // Update icon to forbidden sign
+          const svg = newBtn.querySelector('svg');
+          if (svg) {
+            svg.outerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+              </svg>
+            `;
+          }
+          // Update tooltip text
+          const tooltipText = newBtn.querySelector('.tooltip-text');
+          if (tooltipText) {
+            tooltipText.textContent = 'Cannot move down\n(already at bottom)';
+          }
+        } else {
+          newBtn.removeAttribute('disabled');
+          // Update icon to down arrow
+          const svg = newBtn.querySelector('svg');
+          if (svg && svg.querySelector('line[x1="4.93"]')) {
+            svg.outerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            `;
+          }
+          // Update tooltip text
+          const tooltipText = newBtn.querySelector('.tooltip-text');
+          if (tooltipText && tooltipText.textContent.includes('Cannot move down')) {
+            tooltipText.textContent = 'Move this rule\ndown in the list.';
+          }
+        }
+      }
+      
+      // Attach click listener (like trait layers)
+      newBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const button = this;
+        if (button.disabled || button.hasAttribute('disabled')) {
+          return;
+        }
+        
+        const idx = parseInt(button.getAttribute('data-rule-idx'), 10);
+        if (!isNaN(idx) && idx > 0) {
+          combinationRulesModule.moveRuleUp(projectData, idx);
+        }
+      });
+    });
   },
 
   // Auto-update thumbnails for NFTs affected by a stacking order rule

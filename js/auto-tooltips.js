@@ -10,6 +10,8 @@
 	function eligible(el){
 		if(!el) return false;
 		if (hasExistingTooltip(el)) return false;
+		// Exclude export image dimension inputs from tooltips
+		if (el.id && ['export-image-width-input', 'export-image-height-input'].includes(el.id)) return false;
 		// Exclude blockchain toggles from Export NFTs tab
 		if (el.id && ['ethereum', 'solana', 'bitcoin', 'cosmos', 'tezos', 'xrpl', 'polygon', 'immutablex', 'base', 'avalanche', 'flow', 'arbitrum'].includes(el.id)) return false;
 		// Exclude metadata.rarity.rank toggle

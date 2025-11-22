@@ -143,12 +143,31 @@ if (typeof NFTApp.getModule !== "function") {
 }
 
 // Ensure NFTApp.ruleValidationUtility exists
-if (typeof NFTApp.ruleValidationUtility === "undefined") {
+// CRITICAL: Wait for rule-validation-utility.js to load before using fallback
+if (typeof NFTApp.ruleValidationUtility === "undefined" || !NFTApp.ruleValidationUtility.validateRule) {
+  // Try to get it from the module system if available
+  if (window.NFTApp && typeof window.NFTApp.getModule === "function") {
+    try {
+      const utility = window.NFTApp.getModule("ruleValidationUtility");
+      if (utility && utility.validateRule) {
+        NFTApp.ruleValidationUtility = utility;
+      }
+    } catch (e) {
+      // Module not found, use fallback
+    }
+  }
+  
+  // Only create fallback if still not defined
+  if (typeof NFTApp.ruleValidationUtility === "undefined" || !NFTApp.ruleValidationUtility.validateRule) {
   NFTApp.ruleValidationUtility = {
     validateRule: (rule, existingRules, isUpdate, ruleId) => {
-      console.warn("NFTApp.ruleValidationUtility.validateRule is not defined. Returning a default valid result.")
+        // Only warn if this is actually being called (not just checking)
+        if (rule && existingRules) {
+          console.warn("NFTApp.ruleValidationUtility.validateRule is not properly loaded. Returning a default valid result.")
+        }
       return { valid: true, message: "" }
     },
+    }
   }
 }
 
@@ -337,12 +356,12 @@ function initEnhancedValidation() {
       hasErrors = true
     }
 
-    // Validate trait selections based on rule type
-    if (
-      ruleAppliesTo === "between-traits" ||
-      ruleType === "immediately-above" ||
-      ruleType === "immediately-below"
-    ) {
+    // CRITICAL: Skip trait validation for between-layers rules - they don't need traits
+    // Validate trait selections based on rule type and appliesTo
+    if (ruleAppliesTo === "between-layers") {
+      // For between-layers, no trait validation needed - only layer selection is required
+      // Validation for different layers is already done above
+    } else if (ruleAppliesTo === "between-traits") {
       // Check first traits selection
       const firstTraitsSelected = document.querySelectorAll("#first-traits-list .trait-checkbox-label.selected")
       if (firstTraitsSelected.length === 0) {
@@ -390,10 +409,24 @@ function initEnhancedValidation() {
     // Add specific properties based on rule type
     switch (ruleAppliesTo) {
       case "between-layers":
+        console.log('[DEBUG RULE ADDITION - ENHANCED VALIDATION] Creating between-layers rule:', {
+          ruleType,
+          firstLayerId,
+          secondLayerId,
+          firstLayerName: firstLayer.name,
+          secondLayerName: secondLayer.name
+        });
         rule.firstLayerId = firstLayerId
         rule.secondLayerId = secondLayerId
         rule.firstLayerName = firstLayer.name
         rule.secondLayerName = secondLayer.name
+        // CRITICAL: For between-layers, traits arrays should be empty
+        rule.firstTraits = []
+        rule.secondTraits = []
+        rule.layerId = null
+        rule.layerName = null
+        rule.traits = []
+        console.log('[DEBUG RULE ADDITION - ENHANCED VALIDATION] between-layers rule created:', rule);
         break
 
       case "between-traits":
@@ -462,6 +495,14 @@ function initEnhancedValidation() {
     }
 
     // Use the new validation utility to check for conflicts
+    // CRITICAL: Ensure ruleValidationUtility is loaded before using it
+    if (!NFTApp.ruleValidationUtility || typeof NFTApp.ruleValidationUtility.validateRule !== "function") {
+      // Try to get it from window if not available
+      if (window.NFTApp && window.NFTApp.ruleValidationUtility && typeof window.NFTApp.ruleValidationUtility.validateRule === "function") {
+        NFTApp.ruleValidationUtility = window.NFTApp.ruleValidationUtility;
+      }
+    }
+    
     if (NFTApp.ruleValidationUtility && typeof NFTApp.ruleValidationUtility.validateRule === "function") {
       const validationResult = NFTApp.ruleValidationUtility.validateRule(rule, projectData.rules)
 
@@ -491,8 +532,10 @@ function initEnhancedValidation() {
         if (validationResult.conflictType === "layer-trait-contradiction") {
           // Highlight both layer selects or trait containers depending on the rule type
           if (ruleAppliesTo === "between-layers") {
-            document.getElementById("first-layer").classList.add("error-highlight")
-            document.getElementById("second-layer").classList.add("error-highlight")
+            const firstLayer = document.getElementById("first-layer")
+            const secondLayer = document.getElementById("second-layer")
+            if (firstLayer) firstLayer.classList.add("error-highlight")
+            if (secondLayer) secondLayer.classList.add("error-highlight")
           } else if (ruleAppliesTo === "between-traits") {
             // Highlight only the specific conflicting traits if they're provided
             if (validationResult.conflictingTraits) {
@@ -506,16 +549,23 @@ function initEnhancedValidation() {
               // If no specific traits are provided, highlight the selected traits
               const firstTraitsSelected = document.querySelectorAll("#first-traits-list .trait-checkbox-label.selected")
               firstTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
 
               const secondTraitsSelected = document.querySelectorAll("#second-traits-list .trait-checkbox-label.selected")
               secondTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
             }
           } else if (ruleAppliesTo === "layer-to-traits") {
-            document.getElementById("first-layer").classList.add("error-highlight")
+            const firstLayer = document.getElementById("first-layer")
+            if (firstLayer) firstLayer.classList.add("error-highlight")
 
             // Highlight only the specific conflicting traits
             if (validationResult.conflictingTraits && validationResult.conflictingTraits.secondTraits) {
@@ -523,11 +573,17 @@ function initEnhancedValidation() {
             } else {
               const secondTraitsSelected = document.querySelectorAll("#second-traits-list .trait-checkbox-label.selected")
               secondTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
             }
           } else if (ruleAppliesTo === "traits-to-layer") {
-            document.getElementById("second-layer").classList.add("error-highlight")
+            const secondLayer = document.getElementById("second-layer")
+            if (secondLayer) {
+              secondLayer.classList.add("error-highlight")
+            }
 
             // Highlight only the specific conflicting traits
             if (validationResult.conflictingTraits && validationResult.conflictingTraits.firstTraits) {
@@ -535,7 +591,10 @@ function initEnhancedValidation() {
             } else {
               const firstTraitsSelected = document.querySelectorAll("#first-traits-list .trait-checkbox-label.selected")
               firstTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
             }
           }
@@ -550,9 +609,19 @@ function initEnhancedValidation() {
       projectData.rules = []
     }
 
+    console.log('[DEBUG RULE ADDITION - ENHANCED VALIDATION] Adding rule to projectData:', {
+      ruleId: rule.id,
+      ruleType: rule.type,
+      appliesTo: rule.appliesTo,
+      firstLayerId: rule.firstLayerId,
+      secondLayerId: rule.secondLayerId,
+      totalRulesBefore: projectData.rules.length
+    });
     projectData.rules.push(rule)
+    console.log('[DEBUG RULE ADDITION - ENHANCED VALIDATION] Rule added successfully. Total rules now:', projectData.rules.length);
 
     // Update the UI
+    console.log('[DEBUG RULE ADDITION - ENHANCED VALIDATION] Calling updateRulesUI');
     NFTApp.getModule("combinationRules").updateRulesUI(projectData)
 
     // Close the modal
@@ -649,12 +718,12 @@ function initEnhancedValidation() {
       hasErrors = true
     }
 
-    // Validate trait selections based on rule type
-    if (
-      ruleAppliesTo === "between-traits" ||
-      ruleType === "immediately-above" ||
-      ruleType === "immediately-below"
-    ) {
+    // CRITICAL: Skip trait validation for between-layers rules - they don't need traits
+    // Validate trait selections based on rule type and appliesTo
+    if (ruleAppliesTo === "between-layers") {
+      // For between-layers, no trait validation needed - only layer selection is required
+      // Validation for different layers is already done above
+    } else if (ruleAppliesTo === "between-traits") {
       // Check first traits selection
       const firstTraitsSelected = document.querySelectorAll("#first-traits-list .trait-checkbox-label.selected")
       if (firstTraitsSelected.length === 0) {
@@ -812,8 +881,10 @@ function initEnhancedValidation() {
         if (validationResult.conflictType === "layer-trait-contradiction") {
           // Highlight both layer selects or trait containers depending on the rule type
           if (ruleAppliesTo === "between-layers") {
-            document.getElementById("first-layer").classList.add("error-highlight")
-            document.getElementById("second-layer").classList.add("error-highlight")
+            const firstLayer = document.getElementById("first-layer")
+            const secondLayer = document.getElementById("second-layer")
+            if (firstLayer) firstLayer.classList.add("error-highlight")
+            if (secondLayer) secondLayer.classList.add("error-highlight")
           } else if (ruleAppliesTo === "between-traits") {
             // Highlight only the specific conflicting traits if they're provided
             if (validationResult.conflictingTraits) {
@@ -827,16 +898,23 @@ function initEnhancedValidation() {
               // If no specific traits are provided, highlight the selected traits
               const firstTraitsSelected = document.querySelectorAll("#first-traits-list .trait-checkbox-label.selected")
               firstTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
 
               const secondTraitsSelected = document.querySelectorAll("#second-traits-list .trait-checkbox-label.selected")
               secondTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
             }
           } else if (ruleAppliesTo === "layer-to-traits") {
-            document.getElementById("first-layer").classList.add("error-highlight")
+            const firstLayer = document.getElementById("first-layer")
+            if (firstLayer) firstLayer.classList.add("error-highlight")
 
             // Highlight only the specific conflicting traits
             if (validationResult.conflictingTraits && validationResult.conflictingTraits.secondTraits) {
@@ -844,11 +922,17 @@ function initEnhancedValidation() {
             } else {
               const secondTraitsSelected = document.querySelectorAll("#second-traits-list .trait-checkbox-label.selected")
               secondTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
             }
           } else if (ruleAppliesTo === "traits-to-layer") {
-            document.getElementById("second-layer").classList.add("error-highlight")
+            const secondLayer = document.getElementById("second-layer")
+            if (secondLayer) {
+              secondLayer.classList.add("error-highlight")
+            }
 
             // Highlight only the specific conflicting traits
             if (validationResult.conflictingTraits && validationResult.conflictingTraits.firstTraits) {
@@ -856,7 +940,10 @@ function initEnhancedValidation() {
             } else {
               const firstTraitsSelected = document.querySelectorAll("#first-traits-list .trait-checkbox-label.selected")
               firstTraitsSelected.forEach((checkbox) => {
-                checkbox.closest(".trait-selection-item").classList.add("error-highlight")
+                const traitItem = checkbox.closest(".trait-selection-item")
+                if (traitItem) {
+                  traitItem.classList.add("error-highlight")
+                }
               })
             }
           }

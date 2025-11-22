@@ -38,20 +38,65 @@ document.addEventListener("DOMContentLoaded", () => {
   // Position tooltips on load
   positionTooltips()
 
+  // CRITICAL: Debounce resize and scroll listeners to improve performance
+  let resizeTimeout = null;
+  let scrollTimeout = null;
+  let mutationDebounceTimeout = null;
+
   // Position tooltips on window resize
-  window.addEventListener("resize", positionTooltips)
-
-  // Position tooltips on scroll
-  document.addEventListener("scroll", positionTooltips)
-
-  // Set up a MutationObserver to handle dynamically added tooltips
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.addedNodes.length) {
-        positionTooltips()
-      }
-    })
+  window.addEventListener("resize", () => {
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+    }
+    resizeTimeout = setTimeout(() => {
+      positionTooltips();
+      resizeTimeout = null;
+    }, 150); // Debounce to 150ms
   })
 
+  // Position tooltips on scroll
+  document.addEventListener("scroll", () => {
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+    scrollTimeout = setTimeout(() => {
+      positionTooltips();
+      scrollTimeout = null;
+    }, 100); // Debounce to 100ms for scroll
+  })
+
+  // Set up a MutationObserver to handle dynamically added tooltips
+  // CRITICAL: Use debounced version to prevent performance issues
+  const observer = new MutationObserver((mutations) => {
+    let hasNewTooltips = false;
+    mutations.forEach((mutation) => {
+      if (mutation.addedNodes.length) {
+        // CRITICAL: Only check if added nodes contain tooltips
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1 && (
+            (node.classList && node.classList.contains("tooltip")) ||
+            (node.querySelector && node.querySelector(".tooltip, .tooltiptext"))
+          )) {
+            hasNewTooltips = true;
+            return;
+          }
+        });
+        if (hasNewTooltips) return;
+      }
+    });
+    
+    // CRITICAL: Only position tooltips if new tooltips were actually added
+    if (hasNewTooltips) {
+      if (mutationDebounceTimeout) {
+        clearTimeout(mutationDebounceTimeout);
+      }
+      mutationDebounceTimeout = setTimeout(() => {
+        positionTooltips();
+        mutationDebounceTimeout = null;
+      }, 300); // Debounce to 300ms
+    }
+  })
+
+  // CRITICAL: Only observe childList to reduce overhead
   observer.observe(document.body, { childList: true, subtree: true })
 })

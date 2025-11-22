@@ -1303,17 +1303,36 @@ window.NFTApp.registerModule("generateNfts", {
           });
         } else {
           // Apply to entire layers when no specific traits selected
-          const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
-          const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-          if (idxA !== -1 && idxB !== -1 && idxA > idxB) {
-            // First layer is already above second layer (higher index), no action needed
-            if (debug) console.log(`[Stacking] Layer '${rule.firstLayerName}' is already above '${rule.secondLayerName}'`);
-          } else if (idxA !== -1 && idxB !== -1) {
-            // Move first layer to be above second layer (insert after B, at higher index)
-            const [layerA] = reorderedTraits.splice(idxA, 1);
-            const newIdxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-            reorderedTraits.splice(newIdxB + 1, 0, layerA);
-            if (debug) console.log(`[Stacking] (Always Above) Moved layer '${layerA.layer.name}' to be above '${rule.secondLayerName}'`);
+          // CRITICAL: Find ALL traits from each layer, not just the first one
+          // This ensures the rule applies to the entire layer regardless of initial stacking order
+          const traitsFromLayerA = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+          const traitsFromLayerB = reorderedTraits.filter(t => t.layer.id === rule.secondLayerId);
+          
+          if (traitsFromLayerA.length > 0 && traitsFromLayerB.length > 0) {
+            // Get indices of first occurrence of each layer
+            const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
+            const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+            
+            // CRITICAL: Always apply the rule regardless of initial order
+            // The rule should override the default stacking order
+            if (idxA !== -1 && idxB !== -1 && idxA !== idxB) {
+              // Remove all traits from layer A
+              const removedTraits = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+              reorderedTraits = reorderedTraits.filter(t => t.layer.id !== rule.firstLayerId);
+              
+              // Find new position for layer B after removal
+              const newIdxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+              
+              // Insert all traits from layer A right after layer B
+              if (newIdxB !== -1) {
+                reorderedTraits.splice(newIdxB + 1, 0, ...removedTraits);
+                if (debug) console.log(`[Stacking] (Always Above) Moved layer '${rule.firstLayerName}' to be above '${rule.secondLayerName}' (overrode default order)`);
+              } else {
+                // Layer B not found after removal, append layer A at end
+                reorderedTraits.push(...removedTraits);
+                if (debug) console.log(`[Stacking] (Always Above) Moved layer '${rule.firstLayerName}' to end (layer B not found)`);
+              }
+            }
           }
         }
       } else if (rule.appliesTo === "between-traits") {
@@ -1398,17 +1417,36 @@ window.NFTApp.registerModule("generateNfts", {
           });
         } else {
           // Apply to entire layers when no specific traits selected
-          const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
-          const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-          if (idxA !== -1 && idxB !== -1 && idxA < idxB) {
-            // First layer is already below second layer (lower index), no action needed
-            if (debug) console.log(`[Stacking] Layer '${rule.firstLayerName}' is already below '${rule.secondLayerName}'`);
-          } else if (idxA !== -1 && idxB !== -1) {
-            // Move first layer to be below second layer (insert at idxB, shifting B to higher index)
-            const [layerA] = reorderedTraits.splice(idxA, 1);
-            const newIdxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-            reorderedTraits.splice(newIdxB, 0, layerA);
-            if (debug) console.log(`[Stacking] (Always Below) Moved layer '${layerA.layer.name}' to be below '${rule.secondLayerName}'`);
+          // CRITICAL: Find ALL traits from each layer, not just the first one
+          // This ensures the rule applies to the entire layer regardless of initial stacking order
+          const traitsFromLayerA = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+          const traitsFromLayerB = reorderedTraits.filter(t => t.layer.id === rule.secondLayerId);
+          
+          if (traitsFromLayerA.length > 0 && traitsFromLayerB.length > 0) {
+            // Get indices of first occurrence of each layer
+            const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
+            const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+            
+            // CRITICAL: Always apply the rule regardless of initial order
+            // The rule should override the default stacking order
+            if (idxA !== -1 && idxB !== -1 && idxA !== idxB) {
+              // Remove all traits from layer A
+              const removedTraits = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+              reorderedTraits = reorderedTraits.filter(t => t.layer.id !== rule.firstLayerId);
+              
+              // Find new position for layer B after removal
+              const newIdxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+              
+              // Insert all traits from layer A right before layer B
+              if (newIdxB !== -1) {
+                reorderedTraits.splice(newIdxB, 0, ...removedTraits);
+                if (debug) console.log(`[Stacking] (Always Below) Moved layer '${rule.firstLayerName}' to be below '${rule.secondLayerName}' (overrode default order)`);
+              } else {
+                // Layer B not found after removal, prepend layer A at start
+                reorderedTraits.unshift(...removedTraits);
+                if (debug) console.log(`[Stacking] (Always Below) Moved layer '${rule.firstLayerName}' to start (layer B not found)`);
+              }
+            }
           }
         }
       } else if (rule.appliesTo === "between-traits") {
@@ -1490,13 +1528,36 @@ window.NFTApp.registerModule("generateNfts", {
           });
         } else {
           // Apply to entire layers when no specific traits selected
-          const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
-          const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-          if (idxA !== -1 && idxB !== -1 && idxA !== idxB + 1) {
-            const [a] = reorderedTraits.splice(idxA, 1);
-            const newIdx = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-            reorderedTraits.splice(newIdx + 1, 0, a);
-            if (debug) console.log(`[Stacking] (Immediately Above) Moved layer '${a.layer.name}' to be directly above '${rule.secondLayerName}'`);
+          // CRITICAL: Find ALL traits from each layer and move them as a group
+          // This ensures the rule applies to the entire layer regardless of initial stacking order
+          const traitsFromLayerA = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+          const traitsFromLayerB = reorderedTraits.filter(t => t.layer.id === rule.secondLayerId);
+          
+          if (traitsFromLayerA.length > 0 && traitsFromLayerB.length > 0) {
+            // Get indices of first occurrence of each layer
+            const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
+            const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+            
+            // CRITICAL: Always apply the rule regardless of initial order
+            // The rule should override the default stacking order
+            if (idxA !== -1 && idxB !== -1 && idxA !== idxB) {
+              // Remove all traits from layer A
+              const removedTraits = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+              reorderedTraits = reorderedTraits.filter(t => t.layer.id !== rule.firstLayerId);
+              
+              // Find new position for layer B after removal
+              const newIdxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+              
+              // Insert all traits from layer A right after layer B (immediately above)
+              if (newIdxB !== -1) {
+                reorderedTraits.splice(newIdxB + 1, 0, ...removedTraits);
+                if (debug) console.log(`[Stacking] (Immediately Above) Moved layer '${rule.firstLayerName}' to be directly above '${rule.secondLayerName}' (overrode default order)`);
+              } else {
+                // Layer B not found after removal, append layer A at end
+                reorderedTraits.push(...removedTraits);
+                if (debug) console.log(`[Stacking] (Immediately Above) Moved layer '${rule.firstLayerName}' to end (layer B not found)`);
+              }
+            }
           }
         }
       } else if (rule.appliesTo === "between-traits") {
@@ -1567,13 +1628,36 @@ window.NFTApp.registerModule("generateNfts", {
           });
         } else {
           // Apply to entire layers when no specific traits selected
-          const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
-          const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-          if (idxA !== -1 && idxB !== -1 && idxA !== idxB - 1) {
-            const [a] = reorderedTraits.splice(idxA, 1);
-            const newIdx = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
-            reorderedTraits.splice(newIdx, 0, a);
-            if (debug) console.log(`[Stacking] (Immediately Below) Moved layer '${a.layer.name}' to be directly below '${rule.secondLayerName}'`);
+          // CRITICAL: Find ALL traits from each layer and move them as a group
+          // This ensures the rule applies to the entire layer regardless of initial stacking order
+          const traitsFromLayerA = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+          const traitsFromLayerB = reorderedTraits.filter(t => t.layer.id === rule.secondLayerId);
+          
+          if (traitsFromLayerA.length > 0 && traitsFromLayerB.length > 0) {
+            // Get indices of first occurrence of each layer
+            const idxA = reorderedTraits.findIndex(t => t.layer.id === rule.firstLayerId);
+            const idxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+            
+            // CRITICAL: Always apply the rule regardless of initial order
+            // The rule should override the default stacking order
+            if (idxA !== -1 && idxB !== -1 && idxA !== idxB) {
+              // Remove all traits from layer A
+              const removedTraits = reorderedTraits.filter(t => t.layer.id === rule.firstLayerId);
+              reorderedTraits = reorderedTraits.filter(t => t.layer.id !== rule.firstLayerId);
+              
+              // Find new position for layer B after removal
+              const newIdxB = reorderedTraits.findIndex(t => t.layer.id === rule.secondLayerId);
+              
+              // Insert all traits from layer A right before layer B (immediately below)
+              if (newIdxB !== -1) {
+                reorderedTraits.splice(newIdxB, 0, ...removedTraits);
+                if (debug) console.log(`[Stacking] (Immediately Below) Moved layer '${rule.firstLayerName}' to be directly below '${rule.secondLayerName}' (overrode default order)`);
+              } else {
+                // Layer B not found after removal, prepend layer A at start
+                reorderedTraits.unshift(...removedTraits);
+                if (debug) console.log(`[Stacking] (Immediately Below) Moved layer '${rule.firstLayerName}' to start (layer B not found)`);
+              }
+            }
           }
         }
       } else if (rule.appliesTo === "between-traits") {
@@ -1660,7 +1744,7 @@ window.NFTApp.registerModule("generateNfts", {
       return priorityA - priorityB;
     });
     
-    console.log('[DEBUG] Rule processing order (by priority):', sortedRules.map(r => `${r.type} (priority: ${rulePriority[r.type] || 999})`));
+    // console.log('[DEBUG] Rule processing order (by priority):', sortedRules.map(r => `${r.type} (priority: ${rulePriority[r.type] || 999})`));
     
     // Check each rule in priority order
     for (const rule of sortedRules) {
@@ -2434,8 +2518,10 @@ window.NFTApp.registerModule("generateNfts", {
           
           // Show success notification
           if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+            // Wrap seed number in span with smaller font size (2px smaller)
+            const message = "NFT generated with seed: <span class=\"notification-seed-number\">" + seedValue + "</span>";
             window.NFTApp.getModule("notificationService").show(
-              "NFT generated with seed: " + seedValue, 
+              message, 
               "success", 
               3000
             );

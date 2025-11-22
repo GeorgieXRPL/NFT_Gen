@@ -295,7 +295,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Call the function after initializing tooltips
   handleRandomizeTooltip()
 
+  // CRITICAL: Debounce function to prevent excessive tooltip initialization
+  let tooltipDebounceTimeout = null;
+  const debouncedInitTooltips = () => {
+    if (tooltipDebounceTimeout) {
+      clearTimeout(tooltipDebounceTimeout);
+    }
+    tooltipDebounceTimeout = setTimeout(() => {
+      initTooltips();
+      // handleRandomizeTooltip is disabled, so don't call it
+      tooltipDebounceTimeout = null;
+    }, 300); // Debounce to 300ms to reduce performance impact
+  };
+
   // Set up mutation observer to detect new tooltips
+  // CRITICAL: Use debounced version and be more selective about what triggers refresh
   const observer = new MutationObserver((mutations) => {
     let shouldRefreshTooltips = false
 
@@ -304,51 +318,76 @@ document.addEventListener("DOMContentLoaded", () => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === 1) {
             // Element node
+            // CRITICAL: Only check if node has tooltip class or contains tooltip - more efficient
             if (
               (node.classList && node.classList.contains("tooltip")) ||
-              (node.querySelector && node.querySelector(".tooltip"))
+              (node.querySelector && node.querySelector(".tooltip, .tooltiptext"))
             ) {
               shouldRefreshTooltips = true
+              return; // Early exit once we find a tooltip
             }
           }
         })
       }
     })
 
-    // Also add it to the observer callback
+    // CRITICAL: Use debounced version to prevent performance issues
     if (shouldRefreshTooltips) {
-      initTooltips()
-      handleRandomizeTooltip() // Add this line
+      debouncedInitTooltips();
     }
   })
 
+  // CRITICAL: Only observe childList to reduce overhead
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+    // CRITICAL: Don't observe attributes - too expensive and not needed for tooltip detection
   })
+
+  // CRITICAL: Debounce resize and scroll listeners to improve performance
+  let resizeTimeout = null;
+  let scrollTimeout = null;
 
   // Add window resize listener to reposition tooltips
   window.addEventListener("resize", () => {
-    const visibleTooltips = document.querySelectorAll(".tooltip:hover .tooltiptext")
-    visibleTooltips.forEach((tooltip) => {
-      const parent = tooltip.closest(".tooltip")
-      if (parent) {
-        positionTooltip(parent, tooltip)
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+    }
+    resizeTimeout = setTimeout(() => {
+      // CRITICAL: Only reposition visible tooltips to reduce overhead
+      const visibleTooltips = document.querySelectorAll(".tooltip:hover .tooltiptext")
+      if (visibleTooltips.length > 0) {
+        visibleTooltips.forEach((tooltip) => {
+          const parent = tooltip.closest(".tooltip")
+          if (parent) {
+            positionTooltip(parent, tooltip)
+          }
+        })
       }
-    })
+      resizeTimeout = null;
+    }, 150); // Debounce to 150ms
   })
 
   // Add scroll listener to reposition tooltips
   window.addEventListener(
     "scroll",
     () => {
-      const visibleTooltips = document.querySelectorAll(".tooltip:hover .tooltiptext")
-      visibleTooltips.forEach((tooltip) => {
-        const parent = tooltip.closest(".tooltip")
-        if (parent) {
-          positionTooltip(parent, tooltip)
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(() => {
+        // CRITICAL: Only reposition visible tooltips to reduce overhead
+        const visibleTooltips = document.querySelectorAll(".tooltip:hover .tooltiptext")
+        if (visibleTooltips.length > 0) {
+          visibleTooltips.forEach((tooltip) => {
+            const parent = tooltip.closest(".tooltip")
+            if (parent) {
+              positionTooltip(parent, tooltip)
+            }
+          })
         }
-      })
+        scrollTimeout = null;
+      }, 100); // Debounce to 100ms for scroll
     },
     true,
   )

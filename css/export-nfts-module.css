@@ -82,6 +82,50 @@
   -moz-appearance: textfield;
 }
 
+/* Prevent browser default tooltips for export image dimension inputs */
+/* Note: Title attribute is handled in JavaScript to prevent browser tooltips */
+
+/* Explicitly prevent tooltips on export image dimension inputs */
+#export-image-width-input.tooltip,
+#export-image-height-input.tooltip,
+#export-image-width-input .tooltiptext,
+#export-image-height-input .tooltiptext {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Remove tooltip cursor and prevent tooltip hover effects */
+#export-image-width-input,
+#export-image-height-input {
+  cursor: text !important;
+}
+
+#export-image-width-input:disabled,
+#export-image-height-input:disabled {
+  cursor: not-allowed !important;
+}
+
+/* Prevent browser validation tooltips/messages */
+#export-image-width-input:invalid,
+#export-image-height-input:invalid {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Hide browser validation tooltips using pseudo-elements */
+#export-image-width-input::-webkit-validation-bubble,
+#export-image-height-input::-webkit-validation-bubble,
+#export-image-width-input::-webkit-validation-bubble-arrow,
+#export-image-height-input::-webkit-validation-bubble-arrow {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Note: Language is set via HTML lang attribute in JavaScript */
+
 /* Override export-option-toggle width for image dimension toggles */
 #image-dimension-original-toggle,
 #image-dimension-custom-toggle {
@@ -720,6 +764,23 @@ html:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
   margin-left: 0 !important;
 }
 
+/* Utilities Content Wrapper - allows moving all utilities elements together */
+#utilities-content-wrapper,
+#export-nfts #utilities-content-wrapper {
+  margin-top: -20px !important; /* Adjusted from -22px to move 2px down */
+}
+
+/* Utilities title text height - ensure 14px height */
+#utilities-content-wrapper > div:first-child,
+#export-nfts #utilities-content-wrapper > div:first-child {
+  height: 14px !important;
+  min-height: 14px !important;
+  max-height: 14px !important;
+  line-height: 14px !important;
+  position: relative !important;
+  top: 4px !important; /* Move down 4px without affecting other elements */
+}
+
 /* Fixed size for utilities-section: 256x556px */
 #utilities-section,
 #export-nfts #utilities-section {
@@ -737,10 +798,21 @@ html:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
   width: 174px !important;
   min-width: 174px !important;
   max-width: 174px !important;
+  height: 103px !important;
+  min-height: 103px !important;
+  max-height: 103px !important;
   border: 2px solid #666666 !important;
   background: #111111 !important;
   border-radius: 8px !important;
   box-sizing: border-box !important;
+}
+
+/* Export Image Dimensions Options - fixed height of 145px */
+#export-image-dimensions-options,
+#export-nfts #export-image-dimensions-options {
+  height: 145px !important;
+  min-height: 145px !important;
+  max-height: 145px !important;
 }
 
 /* Remove number input arrows for max-nfts-export-input */
@@ -787,6 +859,24 @@ html:has(#export-nfts.tab-content.active) .content-area::-webkit-scrollbar,
   word-wrap: normal !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  width: auto !important;
+  min-width: auto !important;
+  max-width: none !important;
+}
+
+/* Export option buttons - fixed height of 28px and vertically centered text */
+#export-option-nfts-only,
+#export-nfts #export-option-nfts-only,
+#export-option-metadata-only,
+#export-nfts #export-option-metadata-only,
+#export-option-nfts-metadata,
+#export-nfts #export-option-nfts-metadata {
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .export-option-toggle.active {

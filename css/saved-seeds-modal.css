@@ -1132,7 +1132,8 @@
   gap: 7px;
   padding: 20px;
   padding-bottom: 40px; /* Extra bottom padding to ensure gap between last row and modal bottom */
-  overflow-y: auto;
+  overflow-y: auto !important;
+  overflow-x: hidden !important; /* CRITICAL: Prevent horizontal overflow */
   align-content: start;
   min-height: calc(100% + 28px); /* Increase height by 28px */
   transition: none !important; /* Prevent stretch effect */
@@ -1141,13 +1142,14 @@
   contain: layout style !important; /* Prevent cascading layout changes */
   grid-auto-flow: row !important; /* Ensure consistent row flow */
   scrollbar-gutter: stable !important; /* Reserve space for scrollbar to prevent stretching */
+  box-sizing: border-box !important; /* Ensure padding is included in width calculation */
 }
 
 .saved-seed-card {
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 8px;
-  overflow: visible !important; /* allow tooltips to overflow outside card */
+  overflow: hidden !important; /* CRITICAL: Prevent card content from spilling outside */
   display: flex;
   flex-direction: column;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -1155,6 +1157,8 @@
   height: 180px !important; /* Fixed height to prevent stretching */
   width: 100% !important; /* Fixed width */
   box-sizing: border-box !important; /* Prevent padding from causing resize */
+  max-width: 100% !important; /* CRITICAL: Ensure card doesn't exceed grid cell width */
+  min-width: 0 !important; /* CRITICAL: Allow card to shrink within grid cell */
 }
 
 .saved-seed-card:hover {
@@ -1278,18 +1282,19 @@
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 8px;
+  overflow: hidden !important; /* CRITICAL: Prevent card content from spilling outside */
   padding: 8px;
   margin: 4px;
-  overflow: visible !important; /* Allow tooltips to overflow */
   position: relative !important; /* Ensure proper positioning context */
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  position: relative;
-  overflow: hidden;
   box-sizing: border-box;
+  max-width: 100% !important; /* CRITICAL: Ensure card doesn't exceed grid cell width */
+  min-width: 0 !important; /* CRITICAL: Allow card to shrink within grid cell */
+  width: 100% !important; /* CRITICAL: Ensure card fits within grid cell */
 }
 
 .unified-nft-card:hover {
@@ -1868,6 +1873,8 @@
 .seed-card-thumbnail .seed-desc-btn.has-description { background: #f39c12 !important; background-color: #f39c12 !important; color: #fff !important; border-color: #e67e22 !important; }
 .seed-card-thumbnail .seed-desc-btn.no-description { background: rgba(0, 0, 0, 0.5) !important; background-color: rgba(0, 0, 0, 0.5) !important; color: #fff !important; border-color: rgba(255, 255, 255, 0.3) !important; }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Tooltips on card controls - compact sizing and top placement */
 #saved-seeds-modal .seed-card-thumbnail .tooltip .tooltiptext,
 #saved-seeds-modal .seed-card-buttons .tooltip .tooltiptext,
@@ -1887,6 +1894,7 @@
   will-change: transform, opacity !important; /* Optimize for transform and opacity changes */
   backface-visibility: hidden !important; /* Improve rendering performance */
 }
+*/
 
 .seed-card-rarity.loading {
   background: rgba(255, 165, 0, 0.8);

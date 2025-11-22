@@ -495,9 +495,12 @@
   background: #c82333 !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Ensure tooltip text uses consistent styling */
 #dark-traits-modal .tooltip .tooltiptext {
   font-size: 11px !important;
   font-family: 'Archivo', sans-serif !important;
   line-height: 1.4 !important;
 }
+*/

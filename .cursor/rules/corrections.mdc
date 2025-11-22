@@ -1,6 +1,4 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 Any changes, updates or new features i ask you to include in the app, certify when adding that you don't have any contradictory code to ensure the changes i'm asking you to make will apply for sure. Check through the entire app files and code to garanty those changes are applied at once. Show me the conflicts before you apply the changes.

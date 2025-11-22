@@ -1,3 +1,5 @@
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /**
  * Injected Tooltips Styles
  * These styles apply to tooltips that are directly injected into elements
@@ -92,3 +94,4 @@
 .trait-rarity-actions .randomize-rarities-tiered-btn:hover .injected-tooltip {
   display: none !important;
 }
+*/

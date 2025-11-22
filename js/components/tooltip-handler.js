@@ -16,25 +16,91 @@ window.NFTApp.registerModule("tooltipHandler", {
   },
 
   setupEventListeners: function () {
+    // CRITICAL: Debounce resize and scroll listeners to improve performance
+    let resizeTimeout = null;
+    let scrollTimeout = null;
+    let mutationDebounceTimeout = null;
+
     // Position tooltips on window resize
-    window.addEventListener("resize", this.positionTooltips.bind(this))
+    window.addEventListener("resize", () => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      resizeTimeout = setTimeout(() => {
+        this.positionTooltips();
+        resizeTimeout = null;
+      }, 150); // Debounce to 150ms
+    })
 
     // Position tooltips on scroll
-    document.addEventListener("scroll", this.positionTooltips.bind(this))
+    document.addEventListener("scroll", () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(() => {
+        this.positionTooltips();
+        scrollTimeout = null;
+      }, 100); // Debounce to 100ms for scroll
+    })
 
     // Set up a MutationObserver to handle dynamically added tooltips
-    const observer = new MutationObserver(this.handleDOMChanges.bind(this))
+    // CRITICAL: Use debounced version to prevent performance issues
+    const observer = new MutationObserver((mutations) => {
+      let hasNewTooltips = false;
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+          // CRITICAL: Only check if added nodes contain tooltips
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1 && (
+              (node.classList && node.classList.contains("tooltip")) ||
+              (node.querySelector && node.querySelector(".tooltip, .tooltiptext"))
+            )) {
+              hasNewTooltips = true;
+              return;
+            }
+          });
+          if (hasNewTooltips) return;
+        }
+      });
+      
+      // CRITICAL: Only position tooltips if new tooltips were actually added
+      if (hasNewTooltips) {
+        if (mutationDebounceTimeout) {
+          clearTimeout(mutationDebounceTimeout);
+        }
+        mutationDebounceTimeout = setTimeout(() => {
+          this.positionTooltips();
+          mutationDebounceTimeout = null;
+        }, 300); // Debounce to 300ms
+      }
+    });
+    
+    // CRITICAL: Only observe childList to reduce overhead
     observer.observe(document.body, { childList: true, subtree: true })
   },
 
   handleDOMChanges: function (mutations) {
-    mutations.forEach(
-      function (mutation) {
-        if (mutation.addedNodes.length) {
-          this.positionTooltips()
-        }
-      }.bind(this),
-    )
+    // CRITICAL: This function is now handled by the optimized MutationObserver above
+    // Keeping for backwards compatibility but it's no longer called directly
+    let hasNewTooltips = false;
+    mutations.forEach((mutation) => {
+      if (mutation.addedNodes.length) {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1 && (
+            (node.classList && node.classList.contains("tooltip")) ||
+            (node.querySelector && node.querySelector(".tooltip, .tooltiptext"))
+          )) {
+            hasNewTooltips = true;
+            return;
+          }
+        });
+        if (hasNewTooltips) return;
+      }
+    });
+    
+    if (hasNewTooltips) {
+      this.positionTooltips();
+    }
   },
 
   positionTooltips: () => {

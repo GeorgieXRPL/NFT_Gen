@@ -10,6 +10,16 @@
   function freezeTab(tabId) {
     const tab = document.getElementById(tabId);
     if (tab) {
+      // CRITICAL: Do NOT freeze Collection Info tab (general-info) - it needs overflow: visible to prevent clipping
+      // Collection Info tab overflow is handled by collection-info-override.css and navigation.js
+      if (tabId === 'general-info' || tabId === 'collection-info') {
+        // Only set scrollbar properties, NOT overflow - overflow must stay visible for Collection Info
+        tab.style.setProperty('scrollbar-width', 'none', 'important');
+        tab.style.setProperty('-ms-overflow-style', 'none', 'important');
+        // DO NOT set overflow here - let CSS and navigation.js handle it
+        return true;
+      }
+      
       // For Generate NFTs tab, wait for content to be loaded first
       if (tabId === 'generate-nfts') {
         // Check if the tab has content (traits section)
@@ -21,7 +31,7 @@
         }
       }
       
-      // Force freeze with inline styles (highest priority)
+      // Force freeze with inline styles (highest priority) - only for Generate NFTs
       tab.style.setProperty('overflow-y', 'hidden', 'important');
       tab.style.setProperty('overflow-x', 'hidden', 'important');
       tab.style.setProperty('scrollbar-width', 'none', 'important');
@@ -48,7 +58,8 @@
   function autoFreezeTabs() {
     let frozenCount = 0;
     
-    // Try to freeze Collection Info (try both possible IDs)
+    // CRITICAL: Do NOT freeze Collection Info - it needs overflow: visible
+    // Only set scrollbar properties for Collection Info (handled in freezeTab function)
     if (freezeTab('collection-info')) frozenCount++;
     if (freezeTab('general-info')) frozenCount++;
     

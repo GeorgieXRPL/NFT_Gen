@@ -3,7 +3,7 @@
   position: relative;
   width: 100%;
   font-family: var(--font-family);
-  margin-bottom: 15px;
+  margin-bottom: 0 !important;
 }
 
 .custom-dropdown-selected {
@@ -12,11 +12,30 @@
   gap: 8px;
   padding: 10px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 6px !important; /* CRITICAL: Match app's standard rounded corners (6px) */
   background-color: var(--bg-primary);
   cursor: pointer;
   position: relative;
   padding-right: 35px;
+}
+
+/* CRITICAL: Set #111111 background for rules-filter-dropdown custom dropdown (collapsed and expanded) */
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-selected,
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-selected[data-for="rules-filter-dropdown"] {
+  background-color: #111111 !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  font-size: 0.9rem !important; /* Match Clear Filter button text size */
+  padding: 0.5rem 1rem !important; /* Adjust padding to fit 32px height */
+  padding-right: 2.5rem !important; /* CRITICAL: Increased padding-right to accommodate larger arrow icon (18px + 12px right position) */
+}
+
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-options,
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-options.show {
+  background-color: #111111 !important;
+  background: #111111 !important; /* CRITICAL: Ensure background is set, not transparent */
+  z-index: 999999 !important; /* CRITICAL: Very high z-index for "All Rule Types" dropdown to prevent overlap by any object */
 }
 
 .custom-dropdown-selected::after {
@@ -25,8 +44,8 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 10px;
-  height: 10px;
+  width: 18px !important; /* CRITICAL: Increased from 10px to 18px for better visibility */
+  height: 18px !important; /* CRITICAL: Increased from 10px to 18px for better visibility */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -41,16 +60,33 @@
   max-height: 300px;
   overflow-y: auto;
   background-color: var(--bg-primary);
+  background: var(--bg-primary) !important; /* CRITICAL: Ensure background is set, not transparent */
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  z-index: 1000;
+  border-radius: 6px !important; /* CRITICAL: Match app's standard rounded corners (6px) */
+  z-index: 10001 !important; /* CRITICAL: Higher than combination-rules-warning (z-index: 1) and rule-drag-handle (z-index: 10) but below tooltips (z-index: 2147483647) */
   margin-top: 4px;
   display: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* CRITICAL: "All Rule Types" dropdown - ensure it has very high z-index to prevent overlap */
+.combination-rules-filter-container .custom-dropdown,
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-selected,
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-options,
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-options.show {
+  z-index: 999999 !important; /* CRITICAL: Very high z-index for "All Rule Types" dropdown to prevent overlap by any object */
+  position: relative !important;
+}
+
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-options,
+.combination-rules-filter-container .custom-dropdown .custom-dropdown-options.show {
+  position: absolute !important;
+}
+
 .custom-dropdown-options.show {
   display: block;
+  background-color: var(--bg-primary) !important;
+  background: var(--bg-primary) !important; /* CRITICAL: Ensure background is set when shown, not transparent */
 }
 
 .custom-dropdown-option {
@@ -212,6 +248,29 @@
   display: none;
 }
 
+/* CRITICAL: Hide native select when custom dropdown exists for rules-filter-dropdown */
+#rules-filter-dropdown.custom-dropdown-convert {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+
+/* If a custom dropdown exists next to rules-filter-dropdown, hide the select */
+.rules-filter-dropdown-wrapper:has(.custom-dropdown[data-for="rules-filter-dropdown"]) #rules-filter-dropdown,
+.combination-rules-filter-container:has(.custom-dropdown) #rules-filter-dropdown {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Scrollbar styling for dropdown options */
 .custom-dropdown-options::-webkit-scrollbar {
   width: 8px;
@@ -219,12 +278,12 @@
 
 .custom-dropdown-options::-webkit-scrollbar-track {
   background: var(--bg-primary);
-  border-radius: 4px;
+  border-radius: 6px !important; /* CRITICAL: Match app's standard rounded corners (6px) */
 }
 
 .custom-dropdown-options::-webkit-scrollbar-thumb {
   background: var(--border-color);
-  border-radius: 4px;
+  border-radius: 6px !important; /* CRITICAL: Match app's standard rounded corners (6px) */
 }
 
 .custom-dropdown-options::-webkit-scrollbar-thumb:hover {

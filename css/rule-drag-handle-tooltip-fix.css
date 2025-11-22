@@ -1,0 +1,24 @@
+/* CRITICAL: Ensure rule-drag-handle tooltip does NOT overlap custom-dropdown */
+/* Tooltip should be BELOW custom-dropdown (z-index: 10001 and 999999) to prevent overlap */
+.rule-drag-handle.tooltip .tooltiptext,
+.rule-drag-handle .tooltiptext {
+  z-index: 9998 !important; /* BELOW custom-dropdown (10001 and 999999) to prevent overlap */
+  position: fixed !important;
+}
+
+/* CRITICAL: Ensure combination-rules-warning tooltip does NOT overlap custom-dropdown */
+.combination-rules-warning.tooltip .tooltiptext,
+.combination-rules-warning .tooltiptext {
+  z-index: 9998 !important; /* BELOW custom-dropdown (10001 and 999999) to prevent overlap */
+  position: fixed !important;
+}
+
+/* CRITICAL: Ensure tooltips in combination-rules-filter-container are below dropdown */
+.combination-rules-filter-container .rule-drag-handle.tooltip .tooltiptext,
+.combination-rules-filter-container .rule-drag-handle .tooltiptext,
+.combination-rules-filter-container .combination-rules-warning.tooltip .tooltiptext,
+.combination-rules-filter-container .combination-rules-warning .tooltiptext {
+  z-index: 999998 !important; /* BELOW custom-dropdown (999999) but still visible */
+  position: fixed !important;
+}
+

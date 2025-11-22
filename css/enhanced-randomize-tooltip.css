@@ -1,3 +1,5 @@
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /**
  * Enhanced Randomize Tooltip CSS
  * Provides styles for the improved tier distribution visualization
@@ -171,4 +173,5 @@
 .trait-layer-bar.expanded .traits-grid {
   row-gap: 10px !important;
   column-gap: 2.5px !important;
-} 
+}
+*/ 

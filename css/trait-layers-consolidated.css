@@ -304,21 +304,42 @@
 
 /* Ensure drag handle is visible and properly sized */
 .trait-layer-drag-handle {
-  margin-left: 24px !important;
-  margin-right: 1rem !important;
-  cursor: help !important; /* Hand with "?" for tooltip */
-  flex: 0 0 auto !important;
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+  cursor: grab !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 72px !important; /* 3x larger: 24px * 3 = 72px */
+  height: 72px !important; /* 3x larger: 24px * 3 = 72px */
+  margin-right: 24px !important; /* 3x larger: 8px * 3 = 24px */
+  color: #4a3c6b !important; /* Dark purple color for trait layer drag handles */
   background: transparent !important;
   background-color: transparent !important;
 }
 
-/* CRITICAL: Ensure tooltip class on drag handle doesn't get overridden */
+.trait-layer-drag-handle svg {
+  pointer-events: none !important;
+  width: 60px !important; /* 3x larger: 20px * 3 = 60px */
+  height: 60px !important; /* 3x larger: 20px * 3 = 60px */
+  color: inherit !important;
+}
+
+/* CRITICAL: Ensure tooltip class on drag handle uses grab cursor, not help */
 .trait-layer-drag-handle.tooltip {
-  cursor: help !important;
+  cursor: grab !important;
+}
+
+.trait-layer-drag-handle.tooltip:hover {
+  cursor: grab !important;
+  color: #6b5a8a !important; /* Lighter purple on hover */
 }
 
 .trait-layer-drag-handle:active {
   cursor: grabbing !important;
+  color: #6b5a8a !important;
 }
 
 /* Layer Arrow */
@@ -522,9 +543,19 @@
   color: var(--text-primary) !important;
 }
 
-.position-btn:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
+.position-btn:disabled,
+.position-btn[disabled] {
+  color: #666 !important; /* Greyed out color */
+  opacity: 0.5 !important; /* Make it look disabled */
+  cursor: not-allowed !important; /* Show not-allowed cursor */
+  pointer-events: none !important; /* Prevent any interaction */
+}
+
+.position-btn:disabled:hover,
+.position-btn[disabled]:hover {
+  color: #666 !important; /* Keep greyed out on hover */
+  background-color: transparent !important; /* No background change */
+  cursor: not-allowed !important; /* Keep not-allowed cursor */
 }
 
 /* ===== TRAIT LAYER ACTIONS ===== */
@@ -583,6 +614,10 @@
   transition: max-height 0.5s ease-in !important;
   padding: 1rem 0 1rem 0 !important; /* Remove left and right padding to align with header */
   visibility: visible;
+  /* CRITICAL: Ensure tooltips are not clipped when layer is expanded */
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
 }
 
 /* ===== TRAIT LAYER DROPZONE ===== */
@@ -1167,29 +1202,65 @@
 }
 
 /* ===== TRAIT LAYER DRAG HANDLE ===== */
-/* Only make the drag handle itself transparent, not the tooltip */
+/* Trait layer drag handle styling - dark purple color */
 .trait-layer-drag-handle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 72px !important; /* 3x larger: 24px * 3 = 72px */
+  height: 72px !important; /* 3x larger: 24px * 3 = 72px */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
   background: transparent !important;
   background-color: transparent !important;
+  cursor: grab !important;
+  color: #4a3c6b !important; /* Dark purple color */
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* CRITICAL: Ensure tooltip has proper styling (not transparent) */
 .trait-layer-drag-handle .tooltiptext {
+  display: none !important;
   background-color: #000000 !important;
   background: #000000 !important;
   color: #f39c12 !important;
 }
+*/
+
+.trait-layer-drag-handle {
+  display: flex !important;
+  cursor: grab !important;
+  color: #4a3c6b !important; /* Dark purple color */
+}
+
+.trait-layer-drag-handle:hover {
+  display: flex !important;
+  cursor: grab !important;
+  color: #6b5a8a !important; /* Lighter purple on hover */
+}
 
 .trait-layer-drag-handle:active {
+  display: flex !important;
   cursor: grabbing !important;
+  color: #6b5a8a !important;
 }
 
 .trait-layer-bar.expanded .trait-layer-drag-handle {
+  display: flex !important;
   cursor: not-allowed !important;
   opacity: 0.5 !important;
+  color: #4a3c6b !important; /* Dark purple color */
 }
 
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 /* Remove all custom randomize-tooltip styles */
+/*
 .randomize-tooltip, .randomize-rarities-btn .tooltiptext.randomize-tooltip {
   display: none !important;
   opacity: 0 !important;
@@ -1203,6 +1274,7 @@
   visibility: visible !important;
   pointer-events: auto !important;
 }
+*/
 
 /* FINAL OVERRIDE: Remove all gaps and spacing between trait cards in expanded trait layers */
 .trait-layer-bar.expanded .traits-grid,
@@ -1247,6 +1319,11 @@
   cursor: pointer !important;
 }
 
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 .randomize-rarities-btn:hover .tooltiptext,
 .randomize-rarities-btn .tooltiptext.randomize-tooltip,
 .randomize-rarities-btn:hover .tooltiptext.randomize-tooltip {
@@ -1255,6 +1332,7 @@
   opacity: 0 !important;
   pointer-events: none !important;
 }
+*/
 
 /* Force .trait-layer-dropzone and its parent containers to stretch to the far right */
 .trait-layer-dropzone {
@@ -1288,12 +1366,18 @@
   position: relative !important;
 }
 
+/* ============================================
+   OLD TOOLTIP STYLES - COMMENTED OUT
+   Replaced by css/components/tooltip.css (loads last)
+   ============================================ */
+/*
 .randomize-rarities-btn .tooltiptext {
   display: none !important;
 }
 .randomize-rarities-btn:hover .tooltiptext {
   display: block !important;
 }
+*/
 
 .trait-layer-bar.expanded .traits-grid {
   row-gap: 10px !important;
@@ -1306,9 +1390,12 @@
   min-width: 1557px !important;
 }
 
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 .tooltip, .tooltiptext, .custom-tooltip, .randomize-tooltip {
   z-index: 99999 !important;
 }
+*/
 
 .trait-layer-bar.expanded .traits-grid,
 .traits-grid {
@@ -1320,7 +1407,7 @@
   width: 100% !important;
   align-items: flex-start !important;
   justify-content: start !important;
-  min-height: 228px !important;
+  min-height: 0 !important; /* Remove fixed min-height to prevent empty space */
   max-height: none !important;
   overflow-y: auto !important;
   box-sizing: border-box !important;
@@ -1336,6 +1423,8 @@
 .trait-layer-content {
   z-index: unset !important;
 }
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Floating UI only */
 .tooltip,
 .tooltiptext,
@@ -1347,6 +1436,7 @@
 .notification-container {
   z-index: 9999 !important;
 }
+*/
 
 /* Trait selection modal must always be on top */
 #trait-selection-modal.modal-overlay {
@@ -1494,6 +1584,10 @@ h3.subsection-title {
   border-radius: 12px !important;
   background: #222230 !important;
   box-sizing: border-box !important;
+  /* CRITICAL: Ensure overflow is visible to prevent clipping of rounded corners */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 .tab-content .form-column {
   flex: 1 !important;
@@ -1607,6 +1701,7 @@ h3.subsection-title {
   left: 0 !important;
   width: 100% !important;
   z-index: 1000 !important;
+  padding-left: 178px !important; /* Total indent for alignment with tabs content */
   background: #000 !important;
   display: block !important;
   border-bottom: none !important;

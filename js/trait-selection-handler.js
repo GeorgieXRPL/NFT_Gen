@@ -589,6 +589,7 @@ console.log('[DEBUG] trait-selection-handler.js loaded');
       img.style.maxHeight = '100%';
       img.style.objectFit = 'contain';
       img.style.display = 'block';
+      img.style.borderRadius = '8px'; // Match app's rounded corner style
       
       // Add error handling
       img.onerror = function() {

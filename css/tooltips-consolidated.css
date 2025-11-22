@@ -1,3 +1,5 @@
+/* TOOLTIP STYLES MOVED TO css/components/tooltip.css - DO NOT ADD TOOLTIP STYLES HERE */
+/* COMMENTED OUT - Tooltip styles moved to css/components/tooltip.css
 /* Consolidated Tooltip Styles */
 .tooltip {
   position: relative;
@@ -94,10 +96,18 @@
   border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent !important; /* Arrow points down to tab */
 }
 
-/* CRITICAL: Dark NFTs button - add help cursor for tooltip (only when NOT active) */
-#generate-dark-nfts.tooltip:not(.active),
-#generate-dark-nfts:not(.active) {
+/* CRITICAL: Dark NFTs button - add help cursor for tooltip (only when NOT active and NOT disabled) */
+#generate-dark-nfts.tooltip:not(.active):not([disabled]):not([data-tooltip-disabled="true"]),
+#generate-dark-nfts:not(.active):not([disabled]):not([data-tooltip-disabled="true"]) {
   cursor: help !important; /* Help cursor for tooltip */
+}
+
+/* CRITICAL: Dark NFTs button when disabled/greyed out - default cursor (not help) */
+#generate-dark-nfts[disabled],
+#generate-dark-nfts:disabled,
+#generate-dark-nfts[data-tooltip-disabled="true"],
+#generate-dark-nfts[data-tooltip-disabled="true"]:hover {
+  cursor: default !important; /* Default cursor when disabled/greyed out (not help, not not-allowed) */
 }
 
 /* CRITICAL: Dark NFTs button when active - use pointer cursor (no tooltip when active) */
@@ -598,9 +608,13 @@ html body .rule-actions .action-btn.tooltip .tooltip-text {
   /* Vertical centering achieved through equal padding (8px top/bottom) */
 }
 
-/* CRITICAL: Add cursor help to drag handle when not actively dragging */
+/* CRITICAL: Use grab cursor for drag handle tooltip to indicate draggability */
 .trait-layer-drag-handle.tooltip {
-  cursor: help !important;
+  cursor: grab !important; /* Changed from help to grab to indicate draggability */
+}
+
+.trait-layer-drag-handle.tooltip:hover {
+  cursor: grab !important; /* Ensure grab cursor on hover */
 }
 
 .trait-layer-drag-handle.tooltip:active {
@@ -691,6 +705,31 @@ html body .rule-actions .action-btn.tooltip .tooltip-text {
 .add-folders-btn.tooltip:hover .tooltiptext,
 #add-folders-btn.tooltip:hover .tooltiptext,
 #add-folders-btn:hover .tooltiptext,
+.add-traits-btn.tooltip:hover .tooltiptext,
+.add-traits-btn:hover .tooltiptext,
+.app-action-btn.add-traits-btn.tooltip:hover .tooltiptext,
+.app-action-btn.add-traits-btn:hover .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Ensure tooltip is hidden by default - JavaScript controls display */
+  opacity: 0 !important;
+}
+/* CRITICAL: Ensure tooltips are not hidden by CSS hover rules - JavaScript controls visibility */
+.app-action-btn.tooltip .tooltiptext,
+#add-layer-btn.tooltip .tooltiptext,
+#add-layer-btn .tooltiptext,
+#delete-all-layers.tooltip .tooltiptext,
+#delete-all-layers .tooltiptext,
+.add-folders-btn.tooltip .tooltiptext,
+#add-folders-btn.tooltip .tooltiptext,
+#add-folders-btn .tooltiptext,
+.add-traits-btn.tooltip .tooltiptext,
+.add-traits-btn .tooltiptext,
+.app-action-btn.add-traits-btn.tooltip .tooltiptext,
+.app-action-btn.add-traits-btn .tooltiptext {
+  display: block !important; /* Ensure tooltip is displayable */
+  pointer-events: none !important; /* Prevent tooltip from blocking mouse events */
+}
 .jump-to-rules-btn.tooltip:hover .tooltiptext,
 #jump-to-rules-btn.tooltip:hover .tooltiptext,
 #jump-to-rules-btn:hover .tooltiptext,
@@ -871,13 +910,25 @@ html body .rule-actions .action-btn .tooltip-text.tooltip-bottom::after {
   border-color: transparent transparent rgba(0, 0, 0, 0.9) transparent !important;
 }
 
+/* CRITICAL: Disable CSS hover rules for randomize/normalize buttons - JavaScript controls with 1-second delay */
 .randomize-rarities-tiered-btn .tooltiptext,
-.normalize-rarities-btn .tooltiptext {
-  display: none !important;
+.normalize-rarities-btn .tooltiptext,
+.randomize-unique-rarities-btn .tooltiptext,
+.normalize-unique-rarities-btn .tooltiptext {
+  /* JavaScript controls visibility and opacity with 1-second delay */
+  /* Don't force display via CSS - let JavaScript handle it */
+  visibility: hidden !important; /* JavaScript controls visibility */
+  opacity: 0 !important; /* JavaScript controls opacity */
+  display: block !important; /* Keep as block for proper positioning */
 }
+/* CRITICAL: Disable CSS hover rules - JavaScript controls with 1-second delay */
 .randomize-rarities-tiered-btn:hover .tooltiptext,
-.normalize-rarities-btn:hover .tooltiptext {
-  display: block !important;
+.normalize-rarities-btn:hover .tooltiptext,
+.randomize-unique-rarities-btn:hover .tooltiptext,
+.normalize-unique-rarities-btn:hover .tooltiptext {
+  /* JavaScript will control visibility and opacity with 1-second delay */
+  /* Don't force immediate display via CSS */
+  visibility: hidden !important; /* Ensure tooltip is hidden by default - JavaScript controls display */
 }
 
 .trait-details {
@@ -927,3 +978,4 @@ html body .rule-actions .action-btn .tooltip-text.tooltip-bottom::after {
   grid-auto-flow: row !important;
   place-items: start !important;
 }
+*/

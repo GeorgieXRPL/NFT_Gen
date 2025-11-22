@@ -17,13 +17,50 @@ window.NFTApp.registerModule("generateNftsUI", {
   setupTooltipPositioning: function(element, tooltip) {
     if (!element || !tooltip) return;
     
-    // CRITICAL: Skip if already set up to prevent duplicate event listeners
+    // CRITICAL: Skip all tooltips inside Collection Info tab (general-info)
+    const isInCollectionInfoTab = element.closest('#general-info') !== null || 
+                                   element.closest('.tab-content#general-info') !== null ||
+                                   (element.id === 'general-info');
+    if (isInCollectionInfoTab) {
+      // Remove tooltip class and tooltip element if present
+      element.classList.remove('tooltip');
+      const existingTooltip = element.querySelector('.tooltiptext') || element.querySelector('.tooltip-text');
+      if (existingTooltip) {
+        existingTooltip.remove();
+      }
+      element.style.cursor = element.disabled ? "not-allowed" : "default";
+      return;
+    }
+    
+    // CRITICAL: Skip if tooltip is disabled (e.g., when tab is greyed out)
+    if (element.dataset.tooltipDisabled === "true") {
+      element.style.cursor = "not-allowed";
+      return;
+    }
+    
+    // CRITICAL: Always use global tooltip manager if available - it handles delays and visibility correctly
+    // Don't skip if already set up - allow re-setup to fix broken tooltips
+    const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+    
+    // CRITICAL: Skip global tooltip manager only if explicitly requested (e.g., Seed NFT with special delay)
+    const skipGlobalTooltip = element.dataset.skipGlobalTooltip === "true";
+    
+    if (!skipGlobalTooltip && tooltipManager && tooltipManager.setupTooltip) {
+      // Remove old setup flag to allow re-setup
+      if (element.dataset.tooltipSetup === "true") {
+        delete element.dataset.tooltipSetup;
+      }
+      tooltipManager.setupTooltip(element, tooltip);
+      return;
+    }
+    
+    // CRITICAL: Skip if already set up to prevent duplicate event listeners (only for fallback)
     if (element.dataset.tooltipSetup === "true") {
       return;
     }
     element.dataset.tooltipSetup = "true";
     
-    // CRITICAL: Add cursor help to element
+    // CRITICAL: Add cursor help to element (only if tooltip is enabled)
     element.style.cursor = "help";
     
     // CRITICAL: Ensure tooltip has 1 second transition
@@ -32,19 +69,6 @@ window.NFTApp.registerModule("generateNftsUI", {
     // CRITICAL: Ensure tooltip starts hidden
     tooltip.style.setProperty("visibility", "hidden", "important");
     tooltip.style.setProperty("opacity", "0", "important");
-    
-    // CRITICAL: Skip global tooltip manager for Seed NFT to ensure delay is always applied
-    // Check if this element should skip global tooltip manager
-    const skipGlobalTooltip = element.dataset.skipGlobalTooltip === "true";
-    
-    // Use global tooltip manager if available (but skip if element requests it)
-    if (!skipGlobalTooltip) {
-      const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
-      if (tooltipManager && tooltipManager.setupTooltip) {
-        tooltipManager.setupTooltip(element, tooltip);
-        return;
-      }
-    }
 
     // Fallback to local implementation if manager not available
     let tooltipTimeout = null;
@@ -75,6 +99,11 @@ window.NFTApp.registerModule("generateNftsUI", {
     }
     
     element.addEventListener("mouseenter", () => {
+      // CRITICAL: Don't show tooltip if it's disabled (e.g., when tab is greyed out)
+      if (element.dataset.tooltipDisabled === "true") {
+        return;
+      }
+      
       // Clear any existing timeout
       if (tooltipTimeout) {
         clearTimeout(tooltipTimeout);
@@ -82,6 +111,10 @@ window.NFTApp.registerModule("generateNftsUI", {
       }
       // Show tooltip after 1 second delay
       tooltipTimeout = setTimeout(() => {
+        // CRITICAL: Double-check tooltip is still enabled before showing
+        if (element.dataset.tooltipDisabled === "true") {
+          return;
+        }
         // CRITICAL: Get element position once
         const elementRect = element.getBoundingClientRect();
         
@@ -162,11 +195,18 @@ window.NFTApp.registerModule("generateNftsUI", {
       element.style.cursor = "pointer";
     }
     
-    // CRITICAL: Ensure help cursor is shown when disabled (but not active)
+    // CRITICAL: Ensure correct cursor based on state (active, disabled, or normal)
     const updateCursor = () => {
+      // Check if button is disabled/greyed out (tab is greyed out)
+      const isDisabled = element.disabled || element.hasAttribute('disabled') || element.dataset.tooltipDisabled === 'true';
+      
       if (element.classList.contains("active")) {
         element.style.cursor = "pointer";
+      } else if (isDisabled) {
+        // Default cursor when disabled/greyed out (not help, not not-allowed)
+        element.style.cursor = "default";
       } else {
+        // Help cursor when not active but enabled
         element.style.cursor = "help";
       }
     };
@@ -311,12 +351,12 @@ window.NFTApp.registerModule("generateNftsUI", {
 
   createDarkTraitsModal: function() {
     try {
-      console.log('[DEBUG] createDarkTraitsModal called');
+      // console.log('[DEBUG] createDarkTraitsModal called');
       
       // Load current configuration before creating modal
-      console.log('[DEBUG] Loading Dark NFTs configuration...');
+      // console.log('[DEBUG] Loading Dark NFTs configuration...');
       this.loadDarkTraitsConfig(true); // Force reload when creating modal
-      console.log('[DEBUG] Configuration loaded, selectedTraits size:', this.darkTraitsConfig.selectedTraits.size);
+      // console.log('[DEBUG] Configuration loaded, selectedTraits size:', this.darkTraitsConfig.selectedTraits.size);
       
       // Remove existing modal if it exists
       const existingModal = document.getElementById('dark-traits-modal');
@@ -347,8 +387,7 @@ window.NFTApp.registerModule("generateNftsUI", {
                 <h2 class="saved-seeds-title">Dark NFT Traits Configuration</h2>
                 <div class="saved-seeds-tip">Select traits being used for Dark NFT generation ONLY. This selection do not affect regular generation</div>
               </div>
-              <button id="close-dark-traits-modal" class="saved-seeds-close-btn tooltip">
-                <span class="tooltiptext">Close modal</span>
+              <button id="close-dark-traits-modal" class="saved-seeds-close-btn">
                 &times;
               </button>
             </div>
@@ -388,7 +427,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       `;
 
       document.body.appendChild(modal);
-      console.log('[DEBUG] Dark Traits modal appended to DOM');
+      // console.log('[DEBUG] Dark Traits modal appended to DOM');
       
       // Force modal container width with !important to override all CSS
       const modalContainer = modal.querySelector('.saved-seeds-container');
@@ -406,17 +445,17 @@ window.NFTApp.registerModule("generateNftsUI", {
       modal.style.visibility = 'visible';
       modal.style.opacity = '1';
       
-      console.log('[DEBUG] Modal display styles applied:', {
+      /* console.log('[DEBUG] Modal display styles applied:', {
         display: modal.style.display,
         visibility: modal.style.visibility,
         opacity: modal.style.opacity,
         zIndex: modal.style.zIndex
-      });
+      }); */
       
       this.populateDarkTraitsModal();
       this.setupDarkTraitsModalEvents();
     } catch (error) {
-      console.error('[DEBUG] Error creating Dark Traits modal:', error);
+      // console.error('[DEBUG] Error creating Dark Traits modal:', error);
       if (window.NFTApp && window.NFTApp.getModule('notificationService')) {
         window.NFTApp.getModule('notificationService').show(
           'Error creating Dark Traits configuration modal',
@@ -428,15 +467,15 @@ window.NFTApp.registerModule("generateNftsUI", {
   },
 
   populateDarkTraitsModal: function(loadConfig = true) {
-    console.log('[DEBUG] populateDarkTraitsModal called, loadConfig:', loadConfig);
+    // console.log('[DEBUG] populateDarkTraitsModal called, loadConfig:', loadConfig);
     const projectData = this.projectData || window.currentProject;
-    console.log('[DEBUG] Project data available:', !!projectData);
-    console.log('[DEBUG] Project traits available:', !!projectData?.traits);
-    console.log('[DEBUG] Current darkTraitsConfig:', this.darkTraitsConfig);
-    console.log('[DEBUG] Selected traits count:', this.darkTraitsConfig.selectedTraits.size);
+    // console.log('[DEBUG] Project data available:', !!projectData);
+    // console.log('[DEBUG] Project traits available:', !!projectData?.traits);
+    // console.log('[DEBUG] Current darkTraitsConfig:', this.darkTraitsConfig);
+    // console.log('[DEBUG] Selected traits count:', this.darkTraitsConfig.selectedTraits.size);
     
     if (!projectData || !projectData.traits) {
-      console.error('[DEBUG] No project data available for dark traits configuration');
+      // console.error('[DEBUG] No project data available for dark traits configuration');
       return;
     }
 
@@ -576,9 +615,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Add click handler for select all
       selectAllToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('[DEBUG] Select All clicked for layer:', layer.id);
-        console.log('[DEBUG] Layer traits:', layer.traits);
-        console.log('[DEBUG] Current selected traits:', this.darkTraitsConfig.selectedTraits);
+        // console.log('[DEBUG] Select All clicked for layer:', layer.id);
+        // console.log('[DEBUG] Layer traits:', layer.traits);
+        // console.log('[DEBUG] Current selected traits:', this.darkTraitsConfig.selectedTraits);
         this.toggleSelectAllForLayer(layer.id, layer.traits);
       });
 
@@ -613,7 +652,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         // Check if this trait is selected for dark mode
         const traitId = `${layer.id}_${trait.id}`;
         const isSelected = this.darkTraitsConfig.selectedTraits.has(traitId);
-        console.log('[DEBUG] Trait:', trait.name, 'Layer:', layer.name, 'ID:', traitId, 'isSelected:', isSelected);
+        // console.log('[DEBUG] Trait:', trait.name, 'Layer:', layer.name, 'ID:', traitId, 'isSelected:', isSelected);
         
         // ALWAYS 141x165px - Match NFT Traits sidebar card look
         traitThumb.style.cssText = `
@@ -873,14 +912,14 @@ window.NFTApp.registerModule("generateNftsUI", {
 
         // Add click handler for card body (toggles selection)
         traitThumb.addEventListener('click', (e) => {
-          console.log('[DEBUG] Card clicked, target:', e.target);
+          // console.log('[DEBUG] Card clicked, target:', e.target);
           // Only toggle if not clicking on the image or VIEW button
           if (!e.target.closest('.trait-selection-img') && !e.target.closest('.dark-trait-view-btn')) {
             e.stopPropagation();
-            console.log('[DEBUG] Calling toggleDarkTraitSelection');
+            // console.log('[DEBUG] Calling toggleDarkTraitSelection');
             this.toggleDarkTraitSelection(layer.id, trait.id, traitThumb);
           } else {
-            console.log('[DEBUG] Click ignored - clicked on image or VIEW button');
+            // console.log('[DEBUG] Click ignored - clicked on image or VIEW button');
           }
         });
 
@@ -923,7 +962,7 @@ window.NFTApp.registerModule("generateNftsUI", {
     
     // Clear button functionality
     document.getElementById('dark-traits-clear-btn').addEventListener('click', () => {
-      console.log('[DEBUG] Clear button clicked');
+      // console.log('[DEBUG] Clear button clicked');
       document.getElementById('dark-traits-search').value = '';
       this.filterDarkTraits('');
       // Update all Select All button states when search is cleared
@@ -932,7 +971,7 @@ window.NFTApp.registerModule("generateNftsUI", {
     
     // Clear search functionality (double-click on search input)
     document.getElementById('dark-traits-search').addEventListener('dblclick', () => {
-      console.log('[DEBUG] Search input double-clicked, clearing search');
+      // console.log('[DEBUG] Search input double-clicked, clearing search');
       document.getElementById('dark-traits-search').value = '';
       this.filterDarkTraits('');
       // Update all Select All button states when search is cleared
@@ -942,32 +981,32 @@ window.NFTApp.registerModule("generateNftsUI", {
     // Filter active traits
     const filterButton = document.getElementById('dark-nfts-filter-active-traits');
     if (filterButton) {
-      console.log('[DEBUG] Filter button found during setup:', filterButton);
+      // console.log('[DEBUG] Filter button found during setup:', filterButton);
       filterButton.dataset.filtering = 'false'; // Initialize as not filtering
       filterButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('[DEBUG] Filter Active Only button clicked');
-        console.log('[DEBUG] Button element:', filterButton);
-        console.log('[DEBUG] Button text:', filterButton.textContent);
+        // console.log('[DEBUG] Filter Active Only button clicked');
+        // console.log('[DEBUG] Button element:', filterButton);
+        // console.log('[DEBUG] Button text:', filterButton.textContent);
         this.toggleActiveTraitsFilter();
       });
-      console.log('[DEBUG] Event listener added to filter button');
+      // console.log('[DEBUG] Event listener added to filter button');
     } else {
-      console.log('[DEBUG] ERROR: Filter button not found during setup!');
-      console.log('[DEBUG] Available elements with similar IDs:', document.querySelectorAll('[id*="filter"]'));
+      // console.log('[DEBUG] ERROR: Filter button not found during setup!');
+      // console.log('[DEBUG] Available elements with similar IDs:', document.querySelectorAll('[id*="filter"]'));
     }
     
     // Reset to defaults
     const resetButton = document.getElementById('reset-dark-traits');
     if (resetButton) {
       resetButton.addEventListener('click', () => {
-        console.log('[DEBUG] Reset to Default button clicked');
+        // console.log('[DEBUG] Reset to Default button clicked');
         this.resetDarkTraitsToDefault();
         this.populateDarkTraitsModal(false); // Refresh the modal display after reset without loading config
       });
     } else {
-      console.log('[DEBUG] ERROR: Reset button not found during setup!');
+      // console.log('[DEBUG] ERROR: Reset button not found during setup!');
     }
     
     // Close on outside click
@@ -980,17 +1019,17 @@ window.NFTApp.registerModule("generateNftsUI", {
 
 
   toggleDarkTraitSelection: function(layerId, traitId, traitThumb) {
-    console.log('[DEBUG] toggleDarkTraitSelection called:', { layerId, traitId });
+    // console.log('[DEBUG] toggleDarkTraitSelection called:', { layerId, traitId });
     const fullTraitId = `${layerId}_${traitId}`;
     const isSelected = this.darkTraitsConfig.selectedTraits.has(fullTraitId);
-    console.log('[DEBUG] Current selection state:', { fullTraitId, isSelected });
+    // console.log('[DEBUG] Current selection state:', { fullTraitId, isSelected });
     
     if (isSelected) {
       this.darkTraitsConfig.selectedTraits.delete(fullTraitId);
-      console.log('[DEBUG] Deselected trait:', fullTraitId);
+      // console.log('[DEBUG] Deselected trait:', fullTraitId);
     } else {
       this.darkTraitsConfig.selectedTraits.add(fullTraitId);
-      console.log('[DEBUG] Selected trait:', fullTraitId);
+      // console.log('[DEBUG] Selected trait:', fullTraitId);
     }
     
     this.darkTraitsConfig.customConfig = true;
@@ -1004,7 +1043,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       traitThumb.style.setProperty('z-index', '1', 'important');
       traitThumb.classList.remove('selected');
       traitThumb.classList.add('unselected');
-      console.log('[DEBUG] Applied deselected styling');
+      // console.log('[DEBUG] Applied deselected styling');
     } else {
       // Select: show selection with orange border
       traitThumb.style.setProperty('border-color', '#e17055', 'important');
@@ -1013,7 +1052,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       traitThumb.style.setProperty('z-index', '2000', 'important');
       traitThumb.classList.remove('unselected');
       traitThumb.classList.add('selected');
-      console.log('[DEBUG] Applied selected styling');
+      // console.log('[DEBUG] Applied selected styling');
     }
     
     this.updateSelectedCount();
@@ -1023,26 +1062,26 @@ window.NFTApp.registerModule("generateNftsUI", {
   },
 
   updateSelectAllButtonState: function(layerId) {
-    console.log('[DEBUG] updateSelectAllButtonState called for layer:', layerId);
+    // console.log('[DEBUG] updateSelectAllButtonState called for layer:', layerId);
     
     // Get the Select All button for this layer
     const selectAllButton = document.querySelector(`[data-layer-id="${layerId}"].dark-traits-select-all-btn`);
     if (!selectAllButton) {
-      console.log('[DEBUG] Select All button not found for layer:', layerId);
+      // console.log('[DEBUG] Select All button not found for layer:', layerId);
       return;
     }
     
     // Get the project data to find traits for this layer
     const projectData = this.projectData || window.currentProject;
     if (!projectData || !projectData.traits) {
-      console.log('[DEBUG] No project data available for button state update');
+      // console.log('[DEBUG] No project data available for button state update');
       return;
     }
     
     // Find the layer
     const layer = projectData.traits.find(l => l.id === layerId);
     if (!layer || !layer.traits) {
-      console.log('[DEBUG] Layer not found or has no traits:', layerId);
+      // console.log('[DEBUG] Layer not found or has no traits:', layerId);
       return;
     }
     
@@ -1073,9 +1112,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       this.darkTraitsConfig.selectedTraits.has(`${layerId}_${trait.id}`)
     );
     
-    console.log('[DEBUG] All traits selected for layer', layerId, ':', allSelected);
-    console.log('[DEBUG] Search active:', isSearchActive, 'Traits to check:', traitsToCheck.length, 'out of', layer.traits.length);
-    console.log('[DEBUG] Current button text:', selectAllButton.textContent);
+    // console.log('[DEBUG] All traits selected for layer', layerId, ':', allSelected);
+    // console.log('[DEBUG] Search active:', isSearchActive, 'Traits to check:', traitsToCheck.length, 'out of', layer.traits.length);
+    // console.log('[DEBUG] Current button text:', selectAllButton.textContent);
     
     // Update button text and styling based on selection state
     if (allSelected) {
@@ -1104,7 +1143,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       if (selectAllTooltip) {
         this.setupTooltipPositioning(selectAllButton, selectAllTooltip);
       }
-      console.log('[DEBUG] Updated button to "Unselect All"');
+      // console.log('[DEBUG] Updated button to "Unselect All"');
     } else {
       selectAllButton.textContent = 'Select All';
       selectAllButton.style.background = '#007bff';
@@ -1131,15 +1170,15 @@ window.NFTApp.registerModule("generateNftsUI", {
       if (selectAllTooltip) {
         this.setupTooltipPositioning(selectAllButton, selectAllTooltip);
       }
-      console.log('[DEBUG] Updated button to "Select All"');
+      // console.log('[DEBUG] Updated button to "Select All"');
     }
   },
 
   updateAllSelectAllButtonStates: function() {
-    console.log('[DEBUG] updateAllSelectAllButtonStates called');
+    // console.log('[DEBUG] updateAllSelectAllButtonStates called');
     const projectData = this.projectData || window.currentProject;
     if (!projectData || !projectData.traits) {
-      console.log('[DEBUG] No project data available for updating all button states');
+      // console.log('[DEBUG] No project data available for updating all button states');
       return;
     }
     
@@ -1150,16 +1189,16 @@ window.NFTApp.registerModule("generateNftsUI", {
   },
 
   toggleSelectAllForLayer: function(layerId, traits) {
-    console.log('[DEBUG] toggleSelectAllForLayer called for layer:', layerId);
-    console.log('[DEBUG] Traits array:', traits);
-    console.log('[DEBUG] Traits length:', traits.length);
+    // console.log('[DEBUG] toggleSelectAllForLayer called for layer:', layerId);
+    // console.log('[DEBUG] Traits array:', traits);
+    // console.log('[DEBUG] Traits length:', traits.length);
     
     // Check if there's an active search filter
     const searchInput = document.getElementById('dark-traits-search');
     const searchTerm = searchInput ? searchInput.value.trim() : '';
     const isSearchActive = searchTerm.length > 0;
     
-    console.log('[DEBUG] Search active:', isSearchActive, 'Search term:', searchTerm);
+    // console.log('[DEBUG] Search active:', isSearchActive, 'Search term:', searchTerm);
     
     let traitsToProcess = traits;
     
@@ -1177,7 +1216,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         );
       });
       
-      console.log('[DEBUG] Filtered traits for selection:', traitsToProcess.length, 'out of', traits.length);
+      // console.log('[DEBUG] Filtered traits for selection:', traitsToProcess.length, 'out of', traits.length);
     }
     
     // Check if all visible/filtered traits in this layer are selected
@@ -1185,47 +1224,47 @@ window.NFTApp.registerModule("generateNftsUI", {
       this.darkTraitsConfig.selectedTraits.has(`${layerId}_${trait.id}`)
     );
     
-    console.log('[DEBUG] All selected state:', allSelected);
-    console.log('[DEBUG] Selected traits before:', Array.from(this.darkTraitsConfig.selectedTraits));
+    // console.log('[DEBUG] All selected state:', allSelected);
+    // console.log('[DEBUG] Selected traits before:', Array.from(this.darkTraitsConfig.selectedTraits));
     
     if (allSelected) {
       // Deselect all visible/filtered traits in this layer
-      console.log('[DEBUG] Deselecting all visible traits in layer');
+      // console.log('[DEBUG] Deselecting all visible traits in layer');
       traitsToProcess.forEach(trait => {
         const fullTraitId = `${layerId}_${trait.id}`;
-        console.log('[DEBUG] Removing trait:', fullTraitId);
+        // console.log('[DEBUG] Removing trait:', fullTraitId);
         this.darkTraitsConfig.selectedTraits.delete(fullTraitId);
       });
     } else {
       // Select all visible/filtered traits in this layer
-      console.log('[DEBUG] Selecting all visible traits in layer');
+      // console.log('[DEBUG] Selecting all visible traits in layer');
       traitsToProcess.forEach(trait => {
         const fullTraitId = `${layerId}_${trait.id}`;
-        console.log('[DEBUG] Adding trait:', fullTraitId);
+        // console.log('[DEBUG] Adding trait:', fullTraitId);
         this.darkTraitsConfig.selectedTraits.add(fullTraitId);
       });
     }
     
-    console.log('[DEBUG] Selected traits after:', Array.from(this.darkTraitsConfig.selectedTraits));
+    // console.log('[DEBUG] Selected traits after:', Array.from(this.darkTraitsConfig.selectedTraits));
     
     this.darkTraitsConfig.customConfig = true;
     
     // Update visual state for all trait cards in this layer
     const traitCards = document.querySelectorAll(`.dark-trait-thumb[data-layer-id="${layerId}"]`);
-    console.log('[DEBUG] Found trait cards:', traitCards.length);
-    console.log('[DEBUG] Looking for cards with selector: .dark-trait-thumb[data-layer-id="${layerId}"]');
-    console.log('[DEBUG] All trait cards in DOM:', document.querySelectorAll('.dark-trait-thumb').length);
-    console.log('[DEBUG] All trait cards with data-layer-id:', document.querySelectorAll('[data-layer-id]').length);
+    // console.log('[DEBUG] Found trait cards:', traitCards.length);
+    // console.log('[DEBUG] Looking for cards with selector: .dark-trait-thumb[data-layer-id="${layerId}"]');
+    // console.log('[DEBUG] All trait cards in DOM:', document.querySelectorAll('.dark-trait-thumb').length);
+    // console.log('[DEBUG] All trait cards with data-layer-id:', document.querySelectorAll('[data-layer-id]').length);
     
     traitCards.forEach(card => {
       const traitId = card.getAttribute('data-trait-id');
       const fullTraitId = `${layerId}_${traitId}`;
       const isSelected = this.darkTraitsConfig.selectedTraits.has(fullTraitId);
       
-      console.log('[DEBUG] Updating card:', { traitId, fullTraitId, isSelected });
-      console.log('[DEBUG] Card element:', card);
-      console.log('[DEBUG] Card current classes:', card.className);
-      console.log('[DEBUG] Card current border color:', card.style.borderColor);
+      // console.log('[DEBUG] Updating card:', { traitId, fullTraitId, isSelected });
+      // console.log('[DEBUG] Card element:', card);
+      // console.log('[DEBUG] Card current classes:', card.className);
+      // console.log('[DEBUG] Card current border color:', card.style.borderColor);
       
       if (isSelected) {
         // Select: show orange border
@@ -1235,9 +1274,9 @@ window.NFTApp.registerModule("generateNftsUI", {
         card.style.setProperty('z-index', '2000', 'important');
         card.classList.remove('unselected');
         card.classList.add('selected');
-        console.log('[DEBUG] Applied selected styling to card');
-        console.log('[DEBUG] Card new border color:', card.style.borderColor);
-        console.log('[DEBUG] Card new classes:', card.className);
+        // console.log('[DEBUG] Applied selected styling to card');
+        // console.log('[DEBUG] Card new border color:', card.style.borderColor);
+        // console.log('[DEBUG] Card new classes:', card.className);
       } else {
         // Deselect: remove border styling
         card.style.setProperty('border-color', 'transparent', 'important');
@@ -1246,21 +1285,21 @@ window.NFTApp.registerModule("generateNftsUI", {
         card.style.setProperty('z-index', '1', 'important');
         card.classList.remove('selected');
         card.classList.add('unselected');
-        console.log('[DEBUG] Applied deselected styling to card');
-        console.log('[DEBUG] Card new border color:', card.style.borderColor);
-        console.log('[DEBUG] Card new classes:', card.className);
+        // console.log('[DEBUG] Applied deselected styling to card');
+        // console.log('[DEBUG] Card new border color:', card.style.borderColor);
+        // console.log('[DEBUG] Card new classes:', card.className);
       }
     });
     
     // Force a visual refresh to ensure changes take effect
     setTimeout(() => {
-      console.log('[DEBUG] Force refreshing visual state');
+      // console.log('[DEBUG] Force refreshing visual state');
       traitCards.forEach(card => {
         const traitId = card.getAttribute('data-trait-id');
         const fullTraitId = `${layerId}_${traitId}`;
         const isSelected = this.darkTraitsConfig.selectedTraits.has(fullTraitId);
         
-        console.log('[DEBUG] Force refresh - Card:', { traitId, fullTraitId, isSelected });
+        // console.log('[DEBUG] Force refresh - Card:', { traitId, fullTraitId, isSelected });
         
         if (isSelected) {
           card.style.setProperty('border-color', '#e17055', 'important');
@@ -1268,28 +1307,28 @@ window.NFTApp.registerModule("generateNftsUI", {
           card.style.setProperty('z-index', '2000', 'important');
           card.classList.add('selected');
           card.classList.remove('unselected');
-          console.log('[DEBUG] Force refresh - Applied selected styling');
+          // console.log('[DEBUG] Force refresh - Applied selected styling');
         } else {
           card.style.setProperty('border-color', 'transparent', 'important');
           card.style.setProperty('border-width', '1px', 'important');
           card.style.setProperty('z-index', '1', 'important');
           card.classList.add('unselected');
           card.classList.remove('selected');
-          console.log('[DEBUG] Force refresh - Applied deselected styling');
+          // console.log('[DEBUG] Force refresh - Applied deselected styling');
         }
       });
       
       // Also force refresh the button state
       const refreshButton = document.querySelector(`[data-layer-id="${layerId}"].dark-traits-select-all-btn`);
-      console.log('[DEBUG] Force refresh - Found button:', !!refreshButton);
+      // console.log('[DEBUG] Force refresh - Found button:', !!refreshButton);
       if (refreshButton) {
         const allSelected = traits.every(trait => 
           this.darkTraitsConfig.selectedTraits.has(`${layerId}_${trait.id}`)
         );
         
-        console.log('[DEBUG] Force refresh - Button state:', allSelected);
-        console.log('[DEBUG] Force refresh - Button current text:', refreshButton.textContent);
-        console.log('[DEBUG] Force refresh - Button current classes:', refreshButton.className);
+        // console.log('[DEBUG] Force refresh - Button state:', allSelected);
+        // console.log('[DEBUG] Force refresh - Button current text:', refreshButton.textContent);
+        // console.log('[DEBUG] Force refresh - Button current classes:', refreshButton.className);
         
         if (allSelected) {
           refreshButton.textContent = 'Unselect All';
@@ -1297,44 +1336,44 @@ window.NFTApp.registerModule("generateNftsUI", {
           refreshButton.style.backgroundColor = '#dc3545';
           refreshButton.classList.add('unselect-all');
           refreshButton.classList.remove('select-all');
-          console.log('[DEBUG] Force refresh - Button set to Unselect All');
-          console.log('[DEBUG] Force refresh - Button new text:', refreshButton.textContent);
+          // console.log('[DEBUG] Force refresh - Button set to Unselect All');
+          // console.log('[DEBUG] Force refresh - Button new text:', refreshButton.textContent);
         } else {
           refreshButton.textContent = 'Select All';
           refreshButton.style.background = '#007bff';
           refreshButton.style.backgroundColor = '#007bff';
           refreshButton.classList.add('select-all');
           refreshButton.classList.remove('unselect-all');
-          console.log('[DEBUG] Force refresh - Button set to Select All');
-          console.log('[DEBUG] Force refresh - Button new text:', refreshButton.textContent);
+          // console.log('[DEBUG] Force refresh - Button set to Select All');
+          // console.log('[DEBUG] Force refresh - Button new text:', refreshButton.textContent);
         }
       } else {
-        console.log('[DEBUG] Force refresh - Button not found for layer:', layerId);
+        // console.log('[DEBUG] Force refresh - Button not found for layer:', layerId);
       }
     }, 50);
     
     // Double-check visual state after a longer delay
     setTimeout(() => {
-      console.log('[DEBUG] Double-checking visual state for layer:', layerId);
+      // console.log('[DEBUG] Double-checking visual state for layer:', layerId);
       const doubleCheckCards = document.querySelectorAll(`.dark-trait-thumb[data-layer-id="${layerId}"]`);
       doubleCheckCards.forEach(card => {
         const traitId = card.getAttribute('data-trait-id');
         const fullTraitId = `${layerId}_${traitId}`;
         const isSelected = this.darkTraitsConfig.selectedTraits.has(fullTraitId);
         
-        console.log('[DEBUG] Double-check - Card:', { traitId, fullTraitId, isSelected });
-        console.log('[DEBUG] Double-check - Card classes:', card.className);
-        console.log('[DEBUG] Double-check - Card border color:', card.style.borderColor);
+        // console.log('[DEBUG] Double-check - Card:', { traitId, fullTraitId, isSelected });
+        // console.log('[DEBUG] Double-check - Card classes:', card.className);
+        // console.log('[DEBUG] Double-check - Card border color:', card.style.borderColor);
         
         if (isSelected && !card.classList.contains('selected')) {
-          console.log('[DEBUG] Double-check - Fixing missing selected class');
+          // console.log('[DEBUG] Double-check - Fixing missing selected class');
           card.style.setProperty('border-color', '#e17055', 'important');
           card.style.setProperty('border-width', '3px', 'important');
           card.style.setProperty('z-index', '2000', 'important');
           card.classList.add('selected');
           card.classList.remove('unselected');
         } else if (!isSelected && card.classList.contains('selected')) {
-          console.log('[DEBUG] Double-check - Fixing incorrect selected class');
+          // console.log('[DEBUG] Double-check - Fixing incorrect selected class');
           card.style.setProperty('border-color', 'transparent', 'important');
           card.style.setProperty('border-width', '1px', 'important');
           card.style.setProperty('z-index', '1', 'important');
@@ -1501,23 +1540,23 @@ window.NFTApp.registerModule("generateNftsUI", {
   },
 
   filterDarkTraits: function(searchTerm) {
-    console.log('[DEBUG] filterDarkTraits called with searchTerm:', searchTerm);
+    // console.log('[DEBUG] filterDarkTraits called with searchTerm:', searchTerm);
     const traitThumbs = document.querySelectorAll('.dark-trait-thumb');
-    console.log('[DEBUG] Found trait thumbs:', traitThumbs.length);
+    // console.log('[DEBUG] Found trait thumbs:', traitThumbs.length);
     
     // Split search term by multiple separators and filter out empty strings
     const keywords = searchTerm.toLowerCase()
       .split(/[\s,;-]+/)
       .filter(keyword => keyword.trim().length > 0);
     
-    console.log('[DEBUG] Extracted keywords:', keywords);
+    // console.log('[DEBUG] Extracted keywords:', keywords);
     
     traitThumbs.forEach(thumb => {
       const traitName = thumb.getAttribute('data-trait-name');
       const layerName = thumb.getAttribute('data-layer-name');
       
       if (!traitName || !layerName) {
-        console.log('[DEBUG] Missing attributes for trait thumb:', thumb);
+        // console.log('[DEBUG] Missing attributes for trait thumb:', thumb);
         return;
       }
       
@@ -1674,15 +1713,15 @@ window.NFTApp.registerModule("generateNftsUI", {
         const config = JSON.parse(savedConfig);
         this.darkTraitsConfig.selectedTraits = new Set(config.selectedTraits || []);
         this.darkTraitsConfig.customConfig = config.customConfig || false;
-        console.log('[DEBUG] Loaded dark traits configuration from localStorage:', this.darkTraitsConfig);
-        console.log('[DEBUG] Selected traits count:', this.darkTraitsConfig.selectedTraits.size);
+        // console.log('[DEBUG] Loaded dark traits configuration from localStorage:', this.darkTraitsConfig);
+        // console.log('[DEBUG] Selected traits count:', this.darkTraitsConfig.selectedTraits.size);
       } catch (error) {
-        console.error('[DEBUG] Error loading dark traits configuration:', error);
+        // console.error('[DEBUG] Error loading dark traits configuration:', error);
         // Use default dark traits
         this.resetDarkTraitsToDefault();
       }
     } else {
-      console.log('[DEBUG] No saved config in localStorage, using default dark traits');
+      // console.log('[DEBUG] No saved config in localStorage, using default dark traits');
       // Use default dark traits
       this.resetDarkTraitsToDefault();
     }
@@ -1720,7 +1759,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       
       this.closeDarkTraitsModal();
     } catch (error) {
-      console.error('[DEBUG] Error saving dark traits configuration:', error);
+      // console.error('[DEBUG] Error saving dark traits configuration:', error);
       if (window.NFTApp && window.NFTApp.getModule('notificationService')) {
         window.NFTApp.getModule('notificationService').show(
           'Error saving configuration',
@@ -1745,29 +1784,29 @@ window.NFTApp.registerModule("generateNftsUI", {
 
   // Ensure NFT preview container exists - used by tests and error recovery
   ensureNftPreviewContainerExists: function() {
-    console.log('[DEBUG] Ensuring NFT preview container exists...');
+    // console.log('[DEBUG] Ensuring NFT preview container exists...');
     
     // Find the preview panel element
     const previewPanelElem = document.querySelector('.nft-preview-image-area');
     if (!previewPanelElem) {
-      console.error('[DEBUG] .nft-preview-image-area not found in DOM');
+      // console.error('[DEBUG] .nft-preview-image-area not found in DOM');
       return false;
     }
     
     // Check if container already exists
     let previewContainer = previewPanelElem.querySelector('#nft-preview-container');
     if (previewContainer) {
-      console.log('[DEBUG] NFT preview container already exists');
+      // console.log('[DEBUG] NFT preview container already exists');
     } else {
       // Create the container
-      console.log('[DEBUG] Creating NFT preview container...');
+      // console.log('[DEBUG] Creating NFT preview container...');
       previewContainer = document.createElement('div');
       previewContainer.id = 'nft-preview-container';
       previewContainer.style.position = 'relative';
       previewContainer.style.width = '100%';
       previewContainer.style.height = '100%';
       previewPanelElem.appendChild(previewContainer);
-      console.log('[DEBUG] NFT preview container created successfully');
+      // console.log('[DEBUG] NFT preview container created successfully');
     }
     
     // Also ensure the control elements exist (for test compatibility)
@@ -1790,7 +1829,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Create parent container (Container 1) that wraps container 2 and container 3
       let parentContainer = contentContainer.querySelector('.nft-seed-controls-parent');
       if (!parentContainer) {
-        console.log('[DEBUG] Creating parent container for seed controls...');
+        // console.log('[DEBUG] Creating parent container for seed controls...');
         parentContainer = document.createElement('div');
         parentContainer.className = 'nft-seed-controls-parent';
         parentContainer.id = 'nft-seed-controls-parent';
@@ -1805,7 +1844,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Check if rarity seed row exists (Container 2)
       let raritySeedRow = parentContainer.querySelector('.nft-rarity-seed-row');
       if (!raritySeedRow) {
-        console.log('[DEBUG] Creating missing rarity seed row...');
+        // console.log('[DEBUG] Creating missing rarity seed row...');
         raritySeedRow = document.createElement('div');
         raritySeedRow.className = 'nft-rarity-seed-row';
         parentContainer.appendChild(raritySeedRow);
@@ -1814,7 +1853,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Check if seedlist random row exists
       let seedlistRandomRow = contentContainer.querySelector('.nft-seedlist-random-row');
       if (!seedlistRandomRow) {
-        console.log('[DEBUG] Creating missing seedlist random row...');
+        // console.log('[DEBUG] Creating missing seedlist random row...');
         seedlistRandomRow = document.createElement('div');
         seedlistRandomRow.className = 'nft-seedlist-random-row';
         contentContainer.appendChild(seedlistRandomRow);
@@ -1823,7 +1862,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Check if seed input row exists (Container 3)
       let seedInputRow = parentContainer.querySelector('.nft-seedinput-row');
       if (!seedInputRow) {
-        console.log('[DEBUG] Creating missing seed input row...');
+        // console.log('[DEBUG] Creating missing seed input row...');
         seedInputRow = document.createElement('div');
         seedInputRow.className = 'nft-seedinput-row';
         parentContainer.appendChild(seedInputRow);
@@ -2077,11 +2116,20 @@ window.NFTApp.registerModule("generateNftsUI", {
         editTooltipText.innerHTML = 'Click to change this trait to another<br>one from the same trait layer';
         editBtn.appendChild(editTooltipText);
         
-        // CRITICAL: Skip global tooltip manager for edit buttons to ensure proper setup
-        editBtn.dataset.skipGlobalTooltip = "true";
+        // CRITICAL: Use global tooltip manager for edit buttons - it handles delays and visibility correctly
+        // Remove skipGlobalTooltip flag to allow global manager to handle tooltip
+        editBtn.removeAttribute('data-skip-global-tooltip');
+        delete editBtn.dataset.skipGlobalTooltip;
         
-        // Setup tooltip positioning with standard delay and fade effects
-        if (this.setupTooltipPositioning) {
+        // CRITICAL: Always use global tooltip manager if available
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          // Remove old setup flag to allow re-setup
+          editBtn.removeAttribute('data-tooltip-setup');
+          delete editBtn.dataset.tooltipSetup;
+          tooltipManager.setupTooltip(editBtn, editTooltipText);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
           this.setupTooltipPositioning(editBtn, editTooltipText);
         }
         if (traitObj.trait.name === 'none' || traitObj.trait === 'none') {
@@ -2927,7 +2975,11 @@ window.NFTApp.registerModule("generateNftsUI", {
             generateSeedBtn.style.setProperty('opacity', '0.6', 'important');
             generateSeedBtn.style.setProperty('border', '1px solid #84a0b0', 'important');
             generateSeedBtn.style.setProperty('border-color', '#84a0b0', 'important');
-            generateSeedBtn.style.pointerEvents = 'none';
+            // CRITICAL: Allow pointer events for tooltip even when disabled
+            // Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
+          } else {
+            // Re-enable pointer events when popup is not showing
+            generateSeedBtn.style.pointerEvents = 'auto';
           }
         }
         // Tab stays enabled - content inside will be greyed out until NFT renders
@@ -3069,8 +3121,10 @@ window.NFTApp.registerModule("generateNftsUI", {
       this.updateSinglePreviewPanel(projectData, nft);
       this.updateTraitInfoPanel(nft, projectData);
       if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule("notificationService")) {
+        // Wrap seed number in span with smaller font size (2px smaller)
+        const message = "NFT generated with seed: <span class=\"notification-seed-number\">" + seedValue + "</span>";
         window.NFTApp.getModule("notificationService").show(
-          "NFT generated with seed: " + seedValue, 
+          message, 
           "success", 
           3000
         );
@@ -3193,6 +3247,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       img.style.maxHeight = '100%';
       img.style.objectFit = 'contain';
       img.style.display = 'block';
+      img.style.borderRadius = '8px'; // Match app's rounded corner style
       
       // Add error handling
       img.onerror = function() {
@@ -3488,6 +3543,33 @@ window.NFTApp.registerModule("generateNftsUI", {
       bulkGenerationBtn.setAttribute('disabled', 'disabled');
     }
 
+      // CRITICAL: Disable tooltips for "Generate NFTs" and "NFT Traits" title text during popup
+      const nftPreviewTitleText = document.querySelector('#generate-nfts .nft-preview-title-text');
+      if (nftPreviewTitleText) {
+        nftPreviewTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+        nftPreviewTitleText.dataset.tooltipDisabled = 'true';
+        // CRITICAL: Ensure tooltip is hidden during popup
+        const nftPreviewTooltip = nftPreviewTitleText.closest('.nft-preview-title')?.querySelector('.tooltiptext');
+        if (nftPreviewTooltip) {
+          nftPreviewTooltip.style.setProperty('visibility', 'hidden', 'important');
+          nftPreviewTooltip.style.setProperty('opacity', '0', 'important');
+          nftPreviewTooltip.style.setProperty('pointer-events', 'none', 'important');
+        }
+      }
+      
+      const traitsTitleText = document.querySelector('#generate-nfts .traits-title-text');
+      if (traitsTitleText) {
+        traitsTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+        traitsTitleText.dataset.tooltipDisabled = 'true';
+        // CRITICAL: Ensure tooltip is hidden during popup
+        const traitsTooltip = traitsTitleText.closest('.traits-title')?.querySelector('.tooltiptext');
+        if (traitsTooltip) {
+          traitsTooltip.style.setProperty('visibility', 'hidden', 'important');
+          traitsTooltip.style.setProperty('opacity', '0', 'important');
+          traitsTooltip.style.setProperty('pointer-events', 'none', 'important');
+        }
+      }
+
     // CRITICAL: Also grey out Generate Seed button during popup
     const generateSeedBtn = document.getElementById('generate-seed-nft-btn');
     if (generateSeedBtn) {
@@ -3508,6 +3590,8 @@ window.NFTApp.registerModule("generateNftsUI", {
       generateSeedBtn.style.setProperty('cursor', 'not-allowed', 'important');
       generateSeedBtn.style.setProperty('box-shadow', 'none', 'important'); // Remove halo effect
       generateSeedBtn.style.setProperty('border', 'none', 'important'); // Remove border completely
+      // CRITICAL: Allow pointer events for tooltip even when disabled
+      // Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
       generateSeedBtn.disabled = true;
       generateSeedBtn.setAttribute('disabled', 'disabled');
     }
@@ -3532,10 +3616,41 @@ window.NFTApp.registerModule("generateNftsUI", {
       progressBarElement.classList.remove('green', 'red', 'orange', 'yellow');
     }
 
-    // CRITICAL: Also grey out "Seed:" label during popup
+    // CRITICAL: Also grey out "Seed:" label and seed value during popup
     const seedLabel = document.querySelector('.seed-label');
     if (seedLabel) {
-      seedLabel.style.color = '#a0a0b0'; // Match Dark NFTs button text color when greyed out
+      seedLabel.style.setProperty('color', '#a0a0b0', 'important'); // Match Dark NFTs button text color when greyed out - must override CSS
+    }
+    
+    // CRITICAL: Grey out seed value during popup
+    const seedBox = document.querySelector('.nft-seed-box');
+    if (seedBox) {
+      seedBox.style.setProperty('color', '#a0a0b0', 'important'); // Match seed label color when greyed out - must override CSS
+    }
+    
+    // CRITICAL: Set default cursor for seed copy button during popup (not not-allowed, not help)
+    // CRITICAL: Only disable tooltip during popup, not permanently
+    const copyBtn = document.querySelector('.nft-seed-copy-btn');
+    if (copyBtn) {
+      copyBtn.style.cursor = 'default'; // Default cursor when greyed out (not not-allowed, not help)
+      // CRITICAL: Only disable tooltip during popup - remove tooltip class temporarily
+      copyBtn.classList.remove('tooltip');
+      copyBtn.dataset.tooltipDisabled = 'true';
+      // CRITICAL: Ensure tooltip is hidden when greyed out during popup
+      const copyTooltipText = copyBtn.querySelector('.tooltiptext');
+      if (copyTooltipText) {
+        copyTooltipText.style.setProperty('visibility', 'hidden', 'important');
+        copyTooltipText.style.setProperty('opacity', '0', 'important');
+        copyTooltipText.style.setProperty('pointer-events', 'none', 'important');
+      }
+    }
+    
+    // CRITICAL: Remove tooltip class from nft-count-panel during popup to prevent help cursor
+    const nftCountPanel = document.getElementById('nft-count-panel');
+    if (nftCountPanel) {
+      nftCountPanel.classList.remove('tooltip');
+      nftCountPanel.style.cursor = 'default'; // Default cursor when greyed out (not help)
+      nftCountPanel.dataset.tooltipDisabled = 'true';
     }
 
     // Remove existing popup if it exists
@@ -3563,6 +3678,10 @@ window.NFTApp.registerModule("generateNftsUI", {
     // Create popup element - match "Calculating Rarity Ranks" popup structure
     popup = document.createElement('div');
     popup.className = 'nft-rendering-popup scan-progress-popup';
+    // CRITICAL: Hide popup but keep code - loading animation is now displayed instead
+    popup.style.display = 'none';
+    popup.style.visibility = 'hidden';
+    popup.style.opacity = '0';
     // CRITICAL: Ensure pointer-events: none so tabs remain clickable during popup
     popup.style.pointerEvents = 'none';
     popup.innerHTML = `
@@ -3837,6 +3956,13 @@ window.NFTApp.registerModule("generateNftsUI", {
         }
         p.remove();
       });
+      
+      // CRITICAL: Hide loading animation when popup is hidden (popup is now hidden but code kept)
+      // Loading animation should be hidden when all operations complete
+      const projectService = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('projectService');
+      if (projectService && projectService.hideLoadingAnimation) {
+        projectService.hideLoadingAnimation();
+      }
     }
     
     // CRITICAL: Restore Create NFT button state (will be updated by _updateAllButtonStates)
@@ -3875,9 +4001,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       if (seedLabel) {
         const hasNFT = window.lastGeneratedNFT && window.lastGeneratedNFT.seed;
         if (hasNFT) {
-          seedLabel.style.color = '#fff'; // White when enabled
+          seedLabel.style.setProperty('color', '#fff', 'important'); // White when enabled - must override CSS
         } else {
-          seedLabel.style.color = '#a0a0b0'; // Grey when no NFT
+          seedLabel.style.setProperty('color', '#a0a0b0', 'important'); // Grey when no NFT - must override CSS
         }
       }
       // Then animate the count
@@ -4120,7 +4246,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Update tooltip
       const tooltipElement = document.querySelector('#nft-count-panel .tooltiptext');
       if (tooltipElement) {
-        tooltipElement.textContent = `NFT Collection is ${currentPercentage.toFixed(2)}% Complete.`;
+        tooltipElement.innerHTML = `NFT Collection is<br>${currentPercentage.toFixed(2)}% Complete`;
       }
 
       if (currentDisplayCount < currentCount) {
@@ -4150,7 +4276,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         
         // Final tooltip update
         if (tooltipElement) {
-          tooltipElement.textContent = `NFT Collection is ${percentage.toFixed(2)}% Complete.`;
+          tooltipElement.innerHTML = `NFT Collection is<br>${percentage.toFixed(2)}% Complete`;
         }
         
         // Mark animation as complete
@@ -4381,8 +4507,7 @@ window.NFTApp.registerModule("generateNftsUI", {
                 <h2 class="select-trait-title">Select Trait for ${layerName}</h2>
                 <div class="select-trait-tip">* Choose a trait to replace the current one for this layer</div>
               </div>
-              <button class="select-trait-close-btn tooltip">
-                <span class="tooltiptext">Close modal</span>
+              <button class="select-trait-close-btn">
                 &times;
               </button>
             </div>
@@ -4807,7 +4932,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       }
     }
     
-    // Create popup overlay
+    // Create popup overlay - use app default style
     popup = document.createElement('div');
     popup.id = 'trait-fullsize-popup';
     popup.className = 'modal-overlay';
@@ -4815,47 +4940,49 @@ window.NFTApp.registerModule("generateNftsUI", {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 2147483647 !important;
-      backdrop-filter: blur(4px);
+      font-family: 'Archivo', sans-serif;
     `;
     
-    // Create popup content
+    // Create popup content - use app default popup style (#2c3e50)
     const popupContent = document.createElement('div');
     popupContent.style.cssText = `
       position: relative;
       max-width: 90vw;
       max-height: 90vh;
-      background: #222;
+      background: #2c3e50;
       border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      border: 1px solid #34495e;
       overflow: hidden;
       display: flex;
       flex-direction: column;
     `;
     
-    // Create header
+    // Create header - use app default style
     const header = document.createElement('div');
     header.style.cssText = `
       padding: 20px 24px 16px 24px;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid #34495e;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #2a2a2a;
+      background: #2c3e50;
     `;
     
     const title = document.createElement('h3');
     title.style.cssText = `
       margin: 0;
-      color: #fff;
+      color: #ffffff;
       font-size: 20px;
-      font-weight: 600;
+      font-weight: 700;
+      font-family: 'Archivo', sans-serif;
     `;
     
     // Ensure we have fallback values for traitName and layerName
@@ -4867,32 +4994,36 @@ window.NFTApp.registerModule("generateNftsUI", {
     const closeBtn = document.createElement('button');
     closeBtn.innerHTML = '&times;';
     closeBtn.style.cssText = `
-      background: none;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 32px;
+      height: 32px;
       border: none;
-      color: #aaa;
-      font-size: 28px;
+      background: #444;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 50%;
       cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      width: 40px;
-      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.2s ease;
+      z-index: 100;
     `;
     
     header.appendChild(title);
     header.appendChild(closeBtn);
     
-    // Create image container
+    // Create image container - use app default style
     const imageContainer = document.createElement('div');
     imageContainer.style.cssText = `
       padding: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #1a1a1a;
+      background: #2c3e50;
       flex: 1;
       min-height: 400px;
     `;
@@ -4935,20 +5066,21 @@ window.NFTApp.registerModule("generateNftsUI", {
       imageContainer.appendChild(placeholder);
     }
     
-    // Create footer with trait info
+    // Create footer with trait info - use app default style
     const footer = document.createElement('div');
     footer.style.cssText = `
       padding: 16px 24px 20px 24px;
-      border-top: 1px solid #333;
-      background: #2a2a2a;
+      border-top: 1px solid #34495e;
+      background: #2c3e50;
       text-align: center;
     `;
     
     const traitInfo = document.createElement('div');
     traitInfo.style.cssText = `
-      color: #ccc;
+      color: #ffffff;
       font-size: 14px;
       line-height: 1.5;
+      font-family: 'Archivo', sans-serif;
     `;
     // Extract rarity from the trait object
     let rarityDisplay = '';
@@ -4971,10 +5103,10 @@ window.NFTApp.registerModule("generateNftsUI", {
     }
     
     traitInfo.innerHTML = `
-      <div style="font-weight: 600; color: #fff; margin-bottom: 8px;">Trait Information</div>
-      <div><strong>Name:</strong> ${displayTraitName}</div>
-      <div><strong>Layer:</strong> ${displayLayerName}</div>
-      ${rarityDisplay ? `<div><strong>Rarity:</strong> ${rarityDisplay}</div>` : ''}
+      <div style="font-weight: 600; color: #ffffff; margin-bottom: 8px; font-family: 'Archivo', sans-serif;">Trait Information</div>
+      <div style="color: #ffffff; font-family: 'Archivo', sans-serif;"><strong>Name:</strong> ${displayTraitName}</div>
+      <div style="color: #ffffff; font-family: 'Archivo', sans-serif;"><strong>Layer:</strong> ${displayLayerName}</div>
+      ${rarityDisplay ? `<div style="color: #ffffff; font-family: 'Archivo', sans-serif;"><strong>Rarity:</strong> ${rarityDisplay}</div>` : ''}
     `;
     footer.appendChild(traitInfo);
     
@@ -5011,14 +5143,14 @@ window.NFTApp.registerModule("generateNftsUI", {
     };
     document.addEventListener('keydown', escHandler);
     
-    // Add hover effects
+    // Add hover effects - match confirmation modal close button style
     closeBtn.onmouseenter = () => {
-      closeBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-      closeBtn.style.color = '#fff';
+      closeBtn.style.background = '#ff4444';
+      closeBtn.style.transform = 'scale(1.1)';
     };
     closeBtn.onmouseleave = () => {
-      closeBtn.style.background = 'none';
-      closeBtn.style.color = '#aaa';
+      closeBtn.style.background = '#444';
+      closeBtn.style.transform = 'scale(1)';
     };
     
     // Animate in
@@ -5191,14 +5323,14 @@ window.NFTApp.registerModule("generateNftsUI", {
     };
     document.addEventListener('keydown', escHandler);
     
-    // Add hover effects
+    // Add hover effects - match confirmation modal close button style
     closeBtn.onmouseenter = () => {
-      closeBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-      closeBtn.style.color = '#fff';
+      closeBtn.style.background = '#ff4444';
+      closeBtn.style.transform = 'scale(1.1)';
     };
     closeBtn.onmouseleave = () => {
-      closeBtn.style.background = 'none';
-      closeBtn.style.color = '#aaa';
+      closeBtn.style.background = '#444';
+      closeBtn.style.transform = 'scale(1)';
     };
     
     // Animate in
@@ -5548,7 +5680,6 @@ window.NFTApp.registerModule("generateNftsUI", {
   // Function to update tooltip with dynamic total supply
   updateTooltipText: function(projectData) {
     const tooltip = document.querySelector('#generate-nfts .nft-preview-title .tooltiptext');
-    const customTooltip = document.querySelector('#generate-nfts .nft-preview-title .custom-tooltip-text');
     
     function getTotalSupply(pd) {
       // First check the input field for the most current value
@@ -5573,9 +5704,6 @@ window.NFTApp.registerModule("generateNftsUI", {
     if (tooltip) {
       tooltip.textContent = tooltipText;
     }
-    if (customTooltip) {
-      customTooltip.textContent = tooltipText;
-    }
   },
 
   // Function to setup tooltip update listener
@@ -5596,7 +5724,7 @@ window.NFTApp.registerModule("generateNftsUI", {
     
     const traitsTitle = generateNftsTab.querySelector('.traits-title');
     const traitsTitleText = traitsTitle?.querySelector('.traits-title-text');
-    const tooltipText = traitsTitle?.querySelector('.custom-tooltip-text');
+    const tooltipText = traitsTitle?.querySelector('.tooltiptext');
     
     if (traitsTitle && traitsTitleText && tooltipText) {
       // Set the tooltip text to match the edit modal
@@ -5622,14 +5750,10 @@ window.NFTApp.registerModule("generateNftsUI", {
         <div class="nft-preview-title tooltip tooltip-bottom" style="position: absolute; top: 0; left: 194px; width: 542px; text-align: center; color: #fff; font-size: 1.8rem; font-weight: 600; margin: 0; padding: 0; z-index: 10;">
           <span class="nft-preview-title-text" style="cursor: help; display: inline-block; font-size: 1.8rem; font-weight: 600;">Generate NFTs</span>
           <span class="tooltiptext"></span>
-          <div class="custom-tooltip-text"></div>
         </div>
         <div class="traits-title tooltip tooltip-bottom" style="position: absolute; top: 0; left: 748px; width: 220px; text-align: center; color: #fff; font-size: 1.8rem; font-weight: 600; margin: 0; padding: 0; z-index: 10;">
           <span class="traits-title-text" style="cursor: help; display: inline-block; font-size: 1.8rem; font-weight: 600;">NFT Traits</span>
-          <span class="tooltiptext"></span>
-          <div class="custom-tooltip-text" style="visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 10px); bottom: auto; left: 50%; transform: translateX(-50%); background: #000000; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 400; white-space: normal; z-index: 999999; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); text-align: center; line-height: 1.4; width: 180px; transition: opacity 1s ease, visibility 1s ease;">
-            View all traits used in<br>your NFT and change<br>any trait to update<br>the NFT's appearance
-          </div>
+          <span class="tooltiptext">Check the list of<br>traits being used on<br>the generated NFT and<br>edit them as you like</span>
         </div>
         <div class="generate-nfts-main-row" style="display: flex; flex-direction: row; gap: 12px; align-items: flex-start; width: 100%;">
           <div class="nft-preview-section" style="flex: 0 0 542px; max-width: 542px; min-width: 542px; display: flex; flex-direction: column; gap: 0;">
@@ -5657,19 +5781,84 @@ window.NFTApp.registerModule("generateNftsUI", {
     
     // Ensure proper title positioning after HTML is set - titles are now inside generate-nfts-container
     setTimeout(() => {
-      const nftPreviewTitle = generateNftsTab.querySelector('.nft-preview-title');
-      const traitsTitle = generateNftsTab.querySelector('.traits-title');
+      // CRITICAL: Get generateNftsTab again inside setTimeout to avoid initialization errors
+      const generateNftsTabElement = document.getElementById('generate-nfts');
+      if (!generateNftsTabElement) return;
+      
+      const nftPreviewTitle = generateNftsTabElement.querySelector('.nft-preview-title');
+      const traitsTitle = generateNftsTabElement.querySelector('.traits-title');
+      const nftPreviewTitleText = nftPreviewTitle?.querySelector('.nft-preview-title-text');
+      const traitsTitleText = traitsTitle?.querySelector('.traits-title-text');
+      const nftPreviewTooltip = nftPreviewTitle?.querySelector('.tooltiptext');
+      const traitsTooltip = traitsTitle?.querySelector('.tooltiptext');
       
       // Ensure titles are properly positioned inside generate-nfts-container
       if (nftPreviewTitle && traitsTitle) {
-        nftPreviewTitle.style.cssText = 'position: absolute; top: 0; left: 194px; width: 542px; text-align: center; color: #fff; font-size: 1.8rem; font-weight: 600; margin: 0; padding: 0; line-height: 1.2; display: flex; align-items: center; justify-content: center; height: 2.5rem; cursor: help; z-index: 10;';
-        traitsTitle.style.cssText = 'position: absolute; top: 0; left: 748px; width: 220px; text-align: center; color: #fff; font-size: 1.8rem; font-weight: 600; margin: 0; padding: 0; line-height: 1.2; display: flex; align-items: center; justify-content: center; height: 2.5rem; cursor: help; z-index: 10;';
+        nftPreviewTitle.style.cssText = 'position: absolute; top: 0; left: 194px; width: 542px; text-align: center; color: #fff; font-size: 1.8rem; font-weight: 600; margin: 0; padding: 0; line-height: 1.2; display: flex; align-items: center; justify-content: center; height: 2.5rem; cursor: default; z-index: 10;';
+        traitsTitle.style.cssText = 'position: absolute; top: 0; left: 748px; width: 220px; text-align: center; color: #fff; font-size: 1.8rem; font-weight: 600; margin: 0; padding: 0; line-height: 1.2; display: flex; align-items: center; justify-content: center; height: 2.5rem; cursor: default; z-index: 10;';
       }
+      
+      // CRITICAL: Check if content should be greyed out before setting up tooltips
+      const projectData = self.projectData || window.currentProject;
+      const hasMinimumRequirements = self._hasMinimumRequirements(projectData);
+      const hasNFT = window.lastGeneratedNFT && window.lastGeneratedNFT.seed;
+      const previewImage = document.querySelector('.nft-preview-image-area img, .nft-preview-item img');
+      const isDataURI = previewImage && previewImage.src && previewImage.src.startsWith('data:');
+      const isNFTImageLoaded = previewImage && (
+        (previewImage.complete && previewImage.naturalWidth > 0) || 
+        isDataURI ||
+        (previewImage.src && previewImage.src !== '')
+      );
+      const shouldEnableContent = hasMinimumRequirements && hasNFT && isNFTImageLoaded;
+      
+      // Check if popup is showing
+      let popup = generateNftsTabElement ? generateNftsTabElement.querySelector('.nft-rendering-popup') : null;
+      if (!popup) {
+        popup = document.querySelector('.nft-rendering-popup');
+      }
+      const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
+      const isPopupShowing = popup || pleaseWaitPopup;
+      
+      // Setup tooltips using global tooltip manager only if content is enabled
+      if (shouldEnableContent && !isPopupShowing) {
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          if (nftPreviewTitleText && nftPreviewTooltip) {
+            tooltipManager.setupTooltip(nftPreviewTitleText, nftPreviewTooltip);
+          }
+          if (traitsTitleText && traitsTooltip) {
+            tooltipManager.setupTooltip(traitsTitleText, traitsTooltip);
+          }
+        }
+        } else {
+          // Disable tooltips if content is greyed out
+          if (nftPreviewTitleText) {
+            nftPreviewTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+            nftPreviewTitleText.dataset.tooltipDisabled = 'true';
+            if (nftPreviewTooltip) {
+              nftPreviewTooltip.style.setProperty('visibility', 'hidden', 'important');
+              nftPreviewTooltip.style.setProperty('opacity', '0', 'important');
+              nftPreviewTooltip.style.setProperty('pointer-events', 'none', 'important');
+            }
+          }
+          if (traitsTitleText) {
+            traitsTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+            traitsTitleText.dataset.tooltipDisabled = 'true';
+            if (traitsTooltip) {
+              traitsTooltip.style.setProperty('visibility', 'hidden', 'important');
+              traitsTooltip.style.setProperty('opacity', '0', 'important');
+              traitsTooltip.style.setProperty('pointer-events', 'none', 'important');
+            }
+          }
+        }
     }, 10);
     
     // Now insert the new action buttons after the preview panel is present
     setTimeout(() => {
-      const btnMount = generateNftsTab.querySelector('.nft-preview-image-area');
+      // CRITICAL: Get generateNftsTab again inside setTimeout to avoid initialization errors
+      const generateNftsTabElement2 = document.getElementById('generate-nfts');
+      if (!generateNftsTabElement2) return;
+      const btnMount = generateNftsTabElement2.querySelector('.nft-preview-image-area');
       if (btnMount && !btnMount.querySelector('.nft-action-buttons-container')) {
         // Get project data and check requirements
         const currentProjectData = self.projectData || window.currentProject || projectData;
@@ -5716,11 +5905,17 @@ window.NFTApp.registerModule("generateNftsUI", {
         createNftBtn.className = 'nft-action-btn tooltip';
         const createTooltip = document.createElement('span');
         createTooltip.className = 'tooltiptext';
-        createTooltip.textContent = 'Create a random NFT, considering all rules and rarities';
+        createTooltip.innerHTML = 'Create a random NFT. considering<br>all added Rules and Rarities.';
         createNftBtn.appendChild(createTooltip);
         
-        // Use standard tooltip positioning with 1 second delay
-        this.setupTooltipPositioning(createNftBtn, createTooltip);
+        // Use global tooltip manager for consistent behavior
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(createNftBtn, createTooltip);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(createNftBtn, createTooltip);
+        }
         // Store original styles for Create NFT button
         const createNftBtnOriginalStyles = {
           backgroundColor: '#047857',
@@ -5853,11 +6048,17 @@ window.NFTApp.registerModule("generateNftsUI", {
         addToCollectionBtn.className = 'nft-action-btn tooltip';
         const addTooltip = document.createElement('span');
         addTooltip.className = 'tooltiptext';
-        addTooltip.textContent = 'Add current NFT to your collection';
+        addTooltip.innerHTML = 'Add current NFT<br>to your collection.';
         addToCollectionBtn.appendChild(addTooltip);
         
-        // Use standard tooltip positioning with 1 second delay
-        this.setupTooltipPositioning(addToCollectionBtn, addTooltip);
+        // Use global tooltip manager for consistent behavior
+        const tooltipManagerAdd = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManagerAdd && tooltipManagerAdd.setupTooltip) {
+          tooltipManagerAdd.setupTooltip(addToCollectionBtn, addTooltip);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(addToCollectionBtn, addTooltip);
+        }
         // Store original styles for Add to Collection button
         const addToCollectionBtnOriginalStyles = {
           backgroundColor: '#1e40af',
@@ -5926,9 +6127,9 @@ window.NFTApp.registerModule("generateNftsUI", {
           let seedList = [];
           try {
             seedList = JSON.parse(localStorage.getItem(seedListKey) || '[]');
-            console.log('[DEBUG] Single NFT add: Read from localStorage:', seedList.length, 'seeds (key:', seedListKey, ')');
+            // console.log('[DEBUG] Single NFT add: Read from localStorage:', seedList.length, 'seeds (key:', seedListKey, ')');
           } catch (parseError) {
-            console.error('[DEBUG] Error parsing localStorage seedList:', parseError);
+            // console.error('[DEBUG] Error parsing localStorage seedList:', parseError);
             seedList = [];
           }
           
@@ -5995,7 +6196,7 @@ window.NFTApp.registerModule("generateNftsUI", {
           try {
             localStorage.setItem(seedListKey, JSON.stringify(seedList));
           } catch (error) {
-            console.error('[DEBUG] Error saving seed list:', error);
+            // console.error('[DEBUG] Error saving seed list:', error);
             if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('notificationService')) {
               window.NFTApp.getModule('notificationService').show(
                 'Error saving NFT to collection. Please try again.',
@@ -6100,8 +6301,14 @@ window.NFTApp.registerModule("generateNftsUI", {
         bulkTooltip.textContent = 'Generate multiple NFTs at once or in batches. Pick the ones you like, select them in the order you want them added, then click Add Selected. They will be appended after the last NFT in your collection.';
         bulkGenerationBtn.appendChild(bulkTooltip);
         
-        // Use standard tooltip positioning with 1 second delay
-        this.setupTooltipPositioning(bulkGenerationBtn, bulkTooltip);
+        // Use global tooltip manager for consistent behavior
+        const tooltipManagerBulk = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManagerBulk && tooltipManagerBulk.setupTooltip) {
+          tooltipManagerBulk.setupTooltip(bulkGenerationBtn, bulkTooltip);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(bulkGenerationBtn, bulkTooltip);
+        }
         // Store original styles for Bulk Generation button
         const bulkGenerationBtnOriginalStyles = {
           backgroundColor: '#ea580c',
@@ -6135,7 +6342,7 @@ window.NFTApp.registerModule("generateNftsUI", {
             const modal = new window.BatchGenerationModal();
             modal.show();
           } else {
-            console.error('[DEBUG] BatchGenerationModal not available');
+            // console.error('[DEBUG] BatchGenerationModal not available');
             // Use confirmation modal instead of browser alert
             if (window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('confirmationModal')) {
               window.NFTApp.getModule('confirmationModal').show(
@@ -6186,11 +6393,17 @@ window.NFTApp.registerModule("generateNftsUI", {
         editCollectionBtn.className = 'nft-action-btn tooltip';
         const editTooltip = document.createElement('span');
         editTooltip.className = 'tooltiptext';
-        editTooltip.textContent = 'View and manage your NFT collection';
+        editTooltip.innerHTML = 'View and manage<br>your NFT collection.';
         editCollectionBtn.appendChild(editTooltip);
         
-        // Use standard tooltip positioning with 1 second delay
-        this.setupTooltipPositioning(editCollectionBtn, editTooltip);
+        // Use global tooltip manager for consistent behavior
+        const tooltipManagerEdit = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManagerEdit && tooltipManagerEdit.setupTooltip) {
+          tooltipManagerEdit.setupTooltip(editCollectionBtn, editTooltip);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(editCollectionBtn, editTooltip);
+        }
         // Store original styles for Edit Collection button
         const editCollectionBtnOriginalStyles = {
           backgroundColor: '#dc2626',
@@ -6202,7 +6415,7 @@ window.NFTApp.registerModule("generateNftsUI", {
         // CRITICAL: Start all buttons greyed out if popup is showing or requirements not met
         if (shouldStartGreyed) {
           self._applyDisabledStyles(editCollectionBtn);
-          editCollectionBtn.style.border = '2px solid #84a0b0';
+          // Border is already removed by _applyDisabledStyles - don't override it
           editCollectionBtn.style.setProperty('box-shadow', 'none', 'important'); // Remove halo
           editCollectionBtn.disabled = true;
           editCollectionBtn.setAttribute('disabled', 'disabled');
@@ -6227,7 +6440,7 @@ window.NFTApp.registerModule("generateNftsUI", {
             }
             window.savedSeedsModalInstance.show();
           } else {
-            console.error('[DEBUG] SavedSeedsModal not available');
+            // console.error('[DEBUG] SavedSeedsModal not available');
           }
         });
         
@@ -6346,12 +6559,18 @@ window.NFTApp.registerModule("generateNftsUI", {
         // Add tooltip for progress bar
         const tooltip = document.createElement('span');
         tooltip.className = 'tooltiptext';
-        tooltip.textContent = '0% Complete';
+        tooltip.innerHTML = 'NFT Collection is<br>0% Complete';
         nftCountPanel.appendChild(tooltip);
         
-        // Use standard tooltip positioning with 1 second delay
+        // Use global tooltip manager for consistent behavior
         // Note: The tooltip text is updated dynamically in updateNftCountPanel
-        this.setupTooltipPositioning(nftCountPanel, tooltip);
+        const counterTooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (counterTooltipManager && counterTooltipManager.setupTooltip) {
+          counterTooltipManager.setupTooltip(nftCountPanel, tooltip);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(nftCountPanel, tooltip);
+        }
         
         // Function to update NFT count panel
         function updateNftCountPanel() {
@@ -6389,7 +6608,7 @@ window.NFTApp.registerModule("generateNftsUI", {
                 } else if (retryCount >= maxRetries) {
                   clearInterval(retryInterval);
                   window._nftCountPanelRetryScheduled = false;
-                  console.warn('[DEBUG] updateNftCountPanel: nft-count-text element not found after retries');
+                  // console.warn('[DEBUG] updateNftCountPanel: nft-count-text element not found after retries');
                 }
                 retryCount++;
               }, 100);
@@ -6493,7 +6712,7 @@ window.NFTApp.registerModule("generateNftsUI", {
               }
               // console.log('[DEBUG] updateNftCountPanel: Read from localStorage:', currentCount, 'items from key:', seedListKey);
             } catch (error) {
-              console.error('[DEBUG] updateNftCountPanel: Error parsing seed list from localStorage:', error);
+              // console.error('[DEBUG] updateNftCountPanel: Error parsing seed list from localStorage:', error);
               seedList = [];
               currentCount = 0;
             }
@@ -6563,7 +6782,7 @@ window.NFTApp.registerModule("generateNftsUI", {
           
           // Update tooltip if found
           if (tooltipElement) {
-            tooltipElement.textContent = `NFT Collection is ${percentage.toFixed(2)}% Complete.`;
+            tooltipElement.innerHTML = `NFT Collection is<br>${percentage.toFixed(2)}% Complete`;
           }
           
           // CRITICAL: Only update styling if popup is NOT showing
@@ -6589,10 +6808,30 @@ window.NFTApp.registerModule("generateNftsUI", {
             if (nftCountPanel) {
               if (!shouldEnableContent) {
                 nftCountPanel.style.backgroundColor = '#23232b';
-                nftCountPanel.style.borderColor = '#84a0b0';
+                // CRITICAL: Remove border when greyed out
+                nftCountPanel.style.border = 'none';
+                nftCountPanel.style.borderColor = 'transparent';
+                // CRITICAL: Remove tooltip class when greyed out to prevent help cursor
+                nftCountPanel.classList.remove('tooltip');
+                nftCountPanel.style.cursor = 'default'; // Default cursor when greyed out (not help)
+                nftCountPanel.dataset.tooltipDisabled = 'true';
+                // CRITICAL: Ensure tooltip is hidden when greyed out
+                const countTooltip = nftCountPanel.querySelector('.tooltiptext');
+                if (countTooltip) {
+                  countTooltip.style.setProperty('visibility', 'hidden', 'important');
+                  countTooltip.style.setProperty('opacity', '0', 'important');
+                  countTooltip.style.setProperty('pointer-events', 'none', 'important');
+                }
               } else {
                 nftCountPanel.style.backgroundColor = '#000000';
+                nftCountPanel.style.border = '2px solid #8b5cf6';
                 nftCountPanel.style.borderColor = '#8b5cf6';
+                // CRITICAL: Restore tooltip class when enabled
+                if (!nftCountPanel.classList.contains('tooltip')) {
+                  nftCountPanel.classList.add('tooltip');
+                }
+                nftCountPanel.removeAttribute('data-tooltip-disabled');
+                nftCountPanel.style.cursor = 'help'; // Help cursor when enabled
               }
             }
             
@@ -6634,7 +6873,20 @@ window.NFTApp.registerModule("generateNftsUI", {
             
             if (nftCountPanel) {
               nftCountPanel.style.backgroundColor = '#23232b';
-              nftCountPanel.style.borderColor = '#84a0b0';
+              // CRITICAL: Remove border when greyed out
+              nftCountPanel.style.border = 'none';
+              nftCountPanel.style.borderColor = 'transparent';
+              // CRITICAL: Remove tooltip class when popup is showing to prevent help cursor
+              nftCountPanel.classList.remove('tooltip');
+              nftCountPanel.style.cursor = 'default'; // Default cursor when greyed out (not help)
+              nftCountPanel.dataset.tooltipDisabled = 'true';
+              // CRITICAL: Ensure tooltip is hidden when greyed out
+              const countTooltip = nftCountPanel.querySelector('.tooltiptext');
+              if (countTooltip) {
+                countTooltip.style.setProperty('visibility', 'hidden', 'important');
+                countTooltip.style.setProperty('opacity', '0', 'important');
+                countTooltip.style.setProperty('pointer-events', 'none', 'important');
+              }
             }
             if (nftCountContainer) {
               nftCountContainer.style.setProperty('opacity', '0.6', 'important');
@@ -6666,7 +6918,7 @@ window.NFTApp.registerModule("generateNftsUI", {
           }
           
           if (typeof tooltip !== 'undefined' && tooltip) {
-            tooltip.textContent = `NFT Collection is ${percentage.toFixed(2)}% Complete.`;
+            tooltip.innerHTML = `NFT Collection is<br>${percentage.toFixed(2)}% Complete`;
           }
         }
         
@@ -6695,7 +6947,18 @@ window.NFTApp.registerModule("generateNftsUI", {
         nftActionButtonsContainer.appendChild(editCollectionBtn);
         nftActionButtonsContainer.appendChild(nftCountPanel);
         
-        btnMount.appendChild(nftActionButtonsContainer);
+        // CRITICAL: Insert buttons container AFTER the preview container (below it)
+        const previewContainer = btnMount.querySelector('#nft-preview-container');
+        if (previewContainer && previewContainer.nextSibling) {
+          // Insert after preview container
+          btnMount.insertBefore(nftActionButtonsContainer, previewContainer.nextSibling);
+        } else if (previewContainer) {
+          // Append after preview container (if it's the last child)
+          btnMount.appendChild(nftActionButtonsContainer);
+        } else {
+          // Fallback: just append if preview container doesn't exist yet
+          btnMount.appendChild(nftActionButtonsContainer);
+        }
         
         // Update all button states after creating buttons (with delay to ensure all buttons exist)
         setTimeout(() => {
@@ -6811,14 +7074,10 @@ window.NFTApp.registerModule("generateNftsUI", {
           <div class="nft-preview-title tooltip tooltip-bottom" style="position: absolute !important; top: -40px !important; left: 0 !important; width: 542px !important; text-align: center !important; color: #fff !important; font-size: 1.8rem !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important; margin-top: 24px !important; line-height: 1.2 !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 2.16rem !important; z-index: 10 !important; visibility: visible !important; opacity: 1 !important; background: transparent !important; background-color: transparent !important; box-sizing: border-box !important; border: none !important; outline: none !important;">
             <span class="nft-preview-title-text" style="cursor: help; display: inline-block; font-size: 1.8rem; font-weight: 600;">Generate NFTs</span>
             <span class="tooltiptext"></span>
-            <div class="custom-tooltip-text"></div>
           </div>
           <div class="traits-title tooltip tooltip-bottom" style="position: absolute !important; top: -36px !important; left: 554px !important; width: 220px !important; text-align: center !important; color: #fff !important; font-size: 1.8rem !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important; margin-top: 24px !important; line-height: 1.2 !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 2.16rem !important; z-index: 10 !important; visibility: visible !important; opacity: 1 !important; background: transparent !important; background-color: transparent !important; box-sizing: border-box !important; border: none !important; outline: none !important; transform: none !important; will-change: auto !important;">
             <span class="traits-title-text" style="cursor: help; display: inline-block; font-size: 1.8rem; font-weight: 600;">NFT Traits</span>
-            <span class="tooltiptext"></span>
-            <div class="custom-tooltip-text" style="visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 10px); bottom: auto; left: 50%; transform: translateX(-50%); background: #000000; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 400; white-space: normal; z-index: 999999; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); text-align: center; line-height: 1.4; width: 180px; transition: opacity 1s ease, visibility 1s ease;">
-              View all traits used in<br>your NFT and change<br>any trait to update<br>the NFT's appearance
-            </div>
+            <span class="tooltiptext">Check the list of<br>traits being used on<br>the generated NFT and<br>edit them as you like</span>
           </div>
           <div class="generate-nfts-main-row" style="display: flex; flex-direction: row; gap: 12px; align-items: flex-start; width: 100%;">
             <div class="nft-preview-section" style="flex: 0 0 542px; max-width: 542px; min-width: 542px; display: flex; flex-direction: column; gap: 0;">
@@ -7422,6 +7681,8 @@ window.NFTApp.registerModule("generateNftsUI", {
       generateSeedBtn.style.setProperty('cursor', 'not-allowed', 'important');
       generateSeedBtn.style.setProperty('box-shadow', 'none', 'important');
       generateSeedBtn.style.setProperty('border', 'none', 'important');
+      // CRITICAL: Allow pointer events for tooltip even when disabled
+      // Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
       generateSeedBtn.disabled = true;
       generateSeedBtn.setAttribute('disabled', 'disabled');
     }
@@ -7433,7 +7694,11 @@ window.NFTApp.registerModule("generateNftsUI", {
       darkNftsBtn.style.setProperty('border-color', '#4a4a4a', 'important');
       darkNftsBtn.style.setProperty('color', '#a0a0b0', 'important');
       darkNftsBtn.style.setProperty('opacity', '0.6', 'important');
-      darkNftsBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      darkNftsBtn.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help, not not-allowed)
+      darkNftsBtn.style.setProperty('pointer-events', 'none', 'important'); // CRITICAL: Prevent any hover interactions
+      // CRITICAL: Remove tooltip class to prevent help cursor when greyed out
+      darkNftsBtn.classList.remove('tooltip');
+      darkNftsBtn.dataset.tooltipDisabled = 'true';
       darkNftsBtn.disabled = true;
       darkNftsBtn.setAttribute('disabled', 'disabled');
     }
@@ -7453,13 +7718,118 @@ window.NFTApp.registerModule("generateNftsUI", {
     // Grey out "Seed:" label
     const seedLabel = document.querySelector('.seed-label');
     if (seedLabel) {
-      seedLabel.style.color = '#a0a0b0';
+      seedLabel.style.setProperty('color', '#a0a0b0', 'important'); // Grey when greyed out - must override any CSS
     }
     
+    // Grey out seed box (seed value)
+    const seedBox = document.querySelector('.nft-seed-box');
+    if (seedBox) {
+      seedBox.style.setProperty('color', '#a0a0b0', 'important'); // Match seed label color when greyed out - must override CSS
+    }
+    
+    // CRITICAL: Set default cursor for seed copy button when greyed out (not not-allowed, not help)
+    const copyBtn = document.querySelector('.nft-seed-copy-btn');
+    if (copyBtn) {
+      copyBtn.style.cursor = 'default'; // Default cursor when greyed out (not not-allowed, not help)
+      // CRITICAL: Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
+      // Remove tooltip class temporarily when tab is greyed out
+      copyBtn.classList.remove('tooltip');
+      copyBtn.dataset.tooltipDisabled = 'true';
+    }
+    
+    // CRITICAL: Remove tooltip class from nft-count-panel when greyed out to prevent help cursor
+    const nftCountPanel = document.getElementById('nft-count-panel');
+    if (nftCountPanel) {
+      nftCountPanel.classList.remove('tooltip');
+      nftCountPanel.style.cursor = 'default'; // Default cursor when greyed out (not help)
+      nftCountPanel.dataset.tooltipDisabled = 'true';
+      // CRITICAL: Remove border when greyed out
+      nftCountPanel.style.border = 'none';
+      nftCountPanel.style.borderColor = 'transparent';
+      // CRITICAL: Ensure tooltip is hidden when greyed out
+      const countTooltip = nftCountPanel.querySelector('.tooltiptext');
+      if (countTooltip) {
+        countTooltip.style.setProperty('visibility', 'hidden', 'important');
+        countTooltip.style.setProperty('opacity', '0', 'important');
+        countTooltip.style.setProperty('pointer-events', 'none', 'important');
+      }
+    }
+    
+    // CRITICAL: Disable tooltips for "Generate NFTs" and "NFT Traits" title text when greyed out
+    const nftPreviewTitleText = document.querySelector('#generate-nfts .nft-preview-title-text');
+    if (nftPreviewTitleText) {
+      nftPreviewTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+      nftPreviewTitleText.dataset.tooltipDisabled = 'true';
+      // CRITICAL: Ensure tooltip is hidden when greyed out
+      const nftPreviewTooltip = nftPreviewTitleText.closest('.nft-preview-title')?.querySelector('.tooltiptext');
+      if (nftPreviewTooltip) {
+        nftPreviewTooltip.style.setProperty('visibility', 'hidden', 'important');
+        nftPreviewTooltip.style.setProperty('opacity', '0', 'important');
+        nftPreviewTooltip.style.setProperty('pointer-events', 'none', 'important');
+      }
+    }
+    
+    const traitsTitleText = document.querySelector('#generate-nfts .traits-title-text');
+    if (traitsTitleText) {
+      traitsTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+      traitsTitleText.dataset.tooltipDisabled = 'true';
+      // CRITICAL: Ensure tooltip is hidden when greyed out
+      const traitsTooltip = traitsTitleText.closest('.traits-title')?.querySelector('.tooltiptext');
+      if (traitsTooltip) {
+        traitsTooltip.style.setProperty('visibility', 'hidden', 'important');
+        traitsTooltip.style.setProperty('opacity', '0', 'important');
+        traitsTooltip.style.setProperty('pointer-events', 'none', 'important');
+      }
+    }
+  },
+
+  // CRITICAL: Grey out all elements (not just buttons) during project loading
+  _ensureAllElementsGreyedOut: function() {
     // Grey out seed box
     const seedBox = document.querySelector('.nft-seed-box');
     if (seedBox) {
-      seedBox.style.color = '#84a0b0';
+      seedBox.style.setProperty('color', '#a0a0b0', 'important');
+      seedBox.style.cursor = 'default';
+      seedBox.style.pointerEvents = 'none';
+      seedBox.onclick = null;
+    }
+    
+    // Grey out seed label
+    const seedLabel = document.querySelector('.seed-label');
+    if (seedLabel) {
+      seedLabel.style.setProperty('color', '#a0a0b0', 'important');
+      seedLabel.style.cursor = 'default';
+      seedLabel.style.pointerEvents = 'none';
+      seedLabel.onclick = null;
+    }
+    
+    // Grey out copy button
+    const copyBtn = document.querySelector('.nft-seed-copy-btn');
+    if (copyBtn) {
+      copyBtn.style.setProperty('color', '#a0a0b0', 'important');
+      copyBtn.style.cursor = 'default';
+      copyBtn.removeAttribute('disabled');
+    }
+    
+    // Grey out Generate Seed button
+    const generateSeedBtn = document.getElementById('generate-seed-nft-btn');
+    if (generateSeedBtn) {
+      generateSeedBtn.style.setProperty('background-color', '#23232b', 'important');
+      generateSeedBtn.style.setProperty('color', '#a0a0b0', 'important');
+      generateSeedBtn.style.setProperty('cursor', 'not-allowed', 'important');
+      generateSeedBtn.style.setProperty('opacity', '0.6', 'important');
+      generateSeedBtn.style.setProperty('border', '1px solid #84a0b0', 'important');
+      generateSeedBtn.style.setProperty('border-color', '#84a0b0', 'important');
+      generateSeedBtn.disabled = true;
+      generateSeedBtn.setAttribute('disabled', 'disabled');
+    }
+    
+    // Grey out NFT count panel
+    const nftCountPanel = document.getElementById('nft-count-panel');
+    if (nftCountPanel) {
+      nftCountPanel.classList.remove('tooltip');
+      nftCountPanel.style.cursor = 'default';
+      nftCountPanel.dataset.tooltipDisabled = 'true';
     }
   },
 
@@ -7476,11 +7846,25 @@ window.NFTApp.registerModule("generateNftsUI", {
     const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
     const isPopupShowing = popup || pleaseWaitPopup;
     
+    // CRITICAL: Check if project is still loading - keep everything greyed out during loading
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const isProjectLoading = loadingOverlay && 
+                            loadingOverlay.style.display !== 'none' && 
+                            loadingOverlay.style.visibility !== 'hidden' &&
+                            loadingOverlay.style.opacity !== '0';
+    
+    if (isPopupShowing || isProjectLoading) {
     if (isPopupShowing) {
       console.log('[DEBUG] _updateAllButtonStates: Popup is still showing, skipping update');
-      // CRITICAL: Ensure all buttons stay greyed out while popup is showing
+      }
+      if (isProjectLoading) {
+        console.log('[DEBUG] _updateAllButtonStates: Project is still loading, keeping elements greyed out');
+      }
+      // CRITICAL: Ensure all buttons stay greyed out while popup is showing OR project is loading
       this._ensureButtonsGreyedOut();
-      return; // Don't update while popup is visible - buttons should stay greyed out
+      // CRITICAL: Also grey out other elements (seed box, seed label, etc.) during loading
+      this._ensureAllElementsGreyedOut();
+      return; // Don't update while popup is visible OR project is loading - buttons should stay greyed out
     }
     
     const projectData = this.projectData || window.currentProject;
@@ -7513,18 +7897,80 @@ window.NFTApp.registerModule("generateNftsUI", {
     
       // Update seed display
       const seedBox = document.querySelector('.nft-seed-box');
+      const seedLabel = document.querySelector('.seed-label');
+      
+      // CRITICAL: Check if popup is showing - if so, keep seed greyed out
+      // Reuse popup, pleaseWaitPopup, and isPopupShowing from lines 7501-7507 (already declared in function scope)
+      
       if (seedBox) {
-        if (!hasNFT) {
-          seedBox.textContent = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-          seedBox.style.color = '#a0a0b0'; // Match placeholder color (var(--text-secondary))
-      } else {
-        if (projectData) {
-          const deterministicSeed = window.NFTApp.getModule('generateNfts').computeDeterministicSeed(projectData, window.lastGeneratedNFT);
-          seedBox.textContent = deterministicSeed;
+        if (!hasNFT || isPopupShowing) {
+          if (!hasNFT) {
+            seedBox.textContent = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+          }
+          seedBox.style.setProperty('color', '#a0a0b0', 'important'); // Match placeholder color when greyed out - must override CSS
+        } else {
+          if (projectData) {
+            const deterministicSeed = window.NFTApp.getModule('generateNfts').computeDeterministicSeed(projectData, window.lastGeneratedNFT);
+            seedBox.textContent = deterministicSeed;
+          }
+          seedBox.style.setProperty('color', '#fff', 'important'); // White when enabled - must override CSS
         }
-        seedBox.style.color = '#fff';
       }
-    }
+      
+      // CRITICAL: Update seed label color based on NFT status and popup
+      if (seedLabel) {
+        if (!hasNFT || isPopupShowing || !shouldEnableContent) {
+          seedLabel.style.setProperty('color', '#a0a0b0', 'important'); // Grey when no NFT, popup showing, or content disabled - must override CSS
+          seedLabel.style.cursor = 'default';
+          seedLabel.style.pointerEvents = 'none'; // Prevent clicks when greyed out
+          seedLabel.onclick = null;
+        } else {
+          seedLabel.style.setProperty('color', '#fff', 'important'); // White when enabled - must override CSS
+          seedLabel.style.cursor = 'pointer';
+          seedLabel.style.userSelect = 'none'; // Prevent text selection
+          seedLabel.style.pointerEvents = 'auto'; // Ensure clicks work
+          // Get the copy function from the copy button if it exists
+          const copyBtn = document.querySelector('.nft-seed-copy-btn');
+          if (copyBtn && copyBtn.onclick) {
+            seedLabel.onclick = copyBtn.onclick; // Use same copy function
+          }
+        }
+      }
+      
+      // CRITICAL: Update seed box clickability based on NFT status and popup
+      if (seedBox) {
+        if (!hasNFT || isPopupShowing || !shouldEnableContent) {
+          seedBox.style.cursor = 'default';
+          seedBox.style.pointerEvents = 'none'; // Prevent clicks when greyed out
+          seedBox.onclick = null;
+        } else {
+          seedBox.style.cursor = 'pointer';
+          seedBox.style.userSelect = 'none'; // Prevent text selection
+          seedBox.style.pointerEvents = 'auto'; // Ensure clicks work
+          // Get the copy function from the copy button if it exists
+          const copyBtn = document.querySelector('.nft-seed-copy-btn');
+          if (copyBtn && copyBtn.onclick) {
+            seedBox.onclick = copyBtn.onclick; // Use same copy function
+          }
+        }
+      }
+      
+      // CRITICAL: Remove tooltip class from nft-count-panel when greyed out to prevent help cursor
+      const nftCountPanel = document.getElementById('nft-count-panel');
+      if (nftCountPanel) {
+        if (isPopupShowing || !shouldEnableContent) {
+          nftCountPanel.classList.remove('tooltip');
+          nftCountPanel.style.cursor = 'default'; // Default cursor when greyed out (not help)
+          nftCountPanel.dataset.tooltipDisabled = 'true';
+        } else {
+          // Restore tooltip class when enabled
+          if (!nftCountPanel.classList.contains('tooltip')) {
+            nftCountPanel.classList.add('tooltip');
+          }
+          nftCountPanel.removeAttribute('data-tooltip-disabled');
+          nftCountPanel.style.cursor = 'help'; // Help cursor when enabled
+        }
+      }
     
       // Update copy button
       const copyBtn = document.querySelector('.nft-seed-copy-btn');
@@ -7535,20 +7981,68 @@ window.NFTApp.registerModule("generateNftsUI", {
           delete copyBtn.dataset.copyTimeoutId;
         }
         const copyTooltipText = copyBtn.querySelector('.tooltiptext');
-        if (!shouldEnableContent) {
+        
+        // CRITICAL: Check if popup is showing - if so, disable tooltip cursor
+        // Reuse popup, pleaseWaitPopup, and isPopupShowing from lines 7501-7507 (already declared in function scope)
+        
+        // CRITICAL: Enable copy button when there's a valid seed (even if NFT image not fully loaded)
+        // Check if seed box has a valid seed value (not placeholder)
+        const seedBoxForCopy = document.querySelector('.nft-seed-box');
+        const hasValidSeed = seedBoxForCopy && seedBoxForCopy.textContent && 
+                            seedBoxForCopy.textContent.trim() !== 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' &&
+                            seedBoxForCopy.textContent.trim().length >= 10;
+        
+        if (!hasValidSeed || isPopupShowing) {
           copyBtn.style.setProperty('color', '#a0a0b0', 'important'); // Match placeholder color (var(--text-secondary))
-          copyBtn.style.cursor = 'not-allowed';
+          copyBtn.style.cursor = 'default'; // Default cursor when greyed out (not not-allowed, not help)
           copyBtn.removeAttribute('disabled'); // Remove disabled to allow clicks
+          // CRITICAL: Keep tooltip class - tooltip should work even when disabled
+          // Only disable tooltip during popups, not when button is just disabled
+          if (isPopupShowing) {
+            copyBtn.classList.remove('tooltip');
+            copyBtn.dataset.tooltipDisabled = 'true';
+          } else {
+            // Ensure tooltip class is present
+            if (!copyBtn.classList.contains('tooltip')) {
+              copyBtn.classList.add('tooltip');
+            }
+            // CRITICAL: Remove data-tooltip-disabled to ensure tooltip works
+            copyBtn.removeAttribute('data-tooltip-disabled');
+            delete copyBtn.dataset.tooltipDisabled;
+          }
           if (copyTooltipText) {
             copyTooltipText.textContent = 'No NFT generated yet';
+            // Don't hide tooltip - let it show to explain why button is disabled
           }
         } else {
-          // Immediately set blue color when enabled
+          // Immediately set blue color when enabled (valid seed exists)
           copyBtn.style.setProperty('color', '#007bff', 'important');
           copyBtn.style.cursor = 'pointer';
+          copyBtn.style.setProperty('pointer-events', 'auto', 'important'); // CRITICAL: Ensure button is clickable
           copyBtn.removeAttribute('disabled');
+          // CRITICAL: Always ensure tooltip class is present
+          if (!copyBtn.classList.contains('tooltip')) {
+            copyBtn.classList.add('tooltip');
+          }
+          // CRITICAL: Only disable tooltip during popups, not when button is just disabled
+          // Remove data-tooltip-disabled if not during popup
+          if (!isPopupShowing) {
+            copyBtn.removeAttribute('data-tooltip-disabled');
+            delete copyBtn.dataset.tooltipDisabled;
+          }
           if (copyTooltipText) {
-            copyTooltipText.textContent = 'Copy Seed number';
+            copyTooltipText.innerHTML = 'Copy the Seed Number<br>to clipboard memory.';
+          }
+          // CRITICAL: Re-setup tooltip when button is enabled to ensure it works
+          const copyTooltipManagerReSetup = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+          if (copyTooltipManagerReSetup && copyTooltipManagerReSetup.setupTooltip) {
+            // Remove old setup flag to allow re-setup
+            copyBtn.removeAttribute('data-tooltip-setup');
+            copyTooltipManagerReSetup.setupTooltip(copyBtn, copyTooltipText);
+          } else if (this.setupTooltipPositioning) {
+            // Remove old setup flag to allow re-setup
+            copyBtn.removeAttribute('data-tooltip-setup');
+            this.setupTooltipPositioning(copyBtn, copyTooltipText);
           }
         }
       }
@@ -7559,12 +8053,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       const generateSeedBtn = document.getElementById('generate-seed-nft-btn');
       if (generateSeedBtn) {
         // CRITICAL: Check if popup is showing - if so, keep button greyed out
-        const generateNftsTab = document.getElementById('generate-nfts');
-        let popup = generateNftsTab ? generateNftsTab.querySelector('.nft-rendering-popup') : null;
-        if (!popup) {
-          popup = document.querySelector('.nft-rendering-popup');
-        }
-        const isPopupShowing = !!popup;
+        // Reuse isPopupShowing from line 7507 (already declared in function scope)
         
         if (isPopupShowing || !hasMinimumRequirements) {
           // Disable if popup is showing OR minimum requirements not met
@@ -7575,7 +8064,8 @@ window.NFTApp.registerModule("generateNftsUI", {
           generateSeedBtn.style.setProperty('opacity', '0.6', 'important');
           generateSeedBtn.style.setProperty('border', '1px solid #84a0b0', 'important'); // Grey border when disabled
           generateSeedBtn.style.setProperty('border-color', '#84a0b0', 'important'); // Ensure grey border color
-          generateSeedBtn.style.pointerEvents = 'none';
+          // CRITICAL: Allow pointer events for tooltip even when disabled
+          // Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
           generateSeedBtn.disabled = true;
           generateSeedBtn.setAttribute('disabled', 'disabled');
         } else {
@@ -7588,6 +8078,27 @@ window.NFTApp.registerModule("generateNftsUI", {
           generateSeedBtn.removeAttribute('disabled');
           generateSeedBtn.style.opacity = '1';
           generateSeedBtn.style.cursor = 'pointer';
+          generateSeedBtn.style.pointerEvents = 'auto'; // Re-enable hover interactions when enabled
+          // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed
+          if (!generateSeedBtn.classList.contains('tooltip')) {
+            generateSeedBtn.classList.add('tooltip');
+          }
+          generateSeedBtn.removeAttribute('data-tooltip-disabled');
+          delete generateSeedBtn.dataset.tooltipDisabled;
+          // CRITICAL: Re-setup tooltip when button is enabled
+          const generateSeedTooltip = generateSeedBtn.querySelector('.tooltiptext');
+          if (generateSeedTooltip) {
+            const generateSeedTooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+            if (generateSeedTooltipManager && generateSeedTooltipManager.setupTooltip) {
+              generateSeedBtn.removeAttribute('data-tooltip-setup');
+              delete generateSeedBtn.dataset.tooltipSetup;
+              generateSeedTooltipManager.setupTooltip(generateSeedBtn, generateSeedTooltip);
+            } else if (this.setupTooltipPositioning) {
+              generateSeedBtn.removeAttribute('data-tooltip-setup');
+              delete generateSeedBtn.dataset.tooltipSetup;
+              this.setupTooltipPositioning(generateSeedBtn, generateSeedTooltip);
+            }
+          }
         }
       }
       
@@ -7614,6 +8125,26 @@ window.NFTApp.registerModule("generateNftsUI", {
           seedToggleBtn.style.opacity = '1';
           seedToggleBtn.disabled = false;
           seedToggleBtn.removeAttribute('disabled');
+          // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed
+          if (!seedToggleBtn.classList.contains('tooltip')) {
+            seedToggleBtn.classList.add('tooltip');
+          }
+          seedToggleBtn.removeAttribute('data-tooltip-disabled');
+          delete seedToggleBtn.dataset.tooltipDisabled;
+          // CRITICAL: Re-setup tooltip when button is enabled
+          const seedToggleTooltip = seedToggleBtn.querySelector('.tooltiptext');
+          if (seedToggleTooltip) {
+            const seedToggleTooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+            if (seedToggleTooltipManager && seedToggleTooltipManager.setupTooltip) {
+              seedToggleBtn.removeAttribute('data-tooltip-setup');
+              delete seedToggleBtn.dataset.tooltipSetup;
+              seedToggleTooltipManager.setupTooltip(seedToggleBtn, seedToggleTooltip);
+            } else if (this.setupTooltipPositioning) {
+              seedToggleBtn.removeAttribute('data-tooltip-setup');
+              delete seedToggleBtn.dataset.tooltipSetup;
+              this.setupTooltipPositioning(seedToggleBtn, seedToggleTooltip);
+            }
+          }
         }
       }
       
@@ -7641,8 +8172,14 @@ window.NFTApp.registerModule("generateNftsUI", {
           darkNftsBtn.style.borderColor = '#4a4a4a';
           darkNftsBtn.style.cursor = 'pointer';
           darkNftsBtn.style.opacity = '1';
+          darkNftsBtn.style.setProperty('pointer-events', 'auto', 'important'); // CRITICAL: Re-enable pointer events when button is enabled
           darkNftsBtn.disabled = false;
           darkNftsBtn.removeAttribute('disabled');
+          darkNftsBtn.removeAttribute('data-tooltip-disabled'); // CRITICAL: Remove tooltip disabled attribute to restore tooltip functionality
+          // Restore tooltip class if it was removed
+          if (!darkNftsBtn.classList.contains('tooltip')) {
+            darkNftsBtn.classList.add('tooltip');
+          }
           // Edit button visibility will be controlled by active state (only show if Dark NFTs is active)
           const editBtn = document.getElementById('dark-traits-edit-btn');
           if (editBtn) {
@@ -7761,7 +8298,7 @@ window.NFTApp.registerModule("generateNftsUI", {
       if (editCollectionBtn) {
         if (!shouldEnableContent) {
           this._applyDisabledStyles(editCollectionBtn);
-          editCollectionBtn.style.border = '2px solid #84a0b0';
+          // Border is already removed by _applyDisabledStyles - don't override it
           editCollectionBtn.disabled = true;
           editCollectionBtn.setAttribute('disabled', 'disabled');
         } else {
@@ -7776,14 +8313,24 @@ window.NFTApp.registerModule("generateNftsUI", {
         }
       }
       
-      // Update NFT count container
-      const nftCountPanel = document.getElementById('nft-count-panel');
+      // Update NFT count container (reuse nftCountPanel declared at line 7616)
+      // nftCountPanel is already declared earlier in this function, so reuse it
       if (nftCountPanel) {
         if (!shouldEnableContent) {
           nftCountPanel.style.backgroundColor = '#23232b';
-          nftCountPanel.style.borderColor = '#84a0b0';
+          // CRITICAL: Remove border when greyed out
+          nftCountPanel.style.border = 'none';
+          nftCountPanel.style.borderColor = 'transparent';
+          // CRITICAL: Ensure tooltip is hidden when greyed out
+          const countTooltip = nftCountPanel.querySelector('.tooltiptext');
+          if (countTooltip) {
+            countTooltip.style.setProperty('visibility', 'hidden', 'important');
+            countTooltip.style.setProperty('opacity', '0', 'important');
+            countTooltip.style.setProperty('pointer-events', 'none', 'important');
+          }
         } else {
           nftCountPanel.style.backgroundColor = '#000000';
+          nftCountPanel.style.border = '2px solid #8b5cf6';
           nftCountPanel.style.borderColor = '#8b5cf6';
         }
       }
@@ -7821,6 +8368,63 @@ window.NFTApp.registerModule("generateNftsUI", {
         } else {
           nftsLabel.style.setProperty('color', '#ffffff', 'important');
           nftsLabel.style.setProperty('text-shadow', '2px 2px 0 #000000', 'important');
+        }
+      }
+      
+      // CRITICAL: Re-enable tooltips for "Generate NFTs" and "NFT Traits" title text when content is enabled
+      const nftPreviewTitleText = document.querySelector('#generate-nfts .nft-preview-title-text');
+      if (nftPreviewTitleText) {
+        if (shouldEnableContent) {
+          nftPreviewTitleText.style.setProperty('cursor', 'help', 'important'); // Help cursor when enabled - must override inline style
+          nftPreviewTitleText.removeAttribute('data-tooltip-disabled');
+          // CRITICAL: Re-setup tooltip using global tooltip manager
+          const nftPreviewTooltip = nftPreviewTitleText.closest('.nft-preview-title')?.querySelector('.tooltiptext');
+          if (nftPreviewTooltip) {
+            const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+            if (tooltipManager && tooltipManager.setupTooltip) {
+              // Remove old setup flag to allow re-setup
+              nftPreviewTitleText.removeAttribute('data-tooltip-setup');
+              tooltipManager.setupTooltip(nftPreviewTitleText, nftPreviewTooltip);
+            }
+          }
+        } else {
+          nftPreviewTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+          nftPreviewTitleText.dataset.tooltipDisabled = 'true';
+          // CRITICAL: Ensure tooltip is hidden when greyed out
+          const nftPreviewTooltip = nftPreviewTitleText.closest('.nft-preview-title')?.querySelector('.tooltiptext');
+          if (nftPreviewTooltip) {
+            nftPreviewTooltip.style.setProperty('visibility', 'hidden', 'important');
+            nftPreviewTooltip.style.setProperty('opacity', '0', 'important');
+            nftPreviewTooltip.style.setProperty('pointer-events', 'none', 'important');
+          }
+        }
+      }
+      
+      const traitsTitleText = document.querySelector('#generate-nfts .traits-title-text');
+      if (traitsTitleText) {
+        if (shouldEnableContent) {
+          traitsTitleText.style.setProperty('cursor', 'help', 'important'); // Help cursor when enabled - must override inline style
+          traitsTitleText.removeAttribute('data-tooltip-disabled');
+          // CRITICAL: Re-setup tooltip using global tooltip manager
+          const traitsTooltip = traitsTitleText.closest('.traits-title')?.querySelector('.tooltiptext');
+          if (traitsTooltip) {
+            const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+            if (tooltipManager && tooltipManager.setupTooltip) {
+              // Remove old setup flag to allow re-setup
+              traitsTitleText.removeAttribute('data-tooltip-setup');
+              tooltipManager.setupTooltip(traitsTitleText, traitsTooltip);
+            }
+          }
+        } else {
+          traitsTitleText.style.setProperty('cursor', 'default', 'important'); // Default cursor when greyed out (not help) - must override inline style
+          traitsTitleText.dataset.tooltipDisabled = 'true';
+          // CRITICAL: Ensure tooltip is hidden when greyed out
+          const traitsTooltip = traitsTitleText.closest('.traits-title')?.querySelector('.tooltiptext');
+          if (traitsTooltip) {
+            traitsTooltip.style.setProperty('visibility', 'hidden', 'important');
+            traitsTooltip.style.setProperty('opacity', '0', 'important');
+            traitsTooltip.style.setProperty('pointer-events', 'none', 'important');
+          }
         }
       }
   },
@@ -7903,16 +8507,18 @@ window.NFTApp.registerModule("generateNftsUI", {
       const pleaseWaitPopup = document.getElementById('nft-edit-please-wait-popup');
       const isPopupShowing = popup || pleaseWaitPopup;
       
-      // Apply greyed out style to seed box and seed label when no NFT OR when popup is showing
-      if (!hasNFT || isPopupShowing) {
-        seedBox.style.color = '#84a0b0';
-        seedLabel.style.color = '#a0a0b0'; // Match Dark NFTs button text color when greyed out
+      // Apply greyed out style to seed box and seed label when no NFT OR when popup is showing OR when requirements not met
+      const shouldGreyOutSeedInRender = !hasNFT || isPopupShowing || !hasMinimumRequirements;
+      if (shouldGreyOutSeedInRender) {
+        seedBox.style.setProperty('color', '#a0a0b0', 'important'); // Match seed label color when greyed out - must override CSS
+        seedLabel.style.setProperty('color', '#a0a0b0', 'important'); // Match Dark NFTs button text color when greyed out - must override CSS
       } else {
-        seedBox.style.color = '#fff';
-        seedLabel.style.color = '#fff'; // White when enabled
+        seedBox.style.setProperty('color', '#fff', 'important'); // White when enabled - must override CSS
+        seedLabel.style.setProperty('color', '#fff', 'important'); // White when enabled - must override CSS
       }
       
       const copyBtn = document.createElement('button');
+      // CRITICAL: Always add tooltip class - tooltip should work even when disabled
       copyBtn.className = 'nft-seed-copy-btn tooltip';
       copyBtn.style.background = 'none';
       copyBtn.style.border = 'none';
@@ -7922,28 +8528,86 @@ window.NFTApp.registerModule("generateNftsUI", {
       copyBtn.style.fontSize = '18px';
       copyBtn.style.fontWeight = 'bold';
       
-      // Create custom tooltip
+      // CRITICAL: Set button text BEFORE appending tooltip to avoid removing tooltip
+      // Use a text node to preserve tooltip element when text changes
+      const buttonTextNode = document.createTextNode('⧉');
+      copyBtn.appendChild(buttonTextNode);
+      
+      // Create custom tooltip with description
       const copyTooltipText = document.createElement('span');
       copyTooltipText.className = 'tooltiptext';
-      copyTooltipText.textContent = 'Copy Seed number';
+      copyTooltipText.innerHTML = 'Copy the Seed Number<br>to clipboard memory.';
       copyBtn.appendChild(copyTooltipText);
       
-      // Use proper tooltip setup with delay
-      if (this.setupTooltipPositioning) {
-        this.setupTooltipPositioning(copyBtn, copyTooltipText);
+      // CRITICAL: Always set up tooltip - tooltip should work even when button is disabled
+      // Store reference for later setup
+      const setupCopySeedTooltip = () => {
+        const copyTooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (copyTooltipManager && copyTooltipManager.setupTooltip) {
+          copyTooltipManager.setupTooltip(copyBtn, copyTooltipText);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(copyBtn, copyTooltipText);
+        }
+      };
+      
+      // Set up tooltip immediately
+      setupCopySeedTooltip();
+      
+      // Grey out copy button when no NFT, requirements not met, or popup is showing (but don't disable it)
+      if (!hasNFT || !hasMinimumRequirements || isPopupShowing) {
+        // CRITICAL: Don't set data-tooltip-disabled - tooltip should still work to explain why button is disabled
+        // Just apply visual styling
+        // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed
+        if (!copyBtn.classList.contains('tooltip')) {
+          copyBtn.classList.add('tooltip');
+        }
+        copyBtn.removeAttribute('data-tooltip-disabled');
+        delete copyBtn.dataset.tooltipDisabled;
+      } else {
+        // Button is enabled - ensure tooltip is set up
+        // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed
+        if (!copyBtn.classList.contains('tooltip')) {
+          copyBtn.classList.add('tooltip');
+        }
+        copyBtn.removeAttribute('data-tooltip-disabled');
+        delete copyBtn.dataset.tooltipDisabled;
+        // Re-setup tooltip after button state is determined
+        setTimeout(() => {
+          // Remove any existing tooltip setup to force re-setup
+          if (copyBtn.dataset.tooltipSetup === "true") {
+            delete copyBtn.dataset.tooltipSetup;
+          }
+          setupCopySeedTooltip();
+        }, 0);
       }
       
-      // Grey out copy button when no NFT or requirements not met (but don't disable it)
-      if (!hasNFT || !hasMinimumRequirements) {
+      // Apply greyed out styling
+      if (!hasNFT || !hasMinimumRequirements || isPopupShowing) {
         // Clear any pending timeout from previous copy action
         if (copyBtn.dataset.copyTimeoutId) {
           clearTimeout(parseInt(copyBtn.dataset.copyTimeoutId));
           delete copyBtn.dataset.copyTimeoutId;
         }
         copyBtn.style.color = '#a0a0b0'; // Match placeholder color (var(--text-secondary))
-        copyBtn.style.cursor = 'not-allowed';
+        copyBtn.style.cursor = 'default'; // Default cursor when greyed out (not not-allowed, not help)
         copyBtn.removeAttribute('disabled'); // Remove disabled to allow clicks
+        // CRITICAL: Keep tooltip class - tooltip should work even when disabled
+        // Only disable tooltip during popups, not when button is just disabled
+        if (isPopupShowing) {
+          copyBtn.classList.remove('tooltip');
+          copyBtn.dataset.tooltipDisabled = 'true';
+        } else {
+          // Ensure tooltip class is present
+          if (!copyBtn.classList.contains('tooltip')) {
+            copyBtn.classList.add('tooltip');
+          }
+          // CRITICAL: Remove data-tooltip-disabled to ensure tooltip works
+          copyBtn.removeAttribute('data-tooltip-disabled');
+          delete copyBtn.dataset.tooltipDisabled;
+        }
         copyTooltipText.textContent = 'No NFT generated yet';
+        // Don't hide tooltip - let it show to explain why button is disabled
       } else {
         // Clear any pending timeout from previous copy action
         if (copyBtn.dataset.copyTimeoutId) {
@@ -7953,59 +8617,158 @@ window.NFTApp.registerModule("generateNftsUI", {
         // Immediately set blue color when enabled
         copyBtn.style.setProperty('color', '#007bff', 'important'); // Same blue as Generate Seed button
         copyBtn.style.cursor = 'pointer';
+        copyBtn.style.setProperty('pointer-events', 'auto', 'important'); // CRITICAL: Ensure button is clickable
+        copyBtn.disabled = false;
         copyBtn.removeAttribute('disabled');
+        // CRITICAL: Always ensure tooltip class is present
+        if (!copyBtn.classList.contains('tooltip')) {
+          copyBtn.classList.add('tooltip');
+        }
+        // CRITICAL: Only disable tooltip during popups, not when button is just disabled
+        // Remove data-tooltip-disabled if not during popup
+        if (!isPopupShowing) {
+          copyBtn.removeAttribute('data-tooltip-disabled');
+          delete copyBtn.dataset.tooltipDisabled;
+        }
         copyTooltipText.textContent = 'Copy Seed number';
+        // CRITICAL: Re-setup tooltip when button is enabled to ensure it works
+        // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed before re-setup
+        if (!copyBtn.classList.contains('tooltip')) {
+          copyBtn.classList.add('tooltip');
+        }
+        copyBtn.removeAttribute('data-tooltip-disabled');
+        delete copyBtn.dataset.tooltipDisabled;
+        
+        const copyTooltipManagerReSetup = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (copyTooltipManagerReSetup && copyTooltipManagerReSetup.setupTooltip) {
+          // Remove old setup flag to allow re-setup
+          copyBtn.removeAttribute('data-tooltip-setup');
+          delete copyBtn.dataset.tooltipSetup;
+          copyTooltipManagerReSetup.setupTooltip(copyBtn, copyTooltipText);
+        } else if (this.setupTooltipPositioning) {
+          // Remove old setup flag to allow re-setup
+          copyBtn.removeAttribute('data-tooltip-setup');
+          delete copyBtn.dataset.tooltipSetup;
+          this.setupTooltipPositioning(copyBtn, copyTooltipText);
+        }
       }
       
-      copyBtn.textContent = '⧉';
+      // CRITICAL: Button text is already set above using a text node to preserve tooltip
+      // No need to set textContent here as it would remove the tooltip
       copyBtn.onmousedown = e => e.preventDefault(); // Prevent focus outline
-      copyBtn.onclick = async function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      
+      // CRITICAL: Shared copy function for seed label, seed box, and copy button
+      const copySeedToClipboard = async function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        console.log('[DEBUG] Copy seed triggered');
         
         // Check if there's actually a valid seed value to copy
-        const seedBox = document.querySelector('.nft-seed-box');
-        if (!seedBox || !seedBox.textContent) {
+        const seedBoxElement = document.querySelector('.nft-seed-box');
+        if (!seedBoxElement || !seedBoxElement.textContent) {
+          console.log('[DEBUG] Copy seed click ignored - no seed box found');
           return; // No seed box found
         }
         
-        const seedValue = seedBox.textContent.trim();
+        const seedValue = seedBoxElement.textContent.trim();
         // Check if seed is valid (not placeholder)
         if (!seedValue || seedValue === 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' || seedValue.length < 10) {
+          console.log('[DEBUG] Copy seed click ignored - invalid or placeholder seed');
           return; // Invalid or placeholder seed
         }
         
-          try {
-            // Copy to clipboard
+        console.log('[DEBUG] Copying seed to clipboard:', seedValue);
+        
+        try {
+          // Copy to clipboard
           await navigator.clipboard.writeText(seedValue);
-            
-            // Clear any existing timeout
-            if (copyBtn.dataset.copyTimeoutId) {
-              clearTimeout(parseInt(copyBtn.dataset.copyTimeoutId));
+          console.log('[DEBUG] Seed copied to clipboard successfully');
+          
+          // Get references to all elements
+          const copyBtnElement = document.querySelector('.nft-seed-copy-btn');
+          const seedLabelElement = document.querySelector('.seed-label');
+          const seedBoxCheck = document.querySelector('.nft-seed-box');
+          
+          // Clear any existing timeout
+          if (copyBtnElement && copyBtnElement.dataset.copyTimeoutId) {
+            clearTimeout(parseInt(copyBtnElement.dataset.copyTimeoutId));
+          }
+          
+          // CRITICAL: Store original colors before changing them
+          const seedBoxComputedStyle = window.getComputedStyle(seedBoxCheck);
+          const seedBoxOriginalColor = seedBoxCheck.style.color || seedBoxComputedStyle.color || '#ffffff';
+          const seedLabelComputedStyle = seedLabelElement ? window.getComputedStyle(seedLabelElement) : null;
+          const seedLabelOriginalColor = seedLabelElement ? (seedLabelElement.style.color || seedLabelComputedStyle.color || '#ffffff') : null;
+          
+          // Store original button values - CRITICAL: Preserve tooltip element
+          const tooltipElement = copyBtnElement ? copyBtnElement.querySelector('.tooltiptext') : null;
+          // Get the text node (the button icon '⧉') - it's the first child text node
+          let textNode = null;
+          if (copyBtnElement) {
+            for (let node of copyBtnElement.childNodes) {
+              if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                textNode = node;
+                break;
+              }
             }
-            
-            // CRITICAL: Store and maintain seed box color to prevent it from changing
-            const seedBoxCurrentColor = seedBox.style.color || window.getComputedStyle(seedBox).color;
-            const seedBoxOriginalColor = seedBoxCurrentColor;
-            
-            // Store original values
-            const originalText = copyBtn.textContent;
-            
-            // Change to verified green state
-            copyBtn.textContent = '✔';
-          copyBtn.style.setProperty('color', '#00ff3c', 'important'); // Verified green color as requested
-            copyBtn.style.transition = 'color 0.3s ease';
-            
-            // CRITICAL: Explicitly maintain seed box color - prevent it from changing
-            if (seedBoxOriginalColor) {
-              seedBox.style.setProperty('color', seedBoxOriginalColor, 'important');
+          }
+          const originalButtonText = textNode ? textNode.textContent.trim() : (copyBtnElement ? '⧉' : '⧉');
+          
+          // Change copy button to verified green state - CRITICAL: Preserve tooltip element
+          if (copyBtnElement) {
+            // Only change the text node, not the entire content (preserves tooltip)
+            if (textNode) {
+              textNode.textContent = '✔';
+            } else {
+              // If no text node found, create one and insert before tooltip
+              const checkmarkNode = document.createTextNode('✔');
+              if (tooltipElement) {
+                copyBtnElement.insertBefore(checkmarkNode, tooltipElement);
+              } else {
+                copyBtnElement.appendChild(checkmarkNode);
+              }
             }
-            
-            // Revert after 2 seconds - check current button state to use correct color
-            const timeoutId = setTimeout(() => {
-              copyBtn.textContent = originalText;
+            copyBtnElement.style.setProperty('color', '#00ff24', 'important'); // Verified green color #00ff24
+            copyBtnElement.style.transition = 'color 0.3s ease';
+          }
+          
+          // CRITICAL: Change seed box color to green (#00ff24) when copy is triggered
+          if (seedBoxCheck) {
+            seedBoxCheck.style.setProperty('color', '#00ff24', 'important');
+            seedBoxCheck.style.transition = 'color 0.3s ease';
+          }
+          
+          // CRITICAL: Change seed label color to green (#00ff24) when copy is triggered
+          if (seedLabelElement) {
+            seedLabelElement.style.setProperty('color', '#00ff24', 'important');
+            seedLabelElement.style.transition = 'color 0.3s ease';
+          }
+          
+          console.log('[DEBUG] Seed label, seed box, and copy button changed to green');
+          
+          // Revert after 2 seconds - check current button state to use correct color
+          const timeoutId = setTimeout(() => {
+            if (copyBtnElement) {
+              // CRITICAL: Restore button text while preserving tooltip element
+              const currentTextNode = Array.from(copyBtnElement.childNodes).find(node => 
+                node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+              );
+              if (currentTextNode) {
+                currentTextNode.textContent = originalButtonText;
+              } else {
+                // If no text node found, create one and insert before tooltip
+                const textNodeToRestore = document.createTextNode(originalButtonText);
+                const tooltipToPreserve = copyBtnElement.querySelector('.tooltiptext');
+                if (tooltipToPreserve) {
+                  copyBtnElement.insertBefore(textNodeToRestore, tooltipToPreserve);
+                } else {
+                  copyBtnElement.appendChild(textNodeToRestore);
+                }
+              }
               // Check if button should be enabled (has NFT and requirements met)
-              const seedBoxCheck = document.querySelector('.nft-seed-box');
               const hasValidSeed = seedBoxCheck && seedBoxCheck.textContent && 
                                    seedBoxCheck.textContent.trim() !== 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' &&
                                    seedBoxCheck.textContent.trim().length >= 10;
@@ -8016,37 +8779,115 @@ window.NFTApp.registerModule("generateNftsUI", {
               
               if (hasValidSeed && hasNFTCheck && hasMinimumRequirementsCheck) {
                 // Button should be enabled - use blue color
-                copyBtn.style.setProperty('color', '#007bff', 'important');
-            } else {
+                copyBtnElement.style.setProperty('color', '#007bff', 'important');
+              } else {
                 // Button should be disabled - use grey color
-                copyBtn.style.setProperty('color', '#a0a0b0', 'important');
-            }
-              
-              // CRITICAL: Ensure seed box color is maintained after timeout
-              if (seedBoxCheck && seedBoxOriginalColor) {
-                seedBoxCheck.style.setProperty('color', seedBoxOriginalColor, 'important');
+                copyBtnElement.style.setProperty('color', '#a0a0b0', 'important');
               }
-              
-              delete copyBtn.dataset.copyTimeoutId;
-            }, 2000);
-            copyBtn.dataset.copyTimeoutId = timeoutId.toString();
-          } catch (error) {
-            console.error('Failed to copy seed to clipboard:', error);
-            // Show brief error feedback
-            const originalText = copyBtn.textContent;
-            const originalColor = copyBtn.style.color;
-            copyBtn.textContent = '✗';
-          copyBtn.style.setProperty('color', '#ff0000', 'important'); // Red for error
-            setTimeout(() => {
-              copyBtn.textContent = originalText;
-            if (originalColor) {
-              copyBtn.style.setProperty('color', originalColor, 'important');
-            } else {
-              copyBtn.style.removeProperty('color');
             }
+            
+            // CRITICAL: Revert seed box color to original after timeout
+            if (seedBoxCheck) {
+              seedBoxCheck.style.setProperty('color', seedBoxOriginalColor, 'important');
+            }
+            
+            // CRITICAL: Revert seed label color to original after timeout
+            if (seedLabelElement && seedLabelOriginalColor) {
+              seedLabelElement.style.setProperty('color', seedLabelOriginalColor, 'important');
+            }
+            
+            if (copyBtnElement) {
+              delete copyBtnElement.dataset.copyTimeoutId;
+            }
+            console.log('[DEBUG] Seed label, seed box, and copy button reverted to original colors');
+          }, 2000);
+          
+          if (copyBtnElement) {
+            copyBtnElement.dataset.copyTimeoutId = timeoutId.toString();
+          }
+        } catch (error) {
+          console.error('Failed to copy seed to clipboard:', error);
+          // Show brief error feedback - CRITICAL: Preserve tooltip element
+          const copyBtnElement = document.querySelector('.nft-seed-copy-btn');
+          if (copyBtnElement) {
+            // Get the text node (the button icon) - preserve tooltip
+            let textNodeForError = null;
+            for (let node of copyBtnElement.childNodes) {
+              if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                textNodeForError = node;
+                break;
+              }
+            }
+            const originalText = textNodeForError ? textNodeForError.textContent.trim() : '⧉';
+            const originalColor = copyBtnElement.style.color;
+            
+            // Change only the text node, not the entire content (preserves tooltip)
+            if (textNodeForError) {
+              textNodeForError.textContent = '✗';
+            } else {
+              // If no text node found, create one and insert before tooltip
+              const errorNode = document.createTextNode('✗');
+              const tooltipElement = copyBtnElement.querySelector('.tooltiptext');
+              if (tooltipElement) {
+                copyBtnElement.insertBefore(errorNode, tooltipElement);
+              } else {
+                copyBtnElement.appendChild(errorNode);
+              }
+            }
+            copyBtnElement.style.setProperty('color', '#ff0000', 'important'); // Red for error
+            setTimeout(() => {
+              // Restore button text while preserving tooltip
+              const currentTextNodeForError = Array.from(copyBtnElement.childNodes).find(node => 
+                node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+              );
+              if (currentTextNodeForError) {
+                currentTextNodeForError.textContent = originalText;
+              } else {
+                // If no text node found, create one and insert before tooltip
+                const textNodeToRestoreError = document.createTextNode(originalText);
+                const tooltipToPreserveError = copyBtnElement.querySelector('.tooltiptext');
+                if (tooltipToPreserveError) {
+                  copyBtnElement.insertBefore(textNodeToRestoreError, tooltipToPreserveError);
+                } else {
+                  copyBtnElement.appendChild(textNodeToRestoreError);
+                }
+              }
+              if (originalColor) {
+                copyBtnElement.style.setProperty('color', originalColor, 'important');
+              } else {
+                copyBtnElement.style.removeProperty('color');
+              }
             }, 2000);
+          }
         }
       };
+      
+      // Add click handler to copy button
+      copyBtn.onclick = copySeedToClipboard;
+      
+      // CRITICAL: Make seed label clickable with same copy effect (only when enabled)
+      if (!shouldGreyOutSeedInRender) {
+        seedLabel.style.cursor = 'pointer';
+        seedLabel.style.userSelect = 'none'; // Prevent text selection
+        seedLabel.style.pointerEvents = 'auto'; // Ensure clicks work
+        seedLabel.onclick = copySeedToClipboard;
+      } else {
+        seedLabel.style.cursor = 'default';
+        seedLabel.style.pointerEvents = 'none'; // Prevent clicks when greyed out
+        seedLabel.onclick = null;
+      }
+      
+      // CRITICAL: Make seed box clickable with same copy effect (only when enabled)
+      if (!shouldGreyOutSeedInRender) {
+        seedBox.style.cursor = 'pointer';
+        seedBox.style.userSelect = 'none'; // Prevent text selection
+        seedBox.style.pointerEvents = 'auto'; // Ensure clicks work
+        seedBox.onclick = copySeedToClipboard;
+      } else {
+        seedBox.style.cursor = 'default';
+        seedBox.style.pointerEvents = 'none'; // Prevent clicks when greyed out
+        seedBox.onclick = null;
+      }
       rowFlex.appendChild(seedLabel);
       rowFlex.appendChild(seedBox);
       rowFlex.appendChild(copyBtn);
@@ -8161,17 +9002,25 @@ window.NFTApp.registerModule("generateNftsUI", {
       // Create tooltip text
       const seedTooltipText = document.createElement('span');
       seedTooltipText.className = 'tooltiptext';
-      seedTooltipText.innerHTML = 'activate it if you want to generate a particular NFT<br>based on a specific Seed Number.';
+      seedTooltipText.innerHTML = 'activate it if you want to<br>generate a particular NFT<br>using on a specific Seed Number';
       toggleButton.appendChild(seedTooltipText);
       
-      // Use standard tooltip positioning function to ensure consistent behavior
-      // This will position tooltip above and centered to the button with 1-second delay and fade
-      // CRITICAL: Force local implementation for Seed NFT to ensure delay is always applied
-      if (this.setupTooltipPositioning) {
-        // Mark element to skip global tooltip manager
-        toggleButton.dataset.skipGlobalTooltip = "true";
-        this.setupTooltipPositioning(toggleButton, seedTooltipText);
-      }
+      // CRITICAL: Set up tooltip BEFORE button state is determined to ensure it works correctly
+      // Store reference for later setup
+      const setupSeedTooltip = () => {
+        // CRITICAL: Use global tooltip manager for consistent behavior and proper positioning
+        // This ensures tooltip is centered correctly on first display and has proper z-index
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(toggleButton, seedTooltipText);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local implementation if global manager not available
+          this.setupTooltipPositioning(toggleButton, seedTooltipText);
+        }
+      };
+      
+      // Set up tooltip immediately
+      setupSeedTooltip();
       
       // CRITICAL: Check if "Please Wait" popup is showing - keep grey during popup
       const generateNftsTabCheck = document.getElementById('generate-nfts');
@@ -8192,7 +9041,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         toggleButton.style.borderColor = '#84a0b0';
         toggleButton.style.cursor = 'not-allowed';
         toggleButton.style.opacity = '0.6';
-        toggleButton.style.pointerEvents = 'none'; // Completely prevent hover interactions
+        // CRITICAL: Allow pointer events for tooltip even when disabled
+        // Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
         toggleButton.disabled = true;
       } else {
         // Enable if minimum requirements are met (regardless of existing NFT)
@@ -8205,6 +9055,22 @@ window.NFTApp.registerModule("generateNftsUI", {
         toggleButton.disabled = false;
         toggleButton.removeAttribute('disabled');
       }
+      
+      // CRITICAL: Re-setup tooltip after button state is set to ensure it works correctly
+      // Use setTimeout to ensure DOM is updated and button state is applied
+      setTimeout(() => {
+        // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed before re-setup
+        if (!toggleButton.classList.contains('tooltip')) {
+          toggleButton.classList.add('tooltip');
+        }
+        toggleButton.removeAttribute('data-tooltip-disabled');
+        delete toggleButton.dataset.tooltipDisabled;
+        // Remove any existing tooltip setup to force re-setup
+        if (toggleButton.dataset.tooltipSetup === "true") {
+          delete toggleButton.dataset.tooltipSetup;
+        }
+        setupSeedTooltip();
+      }, 0);
       
       // Add click handler to toggle the button state
       toggleButton.addEventListener('click', function() {
@@ -8255,13 +9121,19 @@ window.NFTApp.registerModule("generateNftsUI", {
 
       const generateSeedBtn = document.createElement('button');
       generateSeedBtn.id = 'generate-seed-nft-btn';
-      generateSeedBtn.className = 'btn btn-primary';
+      generateSeedBtn.className = 'btn btn-primary tooltip'; // Add tooltip class for standard tooltip
       generateSeedBtn.textContent = 'Generate Seed';
       generateSeedBtn.style.width = '115px';
       generateSeedBtn.style.height = '32px';
       generateSeedBtn.style.fontSize = '13px';
       generateSeedBtn.style.margin = '0';
       generateSeedBtn.style.borderRadius = '4px';
+      
+      // Create tooltip text for Generate Seed button
+      const generateSeedTooltipText = document.createElement('span');
+      generateSeedTooltipText.className = 'tooltiptext';
+      generateSeedTooltipText.innerHTML = 'Paste a valid Seed Number to the left<br>and generate the corresponding NFT';
+      generateSeedBtn.appendChild(generateSeedTooltipText);
       
       // CRITICAL: Generate Seed button only needs minimum requirements (2 layers with 1 trait each)
       // It doesn't need an existing NFT because it's meant to GENERATE one with a seed
@@ -8275,6 +9147,22 @@ window.NFTApp.registerModule("generateNftsUI", {
       const pleaseWaitPopupCheckForSeed = document.getElementById('nft-edit-please-wait-popup');
       const isPopupShowingCheck = popupCheckForSeed || pleaseWaitPopupCheckForSeed;
       
+      // CRITICAL: Set up tooltip BEFORE button state is determined to ensure it works correctly
+      // Store reference for later setup
+      const setupGenerateSeedTooltip = () => {
+        // CRITICAL: Use global tooltip manager for consistent behavior and proper positioning
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(generateSeedBtn, generateSeedTooltipText);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(generateSeedBtn, generateSeedTooltipText);
+        }
+      };
+      
+      // Set up tooltip immediately
+      setupGenerateSeedTooltip();
+      
       if (!hasMinimumRequirements || isPopupShowingCheck) {
         // Disable if minimum requirements not met OR popup is showing
         // Apply disabled styles but override border to grey
@@ -8284,7 +9172,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         generateSeedBtn.style.setProperty('opacity', '0.6', 'important');
         generateSeedBtn.style.setProperty('border', '1px solid #84a0b0', 'important'); // Grey border when disabled
         generateSeedBtn.style.setProperty('border-color', '#84a0b0', 'important'); // Ensure grey border color
-        generateSeedBtn.style.pointerEvents = 'none';
+        // CRITICAL: Allow pointer events for tooltip even when disabled
+        // Don't set pointerEvents to 'none' - tooltip should still work to explain why button is disabled
         generateSeedBtn.disabled = true;
         generateSeedBtn.setAttribute('disabled', 'disabled');
       } else {
@@ -8297,7 +9186,24 @@ window.NFTApp.registerModule("generateNftsUI", {
         generateSeedBtn.removeAttribute('disabled');
         generateSeedBtn.style.opacity = '1';
         generateSeedBtn.style.cursor = 'pointer';
+        generateSeedBtn.style.pointerEvents = 'auto'; // Re-enable hover interactions when enabled
       }
+      
+      // CRITICAL: Re-setup tooltip after button state is set to ensure it works correctly
+      // Use setTimeout to ensure DOM is updated and button state is applied
+      setTimeout(() => {
+        // CRITICAL: Ensure tooltip class is present and data-tooltip-disabled is removed before re-setup
+        if (!generateSeedBtn.classList.contains('tooltip')) {
+          generateSeedBtn.classList.add('tooltip');
+        }
+        generateSeedBtn.removeAttribute('data-tooltip-disabled');
+        delete generateSeedBtn.dataset.tooltipDisabled;
+        // Remove any existing tooltip setup to force re-setup
+        if (generateSeedBtn.dataset.tooltipSetup === "true") {
+          delete generateSeedBtn.dataset.tooltipSetup;
+        }
+        setupGenerateSeedTooltip();
+      }, 0);
 
       // Remove existing Dark NFTs button if it exists
       const existingDarkNftsBtn = document.getElementById('generate-dark-nfts');
@@ -8318,10 +9224,10 @@ window.NFTApp.registerModule("generateNftsUI", {
       duplicateGenerateSeedBtn.removeAttribute('title');
       duplicateGenerateSeedBtn.removeAttribute('data-tooltip');
       
-      // Create tooltip text similar to Seed NFT
+      // Create tooltip text - use same text as Bulk Generation Dark NFTs tooltip
       const darkNftsTooltipText = document.createElement('span');
       darkNftsTooltipText.className = 'tooltiptext';
-      darkNftsTooltipText.innerHTML = 'activate it if you want to generate NFTs considering only<br>part of the traits in your collection. This is useful to create<br>NFTs with particular styles or using particular dominant colors<br>(like dark colors, for instance). By default, the app will consider<br>a major percentage of dark traits, but this can be personalized.';
+      darkNftsTooltipText.innerHTML = 'use this filter in case you want to generate nfts considering only part of the traits on your collection. This is useful to create nfts with particular styles or using particular dominant colors (like dark colors, for instance). By default, the app will consider a major percentage of dark traits, but this can be personalized ("EDIT" button).';
       duplicateGenerateSeedBtn.appendChild(darkNftsTooltipText);
       duplicateGenerateSeedBtn.style.cssText = `
         padding: 8px 14px;
@@ -8363,6 +9269,8 @@ window.NFTApp.registerModule("generateNftsUI", {
         duplicateGenerateSeedBtn.style.cursor = 'pointer';
         duplicateGenerateSeedBtn.style.opacity = '1';
         duplicateGenerateSeedBtn.disabled = false;
+        duplicateGenerateSeedBtn.removeAttribute('disabled');
+        duplicateGenerateSeedBtn.style.setProperty('pointer-events', 'auto', 'important'); // CRITICAL: Ensure button is clickable
         // Edit button visibility will be controlled by active state
       }
       
@@ -8384,7 +9292,33 @@ window.NFTApp.registerModule("generateNftsUI", {
       // CRITICAL: Only show tooltip when button is NOT active (like Seed NFT)
       if (darkNftsTooltipText && this.setupTooltipPositioning) {
         // Create custom tooltip handler that checks for active state
-        this.setupDarkNftsTooltip(duplicateGenerateSeedBtn, darkNftsTooltipText);
+        // CRITICAL: Use global tooltip manager for Dark NFTs button (with special handling for active state)
+        // The global tooltip manager will handle the standard app style (black background, orange text, 1s delay)
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          // Set up tooltip with global manager, but add custom logic to hide when active
+          tooltipManager.setupTooltip(duplicateGenerateSeedBtn, darkNftsTooltipText);
+          
+          // CRITICAL: Add custom logic to hide tooltip when button is active
+          // Override the mouseenter handler to check for active state
+          const originalMouseEnter = duplicateGenerateSeedBtn.onmouseenter;
+          duplicateGenerateSeedBtn.addEventListener('mouseenter', function(e) {
+            if (this.classList.contains('active')) {
+              // Hide tooltip if active - clear timeout and hide immediately
+              if (tooltipManager.currentTimeout) {
+                clearTimeout(tooltipManager.currentTimeout);
+                tooltipManager.currentTimeout = null;
+              }
+              if (tooltipManager.currentTooltip) {
+                tooltipManager.hideTooltip();
+              }
+              return;
+            }
+          }, { capture: true }); // Use capture phase to run before global manager's handler
+        } else {
+          // Fallback to custom setup if global manager not available
+          this.setupDarkNftsTooltip(duplicateGenerateSeedBtn, darkNftsTooltipText);
+        }
       }
 
       // Append toggle, input and button directly to Container 3 (seedInputRow)
@@ -8433,8 +9367,15 @@ window.NFTApp.registerModule("generateNftsUI", {
       `;
       
       // Setup tooltip positioning with standard delay and fade effects
-      if (this.setupTooltipPositioning && darkTraitsEditTooltipText) {
-        this.setupTooltipPositioning(darkTraitsEditBtn, darkTraitsEditTooltipText);
+      // CRITICAL: Use global tooltip manager for Dark NFTs edit button tooltip
+      if (darkTraitsEditTooltipText) {
+        const tooltipManager = window.NFTApp && window.NFTApp.getModule && window.NFTApp.getModule('globalTooltipManager');
+        if (tooltipManager && tooltipManager.setupTooltip) {
+          tooltipManager.setupTooltip(darkTraitsEditBtn, darkTraitsEditTooltipText);
+        } else if (this.setupTooltipPositioning) {
+          // Fallback to local setup if global manager not available
+          this.setupTooltipPositioning(darkTraitsEditBtn, darkTraitsEditTooltipText);
+        }
       }
       
       // CRITICAL: Hide edit button when Dark NFTs button is disabled/greyed out (if it was disabled above)
@@ -8457,10 +9398,10 @@ window.NFTApp.registerModule("generateNftsUI", {
           if (self && self.openDarkTraitsModal) {
             self.openDarkTraitsModal();
           } else {
-            console.error('[DEBUG] generateNftsUI module or openDarkTraitsModal method not found');
+            // console.error('[DEBUG] generateNftsUI module or openDarkTraitsModal method not found');
           }
         } catch (error) {
-          console.error('[DEBUG] Error opening Dark Traits modal:', error);
+          // console.error('[DEBUG] Error opening Dark Traits modal:', error);
         }
       });
       
@@ -8548,6 +9489,9 @@ window.NFTApp.registerModule("generateNftsUI", {
       
       // Ensure Dark NFTs button is always clickable (radio button behavior)
       duplicateGenerateSeedBtn.disabled = false;
+      duplicateGenerateSeedBtn.removeAttribute('disabled');
+      duplicateGenerateSeedBtn.style.setProperty('pointer-events', 'auto', 'important'); // CRITICAL: Ensure button is clickable
+      duplicateGenerateSeedBtn.style.setProperty('cursor', 'pointer', 'important'); // CRITICAL: Ensure pointer cursor
       
       // If Seed NFT is initially active, deactivate and hide Dark NFTs
       if (isInitiallyActive) {
@@ -8611,12 +9555,30 @@ window.NFTApp.registerModule("generateNftsUI", {
       });
       
       // Add dark mode toggle functionality - Radio toggle: when activated, deactivate Seed NFT
-      duplicateGenerateSeedBtn.addEventListener('click', function() {
+      duplicateGenerateSeedBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // CRITICAL: Check if button is disabled - if so, don't process click
+        if (this.disabled || this.classList.contains('disabled')) {
+          console.log('[DEBUG] Dark NFTs button click ignored - button is disabled');
+          return;
+        }
+        
+        // CRITICAL: Check if button has pointer-events: none
+        const computedStyle = window.getComputedStyle(this);
+        if (computedStyle.pointerEvents === 'none') {
+          console.log('[DEBUG] Dark NFTs button click ignored - pointer-events is none');
+          return;
+        }
+        
         const seedToggle = document.getElementById('single-seed-toggle');
         
         // Toggle Dark NFTs state
         this.classList.toggle('active');
         const isDarkActive = this.classList.contains('active');
+        
+        console.log('[DEBUG] Dark NFTs button clicked - isActive:', isDarkActive);
         
         if (isDarkActive) {
           // Dark NFTs is now active - deactivate Seed NFT if it was active
@@ -8653,19 +9615,30 @@ window.NFTApp.registerModule("generateNftsUI", {
           const isButtonDisabled = this.disabled || this.classList.contains('disabled') || 
                                    (darkNftsBtn && (darkNftsBtn.disabled || darkNftsBtn.classList.contains('disabled')));
           
+          console.log('[DEBUG] Dark NFTs change event - isActive:', isActive, 'isButtonDisabled:', isButtonDisabled);
+          
           if (isActive && !isButtonDisabled) {
             // Show edit button only when Dark NFTs is active and button is enabled
+            console.log('[DEBUG] Showing Dark NFTs edit button');
             editBtn.style.setProperty('visibility', 'visible', 'important');
             editBtn.style.setProperty('pointer-events', 'auto', 'important');
             editBtn.style.setProperty('display', 'flex', 'important');
-            setTimeout(() => editBtn.style.setProperty('opacity', '1', 'important'), 10);
+            editBtn.style.setProperty('z-index', '10000', 'important'); // Ensure it's above other elements
+            setTimeout(() => {
+              editBtn.style.setProperty('opacity', '1', 'important');
+            }, 10);
           } else {
             // Hide edit button when Dark NFTs is inactive or button is disabled
+            console.log('[DEBUG] Hiding Dark NFTs edit button');
             editBtn.style.setProperty('opacity', '0', 'important');
             editBtn.style.setProperty('visibility', 'hidden', 'important');
             editBtn.style.setProperty('pointer-events', 'none', 'important');
-            setTimeout(() => editBtn.style.setProperty('display', 'none', 'important'), 300);
+            setTimeout(() => {
+              editBtn.style.setProperty('display', 'none', 'important');
+            }, 300);
           }
+        } else {
+          console.warn('[DEBUG] Dark NFTs edit button not found in DOM');
         }
         
         // Update Create NFT button visual
@@ -8874,12 +9847,12 @@ function enableNftGenButtons() {
 // --- [HELPER: IS NONE FORCED BY RULES] ---
 function isNoneForcedByRules(layer, nft, projectData) {
   if (!layer || !layer.traits || !projectData || !projectData.rules || !projectData.rules.length) {
-    console.log('[DEBUG][isNoneForcedByRules] Early exit: missing layer/traits/projectData/rules', {layer, nft, projectData});
+    // console.log('[DEBUG][isNoneForcedByRules] Early exit: missing layer/traits/projectData/rules', {layer, nft, projectData});
     return false;
   }
   const generateNfts = window.NFTApp.getModule('generateNfts');
   if (!generateNfts || typeof generateNfts.checkForRuleViolations !== 'function') {
-    console.log('[DEBUG][isNoneForcedByRules] Early exit: generateNfts/checkForRuleViolations missing');
+    // console.log('[DEBUG][isNoneForcedByRules] Early exit: generateNfts/checkForRuleViolations missing');
     return false;
   }
   // Log the rules being checked for this layer
@@ -8889,7 +9862,7 @@ function isNoneForcedByRules(layer, nft, projectData) {
     }
     return false;
   });
-  console.log(`[DEBUG][isNoneForcedByRules] Checking layer '${layer.name}' (id: ${layer.id}) with relevant rules:`, relevantRules);
+  // console.log(`[DEBUG][isNoneForcedByRules] Checking layer '${layer.name}' (id: ${layer.id}) with relevant rules:`, relevantRules);
   let allForbidden = true;
   for (const trait of layer.traits) {
     // Simulate NFT with this trait selected for this layer
@@ -8903,28 +9876,28 @@ function isNoneForcedByRules(layer, nft, projectData) {
     const simulatedNFT = { ...nft, traits: simulatedTraits };
     const violations = generateNfts.checkForRuleViolations(simulatedNFT, projectData.rules);
     // Log the violations for this trait
-    console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}': violations:`, violations);
+    // console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}': violations:`, violations);
     // If any trait is allowed, not forced-none
     if (!violations || violations.length === 0) {
-      console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is allowed (no violations)`, {trait, layer, violations});
+      // console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is allowed (no violations)`, {trait, layer, violations});
       allForbidden = false;
       break;
     }
     // Only count as forced-none if every trait is forbidden by a never-combine rule that mentions this trait
     const hasNeverCombine = violations.some(v => v.includes('should never be combined') && v.includes(trait.name));
     if (!hasNeverCombine) {
-      console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is not forbidden by never-combine (no direct mention)`, {trait, layer, violations});
+      // console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is not forbidden by never-combine (no direct mention)`, {trait, layer, violations});
       allForbidden = false;
       break;
     } else {
-      console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is forbidden by never-combine (direct mention)`, {trait, layer, violations});
+      // console.log(`[DEBUG][isNoneForcedByRules] Trait '${trait.name}' in layer '${layer.name}' is forbidden by never-combine (direct mention)`, {trait, layer, violations});
     }
   }
-  if (allForbidden) {
-    console.log(`[DEBUG][isNoneForcedByRules] Layer '${layer.name}' is forced to none by rules (all traits forbidden by never-combine)`);
-  } else {
-    console.log(`[DEBUG][isNoneForcedByRules] Layer '${layer.name}' is NOT forced to none (at least one trait allowed)`);
-  }
+  // if (allForbidden) {
+  //   console.log(`[DEBUG][isNoneForcedByRules] Layer '${layer.name}' is forced to none by rules (all traits forbidden by never-combine)`);
+  // } else {
+  //   console.log(`[DEBUG][isNoneForcedByRules] Layer '${layer.name}' is NOT forced to none (at least one trait allowed)`);
+  // }
   return allForbidden;
 }
 // --- [END HELPER] ---
@@ -9433,7 +10406,7 @@ window.ensureNftPreviewContainerExists = function() {
   if (generateNftsUIModule && generateNftsUIModule.ensureNftPreviewContainerExists) {
     return generateNftsUIModule.ensureNftPreviewContainerExists();
   } else {
-    console.error('[DEBUG] generateNftsUI module or ensureNftPreviewContainerExists method not found');
+    // console.error('[DEBUG] generateNftsUI module or ensureNftPreviewContainerExists method not found');
     return false;
   }
 };
@@ -9596,4 +10569,5 @@ function setSeedListCounterColor(seedListCounter, count, total) {
     seedListCounter.style.color = '#fff'; // default
   }
 }
+
 
